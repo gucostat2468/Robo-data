@@ -150,6 +150,37 @@ class Api:
         })
         return base
 
+    def escritorio(self, q) -> dict:
+        """Eventos das etapas + números do dia por agente (alimenta o escritório 3D)."""
+        c = self.c
+        desde = int(q.get("desde", ["0"])[0])
+        dados = {"ligado": c.ligado, "erro_config": c.erro_config, "eventos": c.eventos_desde(desde),
+                 "ultimo_seq": c._seq_eventos, "fila": [], "agentes": {}}
+        if not c.cfg:
+            return dados
+        cfg = c.cfg
+        hoje = datetime.now().strftime("%Y-%m-%d")
+        h = [x for x in historico.ler(cfg.logs, 3000) if x.get("data_hora", "").startswith(hoje)]
+        ok = [x for x in h if x.get("status") == "sucesso"]
+        ruim = [x for x in h if x.get("status") == "reprovado"]
+        soma = lambda lista, campo: sum(int(x.get(campo) or 0) for x in lista)
+        com_banco = [x for x in ok if "tratado." in (x.get("saidas") or "")]
+        dados.update({
+            "fila": c.monitor.estado_fila() if c.monitor else [],
+            "banco_habilitado": bool(cfg.banco.get("habilitado")),
+            "agentes": {
+                "recepcao": {"valor": len(h), "rotulo": "arquivos recebidos hoje"},
+                "leitura": {"valor": soma(h, "linhas_entrada"), "rotulo": "linhas lidas hoje"},
+                "limpeza": {"valor": soma(ok, "linhas_entrada") - soma(ok, "linhas_saida"), "rotulo": "linhas descartadas hoje"},
+                "validacao": {"valor": len(ruim), "rotulo": "arquivos barrados hoje"},
+                "modelagem": {"valor": len(ok), "rotulo": "bases modeladas hoje"},
+                "banco": {"valor": soma(com_banco, "linhas_saida"), "rotulo": "linhas carregadas hoje",
+                          "inativo": not cfg.banco.get("habilitado")},
+                "publicacao": {"valor": len(ok), "rotulo": "planilhas publicadas hoje"},
+            },
+        })
+        return dados
+
     def historico(self, q) -> dict:
         limite = int(q.get("limite", ["500"])[0])
         return {"itens": historico.ler(self.cfg.logs, limite)}
@@ -222,6 +253,34 @@ class Api:
             return []
         return [{"nome": p.name, "ativo": not p.name.startswith("_")} for p in sorted(pasta.glob("*.sql"))]
 
+    def agentes(self, _q) -> dict:
+        from robo import skills
+        from robo.agentes import POSICOES
+        from robo.pipeline import obter_equipe
+        equipe = obter_equipe(self.cfg)
+        return {"agentes": equipe.lista(), "catalogo": skills.catalogo(), "erros_skills": list(skills.ERROS_CARGA),
+                "posicoes": POSICOES}
+
+    def agente_salvar(self, b) -> dict:
+        from robo.agentes import ErroAgente
+        from robo.pipeline import obter_equipe
+        try:
+            a = obter_equipe(self.cfg).salvar(b.get("agente") or {})
+        except ErroAgente as e:
+            raise ErroApi(str(e))
+        log.info("Agente %s salvo pelo painel", a.get("nome") or a.get("id"))
+        return {"ok": True, "id": a["id"]}
+
+    def agente_excluir(self, b) -> dict:
+        from robo.agentes import ErroAgente
+        from robo.pipeline import obter_equipe
+        try:
+            obter_equipe(self.cfg).excluir(str(b.get("id", "")))
+        except ErroAgente as e:
+            raise ErroApi(str(e))
+        log.info("Agente %s excluído (guardado em agentes/_excluidos)", b.get("id"))
+        return {"ok": True}
+
     def consultas(self, _q) -> dict:
         from robo import consultas
         return {"itens": consultas.listar(), "banco_habilitado": bool(self.cfg.banco.get("habilitado"))}
@@ -285,7 +344,7 @@ class Api:
         pastas = {"entrada": cfg.entrada, "tratadas": cfg.tratadas, "erros": cfg.erros, "originais": cfg.originais,
                   "relatorios": cfg.relatorios, "logs": cfg.logs,
                   "modelos": self._pasta_modelos(), "projeto": RAIZ_PROJETO,
-                  "consultas": RAIZ_PROJETO / "consultas_sql"}
+                  "consultas": RAIZ_PROJETO / "consultas_sql", "agentes": cfg.agentes, "skills": cfg.skills}
         if alvo in pastas:
             caminho = pastas[alvo]
             caminho.mkdir(parents=True, exist_ok=True)
@@ -451,7 +510,7 @@ class Api:
 
 ROTAS_GET = {
     "/api/ping": lambda api, q: {"app": "robo-planilhas", "versao": __version__},
-    "/api/estado": Api.estado, "/api/historico": Api.historico, "/api/execucao": Api.execucao,
+    "/api/estado": Api.estado, "/api/escritorio": Api.escritorio, "/api/agentes": Api.agentes, "/api/historico": Api.historico, "/api/execucao": Api.execucao,
     "/api/reprovados": Api.reprovados, "/api/log": Api.log, "/api/config": Api.config,
     "/api/banco/resumo": Api.banco_resumo, "/api/consultas": Api.consultas, "/api/consulta": Api.consulta,
 }
@@ -461,7 +520,8 @@ ROTAS_POST = {
     "/api/config/entrada": Api.definir_entrada, "/api/config/salvar": Api.salvar_config,
     "/api/config/recarregar": Api.recarregar, "/api/banco/testar": Api.banco_testar,
     "/api/banco/modelos": Api.banco_modelos, "/api/manutencao": Api.manutencao,
-    "/api/consultas/executar": Api.consulta_executar, "/api/inicializacao": Api.inicializacao, "/api/atalhos": Api.atalhos, "/api/sair": Api.sair,
+    "/api/consultas/executar": Api.consulta_executar, "/api/agentes/salvar": Api.agente_salvar,
+    "/api/agentes/excluir": Api.agente_excluir, "/api/inicializacao": Api.inicializacao, "/api/atalhos": Api.atalhos, "/api/sair": Api.sair,
 }
 ROTAS_UPLOAD = {"/api/testar": Api.testar, "/api/enviar": Api.enviar}
 

@@ -1,0 +1,68 @@
+/* Escritório 3D — camadas de interface por cima da cena */
+body.escritorio { overflow: hidden; background: #dfe6ef; }
+@media (prefers-color-scheme: dark) { body.escritorio { background: #10141c; } }
+#cena { position: fixed; inset: 0; }
+#cena canvas { display: block; outline: none; }
+
+.hud-topo {
+  position: fixed; top: 16px; left: 16px; right: 16px; z-index: 5;
+  display: flex; align-items: center; gap: 14px; pointer-events: none;
+}
+.hud-topo > * { pointer-events: auto; }
+.hud-titulo {
+  display: flex; align-items: center; gap: 10px; padding: 7px 14px 7px 10px; border-radius: 12px;
+  background: color-mix(in srgb, var(--superficie) 88%, transparent); backdrop-filter: blur(8px);
+  border: 1px solid var(--borda); box-shadow: var(--sombra);
+}
+.hud-titulo strong { display: block; font-size: 15px; }
+.hud-titulo span { display: flex; align-items: center; gap: 6px; font-size: 12.5px; color: var(--texto-3); }
+.hud-topo .acoes { margin-left: auto; }
+.hud-topo .btn { box-shadow: var(--sombra); }
+
+.hud-equipe {
+  position: fixed; top: 80px; right: 16px; z-index: 5; width: 290px; max-height: calc(100vh - 160px); overflow-y: auto;
+  background: color-mix(in srgb, var(--superficie) 90%, transparent); backdrop-filter: blur(10px);
+  border: 1px solid var(--borda); border-radius: var(--raio); box-shadow: var(--sombra-media); padding: 6px 0;
+}
+.hud-equipe h3 { font-size: 12px; text-transform: uppercase; letter-spacing: .05em; color: var(--texto-3); padding: 10px 16px 6px; }
+.membro { display: flex; align-items: center; gap: 10px; width: 100%; padding: 8px 14px; border: 0; background: transparent; text-align: left; cursor: pointer; }
+.membro:hover, .membro.selecionado { background: var(--superficie-2); }
+.membro .avatar { width: 30px; height: 30px; border-radius: 50%; display: grid; place-items: center; color: #fff; font-weight: 700; font-size: 13px; flex: none; }
+.membro .info { flex: 1; min-width: 0; }
+.membro .info strong { display: block; font-size: 13.5px; }
+.membro .info small { display: block; color: var(--texto-3); font-size: 12px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.membro .estado { font-size: 11.5px; font-weight: 700; padding: 2px 8px; border-radius: 10px; background: var(--superficie-2); color: var(--texto-3); white-space: nowrap; }
+.membro .estado.trabalhando { background: var(--info-suave); color: var(--info); }
+.membro .estado.ok { background: var(--sucesso-suave); color: var(--sucesso); }
+.membro .estado.erro { background: var(--perigo-suave); color: var(--perigo); }
+.membro .estado.desligado { opacity: .6; }
+
+.hud-ficha {
+  position: fixed; left: 16px; top: 80px; z-index: 6; width: 340px;
+  background: var(--superficie); border: 1px solid var(--borda); border-radius: var(--raio); box-shadow: var(--sombra-media);
+  padding: 18px; display: flex; flex-direction: column; gap: 10px; animation: entra .18s ease;
+}
+.hud-ficha header { display: flex; align-items: center; gap: 12px; }
+.hud-ficha header .avatar { width: 42px; height: 42px; border-radius: 50%; display: grid; place-items: center; color: #fff; font-weight: 700; font-size: 17px; }
+.hud-ficha h2 { font-size: 17px; }
+.hud-ficha p { margin: 0; color: var(--texto-2); }
+.hud-ficha .numero { font-size: 26px; font-weight: 650; font-variant-numeric: tabular-nums; }
+.hud-ficha .fechar { margin-left: auto; }
+
+.hud-rodape {
+  position: fixed; left: 16px; right: 322px; bottom: 16px; z-index: 5; display: flex; flex-direction: column; gap: 6px; pointer-events: none;
+}
+.hud-agora {
+  align-self: flex-start; max-width: 100%; padding: 10px 16px; border-radius: 12px; font-weight: 600;
+  background: color-mix(in srgb, var(--superficie) 92%, transparent); backdrop-filter: blur(8px);
+  border: 1px solid var(--borda); box-shadow: var(--sombra); overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+}
+.hud-dica { font-size: 12px; color: var(--texto-3); padding-left: 4px; text-shadow: 0 1px 0 rgba(255,255,255,.4); }
+.sem-3d { position: fixed; inset: 0; z-index: 20; display: grid; place-items: center; background: var(--fundo); }
+.sem-3d .cartao { max-width: 440px; }
+.sem-3d .cartao-corpo { display: flex; flex-direction: column; gap: 12px; }
+@media (max-width: 900px) {
+  .hud-equipe { display: none; }
+  .hud-rodape { right: 16px; }
+  .hud-topo .acoes .btn span, #btn-camera { display: none; }
+}

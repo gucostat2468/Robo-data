@@ -50,8 +50,11 @@ class ControleRobo:
         self._thread: threading.Thread | None = None
         self._parar = threading.Event()
         self._trava = threading.Lock()
+        self._trava_eventos = threading.Lock()
         self.ligado_desde: float | None = None
         self.memoria_log = MemoriaLog()
+        self.eventos = collections.deque(maxlen=400)   # etapas do pipeline, para o escritório 3D
+        self._seq_eventos = 0
         log.addHandler(self.memoria_log)
         self.carregar()
 
@@ -60,7 +63,7 @@ class ControleRobo:
         try:
             self.cfg = carregar_config(self.caminho_config)
             self.cfg.criar_pastas()
-            self.monitor = Monitor(self.cfg, ao_processar=self._apos_processar)
+            self.monitor = Monitor(self.cfg, ao_processar=self._apos_processar, ao_etapa=self._registrar_etapa)
             self.erro_config = None
         except ErroConfig as e:
             self.cfg, self.monitor, self.erro_config = None, None, str(e)
@@ -115,6 +118,16 @@ class ControleRobo:
             return False
         threading.Thread(target=lambda: self.monitor.ciclo(forcar=True), name="robo-agora", daemon=True).start()
         return True
+
+    # ------------------------------------------------------------ eventos do escritório
+    def _registrar_etapa(self, etapa: str, arquivo: str, **extra):
+        with self._trava_eventos:
+            self._seq_eventos += 1
+            self.eventos.append({"seq": self._seq_eventos, "ts": time.time(), "etapa": etapa, "arquivo": arquivo, **extra})
+
+    def eventos_desde(self, seq: int) -> list[dict]:
+        with self._trava_eventos:
+            return [e for e in self.eventos if e["seq"] > seq]
 
     # ------------------------------------------------------------ notificações
     def _apos_processar(self, r):

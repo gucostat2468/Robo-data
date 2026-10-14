@@ -89,7 +89,38 @@ def nome_base_tabela(caminho: Path, regra: dict) -> str:
     return normalizar_nome_coluna(destino.get("tabela") or caminho.stem)
 
 
-def _tratar(caminho: Path, cfg: Config, rel: Relatorio) -> _Tratamento:
+def _sinal(ao_etapa, etapa: str, arquivo: str, **extra):
+    """Avisa quem estiver ouvindo (o escritório 3D) que uma etapa começou. Nunca interrompe o processamento."""
+    if ao_etapa:
+        try:
+            ao_etapa(etapa, arquivo, **extra)
+        except Exception:
+            log.debug("Falha no aviso de etapa", exc_info=True)
+
+
+_CACHE_EQUIPE: dict = {}
+
+
+def obter_equipe(cfg: Config):
+    """Equipe de agentes, recarregada sozinha quando algum arquivo de agentes/ ou skills_personalizadas/ muda."""
+    from robo.agentes import Equipe
+
+    def assinatura(pasta: Path):
+        if not pasta.exists():
+            return ()
+        return tuple(sorted((p.name, p.stat().st_mtime_ns) for p in pasta.iterdir() if p.is_file()))
+
+    chave = (str(cfg.agentes), str(cfg.skills))
+    marca = (assinatura(cfg.agentes), assinatura(cfg.skills))
+    guardado = _CACHE_EQUIPE.get(chave)
+    if guardado and guardado[0] == marca:
+        return guardado[1]
+    equipe = Equipe(cfg.agentes, cfg.skills)
+    _CACHE_EQUIPE[chave] = (marca, equipe)
+    return equipe
+
+
+def _tratar(caminho: Path, cfg: Config, rel: Relatorio, ao_etapa=None) -> _Tratamento:
     t = _Tratamento(regra=cfg.regra_para(caminho.name))
     if t.regra:
         rel.info(f"Regra aplicada: padrão '{t.regra.get('padrao')}'")
@@ -97,6 +128,7 @@ def _tratar(caminho: Path, cfg: Config, rel: Relatorio) -> _Tratamento:
     if caminho.suffix.lower() not in EXTENSOES_SUPORTADAS:
         rel.erro(f"Formato '{caminho.suffix}' não suportado. Envie .xlsx, .xlsm, .xls, .csv ou .txt")
         return t
+    _sinal(ao_etapa, "leitura", caminho.name)
     try:
         t.brutas = ler_arquivo(caminho, abas=t.regra.get("abas", cfg.leitura["abas"]),
                                linhas_busca_cabecalho=int(cfg.leitura["linhas_busca_cabecalho"]))
@@ -108,14 +140,21 @@ def _tratar(caminho: Path, cfg: Config, rel: Relatorio) -> _Tratamento:
         return t
 
     t.linhas_entrada = sum(len(df) for df in t.brutas.values())
+    equipe = obter_equipe(cfg)
     unica = len(t.brutas) == 1
     t.modelo = t.regra.get("modelo") if unica else None
     for aba, bruto in t.brutas.items():
         nome = normalizar_nome_coluna(cfg.saida["nome_aba"]) if unica else normalizar_nome_coluna(aba)
         rel.info(f"Aba '{aba}' lida: cabeçalho na linha {bruto.attrs.get('linha_cabecalho', '?')}, "
                  f"{len(bruto)} linhas, {len(bruto.columns)} colunas", tabela=nome)
+        _sinal(ao_etapa, "limpeza", caminho.name)
         limpo = limpar_tabela(bruto, nome, cfg.limpeza, t.regra, rel)
+        limpo = equipe.executar("limpeza", limpo, rel, nome, caminho.name, ao_etapa)
+        _sinal(ao_etapa, "validacao", caminho.name)
         validar_tabela(limpo, nome, t.regra, rel)
+        limpo = equipe.executar("validacao", limpo, rel, nome, caminho.name, ao_etapa)
+        limpo = equipe.executar("modelagem", limpo, rel, nome, caminho.name, ao_etapa)
+        _sinal(ao_etapa, "modelagem", caminho.name)
         for nome_final, df in modelar(limpo, nome, t.modelo, rel).items():
             t.tabelas[nome_final] = df.reset_index(drop=True)
 
@@ -180,15 +219,16 @@ def _dados_lote(caminho, lote_id, rel: Relatorio, t: _Tratamento, gravadas, apro
     }
 
 
-def processar_arquivo(caminho: str | Path, cfg: Config, gravar: bool = True) -> Resultado:
-    """gravar=False = modo diagnóstico: só analisa; não grava, não carrega no banco e não move nada."""
+def processar_arquivo(caminho: str | Path, cfg: Config, gravar: bool = True, ao_etapa=None) -> Resultado:
+    """gravar=False = modo diagnóstico: só analisa; não grava, não carrega no banco e não move nada.
+    ao_etapa(etapa, arquivo, **extra): chamado no início de cada etapa (usado pelo escritório 3D)."""
     inicio = time.perf_counter()
     caminho = Path(caminho)
     rel = Relatorio(arquivo=caminho.name)
     log.info("Processando %s" if gravar else "Testando %s (sem gravar nada)", caminho.name)
 
     try:
-        t = _tratar(caminho, cfg, rel)
+        t = _tratar(caminho, cfg, rel, ao_etapa if gravar else None)
     except Exception as e:  # erro inesperado: nunca deixa o robô cair
         log.exception("Falha inesperada ao tratar %s", caminho.name)
         rel.erro(f"Falha inesperada: {type(e).__name__}: {e}")
@@ -209,14 +249,17 @@ def processar_arquivo(caminho: str | Path, cfg: Config, gravar: bool = True) -> 
     # ---- carga no banco (antes dos arquivos: se o banco recusar, o arquivo não é publicado)
     if cfg.banco.get("habilitado"):
         from robo.banco import ErroBancoIndisponivel
+        _sinal(ao_etapa, "banco", caminho.name)
         try:
             r.tabelas_banco = _carregar_banco(cfg, caminho, t, rel, r.id, aprovado=not rel.tem_erros)
         except ErroBancoIndisponivel as e:
+            _sinal(ao_etapa, "adiado", caminho.name)
             return _adiar(r, inicio, f"PostgreSQL indisponível: {e}")
         except Exception as e:
             log.exception("Falha inesperada no banco ao carregar %s", caminho.name)
             rel.erro(f"Falha inesperada no PostgreSQL: {type(e).__name__}: {e}")
 
+    _sinal(ao_etapa, "publicacao", caminho.name)
     if rel.tem_erros:
         r.status = REPROVADO
         r.linhas_saida = 0
@@ -233,6 +276,7 @@ def processar_arquivo(caminho: str | Path, cfg: Config, gravar: bool = True) -> 
             try:
                 r.saidas, avisos = gravar_tabelas(t.tabelas, cfg.tratadas, nome_base, cfg.saida)
             except PermissionError:
+                _sinal(ao_etapa, "adiado", caminho.name)
                 return _adiar(r, inicio, "o arquivo de saída está aberto (feche o Excel/Power BI)")
             for a in avisos:
                 rel.aviso(a)
@@ -244,6 +288,8 @@ def processar_arquivo(caminho: str | Path, cfg: Config, gravar: bool = True) -> 
 
     r.duracao = time.perf_counter() - inicio
     _registrar(cfg, r)
+    _sinal(ao_etapa, "concluido", caminho.name, status=r.status, linhas=r.linhas_saida,
+           erros=len(rel.erros), banco=bool(r.tabelas_banco))
     return r
 
 

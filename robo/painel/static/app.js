@@ -34,6 +34,11 @@ const ICONES = {
   editar: '<path d="M4 20h4L19 9l-4-4L4 16z"/><path d="m13.5 6.5 4 4"/>',
   codigo: '<path d="m8 8-4 4 4 4"/><path d="m16 8 4 4-4 4"/><path d="m13.5 5-3 14"/>',
   copiar: '<rect x="8" y="8" width="12" height="12" rx="2"/><path d="M16 8V5a1 1 0 0 0-1-1H5a1 1 0 0 0-1 1v10a1 1 0 0 0 1 1h3"/>',
+  cubo: '<path d="M12 2 3 7v10l9 5 9-5V7z"/><path d="m3 7 9 5 9-5"/><path d="M12 12v10"/>',
+  equipe: '<circle cx="9" cy="8" r="3.2"/><path d="M3 20a6 6 0 0 1 12 0"/><circle cx="17.5" cy="9" r="2.5"/><path d="M16 14.2a5 5 0 0 1 6 4.8"/>',
+  mais: '<path d="M12 5v14M5 12h14"/>',
+  cima: '<path d="m6 15 6-6 6 6"/>',
+  baixo: '<path d="m6 9 6 6 6-6"/>',
   atalho: '<rect x="3" y="4" width="18" height="13" rx="2"/><path d="M8 21h8M12 17v4"/>',
 };
 const icone = (nome, classe = "") => `<svg class="icone ${classe}" viewBox="0 0 24 24" aria-hidden="true">${ICONES[nome] || ""}</svg>`;
@@ -128,6 +133,7 @@ const E = {
   reprovados: null, assinaturaRep: "",
   teste: null, arquivoTeste: null, abaTeste: 0,
   config: null, banco: null,
+  equipe: null, editando: null, catalogoAberto: false, buscaSkill: "",
   consultas: null, consultaAtual: null, resultadoConsulta: null, buscaConsulta: "",
   log: [], logSeq: 0, logFiltro: "todos", autoRolar: true,
 };
@@ -147,6 +153,7 @@ const PAGINAS = {
   testar: { titulo: "Testar planilha", render: renderTestar },
   banco: { titulo: "Banco de dados", render: renderBanco, carregar: carregarBanco },
   consultas: { titulo: "Consultas SQL", render: renderConsultas, carregar: carregarConsultas },
+  agentes: { titulo: "Agentes e skills", render: renderAgentes, carregar: carregarAgentes },
   atividade: { titulo: "Atividade", render: renderAtividade },
   configuracoes: { titulo: "Configurações", render: renderConfig, carregar: carregarConfig },
 };
@@ -416,7 +423,8 @@ function abrirGaveta(html) {
 }
 function fecharGaveta() {
   const g = $("#gaveta");
-  g.classList.remove("aberta"); g.setAttribute("aria-hidden", "true");
+  g.classList.remove("aberta", "larga");
+  E.editando = null; g.setAttribute("aria-hidden", "true");
   $("#gaveta-fundo").hidden = true;
 }
 
@@ -560,6 +568,148 @@ function renderBanco() {
       Servidor <code>${esc(cfgB.host || "localhost")}:${esc(cfgB.porta || 5432)}</code>, Banco <code>${esc(cfgB.banco || "robo_dados")}</code>.
       Use as tabelas de <b>tratado</b> e as visões de <b>analitico</b>.</p></div>`;
 }
+
+// ------------------------------------------------------------------ agentes e skills
+const POSICAO_TEXTO = { limpeza: "Depois da Limpeza", validacao: "Depois da Auditoria", modelagem: "Antes da Modelagem" };
+
+async function carregarAgentes() {
+  try { E.equipe = await api("/api/agentes"); } catch (e) { avisar(e.message, "erro"); }
+}
+
+const avatar = (a, classe = "avatar") => `<span class="${classe}" style="background:${esc(a.cor)}">${esc((a.nome || "?").slice(0, 1).toUpperCase())}</span>`;
+
+function renderAgentes() {
+  const acoes = `<button class="btn" data-acao="abrir" data-alvo="skills">${icone("pasta")}Skills em Python</button>
+    <a class="btn" href="escritorio.html">${icone("cubo")}Ver no escritório 3D</a>
+    <button class="btn primario" data-acao="novo-agente">${icone("mais")}Novo agente</button>`;
+  if (!E.equipe) return cabecalho("Agentes e skills", "", acoes) + `<div class="carregando">Carregando…</div>`;
+  const erros = E.equipe.erros_skills || [];
+  return cabecalho("Agentes e skills", "Cada agente é uma etapa do robô. Monte sua equipe e dê a cada um as skills (habilidades) da tarefa dele.", acoes) +
+    (erros.length ? `<div class="ocorrencia erro"><div class="principal"><strong>Skills personalizadas com problema</strong><div class="exemplos">${erros.map((x) => `<span>${esc(x)}</span>`).join("")}</div></div></div>` : "") +
+    `<div class="dica">${icone("info")}<p>A ordem abaixo é a ordem real de trabalho. Agentes nativos fazem o essencial; os seus agentes e as skills extras
+      entram depois da <b>Limpeza</b>, depois da <b>Auditoria</b> ou antes da <b>Modelagem</b>. Qualquer skill que encontrar erro <b>reprova o arquivo</b> — nada sai pela metade.</p></div>
+    <section class="equipe">${E.equipe.agentes.map((a, i) => `<article class="cartao agente ${a.ativo ? "" : "inativo"}" data-acao="editar-agente" data-id="${esc(a.id)}">
+      <span class="ordem-agente">${i + 1}º</span>
+      <div class="agente-topo">${avatar(a)}<div><strong>${esc(a.nome)}</strong><small>${esc(a.papel || "")}</small></div></div>
+      <p>${esc(a.descricao || "Sem descrição.")}</p>
+      <div class="chips-colunas">
+        ${a.nativo ? `<span class="etiqueta">nativo</span>` : `<span class="etiqueta info">${esc(POSICAO_TEXTO[a.posicao] || a.posicao)}</span>`}
+        ${a.aceita_skills ? `<span class="etiqueta ${a.skills.length ? "sucesso" : ""}">${a.skills.length} skill(s)</span>` : ""}
+        ${!a.nativo && (a.aplicar_em || []).join(",") !== "*" ? `<span class="etiqueta">${esc(a.aplicar_em.join(", "))}</span>` : ""}
+        ${a.ativo ? "" : `<span class="etiqueta alerta">desligado</span>`}
+        ${(a.problemas || []).length ? `<span class="etiqueta perigo">${icone("alerta")}configuração inválida</span>` : ""}
+      </div></article>`).join("")}</section>`;
+}
+
+function editorAgente() {
+  const a = E.editando, cat = E.equipe.catalogo;
+  const porId = Object.fromEntries(cat.map((s) => [s.id, s]));
+  const campoParam = (sk, i, par, valor) => {
+    const id = `p-${i}-${par.nome}`, nome = `${esc(par.rotulo)}${par.obrigatorio ? " *" : ""}`;
+    const ajuda = par.ajuda ? `<small>${esc(par.ajuda).replace(/\n/g, "<br>")}</small>` : "";
+    const v = valor ?? par.padrao ?? "";
+    const attrs = `id="${id}" data-skill="${i}" data-param="${esc(par.nome)}" data-tipo="${par.tipo}"`;
+    if (par.tipo === "booleano") return `<label>${nome}${ajuda}<span>${chave(Boolean(v), "alternar-local", attrs)}</span></label>`;
+    if (par.tipo === "escolha") return `<label>${nome}${ajuda}<select ${attrs}>${par.opcoes.map((o) => `<option ${String(v) === String(o) ? "selected" : ""}>${esc(o)}</option>`).join("")}</select></label>`;
+    if (par.tipo === "mapa") {
+      const texto = typeof v === "object" ? Object.entries(v).map(([k, x]) => `${k}=${x}`).join("\n") : v;
+      return `<label class="inteiro">${nome}${ajuda}<textarea ${attrs}>${esc(texto)}</textarea></label>`;
+    }
+    const texto = Array.isArray(v) ? v.join(", ") : v;
+    const tipo = par.tipo === "numero" || par.tipo === "inteiro" ? "number" : "text";
+    return `<label class="${par.tipo === "expressao" ? "inteiro" : ""}">${nome}${ajuda}<input type="${tipo}" step="any" ${attrs} value="${esc(texto)}" ${par.tipo === "expressao" ? 'class="mono"' : ""}></label>`;
+  };
+  const skillsHtml = (a.skills || []).map((cfgSk, i) => {
+    const sk = porId[cfgSk.skill];
+    if (!sk) return `<div class="ocorrencia erro"><div class="principal"><strong>Skill “${esc(cfgSk.skill)}” não existe no catálogo</strong></div>
+      <button class="btn pequeno perigo" data-acao="remover-skill" data-i="${i}">${icone("lixeira")}</button></div>`;
+    return `<div class="skill-cartao ${cfgSk.ativo === false ? "desligada" : ""}">
+      <div class="skill-cab"><b class="contador">${i + 1}</b><div class="principal"><strong>${esc(sk.nome)}</strong><small>${esc(sk.categoria)} · ${esc(sk.descricao)}</small></div>
+        ${chave(cfgSk.ativo !== false, "alternar-local", `data-skill-ativa="${i}" title="Ligar/desligar"`)}
+        <button class="btn fantasma pequeno" data-acao="mover-skill" data-i="${i}" data-d="-1" title="Subir" ${i === 0 ? "disabled" : ""}>${icone("cima")}</button>
+        <button class="btn fantasma pequeno" data-acao="mover-skill" data-i="${i}" data-d="1" title="Descer" ${i === a.skills.length - 1 ? "disabled" : ""}>${icone("baixo")}</button>
+        <button class="btn fantasma pequeno" data-acao="remover-skill" data-i="${i}" title="Remover">${icone("lixeira")}</button></div>
+      <div class="skill-corpo">
+        ${sk.parametros.length ? `<div class="form">${sk.parametros.map((par) => campoParam(sk, i, par, (cfgSk.parametros || {})[par.nome])).join("")}</div>` : `<p class="muted">Sem parâmetros.</p>`}
+        ${sk.conhecimento ? `<details class="conhecimento"><summary>Conhecimento: quando usar e cuidados</summary><pre>${esc(sk.conhecimento)}</pre></details>` : ""}
+      </div></div>`;
+  }).join("");
+
+  const busca = E.buscaSkill.trim().toLowerCase();
+  let grupo = "";
+  const catalogoHtml = cat.filter((s) => !busca || `${s.nome} ${s.descricao} ${s.categoria}`.toLowerCase().includes(busca)).map((s) => {
+    let h = "";
+    if (s.categoria !== grupo) { grupo = s.categoria; h += `<div class="grupo">${esc(grupo)}</div>`; }
+    return h + `<button data-acao="adicionar-skill" data-skill="${esc(s.id)}"><strong>${esc(s.nome)}</strong><small>${esc(s.descricao)}</small></button>`;
+  }).join("");
+
+  const nativoInfo = a.nativo ? `<p class="muted" style="margin:0">${esc(a.descricao)}</p>` : `
+    <div class="form">
+      <label>Nome<input type="text" id="ag-nome" value="${esc(a.nome)}" placeholder="Ex.: Tina"></label>
+      <label>Função<input type="text" id="ag-papel" value="${esc(a.papel)}" placeholder="Ex.: Contatos e LGPD"></label>
+      <label class="inteiro">O que faz<input type="text" id="ag-descricao" value="${esc(a.descricao)}" placeholder="Uma frase para a equipe entender o papel dele"></label>
+      <label>Quando trabalha<select id="ag-posicao">${E.equipe.posicoes.map((p) => `<option value="${p}" ${a.posicao === p ? "selected" : ""}>${POSICAO_TEXTO[p]}</option>`).join("")}</select></label>
+      <label>Ordem (menor trabalha antes)<input type="number" id="ag-ordem" value="${esc(a.ordem ?? 50)}"></label>
+      <label>Arquivos que ele trata<input type="text" id="ag-aplicar" value="${esc((a.aplicar_em || ["*"]).join(", "))}"><small>* = todos · nps_* = só os que começam com nps_</small></label>
+      <label>Cor no escritório<input type="color" id="ag-cor" value="${esc(a.cor || "#64748b")}"></label>
+    </div>
+    <div class="opcao"><div><strong>Agente ligado</strong><small>Desligado, ele não trabalha (mas a configuração fica guardada).</small></div>${chave(a.ativo !== false, "alternar-local", 'id="ag-ativo"')}</div>`;
+
+  return `<div class="gaveta-cab">${avatar(a, "avatar")}
+      <div style="flex:1"><div class="muted">${a.nativo ? "Agente nativo" : a.id ? "Agente personalizado" : "Novo agente"}</div><h2>${esc(a.nome || "Novo agente")}${a.papel ? ` · ${esc(a.papel)}` : ""}</h2></div>
+      <button class="btn fantasma" data-acao="fechar-gaveta" aria-label="Fechar">${icone("x")}</button></div>
+    <div class="gaveta-corpo">
+      ${(a.problemas || []).length ? `<div class="ocorrencia erro"><div class="principal"><strong>Configuração inválida</strong><div class="exemplos">${a.problemas.map((x) => `<span>${esc(x)}</span>`).join("")}</div></div></div>` : ""}
+      ${nativoInfo}
+      ${a.aceita_skills === false ? `<div class="dica">${icone("info")}<p>Este agente faz uma tarefa de infraestrutura (ler, carregar ou arquivar) e não usa skills de dados.</p></div>` : `
+      <div><div class="secao-titulo">Skills — executadas de cima para baixo</div>
+        <div style="display:flex;flex-direction:column;gap:10px">${skillsHtml || `<p class="muted">Nenhuma skill ainda. Adicione do catálogo abaixo.</p>`}</div></div>
+      <div><div class="secao-titulo">Catálogo de skills (${cat.length})</div>
+        ${E.catalogoAberto ? `<label class="campo-busca" style="max-width:none;margin-bottom:10px">${icone("busca")}<input type="text" id="busca-skill" placeholder="Buscar skill…" value="${esc(E.buscaSkill)}"></label>
+          <div class="catalogo" id="catalogo-skills">${catalogoHtml}</div>`
+        : `<button class="btn" data-acao="abrir-catalogo">${icone("mais")}Adicionar skill</button>`}</div>`}
+      <div class="acoes" style="justify-content:space-between;border-top:1px solid var(--borda);padding-top:16px">
+        <div>${!a.nativo && a.id && E.equipe.agentes.some((x) => x.id === a.id) ? `<button class="btn perigo" data-acao="excluir-agente">${icone("lixeira")}Excluir agente</button>` : ""}</div>
+        <div class="acoes"><button class="btn" data-acao="fechar-gaveta">Cancelar</button>
+        ${a.aceita_skills === false ? "" : `<button class="btn primario" data-acao="salvar-agente">${icone("ok")}Salvar agente</button>`}</div>
+      </div>
+    </div>`;
+}
+
+function coletarEditor() {
+  const a = E.editando; if (!a) return;
+  const ler = (id) => $(`#${id}`);
+  if (!a.nativo && ler("ag-nome")) {
+    a.nome = ler("ag-nome").value.trim(); a.papel = ler("ag-papel").value.trim(); a.descricao = ler("ag-descricao").value.trim();
+    a.posicao = ler("ag-posicao").value; a.ordem = Number(ler("ag-ordem").value) || 50; a.cor = ler("ag-cor").value;
+    a.aplicar_em = ler("ag-aplicar").value.split(",").map((x) => x.trim()).filter(Boolean);
+    a.ativo = ler("ag-ativo").getAttribute("aria-checked") === "true";
+  }
+  (a.skills || []).forEach((s, i) => {
+    const liga = $(`[data-skill-ativa="${i}"]`);
+    if (liga) s.ativo = liga.getAttribute("aria-checked") === "true";
+    s.parametros = s.parametros || {};
+    document.querySelectorAll(`[data-skill="${i}"][data-param]`).forEach((el) => {
+      const tipo = el.dataset.tipo;
+      let v = tipo === "booleano" ? el.getAttribute("aria-checked") === "true" : el.value;
+      if (tipo === "colunas" || tipo === "lista") v = String(v).split(",").map((x) => x.trim()).filter(Boolean);
+      if (tipo === "mapa") {
+        const mapa = {};
+        String(v).split("\n").forEach((linha) => { const k = linha.indexOf("="); if (k > 0) mapa[linha.slice(0, k).trim()] = linha.slice(k + 1).trim(); });
+        v = Object.keys(mapa).length ? mapa : "";
+      }
+      if ((tipo === "numero" || tipo === "inteiro") && v !== "") v = Number(v);
+      if (v === "" || (Array.isArray(v) && !v.length)) delete s.parametros[el.dataset.param]; else s.parametros[el.dataset.param] = v;
+    });
+  });
+}
+
+function abrirEditor(agente) {
+  E.editando = JSON.parse(JSON.stringify(agente)); E.catalogoAberto = false; E.buscaSkill = "";
+  abrirGaveta(editorAgente());
+  $("#gaveta").classList.add("larga");
+}
+const redesenharEditor = () => { const rolagem = $(".gaveta-corpo")?.scrollTop || 0; abrirGaveta(editorAgente()); $("#gaveta").classList.add("larga"); const c = $(".gaveta-corpo"); if (c) c.scrollTop = rolagem; };
 
 // ------------------------------------------------------------------ consultas SQL
 async function carregarConsultas() {
@@ -838,6 +988,39 @@ const ACOES = {
     avisar(r.ok ? `Modelos executados: ${r.executados.join(", ") || "nenhum"}` : r.mensagem, r.ok ? "sucesso" : "erro");
     await carregarBanco(); desenhar();
   }),
+  "novo-agente": () => abrirEditor({ id: "", nome: "", papel: "", descricao: "", cor: "#f97316", posicao: "limpeza", ordem: 50,
+    ativo: true, aplicar_em: ["*"], skills: [], nativo: false, aceita_skills: true }),
+  "editar-agente": (el) => { const a = E.equipe.agentes.find((x) => x.id === el.dataset.id); if (a) abrirEditor(a); },
+  "abrir-catalogo": () => { coletarEditor(); E.catalogoAberto = true; redesenharEditor(); $("#busca-skill")?.focus(); },
+  "adicionar-skill": (el) => {
+    coletarEditor();
+    E.editando.skills.push({ skill: el.dataset.skill, ativo: true, parametros: {} });
+    E.catalogoAberto = false; E.buscaSkill = ""; redesenharEditor();
+    avisar("Skill adicionada. Preencha os campos com * e salve.");
+  },
+  "remover-skill": (el) => { coletarEditor(); E.editando.skills.splice(Number(el.dataset.i), 1); redesenharEditor(); },
+  "mover-skill": (el) => {
+    coletarEditor();
+    const i = Number(el.dataset.i), j = i + Number(el.dataset.d), l = E.editando.skills;
+    [l[i], l[j]] = [l[j], l[i]]; redesenharEditor();
+  },
+  "salvar-agente": (el) => comCarregando(el, async () => {
+    coletarEditor();
+    const a = E.editando;
+    if (!a.nativo && !a.id) a.id = (a.nome || "agente").normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase().replace(/[^a-z0-9]+/g, "_").replace(/^_|_$/g, "").replace(/^(\d)/, "a_$1").slice(0, 40) || "agente";
+    const corpo = { id: a.id, skills: a.skills };
+    if (!a.nativo) Object.assign(corpo, { nome: a.nome, papel: a.papel, descricao: a.descricao, cor: a.cor, posicao: a.posicao, ordem: a.ordem, ativo: a.ativo, aplicar_em: a.aplicar_em });
+    await api("/api/agentes/salvar", { corpo: { agente: corpo } });
+    avisar(`${a.nome} salvo! Já vale para as próximas planilhas.`, "sucesso");
+    fecharGaveta(); await carregarAgentes(); desenhar();
+  }),
+  "excluir-agente": async () => {
+    const a = E.editando;
+    const ok = await confirmar({ titulo: `Excluir ${a.nome}?`, texto: "A configuração vai para agentes/_excluidos (dá para recuperar).", botao: "Excluir", perigo: true });
+    if (!ok) return;
+    try { await api("/api/agentes/excluir", { corpo: { id: a.id } }); avisar("Agente excluído."); fecharGaveta(); await carregarAgentes(); desenhar(); }
+    catch (e) { avisar(e.message, "erro"); }
+  },
   "abrir-consulta": (el) => abrirConsulta(el.dataset.id),
   "executar-consulta": async () => {
     if (!E.consultaAtual) return;
@@ -878,6 +1061,11 @@ document.addEventListener("click", (ev) => {
 $("#gaveta-fundo").addEventListener("click", fecharGaveta);
 document.addEventListener("keydown", (e) => { if (e.key === "Escape") fecharGaveta(); });
 document.addEventListener("input", (e) => {
+  if (e.target.id === "busca-skill") {
+    E.buscaSkill = e.target.value;
+    const tmp = document.createElement("div"); tmp.innerHTML = editorAgente();
+    $("#catalogo-skills").innerHTML = $("#catalogo-skills", tmp).innerHTML;
+  }
   if (e.target.id === "busca-consulta") { E.buscaConsulta = e.target.value; $("#lista-consultas").innerHTML = listaConsultas(); }
   if (e.target.id === "busca-historico") { E.busca = e.target.value; $("#corpo-historico").innerHTML = linhasHistorico(); }
 });

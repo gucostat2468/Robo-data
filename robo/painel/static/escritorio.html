@@ -1,0 +1,48 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Escritório dos Robôs</title>
+<link rel="icon" href="robo.svg" type="image/svg+xml">
+<link rel="stylesheet" href="app.css">
+<link rel="stylesheet" href="escritorio.css">
+<script type="importmap">{ "imports": { "three": "./vendor/three.module.min.js" } }</script>
+</head>
+<body class="escritorio">
+<div id="cena" aria-label="Escritório 3D com os agentes do robô"></div>
+
+<header class="hud-topo">
+  <a class="btn" href="index.html#inicio" title="Voltar ao painel"><svg class="icone" viewBox="0 0 24 24"><path d="M19 12H5"/><path d="m11 6-6 6 6 6"/></svg>Painel</a>
+  <div class="hud-titulo">
+    <img src="robo.svg" width="28" height="28" alt="">
+    <div><strong>Escritório dos Robôs</strong><span id="hud-status"><i class="ponto"></i>Conectando…</span></div>
+  </div>
+  <div class="acoes">
+    <button class="btn" id="btn-enviar"><svg class="icone" viewBox="0 0 24 24"><path d="M12 16V4"/><path d="m7 9 5-5 5 5"/><path d="M4 16v3a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1v-3"/></svg>Enviar planilha</button>
+    <button class="btn" id="btn-agora"><svg class="icone" viewBox="0 0 24 24"><path d="M13 2 4 14h7l-1 8 9-12h-7z"/></svg>Processar agora</button>
+    <button class="btn" id="btn-camera" title="Voltar à visão geral"><svg class="icone" viewBox="0 0 24 24"><path d="M3 7V5a2 2 0 0 1 2-2h2M17 3h2a2 2 0 0 1 2 2v2M21 17v2a2 2 0 0 1-2 2h-2M7 21H5a2 2 0 0 1-2-2v-2"/></svg>Visão geral</button>
+  </div>
+</header>
+
+<aside class="hud-equipe" id="hud-equipe" aria-label="Equipe"></aside>
+
+<section class="hud-ficha" id="hud-ficha" hidden></section>
+
+<footer class="hud-rodape">
+  <div class="hud-agora" id="hud-agora">Aguardando planilhas em Bases-Limpeza…</div>
+  <div class="hud-dica">Arraste para girar · role para aproximar · clique num agente para saber o que ele faz</div>
+</footer>
+
+<div class="sem-3d" id="sem-3d" hidden>
+  <div class="cartao"><div class="cartao-corpo">
+    <h2>Seu computador não conseguiu desenhar o 3D</h2>
+    <p class="muted">A placa de vídeo ou o navegador não liberou o WebGL. O robô continua funcionando normalmente.</p>
+    <a class="btn primario" href="index.html#inicio">Voltar ao painel</a>
+  </div></div>
+</div>
+<div class="avisos" id="avisos"></div>
+
+<script type="module" src="escritorio.js"></script>
+</body>
+</html>

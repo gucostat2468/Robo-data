@@ -19,7 +19,8 @@ def pastas(tmp_path: Path):
 @pytest.fixture
 def cfg_factory(pastas, tmp_path):
     def _fazer(regras=None, **extra):
-        sobrescrever = {"pastas": {"entrada": str(pastas / "Bases-Limpeza"), "logs": str(tmp_path / "logs")},
+        sobrescrever = {"pastas": {"entrada": str(pastas / "Bases-Limpeza"), "logs": str(tmp_path / "logs"),
+                                   "agentes": str(tmp_path / "agentes"), "skills": str(tmp_path / "skills")},
                         "regras": regras or [], **extra}
         return carregar_config(tmp_path / "nao_existe.yaml", sobrescrever=sobrescrever)
     return _fazer

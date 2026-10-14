@@ -45,7 +45,7 @@ def pode_abrir(caminho: Path) -> bool:
 
 
 class Monitor:
-    def __init__(self, cfg: Config, ao_processar=None):
+    def __init__(self, cfg: Config, ao_processar=None, ao_etapa=None):
         self.cfg = cfg
         self.intervalo = float(cfg.monitoramento["intervalo_segundos"])
         self.espera = float(cfg.monitoramento["espera_estabilidade_segundos"])
@@ -54,6 +54,7 @@ class Monitor:
         self._ultima_manutencao: date | None = None
         self._trava = threading.Lock()
         self.ao_processar = ao_processar      # função chamada com cada Resultado (painel/notificações)
+        self.ao_etapa = ao_etapa              # função chamada a cada etapa (escritório 3D)
         self.processando: str | None = None
         self.em_uso: set[str] = set()
         self.adiados: dict[str, str] = {}     # nome -> motivo
@@ -84,6 +85,8 @@ class Monitor:
                 self._vistos[arq] = (*assinatura, agora)
                 if anterior is None:
                     log.info("Novo arquivo detectado: %s (aguardando sincronização terminar)", arq.name)
+                    if self.ao_etapa:
+                        self.ao_etapa("recepcao", arq.name)
                 if not forcar:
                     continue
                 anterior = self._vistos[arq]
@@ -97,7 +100,7 @@ class Monitor:
             self.em_uso.discard(arq.name)
             self.processando = arq.name
             try:
-                r = processar_arquivo(arq, self.cfg)
+                r = processar_arquivo(arq, self.cfg, ao_etapa=self.ao_etapa)
             except Exception:
                 log.exception("Erro ao processar %s; nova tentativa no próximo ciclo", arq.name)
                 self._vistos[arq] = (*assinatura, agora)

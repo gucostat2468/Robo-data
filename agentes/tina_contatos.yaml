@@ -1,0 +1,28 @@
+# Agente de EXEMPLO (desligado: ativo: false). Ligue pelo painel em "Agentes e skills" ou troque para true.
+# Padroniza contatos e classifica o NPS das bases de pesquisa (arquivos que começam com nps_).
+id: tina_contatos
+nome: Tina
+papel: Contatos e NPS
+descricao: Padroniza telefones e e-mails para o closed loop com detratores e cria a coluna grupo_nps.
+cor: '#F97316'
+posicao: limpeza
+ordem: 10
+ativo: false
+aplicar_em:
+- nps_*
+skills:
+- skill: validar_email
+  ativo: true
+  parametros:
+    colunas: [email]
+    invalidos: vazio
+- skill: normalizar_telefone
+  ativo: true
+  parametros:
+    colunas: [telefone]
+    formato: formatado
+    invalidos: aviso
+- skill: classificar_nps
+  ativo: true
+  parametros:
+    coluna: nota_nps

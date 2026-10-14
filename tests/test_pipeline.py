@@ -118,3 +118,11 @@ def test_csv_saida(planilha_baguncada, cfg_factory):
     assert r.status == SUCESSO
     df = pd.read_csv(cfg.tratadas / "nps_outubro.csv", sep=";", decimal=",", encoding="utf-8-sig")
     assert df["valor_mensalidade"].iloc[0] == 1234.56
+
+
+def test_etapas_emitidas_em_ordem(planilha_baguncada, cfg_factory):
+    etapas = []
+    r = processar_arquivo(planilha_baguncada, cfg_factory([REGRA_NPS]), ao_etapa=lambda e, a, **k: etapas.append((e, k)))
+    assert r.status == SUCESSO
+    assert [e for e, _ in etapas] == ["leitura", "limpeza", "validacao", "modelagem", "publicacao", "concluido"]
+    assert etapas[-1][1]["status"] == SUCESSO and etapas[-1][1]["linhas"] == 4
