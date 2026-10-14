@@ -17,7 +17,7 @@ OneDrive/
 
 ## 1. Instalação (uma vez só)
 
-1. Instale o **Python 3.11 ou mais novo**: https://www.python.org/downloads/
+1. Tenha o **Python 3.11 a 3.14** (recomendado 3.13). Versões mais novas, como a 3.15, ainda não têm as bibliotecas prontas para Windows — o `instalar.bat` detecta isso e instala a 3.13 ao lado, sem remover a sua.
    - Na primeira tela do instalador, **marque a caixa "Add python.exe to PATH"** (fica embaixo). Se esquecer, o robô não acha o Python.
    - Clique em **Install Now**.
 2. Coloque a pasta deste projeto em um lugar **fora do OneDrive**, por exemplo `C:\Robo-data`.
