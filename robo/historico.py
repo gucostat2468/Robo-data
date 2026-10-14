@@ -68,3 +68,35 @@ def ler_execucao(pasta_logs: Path, id_execucao: str) -> dict | None:
     if not arquivo.exists():
         return None
     return json.loads(arquivo.read_text(encoding="utf-8"))
+
+
+CABECALHO_OCORRENCIAS = ["data_hora", "arquivo", "status", "nivel", "tabela", "coluna", "mensagem", "quantidade",
+                         "exemplos", "id"]
+ARQUIVO_OCORRENCIAS = "resumo_ocorrencias.csv"
+
+
+def registrar_ocorrencias(pasta: Path, data_hora: str, arquivo: str, status: str, id_execucao: str,
+                          ocorrencias: list) -> None:
+    """Resumo consolidado de TODOS os erros e avisos de todas as planilhas (um por linha).
+
+    Fica em Bases-Relatorios/resumo_ocorrencias.csv: abra no Excel (filtro por arquivo/mensagem)
+    ou no Power BI para descobrir quais problemas mais se repetem e em quais planilhas.
+    """
+    linhas = [o for o in ocorrencias if o.nivel in ("ERRO", "AVISO")]
+    if not linhas:
+        return
+    pasta.mkdir(parents=True, exist_ok=True)
+    destino = pasta / ARQUIVO_OCORRENCIAS
+    novo = not destino.exists()
+    try:
+        with open(destino, "a", newline="", encoding="utf-8-sig") as f:
+            w = csv.writer(f, delimiter=";")
+            if novo:
+                w.writerow(CABECALHO_OCORRENCIAS)
+            for o in linhas:
+                w.writerow([data_hora, arquivo, status, o.nivel, o.tabela, o.coluna, o.mensagem,
+                            "" if o.quantidade is None else o.quantidade, " | ".join(o.exemplos), id_execucao])
+    except PermissionError:
+        import logging
+        logging.getLogger("robo").warning("resumo_ocorrencias.csv está aberto no Excel; o resumo desta execução "
+                                          "ficou só no histórico do painel.")

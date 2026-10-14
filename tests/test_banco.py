@@ -132,8 +132,11 @@ def test_conflito_de_tipo_reprova_e_nao_publica(pastas, cfg_factory, banco_cfg):
     assert "Conflito de tipo" in r.relatorio.texto()
     assert not (cfg.tratadas / "metas_2.xlsx").exists()
     assert _q(banco_cfg, "SELECT count(*) FROM tratado.metas")[0][0] == 2
-    assert _q(banco_cfg, "SELECT count(*) FROM bruto.metas")[0][0] == 2  # bruto do reprovado também foi desfeito
+    # bruto guarda tudo o que chegou (auditoria), inclusive o reprovado; tratado não
+    assert _q(banco_cfg, "SELECT count(*) FROM bruto.metas WHERE _arquivo_origem = 'metas_2.xlsx'")[0][0] == 2
     assert ("reprovado",) in _q(banco_cfg, "SELECT status FROM robo.lotes")
+    erros = _q(banco_cfg, "SELECT arquivo, nivel, mensagem FROM robo.ocorrencias WHERE nivel = 'ERRO'")
+    assert erros and erros[0][0] == "metas_2.xlsx" and "Conflito de tipo" in erros[0][2]
 
 
 def test_alargamento_de_tipo_e_coluna_nova(pastas, cfg_factory, banco_cfg):

@@ -102,7 +102,10 @@ def main(argv: list[str] | None = None) -> int:
     p.add_argument("--config", help="caminho do config.yaml (padrão: config.yaml na pasta do projeto)")
     p.add_argument("-v", "--verboso", action="store_true")
     sub = p.add_subparsers(dest="comando", required=True)
-    sub.add_parser("monitorar", help="vigia a pasta de entrada continuamente")
+    sa = sub.add_parser("app", help="abre o painel (interface gráfica) e liga o robô")
+    sa.add_argument("--sem-janela", action="store_true", help="só liga em segundo plano (inicialização do Windows)")
+    sa.add_argument("--porta", type=int)
+    sub.add_parser("monitorar", help="vigia a pasta de entrada continuamente (sem interface)")
     sub.add_parser("varrer", help="processa uma vez todos os arquivos da entrada")
     sp = sub.add_parser("processar", help="processa um arquivo específico")
     sp.add_argument("arquivo")
@@ -113,6 +116,18 @@ def main(argv: list[str] | None = None) -> int:
     sb = sub.add_parser("banco", help="PostgreSQL: testar conexão, executar modelos SQL, ver tabelas")
     sb.add_argument("acao", choices=["testar", "modelos", "resumo"])
     args = p.parse_args(argv)
+
+    if args.comando == "app":
+        from robo.config import RAIZ_PROJETO
+        from robo.painel.servidor import iniciar_app
+        configurar_log(RAIZ_PROJETO / "logs", args.verboso)
+        try:
+            pasta_logs = carregar_config(args.config).logs
+            if pasta_logs != RAIZ_PROJETO / "logs":
+                configurar_log(pasta_logs, args.verboso)
+        except ErroConfig:
+            pass  # o painel mostra a tela de configuração inicial
+        return iniciar_app(Path(args.config) if args.config else None, abrir_janela=not args.sem_janela, porta=args.porta)
 
     try:
         cfg = carregar_config(args.config)
@@ -146,9 +161,7 @@ def main(argv: list[str] | None = None) -> int:
         with TravaInstancia(cfg.logs):
             monitor = Monitor(cfg)
             if args.comando == "varrer":
-                monitor.espera = 0
-                monitor.ciclo()          # 1ª passada registra os arquivos
-                resultados = monitor.ciclo()  # 2ª passada processa os que estão estáveis
+                resultados = monitor.ciclo(forcar=True)
                 ok = sum(r.status == "sucesso" for r in resultados)
                 print(f"\n{len(resultados)} arquivo(s) processado(s): {ok} com sucesso, {len(resultados) - ok} com problema.")
                 return 0 if ok == len(resultados) else 1

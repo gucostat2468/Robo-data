@@ -1,7 +1,8 @@
 """Carga no PostgreSQL em camadas (arquitetura "medalhão", padrão de mercado para ELT).
 
   bruto      Dados EXATAMENTE como vieram da planilha (tudo texto) + linha de origem.
-             Serve de auditoria e permite reconstruir tudo sem a planilha original.
+             Recebe TUDO o que chegou, inclusive arquivos reprovados (veja robo.lotes para o status):
+             serve de auditoria e permite reconstruir tudo sem a planilha original.
   tratado    Resultado da limpeza/validação do robô, com tipos corretos (número, data...).
   analitico  Visões e tabelas criadas por VOCÊ em SQL (pasta modelos_sql/). É aqui que acontece
              o "T" do ELT: transformações dentro do banco, prontas para o Power BI.
@@ -168,6 +169,20 @@ class Banco:
                 tabelas        text[],
                 mensagem       text,
                 ocorrencias    jsonb
+            )""").format(sql.Identifier(self.schemas["controle"])))
+        # uma linha por erro/aviso: base das consultas de qualidade ("quais erros mais se repetem?")
+        conn.execute(sql.SQL("""
+            CREATE TABLE IF NOT EXISTS {}.ocorrencias (
+                lote_id        text NOT NULL,
+                arquivo        text NOT NULL,
+                processado_em  timestamptz NOT NULL DEFAULT now(),
+                status_lote    text,
+                nivel          text NOT NULL,
+                tabela         text,
+                coluna         text,
+                mensagem       text NOT NULL,
+                quantidade     integer,
+                exemplos       text
             )""").format(sql.Identifier(self.schemas["controle"])))
 
     def testar(self) -> dict:
@@ -410,6 +425,16 @@ class Banco:
                 mensagem = EXCLUDED.mensagem, ocorrencias = EXCLUDED.ocorrencias, processado_em = now()
         """).format(sql.Identifier(self.schemas["controle"])),
             {**dados, "ocorrencias": json.dumps(dados.get("ocorrencias") or [], ensure_ascii=False, default=str)})
+        tabela = sql.Identifier(self.schemas["controle"], "ocorrencias")
+        conn.execute(sql.SQL("DELETE FROM {} WHERE lote_id = %s").format(tabela), (dados["lote_id"],))
+        linhas = [(dados["lote_id"], dados["arquivo"], dados["status"], o.get("nivel"), o.get("tabela") or None,
+                   o.get("coluna") or None, o.get("mensagem"), o.get("quantidade"), " | ".join(o.get("exemplos") or []))
+                  for o in dados.get("ocorrencias") or [] if o.get("nivel") in ("ERRO", "AVISO")]
+        if linhas:
+            with conn.cursor() as cur:
+                cur.executemany(sql.SQL(
+                    "INSERT INTO {} (lote_id, arquivo, status_lote, nivel, tabela, coluna, mensagem, quantidade, exemplos) "
+                    "VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)").format(tabela), linhas)
 
     # ------------------------------------------------------------------ painel
     def resumo(self) -> dict:

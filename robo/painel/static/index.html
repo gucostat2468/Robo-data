@@ -1,0 +1,61 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Robô de Planilhas</title>
+<link rel="icon" href="robo.svg" type="image/svg+xml">
+<link rel="stylesheet" href="app.css">
+</head>
+<body>
+<div class="app" id="app">
+  <aside class="sidebar">
+    <div class="brand">
+      <img src="robo.svg" alt="" width="32" height="32">
+      <div>
+        <strong>Robô de Planilhas</strong>
+        <span>ETL &amp; ELT local</span>
+      </div>
+    </div>
+    <nav class="nav" id="nav">
+      <a href="#inicio" data-pagina="inicio"><i data-icone="home"></i><span>Visão geral</span></a>
+      <a href="#reprovados" data-pagina="reprovados"><i data-icone="alerta"></i><span>Reprovados</span><b class="contador perigo" id="badge-reprovados" hidden></b></a>
+      <a href="#historico" data-pagina="historico"><i data-icone="historico"></i><span>Histórico</span></a>
+      <a href="#testar" data-pagina="testar"><i data-icone="frasco"></i><span>Testar planilha</span></a>
+      <a href="#banco" data-pagina="banco"><i data-icone="banco"></i><span>Banco de dados</span></a>
+      <a href="#consultas" data-pagina="consultas"><i data-icone="codigo"></i><span>Consultas SQL</span></a>
+      <a href="#atividade" data-pagina="atividade"><i data-icone="atividade"></i><span>Atividade</span></a>
+      <a href="#configuracoes" data-pagina="configuracoes"><i data-icone="ajustes"></i><span>Configurações</span></a>
+    </nav>
+    <div class="status-lateral" id="status-lateral">
+      <div class="status-linha"><span class="ponto" id="ponto-status"></span><span id="texto-status">Conectando…</span></div>
+      <small id="subtexto-status">&nbsp;</small>
+    </div>
+  </aside>
+
+  <main class="conteudo" id="conteudo" tabindex="-1"></main>
+</div>
+
+<div class="soltar" id="soltar" hidden>
+  <div class="soltar-caixa">
+    <div class="soltar-zona" data-acao="enviar">
+      <i data-icone="enviar"></i>
+      <strong>Enviar para processamento</strong>
+      <span>Copia para Bases-Limpeza. O robô trata e publica.</span>
+    </div>
+    <div class="soltar-zona secundaria" data-acao="testar">
+      <i data-icone="frasco"></i>
+      <strong>Só testar</strong>
+      <span>Mostra o resultado sem gravar nada.</span>
+    </div>
+  </div>
+</div>
+
+<div class="gaveta-fundo" id="gaveta-fundo" hidden></div>
+<aside class="gaveta" id="gaveta" aria-hidden="true"></aside>
+<div class="modal-fundo" id="modal" hidden></div>
+<div class="avisos" id="avisos" aria-live="polite"></div>
+
+<script src="app.js"></script>
+</body>
+</html>

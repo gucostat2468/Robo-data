@@ -45,17 +45,27 @@ def pode_abrir(caminho: Path) -> bool:
 
 
 class Monitor:
-    def __init__(self, cfg: Config):
+    def __init__(self, cfg: Config, ao_processar=None):
         self.cfg = cfg
         self.intervalo = float(cfg.monitoramento["intervalo_segundos"])
         self.espera = float(cfg.monitoramento["espera_estabilidade_segundos"])
         # caminho -> (tamanho, modificação, momento em que essa assinatura foi vista pela 1ª vez)
         self._vistos: dict[Path, tuple[int, float, float]] = {}
         self._ultima_manutencao: date | None = None
+        self._trava = threading.Lock()
+        self.ao_processar = ao_processar      # função chamada com cada Resultado (painel/notificações)
+        self.processando: str | None = None
+        self.em_uso: set[str] = set()
+        self.adiados: dict[str, str] = {}     # nome -> motivo
+        self.ultimo_ciclo: float | None = None
 
-    def ciclo(self, agora: float | None = None) -> list:
-        """Uma passada na pasta. Devolve os resultados dos arquivos processados."""
-        agora = time.monotonic() if agora is None else agora
+    def ciclo(self, agora: float | None = None, forcar: bool = False) -> list:
+        """Uma passada na pasta. Devolve os resultados dos arquivos processados.
+        forcar=True: processa já, sem esperar a estabilidade (botão "Processar agora")."""
+        with self._trava:
+            return self._ciclo(time.monotonic() if agora is None else agora, forcar)
+
+    def _ciclo(self, agora: float, forcar: bool) -> list:
         resultados = []
         try:
             arquivos = sorted(p for p in self.cfg.entrada.iterdir() if eh_candidato(p))
@@ -74,25 +84,74 @@ class Monitor:
                 self._vistos[arq] = (*assinatura, agora)
                 if anterior is None:
                     log.info("Novo arquivo detectado: %s (aguardando sincronização terminar)", arq.name)
+                if not forcar:
+                    continue
+                anterior = self._vistos[arq]
+            if not forcar and agora - anterior[2] < self.espera:
                 continue
-            if agora - anterior[2] < self.espera or not pode_abrir(arq):
+            if not pode_abrir(arq):
+                if arq.name not in self.em_uso:
+                    log.info("%s está aberto em outro programa (Excel?). Aguardando ser fechado.", arq.name)
+                self.em_uso.add(arq.name)
                 continue
+            self.em_uso.discard(arq.name)
+            self.processando = arq.name
             try:
                 r = processar_arquivo(arq, self.cfg)
             except Exception:
                 log.exception("Erro ao processar %s; nova tentativa no próximo ciclo", arq.name)
                 self._vistos[arq] = (*assinatura, agora)
                 continue
+            finally:
+                self.processando = None
             resultados.append(r)
             if r.status == ADIADO:
+                self.adiados[arq.name] = r.motivo_adiamento
                 self._vistos[arq] = (*assinatura, agora + 50)  # espera ~1 min antes de tentar de novo
             else:
+                self.adiados.pop(arq.name, None)
                 self._vistos.pop(arq, None)
+            if self.ao_processar:
+                try:
+                    self.ao_processar(r)
+                except Exception:
+                    log.exception("Falha no aviso pós-processamento")
 
+        nomes = {a.name for a in arquivos}
         for antigo in [p for p in self._vistos if not p.exists()]:
             self._vistos.pop(antigo, None)
+        self.em_uso &= nomes
+        self.adiados = {k: v for k, v in self.adiados.items() if k in nomes}
+        self.ultimo_ciclo = time.time()
         self._manutencao_diaria()
         return resultados
+
+    def estado_fila(self) -> list[dict]:
+        """Situação de cada arquivo em Bases-Limpeza, para o painel."""
+        agora = time.monotonic()
+        fila = []
+        try:
+            arquivos = sorted(p for p in self.cfg.entrada.iterdir() if eh_candidato(p))
+        except OSError:
+            return fila
+        for arq in arquivos:
+            try:
+                tamanho = arq.stat().st_size
+            except OSError:
+                continue
+            item = {"nome": arq.name, "tamanho": tamanho, "estado": "detectado", "segundos": None, "motivo": ""}
+            visto = self._vistos.get(arq)
+            if arq.name == self.processando:
+                item["estado"] = "processando"
+            elif arq.name in self.adiados:
+                item.update(estado="adiado", motivo=self.adiados[arq.name])
+            elif arq.name in self.em_uso:
+                item["estado"] = "em_uso"
+            elif visto is not None:
+                restante = self.espera - (agora - visto[2])
+                item.update(estado="aguardando", segundos=max(0, round(restante)))
+            fila.append(item)
+        return fila
 
     def _manutencao_diaria(self):
         hoje = date.today()

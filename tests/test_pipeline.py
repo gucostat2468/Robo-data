@@ -54,6 +54,9 @@ def test_reprovado_vai_para_erros_com_relatorio(pastas, cfg_factory):
     assert "Chave única repetida" in texto
     assert "erro de fórmula" in texto
     assert "linha 2" in texto
+    resumo = pd.read_csv(cfg.relatorios / "resumo_ocorrencias.csv", sep=";", encoding="utf-8-sig")
+    assert set(resumo["nivel"]) == {"ERRO"} and (resumo["arquivo"] == "nps_ruim.xlsx").all()
+    assert {"Chave única repetida (id_resposta)", "Valores fora da lista permitida"} <= set(resumo["mensagem"])
 
 
 def test_modelo_estrela_e_calendario(planilha_baguncada, cfg_factory):

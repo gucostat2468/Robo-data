@@ -2,7 +2,9 @@
 
   1. Extrair      ler a planilha (leitura.py)
   2. Transformar  limpar, validar e modelar (limpeza.py, validacao.py, modelagem.py)
-  3. Carregar     PostgreSQL em camadas (banco.py, se habilitado) + arquivo em Bases-Tratadas
+  3. Carregar     PostgreSQL em camadas (banco.py, se habilitado) + arquivo em Bases-Tratadas.
+                  A camada "bruto" guarda tudo o que chegou (inclusive reprovados, para auditoria);
+                  "tratado" e "analitico" só recebem arquivos 100% aprovados.
   4. Arquivar     original vai para Bases-Originais (aprovado) ou Bases-Erros (reprovado)
 
 Regra de ouro: "tudo ou nada". Se qualquer etapa encontrar erro, nada é publicado.
@@ -154,11 +156,14 @@ def _carregar_banco(cfg: Config, caminho: Path, t: _Tratamento, rel: Relatorio, 
                 banco.registrar_lote(conn, _dados_lote(caminho, lote_id, rel, t, gravadas, aprovado))
         except ErroCargaDados as e:
             rel.erro(f"Carga no PostgreSQL recusada: {e}")
-            # registra o lote reprovado (nova transação, já que a anterior foi desfeita)
+            # a transação foi desfeita; numa nova, guarda só o bruto (auditoria) e o lote reprovado
+            gravadas = []
             with conn.transaction():
                 banco.inicializar(conn)
-                banco.registrar_lote(conn, _dados_lote(caminho, lote_id, rel, t, [], False))
-            return []
+                if cfg.banco.get("carregar_bruto", True) and t.brutas:
+                    gravadas = banco.carregar_bruto(conn, base, t.brutas, caminho.name, lote_id)
+                banco.registrar_lote(conn, _dados_lote(caminho, lote_id, rel, t, gravadas, False))
+            return gravadas
     if gravadas:
         rel.info(f"PostgreSQL: {', '.join(gravadas)}")
     return gravadas
@@ -180,7 +185,7 @@ def processar_arquivo(caminho: str | Path, cfg: Config, gravar: bool = True) -> 
     inicio = time.perf_counter()
     caminho = Path(caminho)
     rel = Relatorio(arquivo=caminho.name)
-    log.info("Processando %s", caminho.name)
+    log.info("Processando %s" if gravar else "Testando %s (sem gravar nada)", caminho.name)
 
     try:
         t = _tratar(caminho, cfg, rel)
@@ -251,8 +256,10 @@ def _adiar(r: Resultado, inicio: float, motivo: str) -> Resultado:
 
 
 def _registrar(cfg: Config, r: Resultado):
+    agora = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    historico.registrar_ocorrencias(cfg.relatorios, agora, r.arquivo.name, r.status, r.id, r.relatorio.ocorrencias)
     historico.registrar(cfg.logs, {
-        "data_hora": datetime.now().strftime("%Y-%m-%d %H:%M:%S"), "arquivo": r.arquivo.name, "status": r.status,
+        "data_hora": agora, "arquivo": r.arquivo.name, "status": r.status,
         "linhas_entrada": r.linhas_entrada, "linhas_saida": r.linhas_saida, "erros": len(r.relatorio.erros),
         "avisos": len(r.relatorio.avisos), "duracao_seg": f"{r.duracao:.1f}".replace(".", ","),
         "saidas": " | ".join([p.name for p in r.saidas] + r.tabelas_banco), "id": r.id,
