@@ -1,0 +1,83 @@
+# =====================================================================
+#  CONFIGURAÇÃO DO ROBÔ DE PLANILHAS
+#  Copie este arquivo para "config.yaml" (o instalar.bat já faz isso).
+#  Linhas que começam com # são comentários e são ignoradas.
+#  ATENÇÃO: no YAML a indentação (espaços à esquerda) importa. Use espaços, nunca TAB.
+# =====================================================================
+
+pastas:
+  # "auto" = o robô procura a pasta Bases-Limpeza dentro do seu OneDrive.
+  # Se não achar, informe o caminho completo, por exemplo:
+  #   entrada: "C:/Users/patri/OneDrive/Bases-Limpeza"
+  # (use barras normais "/" ou duplique as invertidas "\\")
+  entrada: auto
+  saida: auto          # Bases-Tratadas (ao lado de Bases-Limpeza)
+  erros: auto          # Bases-Erros: arquivos reprovados + relatório _ERROS.txt
+  originais: auto      # Bases-Originais: backup do arquivo original, por mês
+  relatorios: auto     # Bases-Relatorios: log de qualidade + dicionário de dados
+  logs: logs           # pasta "logs" dentro do projeto (não sincroniza no OneDrive)
+
+monitoramento:
+  intervalo_segundos: 5
+  espera_estabilidade_segundos: 10
+
+leitura:
+  abas: primeira       # primeira | todas
+  linhas_busca_cabecalho: 20
+
+limpeza:
+  remover_duplicadas: true
+  remover_linhas_total: true
+  inferir_tipos: true
+  limiar_conversao: 0.95
+  erros_excel: erro    # erro (reprova o arquivo) | anular (esvazia a célula e avisa)
+
+saida:
+  formato: xlsx        # xlsx | csv | ambos
+  sufixo: ""           # ex.: "_tratada" -> vendas_tratada.xlsx
+  versionar: false     # true = cria um arquivo novo a cada processamento (com data/hora)
+  nome_aba: dados
+  colunas_auditoria: true   # adiciona _arquivo_origem e _processado_em
+
+manutencao:
+  dias_retencao_originais: 180
+  dias_retencao_relatorios: 180
+  dias_retencao_logs: 60
+
+# =====================================================================
+#  REGRAS POR ARQUIVO (opcional)
+#  A primeira regra cujo "padrao" casar com o nome do arquivo é aplicada.
+#  * = qualquer texto. Ex.: "nps_*.xlsx" casa com "nps_outubro.xlsx".
+#  Os nomes de coluna podem ser escritos como no Excel ("Nota NPS") ou já
+#  padronizados ("nota_nps") — o robô padroniza dos dois jeitos.
+# =====================================================================
+#  Para ativar: apague o "[]" abaixo e tire o "# " do início das linhas do exemplo.
+# =====================================================================
+regras: []
+
+#   - padrao: "nps_*"
+#     colunas_obrigatorias: [id_resposta, data_resposta, nota_nps]
+#     nao_nulos: [id_resposta, nota_nps]
+#     chave_unica: [id_resposta]
+#     tipos:
+#       data_resposta: data
+#       nota_nps: inteiro
+#     faixas:
+#       nota_nps: {min: 0, max: 10}
+#     texto:
+#       uf: maiusculo
+#     valores_permitidos:
+#       uf: [AC, AL, AP, AM, BA, CE, DF, ES, GO, MA, MT, MS, MG, PA, PB, PR, PE, PI, RJ, RN, RS, RO, RR, SC, SP, SE, TO]
+#     modelo:
+#       fato: fato_nps
+#       dimensoes:
+#         dim_curso:
+#           colunas: [curso, modalidade]
+#           chave: id_curso
+#       calendario: data_resposta
+#
+# Exemplo de regra simples:
+# - padrao: "vendas_*"
+#   renomear: {"Vlr Total": valor_total}
+#   remover_colunas: [observacao_interna]
+#   nao_nulos: [valor_total]
