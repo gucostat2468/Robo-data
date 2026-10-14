@@ -49,7 +49,7 @@ PADROES: dict = {
         "padroes_identificador": ["id", "id_*", "*_id", "cpf*", "cnpj*", "cep*", "telefone*", "celular*", "matricula*", "codigo*", "cod_*", "ra", "rg"],
     },
     "saida": {
-        # xlsx | csv | ambos
+        # xlsx | csv | ambos | nenhum (nenhum = só grava no banco)
         "formato": "xlsx",
         "sufixo": "",
         # True = cada processamento gera um arquivo novo com data/hora no nome
@@ -58,6 +58,27 @@ PADROES: dict = {
         "colunas_auditoria": True,
         "csv_separador": ";",
         "csv_decimal": ",",
+    },
+    "banco": {
+        # Carga no PostgreSQL (ELT). Desligado até você configurar.
+        "habilitado": False,
+        "host": "localhost",
+        "porta": 5432,
+        "banco": "robo_dados",
+        "usuario": "postgres",
+        "senha": "",
+        # se esta variável de ambiente existir, a senha vem dela (mais seguro que deixar no arquivo)
+        "senha_variavel_ambiente": "ROBO_PG_SENHA",
+        "carregar_bruto": True,
+        "pasta_modelos": "modelos_sql",
+        # por_arquivo | substituir | mesclar | anexar
+        "modo_carga_padrao": "por_arquivo",
+        "tempo_limite_conexao": 5,
+    },
+    "painel": {
+        "porta": 8765,
+        "ligar_robo_ao_abrir": True,
+        "notificacoes": True,
     },
     "manutencao": {
         "dias_retencao_originais": 180,
@@ -129,9 +150,10 @@ def localizar_pasta(nome: str, raizes: list[Path] | None = None, profundidade: i
 
 
 class Config:
-    def __init__(self, dados: dict, base: Path):
+    def __init__(self, dados: dict, base: Path, arquivo: Path | None = None):
         self.dados = dados
         self.base = base
+        self.arquivo = arquivo
         self._resolver_pastas()
 
     # ---- atalhos -------------------------------------------------------
@@ -153,6 +175,14 @@ class Config:
     @property
     def monitoramento(self) -> dict:
         return self.dados["monitoramento"]
+
+    @property
+    def banco(self) -> dict:
+        return self.dados["banco"]
+
+    @property
+    def painel(self) -> dict:
+        return self.dados["painel"]
 
     @property
     def manutencao(self) -> dict:
@@ -223,4 +253,4 @@ def carregar_config(caminho: str | Path | None = None, sobrescrever: dict | None
         dados = _mesclar(dados, sobrescrever)
     if not isinstance(dados.get("regras"), list):
         raise ErroConfig("A seção 'regras' do config.yaml precisa ser uma lista (cada item começa com '- padrao:').")
-    return Config(dados, base)
+    return Config(dados, base, caminho)

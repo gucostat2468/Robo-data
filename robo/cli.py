@@ -74,6 +74,29 @@ def _status(cfg):
             print(f"  {l[0]}  {l[2]:<10} {l[1]}  ({l[4]} linhas, {l[5]} erros, {l[6]} avisos)")
 
 
+def _comando_banco(cfg, acao: str) -> int:
+    from robo.banco import Banco, ErroBancoIndisponivel, ErroCargaDados
+    banco = Banco(cfg.banco, cfg.base)
+    if acao == "testar":
+        r = banco.testar()
+        print(("OK  " if r["ok"] else "ERRO  ") + r["mensagem"])
+        return 0 if r["ok"] else 1
+    try:
+        if acao == "modelos":
+            with banco.conectar() as conn, conn.transaction():
+                banco.inicializar(conn)
+                feitos = banco.executar_modelos(conn)
+            print("Modelos executados: " + (", ".join(feitos) or "nenhum"))
+        else:
+            r = banco.resumo()
+            for t in r["tabelas"]:
+                print(f"  {t['schema']}.{t['nome']:<35} {t['tipo']:<7} {t['linhas'] if t['linhas'] is not None else '':>10}")
+        return 0
+    except (ErroBancoIndisponivel, ErroCargaDados) as e:
+        print(f"ERRO  {e}")
+        return 1
+
+
 def main(argv: list[str] | None = None) -> int:
     p = argparse.ArgumentParser(prog="robo", description="Robô de Planilhas — ETL automático Bases-Limpeza -> Bases-Tratadas")
     p.add_argument("--config", help="caminho do config.yaml (padrão: config.yaml na pasta do projeto)")
@@ -87,6 +110,8 @@ def main(argv: list[str] | None = None) -> int:
     sd.add_argument("arquivo")
     sub.add_parser("status", help="mostra pastas, fila e histórico")
     sub.add_parser("manutencao", help="remove arquivos antigos conforme a retenção")
+    sb = sub.add_parser("banco", help="PostgreSQL: testar conexão, executar modelos SQL, ver tabelas")
+    sb.add_argument("acao", choices=["testar", "modelos", "resumo"])
     args = p.parse_args(argv)
 
     try:
@@ -110,6 +135,8 @@ def main(argv: list[str] | None = None) -> int:
         r = processar_arquivo(args.arquivo, cfg)
         _imprimir_resultado(r)
         return 0 if r.status == "sucesso" else 1
+    if args.comando == "banco":
+        return _comando_banco(cfg, args.acao)
     if args.comando == "manutencao":
         print(executar_manutencao(cfg))
         return 0

@@ -33,11 +33,37 @@ limpeza:
   erros_excel: erro    # erro (reprova o arquivo) | anular (esvazia a célula e avisa)
 
 saida:
-  formato: xlsx        # xlsx | csv | ambos
+  formato: xlsx        # xlsx | csv | ambos | nenhum (nenhum = só banco)
   sufixo: ""           # ex.: "_tratada" -> vendas_tratada.xlsx
   versionar: false     # true = cria um arquivo novo a cada processamento (com data/hora)
   nome_aba: dados
   colunas_auditoria: true   # adiciona _arquivo_origem e _processado_em
+
+# =====================================================================
+#  BANCO DE DADOS POSTGRESQL (ELT) — opcional
+#  Com "habilitado: true", cada arquivo aprovado também é carregado no banco:
+#    bruto.<tabela>      dados originais (texto), para auditoria
+#    tratado.<tabela>    dados limpos e tipados
+#    analitico.*         suas views/tabelas SQL (pasta modelos_sql/)
+#    robo.lotes          controle de cada carga
+#  Dica: em vez de escrever a senha aqui, crie a variável de ambiente ROBO_PG_SENHA.
+# =====================================================================
+banco:
+  habilitado: false
+  host: localhost
+  porta: 5432
+  banco: robo_dados          # criado automaticamente se não existir
+  usuario: postgres
+  senha: ""
+  senha_variavel_ambiente: ROBO_PG_SENHA
+  carregar_bruto: true
+  pasta_modelos: modelos_sql
+  modo_carga_padrao: por_arquivo   # por_arquivo | substituir | mesclar | anexar
+
+painel:
+  porta: 8765
+  ligar_robo_ao_abrir: true
+  notificacoes: true
 
 manutencao:
   dias_retencao_originais: 180
@@ -68,6 +94,10 @@ regras: []
 #       uf: maiusculo
 #     valores_permitidos:
 #       uf: [AC, AL, AP, AM, BA, CE, DF, ES, GO, MA, MT, MS, MG, PA, PB, PR, PE, PI, RJ, RN, RS, RO, RR, SC, SP, SE, TO]
+#     destino:                       # opcional: como carregar no PostgreSQL
+#       tabela: nps                  # nome da tabela (padrão: nome do arquivo)
+#       modo: mesclar                # por_arquivo | substituir | mesclar | anexar
+#       chave: [id_resposta]         # usado no modo mesclar
 #     modelo:
 #       fato: fato_nps
 #       dimensoes:
