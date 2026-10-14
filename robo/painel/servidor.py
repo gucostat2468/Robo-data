@@ -38,6 +38,10 @@ ESTATICOS = Path(__file__).parent / "static"
 LIMITE_UPLOAD = 300 * 1024 * 1024
 CABECALHO_ACAO = "X-Robo-Painel"
 RE_CARIMBO = re.compile(r"^\d{8}_\d{6}_")
+TIPOS_ESTATICOS = {
+    ".html": "text/html; charset=utf-8", ".js": "text/javascript; charset=utf-8", ".css": "text/css; charset=utf-8",
+    ".svg": "image/svg+xml", ".ico": "image/x-icon", ".png": "image/png", ".txt": "text/plain; charset=utf-8",
+}
 
 
 class ErroApi(Exception):
@@ -165,7 +169,13 @@ class Api:
         ruim = [x for x in h if x.get("status") == "reprovado"]
         soma = lambda lista, campo: sum(int(x.get(campo) or 0) for x in lista)
         com_banco = [x for x in ok if "tratado." in (x.get("saidas") or "")]
+        from robo.pipeline import obter_equipe
+        equipe = [{"id": a["id"], "nome": a["nome"], "papel": a.get("papel", ""), "cor": a.get("cor", "#64748B"),
+                   "descricao": a.get("descricao", ""), "nativo": a.get("nativo", False), "ativo": a.get("ativo", True),
+                   "skills": [s.get("skill") for s in a.get("skills", []) if s.get("ativo", True)],
+                   "aceita_skills": a.get("aceita_skills", True)} for a in obter_equipe(cfg).lista()]
         dados.update({
+            "equipe": equipe,
             "fila": c.monitor.estado_fila() if c.monitor else [],
             "banco_habilitado": bool(cfg.banco.get("habilitado")),
             "agentes": {
@@ -607,9 +617,9 @@ def criar_manipulador(api: Api):
             if ESTATICOS.resolve() not in arquivo.parents or not arquivo.is_file():
                 return self._json({"erro": "não encontrado"}, 404)
             corpo = arquivo.read_bytes()
-            tipo = mimetypes.guess_type(arquivo.name)[0] or "application/octet-stream"
-            if tipo.startswith("text/") or tipo in ("application/javascript",):
-                tipo += "; charset=utf-8"
+            # tipos fixos: no Windows o mimetypes lê o registro e pode devolver text/plain para .js,
+            # o que impede o navegador de executar os módulos do escritório 3D
+            tipo = TIPOS_ESTATICOS.get(arquivo.suffix.lower()) or mimetypes.guess_type(arquivo.name)[0] or "application/octet-stream"
             self.send_response(200)
             self.send_header("Content-Type", tipo)
             self.send_header("Cache-Control", "no-cache")

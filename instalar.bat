@@ -54,7 +54,7 @@ if not exist ".venv\Scripts\python.exe" (
   exit /b 1
 )
 
-echo [3/5] Instalando bibliotecas (pandas, openpyxl, xlrd, PyYAML)...
+echo [3/5] Instalando bibliotecas (pandas, openpyxl, xlrd, PyYAML, psycopg)...
 ".venv\Scripts\python.exe" -m pip install --upgrade pip --quiet
 REM --only-binary: usa apenas pacotes prontos (nunca tenta compilar)
 ".venv\Scripts\python.exe" -m pip install -r requirements.txt --only-binary=:all: --quiet
@@ -71,5 +71,24 @@ echo [5/5] Verificando pastas do OneDrive...
 ".venv\Scripts\python.exe" -m robo status
 
 echo.
-echo Instalacao concluida. Para ligar o robo, de dois cliques em iniciar_robo.bat
-pause
+echo Criando o atalho "Robo de Planilhas" na Area de Trabalho e no Menu Iniciar...
+".venv\Scripts\python.exe" -m robo atalhos
+
+echo.
+choice /c SN /m "Quer que o robo ligue sozinho quando voce entrar no Windows"
+if errorlevel 2 (
+  ".venv\Scripts\python.exe" -m robo inicializacao desligar >nul
+) else (
+  ".venv\Scripts\python.exe" -m robo inicializacao ligar
+)
+
+echo.
+echo ==============================================================
+echo  Instalacao concluida!
+echo  Para abrir: dois cliques no atalho "Robo de Planilhas"
+echo  (Area de Trabalho ou Menu Iniciar).
+echo ==============================================================
+choice /c SN /m "Abrir o Robo de Planilhas agora"
+if errorlevel 2 goto fim
+start "" wscript.exe "%~dp0Abrir Robo de Planilhas.vbs"
+:fim

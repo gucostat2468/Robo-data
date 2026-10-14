@@ -107,7 +107,8 @@ def definir_inicializacao(ligar: bool) -> bool:
     arquivo = pasta / ARQUIVO_INICIALIZACAO
     if ligar:
         lancador = RAIZ_PROJETO / "Abrir Robo de Planilhas.vbs"
-        arquivo.write_text(f'CreateObject("WScript.Shell").Run """{lancador}"" /oculto", 0, False\r\n', encoding="utf-8")
+        # UTF-16 com BOM: o Windows Script Host lê corretamente caminhos com acento
+        arquivo.write_text(f'CreateObject("WScript.Shell").Run """{lancador}"" /oculto", 0, False\r\n', encoding="utf-16")
     elif arquivo.exists():
         arquivo.unlink()
     return inicializacao_ligada()

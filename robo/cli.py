@@ -113,9 +113,28 @@ def main(argv: list[str] | None = None) -> int:
     sd.add_argument("arquivo")
     sub.add_parser("status", help="mostra pastas, fila e histórico")
     sub.add_parser("manutencao", help="remove arquivos antigos conforme a retenção")
+    sub.add_parser("atalhos", help="cria o atalho 'Robô de Planilhas' na Área de Trabalho e no Menu Iniciar (Windows)")
+    si = sub.add_parser("inicializacao", help="liga/desliga o robô junto com o Windows")
+    si.add_argument("acao", choices=["ligar", "desligar", "status"])
     sb = sub.add_parser("banco", help="PostgreSQL: testar conexão, executar modelos SQL, ver tabelas")
     sb.add_argument("acao", choices=["testar", "modelos", "resumo"])
     args = p.parse_args(argv)
+
+    if args.comando in ("atalhos", "inicializacao"):
+        from robo.painel import sistema
+        try:
+            if args.comando == "atalhos":
+                print("Atalhos criados: " + " e ".join(sistema.criar_atalhos()))
+            elif args.acao == "status":
+                print("Inicia com o Windows: " + ("sim" if sistema.inicializacao_ligada() else "não"))
+            else:
+                ligado = sistema.definir_inicializacao(args.acao == "ligar")
+                print("O robô vai ligar sozinho quando você entrar no Windows." if ligado
+                      else "Inicialização automática desligada.")
+            return 0
+        except Exception as e:
+            print(f"Não foi possível: {e}")
+            return 1
 
     if args.comando == "app":
         from robo.config import RAIZ_PROJETO

@@ -1,6 +1,6 @@
 @echo off
 REM Arraste uma planilha para cima deste arquivo: mostra o que o robo faria, SEM gravar nem mover nada.
-cd /d "%~dp0"
+cd /d "%~dp0.."
 if "%~1"=="" (
   echo Arraste uma planilha para cima deste arquivo .bat
   pause
