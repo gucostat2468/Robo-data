@@ -88,6 +88,8 @@ PADROES: dict = {
         "variacao_alerta_pct": 30,
         "analistas_desligados": [],
     },
+    # 3º andar: Sala Excel (entrega com fórmulas e conferência para cada base aprovada)
+    "excel": {"habilitado": True, "max_linhas": 300000, "max_categorias": 30, "max_segmentos": 6, "top_trade": 50},
     "painel": {
         "porta": 8765,
         "ligar_robo_ao_abrir": True,

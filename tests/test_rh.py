@@ -17,8 +17,9 @@ def test_toda_skill_tem_prova_e_todas_passam():
 
 
 def test_equipe_nativa_e_analistas_aprovados_no_processo_seletivo():
+    from robo.excel import EQUIPE_EXCEL
     from robo.producao import SUPERVISORES
-    for a in NATIVOS + SUPERVISORES + [{**x, "id": "analise_" + x["id"]} for x in ANALISTAS]:
+    for a in NATIVOS + SUPERVISORES + EQUIPE_EXCEL + [{**x, "id": "analise_" + x["id"]} for x in ANALISTAS]:
         f = rh.ficha({**a, "skills": []})
         assert f["provas"]["aprovado"] and f["provas"]["total"] >= 2, (a["id"], f["provas"]["bloqueios"])
         assert f["cargo"] and f["metodologias"] and f["limites"] and f["nivel"] in rh.NOME_NIVEL.values()

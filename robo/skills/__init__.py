@@ -37,6 +37,10 @@ class ErroSkill(Exception):
     """Configuração inválida de uma skill (parâmetro faltando, coluna inexistente...)."""
 
 
+class ErroColunaAusente(ErroSkill):
+    """A planilha não tem a coluna que a skill usa (pode ser pulada se a skill estiver marcada como opcional)."""
+
+
 @dataclass
 class Param:
     nome: str
@@ -201,7 +205,7 @@ def preparar_parametros(sk: Skill, brutos: dict, colunas_df=None) -> dict:
             elif par.tipo == "colunas":
                 faltando += [c for c in p[par.nome] if c not in colunas_df]
         if faltando:
-            raise ErroSkill(f"coluna(s) inexistente(s) na planilha: {', '.join(faltando)}")
+            raise ErroColunaAusente(f"coluna(s) inexistente(s) na planilha: {', '.join(faltando)}")
     return p
 
 
@@ -219,6 +223,11 @@ def executar_skill(df: pd.DataFrame, config: dict, rel, tabela: str, arquivo: st
         if not isinstance(resultado, pd.DataFrame):
             raise ErroSkill("a skill não devolveu uma tabela")
         return resultado
+    except ErroColunaAusente as e:
+        if config.get("opcional"):
+            ctx.info(f"Skill pulada nesta planilha ({e}) — marcada como opcional")
+        else:
+            ctx.erro(f"Configuração inválida: {e}")
     except ErroSkill as e:
         ctx.erro(f"Configuração inválida: {e}")
     except Exception as e:

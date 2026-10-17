@@ -28,7 +28,17 @@ def _nome_aba(nome: str, usados: set[str]) -> str:
     return nome_final
 
 
+def _neutralizar_formulas(ws):
+    """Segurança (injeção de fórmula): texto vindo da planilha de origem que começa com '=' é gravado como TEXTO.
+    A saída tratada nunca contém fórmulas ativas — uma célula "=HYPERLINK(...)" da origem não vira link clicável."""
+    for linha in ws.iter_rows(min_row=1):
+        for cel in linha:
+            if cel.data_type == "f":
+                cel.data_type = "s"
+
+
 def _formatar_aba(ws, df: pd.DataFrame):
+    _neutralizar_formulas(ws)
     ws.freeze_panes = "A2"
     if ws.max_row >= 1 and ws.max_column >= 1:
         ws.auto_filter.ref = ws.dimensions

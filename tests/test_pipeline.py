@@ -126,5 +126,24 @@ def test_etapas_emitidas_em_ordem(planilha_baguncada, cfg_factory):
     assert r.status == SUCESSO
     assert [e for e, _ in etapas] == ["leitura", "limpeza", "validacao", "modelagem", "supervisor", "coord_engenharia",
                                       "publicacao", "analise:perfil", "analise:indicadores", "analise:estatistica",
-                                      "analise:monitoramento", "analise:relator", "coord_analise", "concluido"]
+                                      "analise:monitoramento", "analise:relator", "coord_analise",
+                                      "excel_pesquisa", "excel_formulas", "excel_trade", "excel_dinamicas", "excel_supervisor",
+                                      "concluido"]
     assert etapas[-1][1]["status"] == SUCESSO and etapas[-1][1]["linhas"] == 4
+
+
+def test_texto_com_igual_nao_vira_formula_ativa(pastas, cfg_factory):
+    """Segurança: célula de origem '=HYPERLINK(...)' precisa sair como texto, nunca como fórmula."""
+    from openpyxl import load_workbook
+    wb = Workbook()
+    ws = wb.active
+    ws.append(["Nome", "Obs"])
+    ws.append(["Ana", '=HYPERLINK("http://malicioso","clique")'])
+    ws["B2"].data_type = "s"  # na origem é texto
+    ws.append(["Bia", "ok"])
+    caminho = pastas / "Bases-Limpeza" / "seg.xlsx"
+    wb.save(caminho)
+    r = processar_arquivo(caminho, cfg_factory())
+    assert r.status == SUCESSO
+    celula = load_workbook(r.saidas[0])["dados"]["B2"]
+    assert celula.data_type == "s" and celula.value.startswith("=HYPERLINK")

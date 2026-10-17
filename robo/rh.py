@@ -366,6 +366,34 @@ def _prova_coordenadores():
                               ("Lista a ressalva", any("base menor" in x for x in a["ressalvas"]))]}
 
 
+def _prova_excel():
+    from robo.excel import Entrega, _criterio
+    df = _df(curso=["A", "A", "B*", "=C"], nota_nps=pd.array([10, 6, 9, 3], dtype="Int64"),
+             loja=["L1", "L2", "L1", "L2"], valor_venda=[10.0, 20.0, 30.0, 40.0], quantidade=[1, 2, 3, 4])
+    papeis = {"curso": "categoria", "nota_nps": "numero", "loja": "categoria", "valor_venda": "numero", "quantidade": "numero"}
+    with tempfile.TemporaryDirectory() as d:
+        e = Entrega(df, "p", "p.xlsx", papeis, {"nps": "nota_nps"}, {})
+        info = e.gerar(Path(d) / "p.xlsx")
+        from openpyxl import load_workbook
+        wb = load_workbook(Path(d) / "p.xlsx")
+        dados_igual = wb["Dados"]["A5"].data_type == "s"
+        formulas = [c.value for c in wb["Indicadores"]["B"] if isinstance(c.value, str) and c.value.startswith("=")]
+        trade = [c.value for c in wb["Trade"]["B"] if isinstance(c.value, str) and c.value.startswith("=SUMIFS")]
+    esperado = {x[0]: x[2] for x in e.conferencias}
+    return {
+        "excel_supervisor": [("Monta a conferência de todos os números", info["conferencias"] >= 15),
+                             ("Resumo com status da conferência", "Resumo" in info["abas"])],
+        "excel_pesquisa": [("Escapa curingas do CONT.SES (* ? ~)", _criterio("B*") == '"B~*"'),
+                           ("Base por segmento correta", esperado.get("[curso] base de A") == 2)],
+        "excel_formulas": [("NPS em fórmula", any("B8-B9" in f for f in formulas)),
+                           ("NPS esperado correto", abs(esperado["Indicador: NPS"] - 0.0) < 1e-9)],
+        "excel_trade": [("Vendas por loja em SOMASES", len(trade) == 2),
+                        ("Soma por loja correta", esperado.get("[loja] valor_venda de L2") == 60.0)],
+        "excel_dinamicas": [("Texto com '=' fica como texto (sem injeção de fórmula)", dados_igual),
+                            ("Abas organizadas", info["abas"][0] == "Resumo")],
+    }
+
+
 PROVAS_NATIVAS = {"supervisor": _prova_supervisor, "dba": _prova_dba,"recepcao": _prova_recepcao, "leitura": _prova_leitura, "limpeza": _prova_limpeza,
                   "validacao": _prova_validacao, "modelagem": _prova_modelagem, "banco": _prova_banco,
                   "publicacao": _prova_publicacao}
@@ -380,6 +408,14 @@ def _provas_nativas_cache() -> dict:
                                  for n, ok in funcao()]
         except Exception as e:
             resultado[agente] = [{"prova": "Execução das provas", "aprovado": False, "motivo": f"{type(e).__name__}: {e}"}]
+    for grupo in (_prova_excel,):
+        try:
+            for agente, casos in grupo().items():
+                resultado[agente] = [{"prova": n, "aprovado": bool(ok), "motivo": "" if ok else "resultado diferente do esperado"}
+                                     for n, ok in casos]
+        except Exception as e:
+            for a in ("excel_supervisor", "excel_pesquisa", "excel_formulas", "excel_trade", "excel_dinamicas"):
+                resultado[a] = [{"prova": "Execução das provas", "aprovado": False, "motivo": f"{type(e).__name__}: {e}"}]
     try:
         for agente, casos in _prova_coordenadores().items():
             resultado[agente] = [{"prova": n, "aprovado": bool(ok), "motivo": "" if ok else "resultado diferente do esperado"}
@@ -486,6 +522,33 @@ FICHAS = {
                                        "Reprodutibilidade: toda análise refeita a partir dos dados publicados"],
                       "responsabilidades": ["Revisar as análises do 2º andar", "Apontar ressalvas antes da apresentação"],
                       "criterios": ["Nenhum achado comunicado sem base e margem"], "limites": ["Não altera números: aponta ressalvas"]},
+    "excel_supervisor": {"cargo": "Supervisor da Sala Excel · ex-Microsoft", "nivel": "especialista", "area": "Storytelling e Negócio",
+                         "metodologias": ["Excel de ponta a ponta: fórmulas, matrizes dinâmicas, Power Query, Power Pivot, tabelas dinâmicas",
+                                          "Auditoria de planilhas (rastreabilidade célula a célula)", "Conferência independente de cada número"],
+                         "responsabilidades": ["Coordenar a Sala Excel", "Responder dúvidas de Excel no canal", "Assinar a entrega"],
+                         "criterios": ["Entrega só vale com 100% das conferências OK"],
+                         "limites": ["Não cola valores: tudo em fórmula auditável"]},
+    "excel_pesquisa": {"cargo": "Especialista em Pesquisa de Mercado — Tabulação", "nivel": "especialista",
+                       "area": "Customer Insights e Pesquisa",
+                       "metodologias": ["Plano tabular e tabulação cruzada", "Base mínima e sinalização de base pequena",
+                                        "NPS por segmento (Bain)"],
+                       "responsabilidades": ["Frequências e percentuais por segmento"], "criterios": ["Total do plano = base preenchida"],
+                       "limites": ["Não pondera sem plano de ponderação definido"]},
+    "excel_formulas": {"cargo": "Especialista em Fórmulas e Power Query", "nivel": "especialista", "area": "Engenharia de Dados",
+                       "metodologias": ["CONT.SES, SOMASES, SE, SEERRO, RAIZ", "Fórmulas robustas a divisão por zero",
+                                        "Margem de erro em fórmula"],
+                       "responsabilidades": ["Indicadores em fórmula"], "criterios": ["Nenhum #DIV/0! ou #VALOR! na entrega"],
+                       "limites": ["Não usa macros (VBA) em entregas"]},
+    "excel_trade": {"cargo": "Especialista em Trade Marketing", "nivel": "especialista", "area": "Customer Insights e Pesquisa",
+                    "metodologias": ["Sell-in e sell-out", "Share por loja, canal, região e SKU", "Preço médio e mix",
+                                     "Curva ABC de produtos"],
+                    "responsabilidades": ["Montar a visão comercial da base"], "criterios": ["Soma dos shares = 100%"],
+                    "limites": ["Não mistura sell-in com sell-out na mesma conta"]},
+    "excel_dinamicas": {"cargo": "Especialista em Tabelas Dinâmicas e Dashboards Excel", "nivel": "especialista",
+                        "area": "Storytelling e Negócio",
+                        "metodologias": ["Tabelas dinâmicas e segmentação", "Formatação executiva", "Segurança: sem injeção de fórmula"],
+                        "responsabilidades": ["Organizar a entrega e o Resumo"], "criterios": ["Quem abre entende em 30 segundos"],
+                        "limites": ["Não esconde dados: tudo rastreável na aba Dados"]},
     "analise_perfil": {"cargo": "Cientista de Dados Sênior — Análise Exploratória", "nivel": "senior", "area": "Análise de Dados",
                        "metodologias": ["Análise exploratória (Tukey)", "Estatística descritiva robusta (mediana, quartis)",
                                         "Classificação do papel de cada variável"],

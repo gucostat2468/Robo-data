@@ -57,6 +57,7 @@ class Resultado:
     analise: dict | None = None
     checklist: dict | None = None
     checklist_analise: dict | None = None
+    excel: dict | None = None
 
 
 @dataclass
@@ -328,6 +329,15 @@ def processar_arquivo(caminho: str | Path, cfg: Config, gravar: bool = True, ao_
                 r.checklist_analise = producao.checklist_analise(r.analise, base_min)
         except Exception:
             log.exception("Análise automática de %s falhou (a planilha já está publicada)", caminho.name)
+        # 3º andar: Sala Excel monta a entrega com fórmulas e conferência
+        try:
+            from robo.analise import chave_base
+            from robo.excel import gerar_entrega
+            r.excel = gerar_entrega(t.analisaveis, caminho.name, chave_base(caminho.name, t.regra), cfg, None, None, ao_etapa)
+            if r.excel:
+                log.info("Sala Excel entregou %s (%d conferências)", Path(r.excel["arquivo"]).name, r.excel["conferencias"])
+        except Exception:
+            log.exception("Sala Excel falhou em %s (a planilha já está publicada)", caminho.name)
 
     r.duracao = time.perf_counter() - inicio
     _registrar(cfg, r)
@@ -363,6 +373,7 @@ def _registrar(cfg: Config, r: Resultado):
         "analise": {k: v for k, v in (r.analise or {}).items() if not k.startswith("_")} or None,
         "checklist_producao": r.checklist,
         "checklist_analise": r.checklist_analise,
+        "excel": r.excel,
         "ocorrencias": [o.__dict__ for o in r.relatorio.ocorrencias],
     })
 
