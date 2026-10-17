@@ -81,3 +81,17 @@ def teste_contratacao_manual_em_andar_novo(cfg_factory):
     equipe = obter_equipe(cfg)
     assert equipe.manual("carlos_cep").startswith("# Carlos")
     assert any("5º andar" in m["texto"] for m in Canal(cfg).listar(canal="rh"))
+
+
+def teste_nao_confunde_data_nem_numero_com_contato():
+    datas = pd.Series(pd.to_datetime(["2025-12-01", "2025-12-02", "2025-12-03", "2025-12-04", "2025-12-05"]))
+    assert contratacao.reconhecer(datas, "data_resposta") is None
+    texto_data = pd.Series(["2025-12-01", "2025-12-02", "2025-12-03", "2025-12-04", "2025-12-05"])
+    assert contratacao.reconhecer(texto_data, "data_resposta") is None
+    assert contratacao.reconhecer(pd.Series([11987654321] * 6), "codigo") is None
+    assert contratacao.reconhecer(pd.Series(["(11) 98765-4321"] * 6), "contato")["tipo"] == "telefone"
+
+
+def teste_nao_contrata_quando_quase_tudo_seria_invalido():
+    df = pd.DataFrame({"telefone": ["abc", "xyz", "123", "(11) 98765-4321"]})
+    assert contratacao.precisa(df, "telefone", "normalizar_telefone") == ""

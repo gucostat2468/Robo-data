@@ -41,12 +41,13 @@ DEMANDAS = [
     {"tipo": "email", "habilidade": "validar_email", "nome_col": re.compile(r"(^|_)(e_?mail|email)(_|$)"),
      "valor": re.compile(r"^\s*[^@\s]+@[^@\s]+\s*$"), "cargo": "Estagiário de Qualidade de Dados — E-mails", "cor": "#0891B2"},
     {"tipo": "telefone", "habilidade": "normalizar_telefone", "nome_col": re.compile(r"(^|_)(telefone|fone|celular|whatsapp|tel)(_|$)"),
-     "valor": re.compile(r"^\s*\+?[\d\s().-]{10,16}\s*$"), "cargo": "Estagiário de Qualidade de Dados — Telefones", "cor": "#0D9488"},
+     "valor": re.compile(r"^\s*(\+55\s?)?\(\d{2}\)\s?9?\d{4}[-\s]?\d{4}\s*$"),  # só com DDD entre parênteses: (11) 98765-4321
+     "cargo": "Estagiário de Qualidade de Dados — Telefones", "cor": "#0D9488"},
     {"tipo": "documento", "habilidade": "normalizar_documento", "nome_col": re.compile(r"(^|_)(cpf|cnpj|documento|doc)(_|$)"),
-     "valor": re.compile(r"^\s*\d{3}\.?\d{3}\.?\d{3}-?\d{2}\s*$|^\s*\d{2}\.?\d{3}\.?\d{3}/?\d{4}-?\d{2}\s*$"),
+     "valor": re.compile(r"^\s*\d{3}\.\d{3}\.\d{3}-\d{2}\s*$|^\s*\d{2}\.\d{3}\.\d{3}/\d{4}-\d{2}\s*$"),  # só formatado
      "cargo": "Estagiário de Qualidade de Dados — CPF/CNPJ", "cor": "#4F46E5"},
     {"tipo": "cep", "habilidade": "normalizar_cep", "nome_col": re.compile(r"(^|_)(cep|codigo_postal)(_|$)"),
-     "valor": re.compile(r"^\s*\d{5}-?\d{3}\s*$"), "cargo": "Estagiário de Qualidade de Dados — CEP", "cor": "#9333EA"},
+     "valor": re.compile(r"^\s*\d{5}-\d{3}\s*$"), "cargo": "Estagiário de Qualidade de Dados — CEP", "cor": "#9333EA"},
 ]
 
 NOMES = ["Alice", "Benício", "Cecília", "Davi Lucca", "Elisa", "Felipe", "Giovana", "Heitor", "Isis", "Joaquim", "Lívia",
@@ -78,7 +79,14 @@ def _salvar_estado(cfg, e: dict) -> None:
 
 
 def reconhecer(serie: pd.Series, nome: str) -> dict | None:
-    """Que demanda esta coluna representa (pelo nome ou por ≥60% dos valores no formato)."""
+    """Que demanda esta coluna representa (pelo nome ou por ≥60% dos valores num formato inequívoco).
+
+    Datas e números nunca são reconhecidos pelo valor: "2025-12-01" ou 11987654321 são ambíguos demais.
+    """
+    if pd.api.types.is_datetime64_any_dtype(serie) or pd.api.types.is_bool_dtype(serie):
+        return None
+    if pd.api.types.is_numeric_dtype(serie):
+        return next((d for d in DEMANDAS if d["nome_col"].search(nome)), None)
     valores = serie.dropna().astype(str).str.strip()
     valores = valores[valores != ""].head(300)
     for d in DEMANDAS:
@@ -112,6 +120,12 @@ def precisa(df: pd.DataFrame, coluna: str, habilidade: str) -> str:
            for o in rel.ocorrencias):
         return ""  # a habilidade não se aplica a esta coluna: não há contratação
     mudanca = _diferencas(df[[coluna]], depois)
+    preenchidos = int(df[coluna].notna().sum()) or 1
+    qtd_invalidos = sum(int(o.quantidade or 0) for o in rel.ocorrencias if o.nivel in ("AVISO", "ERRO"))
+    if coluna in depois.columns and len(depois) == len(df):  # valores que a habilidade apagaria também contam
+        qtd_invalidos += int((df[coluna].notna().values & depois[coluna].isna().values).sum())
+    if qtd_invalidos / preenchidos > 0.5:
+        return ""  # mais da metade "inválida" = a coluna não é deste tipo; contratar seria um erro
     invalidos = [o.mensagem for o in rel.ocorrencias if o.nivel in ("AVISO", "ERRO")]
     partes = ([mudanca] if mudanca != "nenhuma alteração" else []) + invalidos[:1]
     return "; ".join(partes)

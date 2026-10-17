@@ -227,7 +227,8 @@ def executar_habilidade(df: pd.DataFrame, config: dict, rel, tabela: str, arquiv
         if config.get("opcional"):
             ctx.info(f"Habilidade pulada nesta planilha ({e}) — marcada como opcional")
         else:
-            ctx.erro(f"Configuração inválida: {e}")
+            ctx.erro(f"Configuração inválida: {e}. Se esta planilha não precisa desta tarefa, limite o agente em "
+                     f"'Arquivos que ele trata' (ex.: nps_*) ou marque a habilidade como opcional")
     except ErroHabilidade as e:
         ctx.erro(f"Configuração inválida: {e}")
     except Exception as e:
