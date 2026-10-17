@@ -67,3 +67,22 @@ Classificação: **[1] implementado e comprovado · [2] implementado parcialment
    ferramenta, hipótese ou "precisa de confirmação".
 6. **IA opcional e honesta** (`robo/ia.py`): um adaptador que hoje reporta "nenhum modelo configurado". Quando houver
    modelo, ele só redige texto; cálculos continuam determinísticos.
+
+## 4. Fase 1 implementada (17/10/2026)
+
+| Capacidade | Antes | Agora | Onde | Testes |
+|---|---|---|---|---|
+| Registro único de funcionários | 4 listas diferentes | `organizacao.lista()`; canal, quadro, estratégia e API usam o mesmo registro (o 3D é conferido contra ele em teste) | `robo/organizacao.py` | `teste_atendimento`, `teste_painel` |
+| Contrato de execução | [2] | [1] identidade, cargo, gestor, especialidade, objetivo, responsabilidades, ferramentas, entradas/saídas, permissões, risco, critérios, encaminhamento, quando pedir ajuda, revisor, fontes | `organizacao.contrato` | `teste_atendimento` |
+| Conversa direta com qualquer funcionário | [2] | [1] botão **Conversar** na ficha (painel e 3D); memória da conversa (arquivo, base, último cálculo, correções), continuação ("e por modalidade?"), encaminhamento real ao colega | `robo/atendimento.py`, `atendimento.js` | `teste_atendimento` |
+| Natureza de cada resposta | [4] | [1] conhecimento · cálculo · execução · ferramenta · hipótese · precisa confirmação · limitação, com evidência | `robo/ferramentas.py` | idem |
+| Central de solicitações | [4] | [1] todo pedido manual e todo arquivo processado; filtros por período, estado, funcionário, andar, tipo, prioridade e origem; SQLite transacional (`logs/trabalho.db`), funciona sem PostgreSQL | `robo/trabalho.py`, página **Solicitações** | `teste_atendimento`, `teste_painel` |
+| Orquestração (plano → etapas → aprovação → execução → revisão) | [4] | [1] 16 estados, dependências, responsável autorizado pelo contrato, aprovação do dono para o que altera dado, revisor independente com recálculo, correção automática uma vez, retomada após reinício | `robo/orquestrador.py` | idem |
+| Etapa sem ferramenta | — | fica **bloqueada** e a tarefa termina **concluída parcialmente** (ex.: .pptx) | idem | idem |
+| Memória por funcionário | [2] | [1] experiências (acerto, erro, aprendizado, treinamento) vindas do pipeline, das tarefas, das revisões e das provas, no SQLite **e no PostgreSQL** (`robo.memoria_experiencias`) | `robo/memoria.py` | `teste_memoria`, `teste_banco` |
+| Handover de erros | [4] | [1] todo erro vira regra da área (causa, como não repetir, como verificar); erro repetido soma recorrência; erro que volta reabre o handover; regras viram conhecimento consultável | idem | `teste_memoria` |
+| Reunião semanal da liderança | [4] | [1] por andar: deu certo, deu errado, plano de ação com responsável e prazo → backlog da Estratégia e canal #lideranca; desempenho com PDI e proposta de desligamento que só o dono aprova | `robo/reuniao.py`, página **Memória e reuniões** | `teste_memoria` |
+| Rotinas com monitor pausado | [2] | [1] laço próprio de rotinas | `controle.iniciar_rotinas` | — |
+| IA | [4] | [3] adaptador opcional só local (Ollama), desligado; declara "nenhum modelo configurado" | `robo/ia.py` | `teste_atendimento` |
+
+Ainda abertos: senha do painel; teste de volume de 300 mil linhas; teste no Windows real; gerar .pptx; testes automáticos do JavaScript.

@@ -65,6 +65,8 @@ class ControleRobo:
             self.cfg.criar_pastas()
             self.monitor = Monitor(self.cfg, ao_processar=self._apos_processar, ao_etapa=self._registrar_etapa)
             self.erro_config = None
+            from robo import orquestrador
+            orquestrador.AO_EVENTO = self._registrar_etapa  # tarefas da central aparecem no escritório 3D
         except ErroConfig as e:
             self.cfg, self.monitor, self.erro_config = None, None, str(e)
             log.error("Configuração: %s", e)
@@ -111,8 +113,32 @@ class ControleRobo:
                 monitor.ciclo()
             except Exception:
                 log.exception("Erro no ciclo do monitor")
-            self._rotinas()
+            if not getattr(self, "_rotinas_independentes", False):
+                self._rotinas()
             parar.wait(monitor.intervalo)
+
+    def iniciar_rotinas(self):
+        """Rotinas da empresa num laço próprio: continuam rodando mesmo com o monitoramento pausado."""
+        if getattr(self, "_rotinas_independentes", False):
+            return
+        self._rotinas_independentes = True
+        if self.cfg:
+            try:
+                from robo import orquestrador
+                retomadas = orquestrador.retomar_pendentes(self.cfg)  # tarefas interrompidas por reinício
+                if retomadas:
+                    log.info("Tarefas retomadas depois de reiniciar: %s", ", ".join(retomadas))
+            except Exception:
+                log.exception("Não consegui retomar as tarefas pendentes")
+
+        def _laco_rotinas():
+            while True:
+                try:
+                    self._rotinas()
+                except Exception:
+                    log.exception("Erro nas rotinas da empresa")
+                time.sleep(15)
+        threading.Thread(target=_laco_rotinas, name="robo-rotinas", daemon=True).start()
 
     def _rotinas(self):
         """Rotinas da empresa que não dependem de arquivo novo: canal (a cada minuto) e ronda de TI (a cada 30 min)."""
@@ -141,6 +167,16 @@ class ControleRobo:
                     backup.rotina(cfg)  # Dora: backup diário do PostgreSQL (guarda os últimos 7)
                 except Exception:
                     log.exception("Falha na rotina de backup do PostgreSQL")
+                try:
+                    from robo import memoria
+                    memoria.sincronizar_postgres(cfg)  # memória de todos os funcionários também no PostgreSQL
+                except Exception:
+                    log.exception("Falha ao copiar a memória para o PostgreSQL (segue no SQLite)")
+                try:
+                    from robo import reuniao
+                    reuniao.rotina(cfg)  # reunião semanal da liderança (uma por semana)
+                except Exception:
+                    log.exception("Falha na reunião semanal da liderança")
                 finally:
                     self._estrategia_rodando = False
             threading.Thread(target=_rodar, name="robo-estrategia", daemon=True).start()
@@ -171,7 +207,17 @@ class ControleRobo:
 
     # ------------------------------------------------------------ notificações
     def _apos_processar(self, r):
-        if not self.cfg or not self.cfg.painel.get("notificacoes", True):
+        if not self.cfg:
+            return
+        try:
+            from robo import memoria, orquestrador
+            orquestrador.registrar_execucao_automatica(self.cfg, r)  # central de solicitações (pedido automático)
+            memoria.registrar_execucao(self.cfg, r)                  # experiências e handovers de cada área
+            if self.cfg.banco.get("habilitado"):
+                memoria.sincronizar_postgres(self.cfg)               # e a mesma memória no PostgreSQL (schema robo)
+        except Exception:
+            log.exception("Não consegui registrar a execução na central/memória")
+        if not self.cfg.painel.get("notificacoes", True):
             return
         if r.status == SUCESSO:
             sistema.notificar("Planilha tratada", f"{r.arquivo.name}: {r.linhas_saida:,} linhas prontas".replace(",", "."))

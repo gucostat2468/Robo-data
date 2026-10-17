@@ -186,3 +186,16 @@ def teste_abas_empilhadas_carregam_no_banco_com_aba_e_linha(pastas, cfg_factory,
     linhas = _q(banco_cfg, "SELECT _aba, _linha_origem FROM bruto.mensal ORDER BY _aba, _linha_origem")
     assert linhas == [("Fev", 2), ("Fev", 3), ("Fev", 4), ("Jan", 2), ("Jan", 3), ("Jan", 4)]
     assert _q(banco_cfg, "SELECT count(*) FROM tratado.mensal")[0][0] == 6
+
+
+def teste_memoria_dos_funcionarios_vai_para_o_postgres(planilha_baguncada, cfg_factory, banco_cfg):
+    from robo import memoria
+    cfg = cfg_factory(regras=[{**REGRA_NPS, "valores_permitidos": {"uf": ["SP"]}}], banco=banco_cfg)
+    r = processar_arquivo(planilha_baguncada, cfg)  # reprovado: gera erro, acerto de quem detectou e handover
+    memoria.registrar_execucao(cfg, r)
+    s = memoria.sincronizar_postgres(cfg)
+    assert s["ok"] and s["experiencias"] > 0 and s["handovers"] > 0
+    assert _q(banco_cfg, "SELECT count(*) FROM robo.memoria_experiencias")[0][0] == s["experiencias"]
+    memoria.registrar_execucao(cfg, r)  # de novo: recorrência atualiza a mesma linha no PostgreSQL
+    memoria.sincronizar_postgres(cfg)
+    assert _q(banco_cfg, "SELECT max(recorrencias) FROM robo.memoria_handovers")[0][0] == 2

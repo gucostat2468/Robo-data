@@ -1,0 +1,372 @@
+"""Memória de cada funcionário, handover de erros por área e desempenho.
+
+Onde fica: no mesmo logs/trabalho.db das conversas e tarefas, separado por funcionário (coluna `funcionario`).
+Um banco único, e não um arquivo por pessoa: assim dá para cruzar dados (reunião semanal, área, período) numa
+transação só. Para ler a memória de uma pessoa como documento, `exportar_dossie` grava logs/memoria/<id>.md.
+
+O que entra na memória (só fatos que aconteceram, cada um com a sua origem):
+  - experiências: acerto, erro, aprendizado, correção do dono e treinamento, vindos do pipeline, das tarefas,
+    das revisões e das provas do RH;
+  - handovers: todo erro vira uma regra para a área responsável (o que aconteceu, a causa provável, o que fazer para
+    não repetir e como verificar). Erro repetido não cria outro handover: soma recorrência no mesmo;
+  - desempenho: acertos ÷ (acertos + erros) no período, mais as provas técnicas.
+
+Desempenho insuficiente segue o processo de uma empresa séria: primeiro um plano de melhoria (PDI) com treinamento;
+se persistir na reunião seguinte, a liderança PROPÕE o desligamento e só o dono decide. Cargos fixos do pipeline são
+código do robô: desempenho ruim de um deles é defeito de programa, vira handover para a TI (Diego) com teste
+automatizado, e não "demissão" (demitir o código que lê as planilhas pararia a empresa).
+"""
+
+from __future__ import annotations
+
+import hashlib
+import re
+from datetime import datetime, timedelta
+from pathlib import Path
+
+from robo import organizacao
+from robo.trabalho import Trabalho, _agora
+
+# (padrão do erro, andar, responsável, causa provável, regra para não repetir, como verificar)
+CATEGORIAS = [
+    (r"desempenho insuficiente de cargo fixo", 5, "dev_pleno", "Cargo fixo é código do robô: erro repetido indica defeito",
+     "Diego investiga os erros listados, corrige o código e cria um teste automatizado que reproduz o caso",
+     "Taxa de acerto do cargo volta a 90% ou mais na reunião seguinte"),
+    (r"configuracao invalida|esta com configuracao invalida", 1, "coord_engenharia",
+     "Agente ou habilidade configurado para uma coluna que esta base não tem",
+     "Restringir o 'padrão de arquivos' do agente às bases que têm a coluna, ou corrigir o nome da coluna na habilidade "
+     "(tela Equipe → agente → habilidades)",
+     "A próxima carga dessa base não reprova por configuração"),
+    (r"erro de formula", 1, "leitura", "Fórmula quebrada na planilha de origem (#REF!, #DIV/0!, #N/D)",
+     "Quem gera a planilha procura #REF!/#DIV/0!/#N/D (Ctrl+L) e corrige antes de salvar em Bases-Limpeza",
+     "Leo (leitura) barra automaticamente; conferir que a próxima carga dessa base veio sem erro de fórmula"),
+    (r"obrigatorias ausentes|nao existe no arquivo|nao existem no arquivo", 1, "validacao",
+     "O cabeçalho mudou na origem (coluna renomeada ou removida)",
+     "Alinhar o nome da coluna com quem gera a planilha ou acrescentar o nome novo em 'sinonimos' na regra",
+     "A próxima carga dessa base passa na validação sem este erro"),
+    (r"vazias em coluna obrigatoria", 1, "validacao", "Campo obrigatório deixado em branco na origem",
+     "Preencher na origem; se a coluna não precisa ser obrigatória, tirar de 'nao_nulos' na regra (decisão do dono)",
+     "Contagem de vazios igual a zero na próxima carga"),
+    (r"chave unica repetida", 1, "validacao", "Registro duplicado na origem",
+     "Remover a duplicidade na origem ou revisar se a chave única está certa", "Zero chaves repetidas na próxima carga"),
+    (r"fora da faixa|fora da lista|fora de \S+ a \S+", 1, "validacao", "Valor inválido ou categoria nova na origem",
+     "Corrigir o valor na origem; se o valor novo é legítimo, atualizar 'faixas' ou 'valores_permitidos' na regra",
+     "Próxima carga sem valor fora da regra"),
+    (r"nao puderam ser convertidos|casas decimais|tipo .* invalido", 1, "limpeza", "Tipo de dado misturado na coluna",
+     "Padronizar o formato na origem (número como número, data como data) ou ajustar 'tipos' na regra",
+     "Próxima carga converte 100% da coluna"),
+    (r"linha\(s\) de dados apos a limpeza|nenhuma coluna com dados|nao tem nenhuma aba", 1, "leitura",
+     "Arquivo vazio ou com dados fora do lugar", "Conferir se o arquivo certo foi salvo e se os dados estão na primeira aba",
+     "Próxima carga com linhas"),
+    (r"supervisor de planilhas", 1, "supervisor", "Inconsistência que só aparece no conjunto (chave órfã, linhas sumidas)",
+     "Ler o detalhe do supervisor e corrigir a relação entre as tabelas na origem", "Supervisor aprova a próxima carga"),
+    (r"conferencia da equipe|coordenadora de engenharia", 1, "coord_engenharia",
+     "Conferência do quadro barrou a produção", "Seguir o achado da conferência (tipos, espaços, auditoria, amostra)",
+     "Checklist da coordenadora verde na próxima carga"),
+    (r"postgresql", 1, "dba", "Carga no banco recusada", "Ver a mensagem do PostgreSQL; ajustar tipo da coluna ou a conexão",
+     "Próxima carga confirmada pela Dora"),
+    (r"gravar a saida|formato .* nao suportado", 1, "publicacao", "Arquivo de saída ou de entrada em formato/estado errado",
+     "Fechar a planilha de saída no Excel antes do processamento; enviar só .xlsx/.xlsm/.xls/.csv/.txt",
+     "Próxima publicação gravada"),
+    (r"falha inesperada|nao conseguiu conferir|nao consegui concluir|nao consegui|falhou \(", 5, "dev_pleno",
+     "Erro de programa (defeito no código do robô)",
+     "Corrigir o código e criar um teste automatizado que reproduz o erro (assim ele nunca volta sem ser percebido)",
+     "Teste automatizado novo passando e a mesma entrada processada sem falha"),
+    (r"recalculo independente|sem texto ou evidencia|artefato", 2, "coord_analise", "Entrega sem evidência ou com número divergente",
+     "Toda entrega precisa de evidência e de recálculo igual; refazer a etapa e revisar o método", "Revisão aprovada na próxima tarefa"),
+    (r"reprovado na prova", 4, "canal_helena", "Funcionário sem a competência comprovada para a habilidade",
+     "Treinamento da trilha da área e nova prova antes de voltar a executar", "Prova aprovada na próxima avaliação"),
+]
+
+
+def _norm(t: str) -> str:
+    from robo.canal import normalizar
+    return normalizar(t)
+
+
+def _chave(texto: str, base: str) -> str:
+    t = re.sub(r"\d+([.,]\d+)?", "#", _norm(texto))
+    t = re.sub(r"\s+", " ", t)[:200]
+    return hashlib.sha1(f"{base}|{t}".encode()).hexdigest()[:16]
+
+
+def categorizar(texto: str) -> tuple:
+    t = _norm(texto)
+    for padrao, andar, resp, causa, regra, verificar in CATEGORIAS:
+        if re.search(padrao, t):
+            return andar, resp, causa, regra, verificar
+    return 1, "coord_engenharia", "Causa ainda não classificada", "A coordenação analisa o caso e escreve a regra", \
+        "Mesmo erro não aparece na próxima ocorrência"
+
+
+# --------------------------------------------------------------------------- registro
+def experiencia(cfg, funcionario: str, tipo: str, resumo: str, origem: str, referencia: str = "", detalhe: str = "",
+                tb: Trabalho | None = None) -> None:
+    assert tipo in ("acerto", "erro", "aprendizado", "correcao", "treinamento"), tipo
+    tb = tb or Trabalho(cfg)
+    andar = (organizacao.por_id(cfg).get(funcionario) or {}).get("andar")
+    with tb.tx() as c:
+        c.execute("INSERT INTO experiencias (funcionario, data_hora, tipo, resumo, detalhe, origem, referencia, andar) "
+                  "VALUES (?,?,?,?,?,?,?,?)", (funcionario, _agora(), tipo, resumo[:500], detalhe[:4000], origem, referencia, andar))
+
+
+def handover(cfg, erro: str, base: str = "", detectado_por: str = "", exemplo: str = "", tb: Trabalho | None = None) -> str:
+    """Erro → handover da área (um por tipo de erro e base; repetição soma recorrência). Devolve o id."""
+    tb = tb or Trabalho(cfg)
+    andar, resp, causa, regra, verificar = categorizar(erro)
+    chave = _chave(erro, base)
+    agora = _agora()
+    with tb.tx() as c:
+        h = c.execute("SELECT id, estado FROM handovers WHERE chave=?", (chave,)).fetchone()
+        if h:
+            # erro que voltou depois de "aplicado" reabre o handover: a regra não segurou
+            estado = "reaberto" if h["estado"] in ("aplicado", "verificado") else h["estado"]
+            c.execute("UPDATE handovers SET recorrencias=recorrencias+1, ultima_ocorrencia=?, atualizado_em=?, estado=? WHERE id=?",
+                      (agora, agora, estado, h["id"]))
+            return h["id"]
+        hid = f"HO-{datetime.now():%Y%m%d}-{chave[:6]}"
+        c.execute("INSERT INTO handovers (id, chave, andar, area, responsavel, detectado_por, erro, causa, regra, como_verificar, "
+                  "exemplo, criado_em, ultima_ocorrencia, atualizado_em) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?)",
+                  (hid, chave, andar, organizacao.NOME_ANDAR.get(andar, ""), resp, detectado_por,
+                   (f"[{base}] " if base else "") + erro[:500], causa, regra, verificar, exemplo[:500], agora, agora, agora))
+    return hid
+
+
+def mudar_handover(cfg, hid: str, estado: str, quem: str = "dono") -> None:
+    if estado not in ("aberto", "em_aplicacao", "aplicado", "verificado", "reaberto"):
+        raise ValueError("estado inválido")
+    tb = Trabalho(cfg)
+    with tb.tx() as c:
+        if not c.execute("SELECT 1 FROM handovers WHERE id=?", (hid,)).fetchone():
+            raise ValueError("handover não existe")
+        c.execute("UPDATE handovers SET estado=?, atualizado_em=? WHERE id=?", (estado, _agora(), hid))
+    tb.lembrar("handover", hid, f"{quem} marcou {hid} como {estado}", quem)
+
+
+def handovers(cfg, andar: int | None = None, abertos: bool = False, limite: int = 200) -> list[dict]:
+    sql, args = "SELECT * FROM handovers WHERE 1=1", []
+    if andar:
+        sql += " AND andar=?"
+        args.append(int(andar))
+    if abertos:
+        sql += " AND estado IN ('aberto','em_aplicacao','reaberto')"
+    with Trabalho(cfg).tx() as c:
+        return [dict(r) for r in c.execute(sql + " ORDER BY recorrencias DESC, ultima_ocorrencia DESC LIMIT ?", args + [limite])]
+
+
+def experiencias(cfg, funcionario: str | None = None, desde: str | None = None, ate: str | None = None,
+                 limite: int = 500) -> list[dict]:
+    sql, args = "SELECT * FROM experiencias WHERE 1=1", []
+    if funcionario:
+        sql += " AND funcionario=?"
+        args.append(funcionario)
+    if desde:
+        sql += " AND data_hora>=?"
+        args.append(desde)
+    if ate:
+        sql += " AND data_hora<=?"
+        args.append(ate)
+    with Trabalho(cfg).tx() as c:
+        return [dict(r) for r in c.execute(sql + " ORDER BY id DESC LIMIT ?", args + [limite])]
+
+
+# --------------------------------------------------------------------------- de onde vêm as experiências
+def _base(arquivo: str) -> str:
+    return re.sub(r"[_\-\s]*\d[\d_\-]*$", "", Path(arquivo).stem.lower()) or Path(arquivo).stem.lower()
+
+
+def registrar_execucao(cfg, r) -> None:
+    """Depois de cada planilha processada: experiência de quem conferiu e handover de cada erro."""
+    try:
+        from robo.pipeline import REPROVADO, SUCESSO
+        if r.status not in (SUCESSO, REPROVADO):
+            return
+        tb = Trabalho(cfg)
+        nome, base = r.arquivo.name, _base(r.arquivo.name)
+        gente = organizacao.por_id(cfg)
+        for conf in r.quadro or []:
+            pid = conf.get("id")
+            if pid not in gente:
+                continue
+            achados = conf.get("achados") or []
+            quebrou = [a for a in achados if a.startswith("não consegui concluir")]
+            if quebrou:
+                experiencia(cfg, pid, "erro", f"Não concluiu a conferência de {nome}", "pipeline", r.id, quebrou[0], tb)
+                handover(cfg, quebrou[0], base, pid, nome, tb)
+            elif achados and conf.get("bloqueia"):
+                experiencia(cfg, pid, "acerto", f"Barrou {nome}: {achados[0][:150]}", "pipeline", r.id, "; ".join(achados), tb)
+            elif achados:
+                experiencia(cfg, pid, "aprendizado", f"Observou em {nome}: {achados[0][:150]}", "pipeline", r.id, "", tb)
+            else:
+                experiencia(cfg, pid, "acerto", f"Conferiu {nome} sem achados", "pipeline", r.id, "", tb)
+        for e in r.relatorio.erros:
+            msg = getattr(e, "mensagem", str(e))
+            col = getattr(e, "coluna", "")
+            texto = msg + (f" (coluna {col})" if col else "")
+            hid = handover(cfg, texto, base, "validacao", ", ".join(getattr(e, "exemplos", [])[:3]), tb)
+            _, resp, *_ = categorizar(texto)
+            if resp in gente:
+                experiencia(cfg, resp, "acerto", f"Detectou em {nome}: {msg[:150]}", "pipeline", hid, texto, tb)
+        if r.id and r.relatorio.erros:
+            tb.lembrar("handover_execucao", r.id, f"Erros de {nome} viraram handover", "pipeline")
+        if r.status == SUCESSO:
+            experiencia(cfg, "publicacao", "acerto", f"Publicou {nome} ({r.linhas_saida} linhas)", "pipeline", r.id, "", tb)
+    except Exception:
+        import logging
+        logging.getLogger("robo").exception("Não consegui registrar a memória da execução")
+
+
+def registrar_tarefa(cfg, sid: str) -> None:
+    """Fim de tarefa: acerto/erro de cada executor, acerto do revisor que pegou problema e handover de cada falha."""
+    tb = Trabalho(cfg)
+    s = tb.solicitacao(sid)
+    if not s:
+        return
+    for e in s["etapas"]:
+        r = e["resultado"] or {}
+        if e["estado"] == "concluida":
+            experiencia(cfg, e["funcionario"], "acerto", f"{e['titulo']} ({s['id']})", "tarefa", sid, r.get("evidencia", ""), tb)
+        elif e["estado"] == "falhou":
+            experiencia(cfg, e["funcionario"], "erro", f"{e['titulo']} falhou ({s['id']})", "tarefa", sid, r.get("texto", ""), tb)
+            handover(cfg, r.get("texto", "") or e["titulo"], e["ferramenta"] or "", e["funcionario"], s["titulo"], tb)
+    achados = (s["revisao"] or {}).get("achados") or []
+    if achados:
+        if s["revisor"] and s["revisor"] != "dono":
+            experiencia(cfg, s["revisor"], "acerto", f"Revisão pegou problema em {s['id']}", "revisao", sid, "; ".join(achados), tb)
+        for a in achados:
+            handover(cfg, a, s["modelo"] or "", s["revisor"] or "", s["titulo"], tb)
+
+
+def registrar_avaliacao(cfg, registro: dict) -> None:
+    """Resultado das provas técnicas (estratégia → avaliar_todos) entra na memória de cada um."""
+    tb = Trabalho(cfg)
+    for p in registro.get("pessoas") or []:
+        if p["aprovado"]:
+            experiencia(cfg, p["id"], "treinamento", f"Aprovado nas provas ({p['acertos']}/{p['total']})", "prova", "", "", tb)
+        else:
+            experiencia(cfg, p["id"], "erro", f"Reprovado nas provas ({p['acertos']}/{p['total']})", "prova", "",
+                        "; ".join(p.get("bloqueios") or []), tb)
+            for b in (p.get("bloqueios") or [])[:3]:
+                handover(cfg, b, p["id"], "canal_helena", p["nome"], tb)
+
+
+# --------------------------------------------------------------------------- desempenho
+MINIMO_EVENTOS = 5
+TAXA_MINIMA = 70.0
+
+
+def desempenho(cfg, dias: int = 7, ate: datetime | None = None) -> list[dict]:
+    """Por funcionário: acertos, erros, taxa e situação (ok / sem dados / atenção / insuficiente)."""
+    ate = ate or datetime.now()
+    desde = (ate - timedelta(days=dias)).isoformat(timespec="seconds")
+    exps = experiencias(cfg, desde=desde, ate=ate.isoformat(timespec="seconds"), limite=100_000)
+    por = {}
+    for x in exps:
+        d = por.setdefault(x["funcionario"], {"acertos": 0, "erros": 0, "aprendizados": 0, "ultimos_erros": []})
+        if x["tipo"] == "acerto":
+            d["acertos"] += 1
+        elif x["tipo"] == "erro":
+            d["erros"] += 1
+            if len(d["ultimos_erros"]) < 3:
+                d["ultimos_erros"].append(x["resumo"])
+        elif x["tipo"] in ("aprendizado", "treinamento"):
+            d["aprendizados"] += 1
+    saida = []
+    for p in organizacao.lista(cfg):
+        d = por.get(p["id"], {"acertos": 0, "erros": 0, "aprendizados": 0, "ultimos_erros": []})
+        n = d["acertos"] + d["erros"]
+        taxa = round(100 * d["acertos"] / n, 1) if n else None
+        if n < MINIMO_EVENTOS:
+            situacao = "sem_dados" if not n else ("atencao" if d["erros"] else "ok")
+        else:
+            situacao = "insuficiente" if taxa < TAXA_MINIMA else "atencao" if taxa < 90 else "ok"
+        saida.append({"id": p["id"], "nome": p["nome"], "andar": p["andar"], "grupo": p["grupo"], **d, "eventos": n,
+                      "taxa": taxa, "situacao": situacao, "pode_ser_desligado": p["grupo"] == "contratado"})
+    return saida
+
+
+def dossie(cfg, pid: str) -> dict | None:
+    """Tudo o que a empresa sabe de uma pessoa: contrato, experiências, desempenho e handovers da área."""
+    c = organizacao.contrato(pid, cfg)
+    if not c:
+        return None
+    exps = experiencias(cfg, pid, limite=200)
+    d30 = next((d for d in desempenho(cfg, 30) if d["id"] == pid), None)
+    tb = Trabalho(cfg)
+    with tb.tx() as conn:
+        conversas = conn.execute("SELECT COUNT(*) FROM conversas WHERE funcionario=?", (pid,)).fetchone()[0]
+        tarefas = conn.execute("SELECT COUNT(DISTINCT solicitacao_id) FROM etapas WHERE funcionario=?", (pid,)).fetchone()[0]
+    return {"contrato": c, "experiencias": exps, "desempenho_30d": d30, "conversas": conversas, "tarefas": tarefas,
+            "handovers_da_area": handovers(cfg, c["andar"], abertos=True, limite=30),
+            "onde_pesquisa": c["fontes_conhecimento"] + ["handovers da área (regras aprendidas com erros)"],
+            "onde_registra": [f"logs/trabalho.db → experiencias (funcionario = {pid})", "logs/trabalho.db → handovers",
+                              f"logs/memoria/{pid}.md (dossiê exportado)"]}
+
+
+def exportar_dossie(cfg, pid: str) -> Path | None:
+    d = dossie(cfg, pid)
+    if not d:
+        return None
+    c = d["contrato"]
+    md = [f"# {c['nome']} — {c['cargo']}", "", f"{c['nivel_nome']} · {c['andar']}º andar ({c['nome_andar']}) · gestor: "
+          f"{c['gestor_nome'] or '—'} · revisor: {c['revisor_nome']}", "", "## Escopo", ""]
+    md += [f"- {r}" for r in c["responsabilidades"]] + ["", "## Ferramentas autorizadas", ""]
+    md += [f"- {f}: entra {c['entradas'].get(f, '')} → sai {c['saidas'].get(f, '')}" for f in c["ferramentas"]]
+    md += ["", "## Limites", ""] + [f"- {l}" for l in c["limites"]]
+    md += ["", "## Onde pesquisa", ""] + [f"- {x}" for x in d["onde_pesquisa"]]
+    md += ["", "## Onde registra", ""] + [f"- {x}" for x in d["onde_registra"]]
+    dd = d["desempenho_30d"] or {}
+    md += ["", "## Desempenho (30 dias)", "", f"Acertos {dd.get('acertos', 0)} · erros {dd.get('erros', 0)} · taxa "
+           f"{dd.get('taxa') if dd.get('taxa') is not None else '—'}% · situação {dd.get('situacao', 'sem_dados')}"]
+    md += ["", "## Experiências (mais recentes)", ""] + [f"- {x['data_hora'][:16]} [{x['tipo']}] {x['resumo']} ({x['origem']})"
+                                                          for x in d["experiencias"][:50]]
+    md += ["", "## Handovers abertos da área", ""] + [f"- {h['id']} ({h['recorrencias']}x): {h['erro']} → {h['regra']}"
+                                                       for h in d["handovers_da_area"]]
+    pasta = Path(cfg.logs) / "memoria"
+    pasta.mkdir(parents=True, exist_ok=True)
+    arq = pasta / f"{pid}.md"
+    arq.write_text("\n".join(md) + "\n", encoding="utf-8")
+    return arq
+
+
+# --------------------------------------------------------------------------- espelho no PostgreSQL
+TABELAS_PG = {
+    "experiencias": ("id BIGINT PRIMARY KEY, funcionario TEXT NOT NULL, data_hora TIMESTAMP, tipo TEXT, resumo TEXT, "
+                     "detalhe TEXT, origem TEXT, referencia TEXT, andar INT",
+                     ["id", "funcionario", "data_hora", "tipo", "resumo", "detalhe", "origem", "referencia", "andar"]),
+    "handovers": ("id TEXT PRIMARY KEY, andar INT, area TEXT, responsavel TEXT, detectado_por TEXT, erro TEXT, causa TEXT, "
+                  "regra TEXT, como_verificar TEXT, exemplo TEXT, recorrencias INT, estado TEXT, backlog_id TEXT, "
+                  "criado_em TIMESTAMP, ultima_ocorrencia TIMESTAMP, atualizado_em TIMESTAMP",
+                  ["id", "andar", "area", "responsavel", "detectado_por", "erro", "causa", "regra", "como_verificar", "exemplo",
+                   "recorrencias", "estado", "backlog_id", "criado_em", "ultima_ocorrencia", "atualizado_em"]),
+}
+
+
+def sincronizar_postgres(cfg) -> dict:
+    """Copia a memória (experiências e handovers) para o schema de controle do PostgreSQL (padrão: robo).
+    O SQLite continua sendo a fonte: funciona com o banco desligado e nada se perde; quando o banco volta, a cópia
+    alcança. Tudo numa transação: ou entra tudo, ou nada."""
+    if not cfg.banco.get("habilitado"):
+        return {"ok": False, "motivo": "PostgreSQL não habilitado nas Configurações (a memória segue no SQLite local)"}
+    from psycopg import sql
+    from robo.banco import Banco
+    b = Banco(cfg.banco, cfg.base)
+    schema = b.schemas["controle"]
+    tb = Trabalho(cfg)
+    copiados = {}
+    with b.conectar() as conn:
+        with conn.transaction():
+            conn.execute(sql.SQL("CREATE SCHEMA IF NOT EXISTS {}").format(sql.Identifier(schema)))
+            for nome, (ddl, cols) in TABELAS_PG.items():
+                tabela = sql.Identifier(schema, f"memoria_{nome}")
+                conn.execute(sql.SQL("CREATE TABLE IF NOT EXISTS {} (" + ddl + ")").format(tabela))
+                with tb.tx() as c:
+                    linhas = [tuple(r[x] for x in cols) for r in c.execute(f"SELECT {', '.join(cols)} FROM {nome}")]
+                atualizar = sql.SQL(", ").join(sql.SQL("{0} = EXCLUDED.{0}").format(sql.Identifier(x)) for x in cols[1:])
+                comando = sql.SQL("INSERT INTO {} ({}) VALUES ({}) ON CONFLICT (id) DO UPDATE SET {}").format(
+                    tabela, sql.SQL(", ").join(map(sql.Identifier, cols)), sql.SQL(", ").join(sql.Placeholder() * len(cols)),
+                    atualizar)
+                with conn.cursor() as cur:
+                    cur.executemany(comando, linhas)
+                copiados[nome] = len(linhas)
+    return {"ok": True, "schema": schema, **copiados}

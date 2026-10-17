@@ -59,6 +59,7 @@ class Resultado:
     checklist_analise: dict | None = None
     excel: dict | None = None
     quadro: list = field(default_factory=list)   # conferências de gerentes, plenos, juniores e estagiários
+    tratamento: object = None   # só no modo diagnóstico: o tratamento completo (para as ferramentas do atendimento)
 
 
 @dataclass
@@ -310,6 +311,7 @@ def processar_arquivo(caminho: str | Path, cfg: Config, gravar: bool = True, ao_
                   linhas_saida=sum(len(df) for n, df in t.tabelas.items() if not n.startswith("dim_")))
     if not gravar:
         r.duracao = time.perf_counter() - inicio
+        r.tratamento = t
         return r
 
     cfg.criar_pastas()

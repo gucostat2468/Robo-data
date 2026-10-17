@@ -248,21 +248,11 @@ def alinhamento(cfg, itens: list[dict] | None = None) -> list[dict]:
 # =============================================================================== avaliações técnicas
 def avaliar_todos(cfg) -> dict:
     """Reaplica as provas de todo o quadro, do zero. Devolve e grava o resultado."""
-    from robo import rh
-    from robo.agentes import NATIVOS
-    from robo.analise import ANALISTAS
-    from robo.canal import EQUIPE_CANAL
-    from robo.excel import EQUIPE_EXCEL
+    from robo import organizacao, rh
     from robo.pipeline import obter_equipe
-    from robo.producao import SUPERVISORES
-    from robo.quadro import QUADRO
-    from robo.ti import EQUIPE_TI
     rh._provas_nativas_cache.cache_clear()
     rh._provas_habilidade_cache.cache_clear()  # "do zero" de verdade: provas das habilidades também refeitas
-    pessoas = [(a["id"], a["nome"], 1) for a in NATIVOS] + [(a["id"], a["nome"], a["andar"]) for a in SUPERVISORES]
-    pessoas += [(f"analise_{a['id']}", a["nome"], 2) for a in ANALISTAS] + [(a["id"], a["nome"], 3) for a in EQUIPE_EXCEL]
-    pessoas += [(p["id"], p["nome"], p["andar"]) for p in QUADRO] + [(a["id"], a["nome"], a["andar"]) for a in EQUIPE_CANAL]
-    pessoas += [(p["id"], p["nome"], 5) for p in EQUIPE_TI]
+    pessoas = [(p["id"], p["nome"], p["andar"]) for p in organizacao.lista()]  # registro único
     resultado = []
     for pid, nome, andar in pessoas:
         f = rh.ficha({"id": pid, "habilidades": []})
@@ -282,6 +272,11 @@ def avaliar_todos(cfg) -> dict:
     pasta.mkdir(parents=True, exist_ok=True)
     with open(pasta / "avaliacoes.jsonl", "a", encoding="utf-8") as f:
         f.write(json.dumps(registro, ensure_ascii=False) + "\n")
+    try:
+        from robo import memoria
+        memoria.registrar_avaliacao(cfg, registro)  # cada prova entra na memória da pessoa
+    except Exception:
+        pass
     return registro
 
 

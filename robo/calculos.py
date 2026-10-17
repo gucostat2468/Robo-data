@@ -180,9 +180,16 @@ def _csat(s: pd.Series) -> tuple[float, int]:
     return 100 * (v >= escala - 1).mean(), len(v)
 
 
-def calcular(cfg, pergunta: str) -> dict | None:
-    """Devolve {autor, texto} ou None (não é um pedido de cálculo). Erros de entendimento viram resposta honesta."""
-    bases = bases_publicadas(cfg)
+def calcular(cfg, pergunta: str, fontes: dict | None = None) -> dict | None:
+    """Devolve {autor, texto} ou None (não é um pedido de cálculo). Erros de entendimento viram resposta honesta.
+    fontes = {nome: (DataFrame, arquivo)} calcula sobre essas tabelas (ex.: arquivo anexado a uma conversa)
+    em vez das bases publicadas."""
+    if fontes:
+        bases = {b: {"arquivo": arq, "data_hora": "agora"} for b, (_, arq) in fontes.items()}
+        carregar_base = lambda _cfg, b: (fontes[b][0], fontes[b][1])  # noqa: E731 (mesma assinatura da global)
+    else:
+        bases = bases_publicadas(cfg)
+        carregar_base = globals()["carregar_base"]
     t = _norm(pergunta)
     if re.search(r"quais (sao as )?bases|bases (publicadas|existem|disponiveis)", t):
         if not bases:

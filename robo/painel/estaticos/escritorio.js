@@ -751,6 +751,14 @@ function iniciarEvento(ev) {
   const curto = ev.arquivo.length > 38 ? `${ev.arquivo.slice(0, 35)}…` : ev.arquivo;
   let doc = estado.documentos.get(ev.arquivo);
 
+  if (ev.etapa === "tarefa_fim") { // tarefa da central terminou: o documento dela sai da mesa
+    for (const [chave, d] of estado.documentos) if (chave.startsWith(ev.arquivo)) { raiz.remove(d.g); estado.documentos.delete(chave); }
+    const NOME_FIM = { concluida: "✅ concluída", concluida_parcialmente: "🟡 concluída em parte", falhou: "⛔ falhou" };
+    narrar(`📋 Tarefa ${ev.arquivo} ${NOME_FIM[ev.status] || ev.status} — detalhes em Solicitações no painel`);
+    estado.tocando = { ev, fim: performance.now() + 1500 };
+    return;
+  }
+
   if (ev.etapa === "concluido" || ev.etapa === "adiado") {
     doc = doc || novoDocumento(ev.arquivo);
     let total, final;
@@ -886,7 +894,8 @@ function mostrarFicha(id) {
     ${lista("Critérios de qualidade", f.criterios)}
     ${lista("O que não faz (limites)", f.limites)}
     ${a.aceita_habilidades ? `<div><div class="secao-titulo">Habilidades</div>${a.habilidades.length ? `<div class="chips-colunas">${a.habilidades.map((s) => `<span class="chip-coluna">${esc(s)}</span>`).join("")}</div>` : `<p class="muted">Nenhuma habilidade extra.</p>`}</div>` : ""}
-    <a class="btn" href="inicio.html#agentes">Ver ficha completa no painel</a>`;
+    <div class="acoes"><a class="btn primario" href="inicio.html#conversa=${encodeURIComponent(a.id)}">Conversar com ${esc(a.nome)}</a>
+    <a class="btn" href="inicio.html#agentes">Ver ficha completa no painel</a></div>`;
   ficha.hidden = false;
   const est = estado.estacoes.get(id);
   if (est && est.andar !== estado.andarVisivel && estado.andarVisivel !== "predio") definirAndarVisivel(est.andar);

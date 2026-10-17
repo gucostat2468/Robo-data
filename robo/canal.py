@@ -77,24 +77,9 @@ def _num(v) -> str:
 
 
 def pessoas() -> dict:
-    """id -> {nome, papel, canal} de todo mundo que pode falar no canal."""
-    from robo.agentes import NATIVOS
-    from robo.analise import ANALISTAS
-    from robo.excel import EQUIPE_EXCEL
-    from robo.producao import SUPERVISORES
-    p = {a["id"]: {"nome": a["nome"], "papel": a["papel"], "canal": "engenharia"} for a in NATIVOS}
-    p["banco"]["canal"] = "banco"
-    p.update({f"analise_{a['id']}": {"nome": a["nome"], "papel": a["papel"], "canal": "analise"} for a in ANALISTAS})
-    p.update({a["id"]: {"nome": a["nome"], "papel": a["papel"], "canal": "excel"} for a in EQUIPE_EXCEL})
-    p.update({a["id"]: {"nome": a["nome"], "papel": a["papel"], "canal": "lideranca"} for a in SUPERVISORES})
-    p["dba"]["canal"] = "banco"
-    p.update({a["id"]: {"nome": a["nome"], "papel": a["papel"], "canal": "geral"} for a in EQUIPE_CANAL})
-    p["canal_iara"]["canal"] = "ideias"
-    p["canal_helena"]["canal"] = "rh"
-    from robo.quadro import QUADRO
-    from robo.ti import EQUIPE_TI
-    p.update({x["id"]: {"nome": x["nome"], "papel": x["cargo"].split(" — ")[0], "canal": "geral"} for x in QUADRO})
-    p.update({x["id"]: {"nome": x["nome"], "papel": x["cargo"].split(" — ")[0], "canal": "ti"} for x in EQUIPE_TI})
+    """id -> {nome, papel, canal} de todo mundo que pode falar no canal (registro único + dono)."""
+    from robo import organizacao
+    p = {x["id"]: {"nome": x["nome"], "papel": x["papel"], "canal": x["canal"]} for x in organizacao.lista()}
     p[DONO["id"]] = {"nome": DONO["nome"], "papel": "Dono da empresa", "canal": "geral"}
     return p
 

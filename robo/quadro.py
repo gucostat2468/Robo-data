@@ -541,24 +541,9 @@ CONFERENCIAS_EXTRAS = [
 
 
 def lotacao() -> dict:
-    """Andar → níveis presentes (nativos, quadro e canal). Usado para provar que todo andar está completo."""
-    from robo import rh
-    from robo.agentes import NATIVOS
-    from robo.analise import ANALISTAS
-    from robo.canal import EQUIPE_CANAL
-    from robo.excel import EQUIPE_EXCEL
-    from robo.producao import SUPERVISORES
-    pessoas = [(a["id"], 1) for a in NATIVOS] + [(a["id"], a["andar"]) for a in SUPERVISORES]
-    pessoas += [(f"analise_{a['id']}", 2) for a in ANALISTAS] + [(a["id"], 3) for a in EQUIPE_EXCEL]
-    pessoas += [(p["id"], p["andar"]) for p in QUADRO] + [(a["id"], a["andar"]) for a in EQUIPE_CANAL]
-    from robo.ti import EQUIPE_TI
-    pessoas += [(p["id"], 5) for p in EQUIPE_TI]
-    andares: dict[int, dict[str, list[str]]] = {}
-    for pid, andar in pessoas:
-        from robo.ti import POR_ID as TI
-        nivel = (rh.FICHAS.get(pid) or POR_ID.get(pid) or TI.get(pid) or {}).get("nivel", "pleno")
-        andares.setdefault(andar, {}).setdefault(nivel, []).append(pid)
-    return andares
+    """Andar → níveis presentes. Usado para provar que todo andar está completo (registro único)."""
+    from robo import organizacao
+    return organizacao.lotacao()
 
 
 def conferir(fase: str, ctx: Contexto) -> list[dict]:

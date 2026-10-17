@@ -7,6 +7,7 @@
 // ------------------------------------------------------------------ ícones (traço 24x24)
 const ICONES = {
   grafico: '<path d="M4 20V10"/><path d="M10 20V4"/><path d="M16 20v-7"/><path d="M22 20H2"/>',
+  lista: '<path d="M9 6h11M9 12h11M9 18h11"/><path d="M4 6h.01M4 12h.01M4 18h.01"/>',
   alvo: '<circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5"/><circle cx="12" cy="12" r="1"/>',
   chat: '<path d="M21 12a8 8 0 0 1-11.6 7.1L4 21l1.9-5.4A8 8 0 1 1 21 12z"/><path d="M8.5 11h7"/><path d="M8.5 14.5h4.5"/>',
   escudo: '<path d="M12 3 4.5 6v6c0 4.4 3.2 8.2 7.5 9 4.3-.8 7.5-4.6 7.5-9V6z"/><path d="m9 12 2 2 4-4"/>',
@@ -622,7 +623,9 @@ async function abrirPessoa(id) {
   const f = a.ficha || {};
   const lista = (t, itens) => itens?.length ? `<div><div class="secao-titulo">${t}</div><ul class="lista-ficha">${itens.map((x) => `<li>${esc(x)}</li>`).join("")}</ul></div>` : "";
   abrirGaveta(`<div class="gaveta-cab">${avatar(a)}<div style="flex:1"><div class="muted">${esc(NOME_ANDAR_PAINEL[a.andar] || "")}</div>
-      <h2>${esc(a.nome)} · ${esc(f.cargo || a.papel)}</h2></div><button class="btn fantasma" data-acao="fechar-gaveta" aria-label="Fechar">${icone("x")}</button></div>
+      <h2>${esc(a.nome)} · ${esc(f.cargo || a.papel)}</h2></div>
+      <button class="btn primario" data-acao="conversar" data-id="${esc(id)}">${icone("chat")}Conversar</button>
+      <button class="btn fantasma" data-acao="fechar-gaveta" aria-label="Fechar">${icone("x")}</button></div>
     <div class="gaveta-corpo">
       <div class="chips-colunas">${f.nivel ? `<span class="etiqueta info">${esc(f.nivel)}</span>` : ""}${f.area ? `<span class="etiqueta">${esc(f.area)}</span>` : ""}
         ${f.gestor ? `<span class="etiqueta">Responde a ${esc(f.gestor)}</span>` : ""}

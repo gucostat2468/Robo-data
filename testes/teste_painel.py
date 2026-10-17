@@ -123,3 +123,37 @@ def teste_canal_e_ti_pela_api(painel):
     assert msgs[0]["autor"] == "dono" and msgs[1]["tipo"] == "resposta"
     status, d = chamar(base, "/api/canal?busca=hoje")
     assert status == 200 and d["mensagens"]
+
+
+def teste_conversa_tarefa_aprovacao_e_memoria_pela_api(painel, tmp_path):
+    base, entrada = painel
+    _, f = chamar(base, "/api/funcionarios")
+    ids = {x["id"] for x in f["funcionarios"]}
+    _, esc = chamar(base, "/api/escritorio")
+    assert ids == {a["id"] for a in esc["equipe"]}, "o escritório 3D e o registro único têm as mesmas pessoas"
+    _, ficha = chamar(base, "/api/funcionario?id=dba")
+    assert ficha["contrato"]["nome"] == "Dora" and ficha["onde_registra"]
+    status, r = chamar(base, "/api/conversa/enviar", {"funcionario": "dba", "texto": "o que você faz?"})
+    assert status == 200 and r["respostas"][0]["natureza"] == "conhecimento"
+    _, c = chamar(base, "/api/conversa?id=" + r["conversa_id"])
+    assert len(c["mensagens"]) == 2
+    # anexo de fora da pasta de anexos é recusado
+    status, _ = chamar(base, "/api/conversa/enviar", {"funcionario": "dba", "texto": "verifique", "arquivo": "/etc/passwd"})
+    assert status == 400
+    status, a = chamar(base, "/api/conversa/anexar", dados=_xlsx(tmp_path), cabecalhos={"X-Nome-Arquivo": "base.xlsx"})
+    assert status == 200
+    status, r = chamar(base, "/api/solicitacoes/criar", {"texto": "publique esta planilha", "funcionario": "coord_engenharia",
+                                                          "arquivo": a["arquivo"]})
+    assert status == 200
+    import time
+    for _ in range(100):
+        _, lista = chamar(base, "/api/solicitacoes")
+        if lista["aprovacoes"]:
+            break
+        time.sleep(0.1)
+    assert lista["aprovacoes"] and not list(entrada.iterdir())
+    status, _ = chamar(base, "/api/aprovacoes/decidir", {"id": lista["aprovacoes"][0]["id"], "aprovado": False})
+    assert status == 200
+    status, m = chamar(base, "/api/memoria")
+    assert status == 200 and "desempenho" in m
+    assert chamar(base, "/api/reuniao/gerar", {})[0] == 200

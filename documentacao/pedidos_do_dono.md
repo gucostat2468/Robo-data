@@ -1,6 +1,6 @@
 # Pedidos do dono — acompanhamento
 
-Todo pedido feito na conversa, com a situação real. Atualizado em 17/10/2026.
+Todo pedido feito na conversa, com a situação real. Atualizado em 17/10/2026 (Fase 1 da evolução arquitetural).
 Legenda: ✅ feito e testado · 🟡 feito em parte · ⏳ pendente
 
 | # | Pedido | Situação | Onde está |
@@ -36,3 +36,10 @@ Legenda: ✅ feito e testado · 🟡 feito em parte · ⏳ pendente
 | 29 | Backup automático do banco | ✅ | `robo/backup.py` |
 | 30 | Teste de volume | 🟡 | 100 mil linhas em 154 s (ok); 300 mil interrompido por reinício da máquina de testes |
 | 31 | Rodar no Windows do dono | ⏳ | depende de você: `instalar.bat` |
+| 32 | Conversar direto com qualquer funcionário, com memória | ✅ | botão Conversar na ficha; `robo/atendimento.py` |
+| 33 | Central de solicitações com estados, aprovações e histórico | ✅ | página Solicitações; `robo/trabalho.py`, `robo/orquestrador.py` |
+| 34 | Banco de memória de cada funcionário (erros, acertos, aprendizados) no SQL | ✅ | `logs/trabalho.db` + PostgreSQL `robo.memoria_experiencias` |
+| 35 | Todo erro vira handover para a área | ✅ | `robo/memoria.py`; `robo.memoria_handovers` |
+| 36 | Reunião semanal da liderança (certo, errado, plano de ação) | ✅ | página Memória e reuniões; `robo/reuniao.py` |
+| 37 | Desligar quem não tem desempenho | 🟡 | contratados: PDI → proposta → sua aprovação; cargos fixos viram correção de código (demitir o código pararia o robô) |
+| 38 | IA opcional sem fingir | 🟡 | `robo/ia.py`: só modelo local, desligado; ainda não usado nas respostas |

@@ -819,6 +819,131 @@ class Api:
         threading.Thread(target=lambda: (time.sleep(0.3), self.encerrar.set()), daemon=True).start()
         return {"ok": True}
 
+    # ------------------------------------------------------------ atendimento, solicitações e memória
+    def _pasta_anexos(self) -> Path:
+        p = Path(self.cfg.logs) / "trabalho" / "anexos"
+        p.mkdir(parents=True, exist_ok=True)
+        return p
+
+    def anexar(self, corpo: Path, nome: str):
+        pasta = self._pasta_anexos() / datetime.now().strftime("%Y%m%d_%H%M%S_%f")
+        pasta.mkdir(parents=True)
+        alvo = self._salvar_upload(corpo, nome, pasta)
+        return {"arquivo": str(alvo), "nome": alvo.name}
+
+    def funcionarios(self, q) -> dict:
+        from robo import ia, organizacao
+        return {"funcionarios": [{k: v for k, v in p.items() if k != "_agente"} | {"nivel": organizacao.nivel_de(p["id"], p)}
+                                 for p in organizacao.lista(self.cfg)], "andares": organizacao.NOME_ANDAR,
+                "ia": ia.status(self.cfg)}
+
+    def funcionario(self, q) -> dict:
+        from robo import memoria
+        pid = q.get("id", [""])[0]
+        d = memoria.dossie(self.cfg, pid)
+        if not d:
+            raise ErroApi("Funcionário não encontrado.", 404)
+        from robo.trabalho import Trabalho
+        return {**d, "conversas_recentes": Trabalho(self.cfg).conversas(pid, 10)}
+
+    def conversa(self, q) -> dict:
+        from robo.trabalho import Trabalho
+        c = Trabalho(self.cfg).conversa(q.get("id", [""])[0])
+        if not c:
+            raise ErroApi("Conversa não encontrada.", 404)
+        return c
+
+    def conversa_enviar(self, b) -> dict:
+        from robo import atendimento
+        arquivo = b.get("arquivo") or None
+        if arquivo:  # só aceita arquivo que veio pelo anexo do painel
+            alvo = Path(str(arquivo)).resolve()
+            if self._pasta_anexos().resolve() not in alvo.parents or not alvo.is_file():
+                raise ErroApi("Anexo inválido: envie o arquivo pelo botão de anexar.", 400)
+            arquivo = str(alvo)
+        return atendimento.conversar(self.cfg, str(b.get("funcionario") or ""), str(b.get("texto") or ""),
+                                     b.get("conversa_id") or None, arquivo, str(b.get("origem") or "ficha")[:20])
+
+    def solicitacoes(self, q) -> dict:
+        from robo.trabalho import ESTADOS, Trabalho
+        g = lambda k: (q.get(k, [""])[0] or None)  # noqa: E731
+        tb = Trabalho(self.cfg)
+        andar = g("andar")
+        dias = g("dias")
+        return {"itens": tb.listar(estado=g("estado"), funcionario=g("funcionario"), andar=int(andar) if andar else None,
+                                   tipo=g("tipo"), prioridade=g("prioridade"), origem=g("origem"),
+                                   dias=int(dias) if dias else None, texto=g("texto")),
+                "contagem": tb.contagem(), "aprovacoes": tb.aprovacoes_pendentes(), "estados": ESTADOS}
+
+    def solicitacao(self, q) -> dict:
+        from robo.trabalho import Trabalho
+        s = Trabalho(self.cfg).solicitacao(q.get("id", [""])[0])
+        if not s:
+            raise ErroApi("Solicitação não encontrada.", 404)
+        return s
+
+    def solicitacao_criar(self, b) -> dict:
+        from robo import orquestrador
+        texto = str(b.get("texto") or "").strip()
+        if not texto:
+            raise ErroApi("Descreva o que você precisa.")
+        arquivo = b.get("arquivo") or None
+        if arquivo:
+            alvo = Path(str(arquivo)).resolve()
+            if self._pasta_anexos().resolve() not in alvo.parents or not alvo.is_file():
+                raise ErroApi("Anexo inválido.", 400)
+            arquivo = str(alvo)
+        sid = orquestrador.criar(self.cfg, texto, b.get("funcionario") or "canal_nina", origem="manual", arquivo=arquivo,
+                                 prioridade=str(b.get("prioridade") or "media"))
+        return {"id": sid}
+
+    def aprovacao_decidir(self, b) -> dict:
+        from robo import orquestrador
+        from robo.trabalho import ErroTransicao
+        try:
+            return orquestrador.decidir(self.cfg, str(b.get("id") or ""), bool(b.get("aprovado")), str(b.get("motivo") or "")[:500])
+        except ErroTransicao as e:
+            raise ErroApi(str(e), 409)
+
+    def solicitacao_cancelar(self, b) -> dict:
+        from robo import orquestrador
+        from robo.trabalho import ErroTransicao
+        try:
+            orquestrador.cancelar(self.cfg, str(b.get("id") or ""), str(b.get("motivo") or "")[:500])
+        except ErroTransicao as e:
+            raise ErroApi(str(e), 409)
+        return {"ok": True}
+
+    def memoria_resumo(self, q) -> dict:
+        from robo import memoria, reuniao
+        dias = int(q.get("dias", ["7"])[0])
+        return {"desempenho": memoria.desempenho(self.cfg, dias), "handovers": memoria.handovers(self.cfg, limite=100),
+                "reunioes": [{k: r[k] for k in ("id", "inicio", "fim", "data_hora", "arquivo")} | {"ata": r["ata"]}
+                             for r in reuniao.listar(self.cfg, 5)]}
+
+    def handover_estado(self, b) -> dict:
+        from robo import memoria
+        try:
+            memoria.mudar_handover(self.cfg, str(b.get("id") or ""), str(b.get("estado") or ""))
+        except ValueError as e:
+            raise ErroApi(str(e))
+        return {"ok": True}
+
+    def reuniao_gerar(self, _b) -> dict:
+        from robo import reuniao
+        return reuniao.gerar(self.cfg)
+
+    def memoria_exportar(self, b) -> dict:
+        from robo import memoria
+        arq = memoria.exportar_dossie(self.cfg, str(b.get("id") or ""))
+        if not arq:
+            raise ErroApi("Funcionário não encontrado.", 404)
+        return {"arquivo": str(arq)}
+
+    def memoria_sincronizar(self, _b) -> dict:
+        from robo import memoria
+        return memoria.sincronizar_postgres(self.cfg)
+
 
 ROTAS_GET = {
     "/api/ping": lambda api, q: {"app": "robo-planilhas", "versao": __version__},
@@ -827,6 +952,8 @@ ROTAS_GET = {
     "/api/banco/resumo": Api.banco_resumo, "/api/canal": Api.canal, "/api/ti": Api.ti,
     "/api/central": Api.central, "/api/estrategia": Api.estrategia, "/api/boas-praticas": Api.boas_praticas,
     "/api/agentes/manual": Api.agente_manual_ler, "/api/consultas": Api.consultas, "/api/consulta": Api.consulta,
+    "/api/funcionarios": Api.funcionarios, "/api/funcionario": Api.funcionario, "/api/conversa": Api.conversa,
+    "/api/solicitacoes": Api.solicitacoes, "/api/solicitacao": Api.solicitacao, "/api/memoria": Api.memoria_resumo,
 }
 ROTAS_POST = {
     "/api/robo/ligar": Api.ligar, "/api/robo/pausar": Api.pausar, "/api/robo/processar-agora": Api.processar_agora,
@@ -840,8 +967,12 @@ ROTAS_POST = {
     "/api/estrategia/item": Api.estrategia_item, "/api/estrategia/excluir": Api.estrategia_excluir,
     "/api/estrategia/avaliar": Api.estrategia_avaliar, "/api/estrategia/treinar": Api.estrategia_treinar,
     "/api/estrategia/sincronizar": Api.estrategia_sincronizar, "/api/inicializacao": Api.inicializacao, "/api/atalhos": Api.atalhos, "/api/sair": Api.sair,
+    "/api/conversa/enviar": Api.conversa_enviar, "/api/solicitacoes/criar": Api.solicitacao_criar,
+    "/api/aprovacoes/decidir": Api.aprovacao_decidir, "/api/solicitacoes/cancelar": Api.solicitacao_cancelar,
+    "/api/handovers/estado": Api.handover_estado, "/api/reuniao/gerar": Api.reuniao_gerar,
+    "/api/memoria/exportar": Api.memoria_exportar, "/api/memoria/sincronizar": Api.memoria_sincronizar,
 }
-ROTAS_UPLOAD = {"/api/testar": Api.testar, "/api/enviar": Api.enviar}
+ROTAS_UPLOAD = {"/api/testar": Api.testar, "/api/enviar": Api.enviar, "/api/conversa/anexar": Api.anexar}
 
 
 def criar_manipulador(api: Api):
@@ -991,6 +1122,7 @@ def iniciar_app(caminho_config: Path | None = None, abrir_janela: bool = True, p
     threading.Thread(target=servidor.serve_forever, name="robo-painel", daemon=True).start()
     log.info("Painel disponível em %s", url)
 
+    controle.iniciar_rotinas()
     if controle.cfg and controle.cfg.painel.get("ligar_robo_ao_abrir", True):
         controle.ligar()
     if abrir_janela:
