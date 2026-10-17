@@ -57,3 +57,18 @@ def teste_canal_diferencia_erros_de_calculo(planilha_baguncada, cfg_factory):
     assert "±2,5" in responder("amostra para margem de 2.5% numa base de 5000", cfg)[0]["texto"].replace(".", ",") or \
         "2,5 pontos" in responder("amostra para margem de 2.5% numa base de 5000", cfg)[0]["texto"].replace(".", ",")
     assert "5 andares" in responder("quem é a equipe?", cfg)[0]["texto"]
+
+
+def teste_nome_da_base_na_frase_nao_vira_coluna(cfg_factory):
+    """'NPS da pesquisa de alunos' (achado no teste de navegador): a frase é o nome da base, não uma coluna."""
+    import pandas as pd
+    from robo import calculos
+    cfg = cfg_factory()
+    nps = pd.DataFrame({"nota_nps": [10, 9, 9, 3, 7, 10], "curso": ["A", "A", "B", "B", "A", "B"]})
+    vendas = pd.DataFrame({"vendas": [10.0, 20.0], "loja": ["x", "y"]})
+    fontes = {"nps_pesquisa_alunos": (nps, "a.xlsx"), "vendas_lojas": (vendas, "b.xlsx")}
+    r = calculos.calcular(cfg, "qual o NPS da pesquisa de alunos?", fontes)
+    assert r["texto"].startswith("NPS de nota_nps — Base nps_pesquisa_alunos") and "NPS 50 = 66,7% promotores (4)" in r["texto"]
+    assert "Base nps_pesquisa_alunos" in calculos.calcular(cfg, "NPS por curso da pesquisa de alunos", fontes)["texto"]
+    assert "Média de vendas" in calculos.calcular(cfg, "média de vendas", fontes)["texto"]  # coluna continua sendo coluna
+    assert "Nenhuma base" in calculos.calcular(cfg, "NPS da pesquisa de funcionários", fontes)["texto"]

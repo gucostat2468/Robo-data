@@ -113,6 +113,11 @@ def principal(argv: list[str] | None = None) -> int:
     sd.add_argument("arquivo")
     sub.add_parser("status", help="mostra pastas, fila e histórico")
     sub.add_parser("manutencao", help="remove arquivos antigos conforme a retenção")
+    sdm = sub.add_parser("demo", help="abre a empresa de demonstração (pasta separada, planilhas de 6 áreas)")
+    sdm.add_argument("--recomecar", action="store_true", help="apaga a demonstração anterior e começa do zero")
+    sdm.add_argument("--porta", type=int, default=8799)
+    sdm.add_argument("--sem-janela", action="store_true")
+    sdm.add_argument("--senha", help="senha do painel da demonstração (se não informar, ela é pedida)")
     sub.add_parser("senha", help="define ou troca a senha do painel (pede a senha duas vezes, sem mostrar)")
     sub.add_parser("atalhos", help="cria o atalho 'Robô de Planilhas' na Área de Trabalho e no Menu Iniciar (Windows)")
     si = sub.add_parser("inicializacao", help="liga/desliga o robô junto com o Windows")
@@ -136,6 +141,31 @@ def principal(argv: list[str] | None = None) -> int:
         except Exception as e:
             print(f"Não foi possível: {e}")
             return 1
+
+    if args.comando == "demo":
+        import getpass
+
+        from robo import demonstracao
+        from robo.painel import configuracao
+        from robo.painel.acesso import gerar_hash
+        from robo.painel.servidor import iniciar_app
+        caminho = demonstracao.preparar(recomecar=args.recomecar, porta=args.porta)
+        if not demonstracao.tem_senha(caminho):
+            senha = args.senha
+            if not senha:
+                print("Primeira vez na demonstração: crie a senha do painel (mínimo 8 caracteres).")
+                senha = getpass.getpass("Senha: ")
+                if senha != getpass.getpass("Repita a senha: "):
+                    print("As duas senhas não são iguais.", file=sys.stderr)
+                    return 1
+            try:
+                configuracao.definir_senha(caminho, gerar_hash(senha))
+            except ValueError as e:
+                print(e, file=sys.stderr)
+                return 1
+        configurar_log(carregar_config(caminho).logs, args.verboso)
+        print(f"Demonstração em {caminho.parent} — painel em http://127.0.0.1:{args.porta}/")
+        return iniciar_app(caminho, abrir_janela=not args.sem_janela, porta=args.porta)
 
     if args.comando == "app":
         from robo.config import RAIZ_PROJETO

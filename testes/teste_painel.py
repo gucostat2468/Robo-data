@@ -216,3 +216,34 @@ def teste_conhecimento_e_erros_pelo_painel(painel):
     assert s == 200 and isinstance(e["erros"], list)
     with urllib.request.urlopen(base + "/conhecimento.js") as r:
         assert b"renderConhecimento" in r.read()
+
+
+def teste_scripts_do_painel_nao_repetem_nomes_globais():
+    """Os .js do painel dividem o mesmo escopo global: um const/function repetido derruba o arquivo inteiro no navegador
+    (aconteceu com 'duracao' na sala de reunião — a página sumiu do menu sem erro visível)."""
+    import re
+    from pathlib import Path
+    pasta = Path(__file__).resolve().parent.parent / "robo" / "painel" / "estaticos"
+    html = (pasta / "inicio.html").read_text(encoding="utf-8")
+    vistos = {}
+    for nome in re.findall(r'<script src="([^"/]+\.js)"', html):
+        for ident in re.findall(r"(?m)^(?:const|let|var|function|async function|class)\s+([A-Za-z_$][\w$]*)",
+                                (pasta / nome).read_text(encoding="utf-8")):
+            assert ident not in vistos, f"'{ident}' declarado em {vistos[ident]} e em {nome}"
+            vistos[ident] = nome
+
+
+def teste_modo_demonstracao_isolado_e_com_erro_real(tmp_path):
+    from robo import demonstracao, historico
+    from robo.config import carregar_config
+    from robo.pipeline import processar_arquivo
+    caminho = demonstracao.preparar(tmp_path / "demo")
+    cfg = carregar_config(caminho)
+    assert str(cfg.entrada).startswith(str(tmp_path)) and str(cfg.logs).startswith(str(tmp_path))  # não toca a produção
+    assert not demonstracao.tem_senha(caminho)
+    arquivos = sorted(cfg.entrada.glob("*.xlsx"))
+    assert len(arquivos) == 7
+    status = {a.stem: processar_arquivo(a, cfg).status for a in arquivos}
+    assert status.pop("pedidos_com_formula_quebrada") == "reprovado" and set(status.values()) == {"sucesso"}
+    assert len(historico.ler(cfg.logs, 50)) == 7
+    assert demonstracao.preparar(tmp_path / "demo") == caminho  # reabrir não recria nem duplica

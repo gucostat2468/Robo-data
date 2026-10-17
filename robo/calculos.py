@@ -116,6 +116,19 @@ def _valor(texto: str):
     return t
 
 
+def _base_pelo_nome(frase: str, bases: list[str]) -> str | None:
+    """'pesquisa de alunos' → nps_pesquisa_alunos: todas as palavras da frase estão no nome da base (singular/plural)."""
+    palavras = [w for w in re.findall(r"[a-z0-9]+", _norm(frase)) if len(w) >= 3 and w not in ("das", "dos", "base", "planilha")]
+    if not palavras:
+        return None
+    achadas = []
+    for b in bases:
+        partes = [x for x in b.split("_") if x]
+        if all(any(p[:5] == w[:5] and abs(len(p) - len(w)) <= 2 for p in partes) for w in palavras):
+            achadas.append(b)
+    return achadas[0] if len(achadas) == 1 else None
+
+
 def interpretar(pergunta: str, bases: list[str]) -> dict | None:
     t = _norm(pergunta)
     base = None
@@ -278,6 +291,16 @@ def calcular(cfg, pergunta: str, fontes: dict | None = None) -> dict | None:
             if implicita_ok and all(_achar_coluna(x, cols) for x in citadas):
                 base = b
                 break
+        if not base and pedido["metrica"]:  # "NPS da pesquisa de alunos": a frase não é coluna — é o nome da base?
+            pela_frase = _base_pelo_nome(pedido["metrica"][0], list(bases))
+            if pela_frase:
+                tab = carregar_base(cfg, pela_frase)[0]
+                cols = [c for c in tab.columns if not str(c).startswith("_")]
+                resto = pedido["por"] + [f[0] for f in pedido["filtros"]]
+                if not _achar_coluna(pedido["metrica"][0], cols) and all(_achar_coluna(x, cols) for x in resto) and \
+                        (pedido["op"] not in ("nps", "csat") or _coluna_indicador(pedido["op"], tab)):
+                    base, pedido["metrica"] = pela_frase, []
+                    citadas = resto
         if not base:
             return {"autor": "canal_nina", "texto": "Nenhuma base publicada tem tudo o que você pediu junto "
                                                     f"({pedido['op'].upper() if pedido['op'] in ('nps', 'csat') else pedido['op']}"

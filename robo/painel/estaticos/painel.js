@@ -1562,6 +1562,8 @@ window.addEventListener("drop", (e) => {
 document.querySelectorAll("[data-icone]").forEach((el) => { el.outerHTML = icone(el.dataset.icone); });
 window.addEventListener("hashchange", () => irPara(location.hash.slice(1)));
 (async () => {
+  // pergunta antes se precisa de senha (rota livre): sem login, nada de chamadas que voltariam 401
+  try { const a = await (await fetch("/api/acesso")).json(); if (a.senha && !a.logado) { mostrarLogin(); return; } } catch { /* sem conexão: o aviso sai abaixo */ }
   await atualizarEstado();
   if (E.geral && !E.geral.erro_config) carregarConfig();
   irPara(location.hash.slice(1) || "inicio");

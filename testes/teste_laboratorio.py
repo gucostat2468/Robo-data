@@ -99,3 +99,59 @@ def teste_nps_numa_formula_so():
     passos = conferencia.montar_excel("nps", "nota", [], [], None)
     formulas = [l for l in passos.split("\n") if l.startswith("=")]
     assert len(formulas) == 1 and formulas[0].count("CONT.SES") == 3 and formulas[0].startswith("=ARRED((")
+
+
+def teste_sala_teams_completa(planilha_baguncada, cfg):
+    import sqlite3
+    from robo.trabalho import Trabalho
+    memoria.registrar_execucao(cfg, processar_arquivo(planilha_baguncada, cfg))
+    memoria.handover(cfg, "Coluna de data com texto misturado", "nps_outubro", "limpeza", "teste")
+    r = sala.abrir(cfg, 1)
+    cid = r["conversa_id"]
+    # coordenação levanta a mão porque há handover aberto no andar (motivo real, com o id)
+    mao = next(m for m in r["maos"] if m["id"] == "coord_engenharia")
+    assert "handover" in mao["motivo"]
+    sala.dar_palavra(cfg, cid, "coord_engenharia")
+    d = sala.detalhes(cfg, cid)
+    ult = d["mensagens"][-1]
+    assert ult["autor"] == "coord_engenharia" and "Coluna de data com texto misturado" in ult["texto"] and "→" in ult["texto"]
+    assert all(m["id"] != "coord_engenharia" for m in d["contexto"]["maos"])
+    with pytest.raises(ValueError):
+        sala.dar_palavra(cfg, cid, "coord_engenharia")  # já falou: mão abaixada
+    # reação, convite, remoção, palco, pauta, notas, tarefa
+    sala.reagir(cfg, cid, d["mensagens"][-1]["id"], "aplausos")
+    with pytest.raises(ValueError):
+        sala.reagir(cfg, cid, d["mensagens"][-1]["id"], "bomba")
+    sala.convidar(cfg, cid, "dba")
+    with pytest.raises(ValueError):
+        sala.remover(cfg, cid, "coord_engenharia")  # quem conduz não sai
+    sala.remover(cfg, cid, "dba")
+    assert sala.compartilhar(cfg, cid, "raio_x")["palco"]["texto"].startswith("Temos")
+    sala.pauta(cfg, cid, ["Erros abertos", "Próximos passos"])
+    sala.pauta(cfg, cid, marcar=0)
+    sala.anotar(cfg, cid, "Decidido: padronizar datas.")
+    t = sala.criar_tarefa(cfg, cid, "padronizar a coluna de data da base nps_outubro", "limpeza")
+    assert Trabalho(cfg).solicitacao(t["id"])
+    d = sala.detalhes(cfg, cid)
+    assert d["mensagens"][-1]["texto"].startswith("✅ Tarefa")
+    assert any(m["reacoes"] for m in d["mensagens"]) and d["contexto"]["palco"]["tipo"] == "raio_x"
+    # encerrar: recap salvo, reunião fecha, registro não se apaga
+    fim = sala.encerrar(cfg, cid)
+    rc = fim["recap"]
+    assert rc["tarefas"] and rc["pauta"][0].startswith("[x]") and "👏" in rc["reacoes"] and "Raio-X da empresa" in rc["compartilhado"]
+    assert "## Transcrição" in open(fim["arquivo"], encoding="utf-8").read()
+    with pytest.raises(ValueError):
+        sala.falar(cfg, cid, "ainda aí?")
+    c = sqlite3.connect(cfg.logs / "trabalho.db")
+    with pytest.raises(sqlite3.DatabaseError):
+        c.execute("DELETE FROM sala_eventos")
+    c.rollback()
+    assert c.execute("SELECT COUNT(*) FROM salas_encerradas").fetchone()[0] == 1
+    # a ata da sala NÃO entra em reunioes (é da reunião semanal; misturar fazia a rotina semanal achar que já tinha rodado)
+    assert c.execute("SELECT COUNT(*) FROM reunioes").fetchone()[0] == 0
+    c.close()
+    from robo import reuniao
+    assert all("andares" in r["ata"] for r in reuniao.listar(cfg))
+    tipos = [e["tipo"] for e in sala.eventos(cfg, cid)]
+    for t in ("abrir", "mao_levantada", "palavra", "reacao", "convite", "remocao", "compartilhar", "pauta", "notas", "tarefa", "encerrar"):
+        assert t in tipos, t

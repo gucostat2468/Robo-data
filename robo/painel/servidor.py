@@ -993,7 +993,44 @@ class Api:
         texto = str(b.get("texto") or "").strip()
         if not texto:
             raise ErroApi("Escreva o que quer dizer na reunião.")
-        return sala.falar(self.cfg, str(b.get("conversa_id") or ""), texto, b.get("para") or None)
+        try:
+            return sala.falar(self.cfg, str(b.get("conversa_id") or ""), texto, b.get("para") or None)
+        except ValueError as e:
+            raise ErroApi(str(e))
+
+    def sala_acao(self, b) -> dict:
+        """Botões da sala (estilo Teams). Cada ação fica registrada em sala_eventos."""
+        from robo import sala
+        cid, acao = str(b.get("conversa_id") or ""), str(b.get("acao") or "")
+        try:
+            if acao == "palavra":
+                return sala.dar_palavra(self.cfg, cid, str(b.get("id") or ""))
+            if acao == "maos":
+                return {"maos": sala.levantar_maos(self.cfg, cid)}
+            if acao == "reagir":
+                return sala.reagir(self.cfg, cid, int(b.get("mensagem") or 0), str(b.get("reacao") or ""))
+            if acao == "convidar":
+                return sala.convidar(self.cfg, cid, str(b.get("id") or ""))
+            if acao == "remover":
+                return sala.remover(self.cfg, cid, str(b.get("id") or ""))
+            if acao == "compartilhar":
+                return sala.compartilhar(self.cfg, cid, str(b.get("tipo") or ""), b.get("ref") or None)
+            if acao == "notas":
+                return sala.anotar(self.cfg, cid, str(b.get("texto") or ""))
+            if acao == "pauta":
+                itens = b.get("itens")
+                return sala.pauta(self.cfg, cid, [str(x) for x in itens] if isinstance(itens, list) else None,
+                                  int(b["marcar"]) if b.get("marcar") is not None else None)
+            if acao == "tarefa":
+                texto = str(b.get("texto") or "").strip()
+                if not texto:
+                    raise ErroApi("Descreva a tarefa.")
+                return sala.criar_tarefa(self.cfg, cid, texto, str(b.get("responsavel") or ""))
+            if acao == "encerrar":
+                return sala.encerrar(self.cfg, cid)
+        except ValueError as e:
+            raise ErroApi(str(e))
+        raise ErroApi("Ação desconhecida.")
 
     def sala_ver(self, q) -> dict:
         from robo import sala
@@ -1127,6 +1164,7 @@ ROTAS_POST = {
     "/api/handovers/estado": Api.handover_estado, "/api/reuniao/gerar": Api.reuniao_gerar, "/api/estudo/rodar": Api.estudo_rodar,
     "/api/auditorias/rodar": Api.auditorias_rodar,
     "/api/reuniao/sala/abrir": Api.sala_abrir, "/api/reuniao/sala/falar": Api.sala_falar,
+    "/api/reuniao/sala/acao": Api.sala_acao,
     "/api/memoria/exportar": Api.memoria_exportar, "/api/memoria/sincronizar": Api.memoria_sincronizar,
     "/api/conhecimento/rodar": Api.conhecimento_rodar, "/api/conhecimento/criar": Api.conhecimento_criar,
     "/api/conhecimento/versao": Api.conhecimento_versao, "/api/conhecimento/arquivar": Api.conhecimento_arquivar,

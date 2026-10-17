@@ -37,6 +37,15 @@ Você já tem o projeto em `C:\Robo-data`. Para atualizar e instalar:
 
 > Se ele não achar a pasta Bases-Limpeza, o próprio painel abre uma tela pedindo o caminho. Clique com o botão direito na pasta → **Copiar como caminho** → cole.
 
+### Ver tudo funcionando antes (modo demonstração)
+
+Dê dois cliques em **`Demonstracao.bat`** (ou rode `python -m robo demo`).
+
+- **Empresa separada.** É criada a pasta `demonstracao/` com a própria pasta de entrada, os próprios logs e o próprio config. A sua produção não é tocada.
+- **Planilhas de teste.** Entram planilhas sujas de 6 áreas, mais uma com `#REF!`/`#DIV/0!` que o robô precisa barrar.
+- **Senha.** Na primeira vez, a demonstração pede uma senha para o painel.
+- **Recomeçar.** Para começar do zero: `Demonstracao.bat --recomecar`.
+
 ## 2. Uso no dia a dia
 
 Dois cliques no atalho **Robô de Planilhas**. Abre uma janela com o painel e o robô começa a trabalhar.

@@ -68,4 +68,10 @@ Legenda: ✅ feito e testado · 🟡 feito em parte · ⏳ pendente
 | 62 | Especialista para cada biblioteca, os mais cobrados | ✅ | guilda Python, exigência de 90% (`robo/bibliotecas.py`) |
 | 63 | Interação entre funcionários e balão no 3D | ✅ | `robo/interacoes.py`; balões no escritório 3D |
 | 64 | NPS numa fórmula só | ✅ | `=ARRED((CONT.SES(…>=9) − CONT.SES(…<=6)) / CONT.SES(…>=0) * 100; 0)` |
+| 65 | Conhecimento sólido de todos, sem perder nada, para sempre | ✅ | caderno de lições (`robo/licoes.py`): todo erro, boa prática, falha de treino, correção sua e manual vira lição; cada um estuda, é testado e só conta como aplicada com prova |
+| 66 | Governança, segurança e organização do conhecimento | ✅ | nada se apaga (gatilhos no banco), versão nova e arquivamento só por você, cadeia SHA-256 que denuncia adulteração, cópia em JSONL e no PostgreSQL |
+| 67 | Todo erro de sistema registrado para nunca mais acontecer | ✅ | `robo/erros.py`: todo log de erro vira registro permanente com traceback, handover para a TI e reabertura se voltar; tela Conhecimento |
+| 68 | Ver a operação inteira na minha frente e interagir | ✅ | `python -m robo demo` / `Demonstracao.bat`: empresa separada, 6 áreas + 1 planilha com defeito real |
+| 69 | Engenharia reversa do Teams | ✅ | `documentacao/sala_teams.md`: mão levantada, reações, pessoas, compartilhar, galeria/palestrante/fixar, câmera local, leitura em voz, pauta, anotações, tarefas e recap |
+| 70 | Nada de erro na operação | ✅ | percurso automático no navegador: 20 páginas e 23 ações da sala sem erro; 255 testes; ronda de TI saudável |
 | 38 | IA opcional sem fingir | 🟡 | `robo/ia.py`: só modelo local, desligado; ainda não usado nas respostas |

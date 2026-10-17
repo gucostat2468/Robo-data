@@ -205,7 +205,7 @@ function renderMemoria() {
       <div><b>Para não repetir:</b> ${esc(h.regra)}</div><div class="muted"><b>Como verificar:</b> ${esc(h.como_verificar)}</div></div>
       <select data-handover="${esc(h.id)}">${["aberto", "em_aplicacao", "aplicado", "verificado", "reaberto"].map((e) => `<option ${e === h.estado ? "selected" : ""} value="${e}">${e.replace("_", " ")}</option>`).join("")}</select></div>`).join("");
   const r = m.reunioes[0];
-  const ata = r ? r.ata.andares.map((a) => `<div class="cartao" style="margin-bottom:8px"><div class="cartao-corpo">
+  const ata = r?.ata?.andares ? r.ata.andares.map((a) => `<div class="cartao" style="margin-bottom:8px"><div class="cartao-corpo">
       <strong>${a.andar}º andar — ${esc(a.nome)}</strong> <span class="muted">líder: ${esc(a.lider_nome)}</span>
       <div class="grade-2" style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:6px">
         <div><div class="secao-titulo">Deu certo</div><ul class="lista-ficha">${a.deu_certo.map((x) => `<li>${esc(x)}</li>`).join("")}</ul></div>
@@ -321,78 +321,14 @@ function renderRaioX() {
     <ul class="lista-ficha">${r.sessoes.map((x) => `<li>${esc(dataT(x.aberto_em))} — ligado ${x.horas_ligado} h${x.desligado_antes_horas != null ? ` · antes ficou desligado ${x.desligado_antes_horas} h` : ""}</li>`).join("")}</ul>`;
 }
 
-// ------------------------------------------------------------------ sala de reunião (estilo Teams)
-async function carregarSala() {
-  await nomesDaEquipe();
-  if (E.salaId) { try { E.sala = await api(`/api/reuniao/sala?id=${encodeURIComponent(E.salaId)}`); } catch { E.sala = null; E.salaId = null; } }
-  try { E.salas = (await api("/api/reuniao/salas")).salas; } catch { E.salas = []; }
-}
-
-function renderSala() {
-  const s = E.sala;
-  const botoes = [1, 2, 3, 4, 5].map((a) => `<button class="btn ${s && s.contexto.andar === a ? "primario" : ""}" data-acao="sala-abrir" data-andar="${a}">${a}º andar</button>`).join("");
-  if (!s) {
-    return cabecalho("Sala de reunião", "Escolha o andar: a liderança entra na sala e cada um apresenta a sua parte com os dados de agora. As telas ficam abertas enquanto você conversa.", botoes) +
-      (E.salas?.length ? `<div class="secao-titulo">Reuniões recentes</div><ul class="lista-ficha">${E.salas.map((x) => `<li><button class="btn pequeno" data-acao="sala-retomar" data-id="${esc(x.id)}">${esc(x.titulo)}</button> <span class="muted">${esc(dataT(x.atualizada_em))}</span></li>`).join("")}</ul>` : "");
-  }
-  const ultimaDe = {}; for (const m of s.mensagens) ultimaDe[m.autor] = m;
-  const falando = [...s.mensagens].reverse().find((m) => m.autor !== "dono")?.autor;
-  const alvo = E.salaPara || "";
-  const tiles = [{ id: "dono", nome: "Você", cargo: "Dono da empresa", cor: "#6264A7", nivel: "" }, ...s.pessoas].map((p) => {
-    const ult = ultimaDe[p.id]; const fala = ult ? ult.texto.split("\n")[0].replace(/\*\*/g, "") : "";
-    const ativo = p.id === falando, escolhido = p.id === alvo;
-    return `<div class="tile-reuniao" data-acao="${p.id === "dono" ? "" : "sala-para"}" data-id="${esc(p.id)}" style="position:relative;background:#292929;border-radius:10px;
-        padding:14px;min-height:170px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;cursor:${p.id === "dono" ? "default" : "pointer"};
-        outline:${ativo ? "3px solid #7B83EB" : escolhido ? "2px dashed #A6A7DC" : "1px solid #3b3b3b"}">
-      <span style="width:64px;height:64px;border-radius:50%;background:${esc(p.cor || "#64748B")};display:grid;place-items:center;color:#fff;font-size:26px;font-weight:600">${esc(p.nome.slice(0, 1))}</span>
-      <strong style="color:#fff">${esc(p.nome)}</strong><small style="color:#c8c8c8;text-align:center">${esc(p.cargo)}${p.nivel ? ` · ${esc(p.nivel)}` : ""}</small>
-      ${fala ? `<div style="margin-top:4px;background:#fff;color:#111;border-radius:10px;padding:6px 8px;font-size:12px;line-height:1.3;max-height:52px;overflow:hidden">${esc(fala.slice(0, 140))}</div>` : ""}
-      ${ativo ? `<span style="position:absolute;top:8px;left:10px;font-size:11px;color:#c5c8ff">● falando</span>` : ""}
-      ${escolhido ? `<span style="position:absolute;top:8px;right:10px;font-size:11px;color:#c5c8ff">você vai falar com ${esc(p.nome)}</span>` : ""}</div>`;
-  }).join("");
-  const nomeDe = (id) => id === "dono" ? "Você" : (E.nomes?.[id] || id);
-  const transcricao = s.mensagens.map((m) => `<div class="msg ${m.autor === "dono" ? "minha" : ""}" style="margin:6px 0">
-      <div class="msg-cab"><strong>${esc(nomeDe(m.autor))}</strong>${m.autor !== "dono" ? etiquetaNatureza(m.natureza) : ""}<time>${esc(dataT(m.criada_em))}</time></div>
-      <div class="msg-texto">${m.autor === "dono" ? esc(m.texto) : formatarMensagem(m.texto)}</div></div>`).join("");
-  return cabecalho(esc(s.titulo), `Reunião ao vivo · ${s.pessoas.length} participante(s). Clique na tela de alguém para falar com essa pessoa, ou cite o nome na mensagem.`,
-      botoes + `<button class="btn" data-acao="sala-sair">${icone("x")}Sair da reunião</button>`) +
-    `<div style="display:grid;grid-template-columns:minmax(0,1fr) 420px;gap:14px;align-items:start">
-      <section style="background:#1F1F1F;border-radius:14px;padding:14px;display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:12px">${tiles}</section>
-      <section class="cartao" style="display:flex;flex-direction:column;max-height:76vh">
-        <div class="cartao-corpo" id="transcricao-sala" style="overflow:auto;flex:1">${transcricao}</div>
-        <div class="caixa-texto" style="flex-wrap:wrap"><select id="sala-para" style="flex:1 1 100%">
-            <option value="">Falar com: a coordenação (ou quem eu citar)</option>${s.pessoas.map((p) => `<option value="${esc(p.id)}" ${alvo === p.id ? "selected" : ""}>Falar com: ${esc(p.nome)} · ${esc(p.cargo)}</option>`).join("")}</select>
-          <textarea id="sala-texto" rows="2" placeholder="Escreva para a reunião. Enter envia." style="flex:1 1 260px;min-width:0"></textarea>
-          <button class="btn primario" data-acao="sala-falar">${icone("enviar")}Falar</button></div></section></div>`;
-}
-
-async function falarNaSala(el) {
-  const texto = ($("#sala-texto")?.value || "").trim(); if (!texto) return;
-  await comCarregando(el, async () => {
-    await api("/api/reuniao/sala/falar", { corpo: { conversa_id: E.salaId, texto, para: E.salaPara || null } });
-    await carregarSala(); desenhar();
-    const t = $("#transcricao-sala"); if (t) t.scrollTop = t.scrollHeight;
-    $("#sala-texto")?.focus();
-  });
-}
-
 // ------------------------------------------------------------------ registro de páginas e ações
 Object.assign(PAGINAS, {
   solicitacoes: { titulo: "Solicitações", render: renderSolicitacoes, carregar: carregarSolicitacoes },
   memoria: { titulo: "Memória e reuniões", render: renderMemoria, carregar: carregarMemoria },
   chat: { titulo: "Chat da empresa", render: renderChat, carregar: carregarChat },
-  reuniao: { titulo: "Sala de reunião", render: renderSala, carregar: carregarSala },
   raio: { titulo: "Raio-X da empresa", render: renderRaioX, carregar: async () => { await nomesDaEquipe(); await carregarRaioX(); } },
 });
 Object.assign(ACOES, {
-  "sala-abrir": (el) => comCarregando(el, async () => {
-    const r = await api("/api/reuniao/sala/abrir", { corpo: { andar: Number(el.dataset.andar) } });
-    E.salaId = r.conversa_id; E.salaPara = ""; await carregarSala(); desenhar();
-    const t = $("#transcricao-sala"); if (t) t.scrollTop = t.scrollHeight; }),
-  "sala-retomar": async (el) => { E.salaId = el.dataset.id; E.salaPara = ""; await carregarSala(); desenhar(); },
-  "sala-sair": () => { E.salaId = null; E.sala = null; E.salaPara = ""; carregarSala().then(desenhar); },
-  "sala-para": (el) => { E.salaPara = E.salaPara === el.dataset.id ? "" : el.dataset.id; desenhar(); $("#sala-texto")?.focus(); },
-  "sala-falar": (el) => falarNaSala(el),
   "recarregar-raio": async () => { await carregarRaioX(); desenhar(); },
   auditar: (el) => comCarregando(el, async () => { const r = await api("/api/auditorias/rodar", { corpo: {} });
     const ruins = (r.auditorias || []).filter((a) => !a.aprovada).length;
@@ -442,7 +378,6 @@ Object.assign(ACOES, {
 
 document.addEventListener("keydown", (e) => {
   if (e.target.id === "conversa-texto" && e.key === "Enter" && !e.shiftKey) { e.preventDefault(); enviarConversa($("[data-acao='conversa-enviar']")); }
-  if (e.target.id === "sala-texto" && e.key === "Enter" && !e.shiftKey) { e.preventDefault(); falarNaSala($("[data-acao='sala-falar']")); }
 });
 document.addEventListener("change", async (e) => {
   if (e.target.dataset.filtroSolic) { E.filtroSolic[e.target.dataset.filtroSolic] = e.target.value; await carregarSolicitacoes(); desenhar(); }
@@ -450,7 +385,6 @@ document.addEventListener("change", async (e) => {
     try { await api("/api/handovers/estado", { corpo: { id: e.target.dataset.handover, estado: e.target.value } }); } catch (err) { avisar(err.message, "erro"); }
     await carregarMemoria(); desenhar();
   }
-  if (e.target.id === "sala-para") { E.salaPara = e.target.value; desenhar(); return; }
   if (e.target.dataset.filtroChat) { E.filtroChat[e.target.dataset.filtroChat] = e.target.type === "checkbox" ? e.target.checked : e.target.value; desenhar(); }
   if (e.target.id === "mem-dias") { E.memoriaDias = e.target.value; await carregarMemoria(); desenhar(); }
   if (e.target.id === "mem-andar") { E.memoriaAndar = e.target.value; desenhar(); }

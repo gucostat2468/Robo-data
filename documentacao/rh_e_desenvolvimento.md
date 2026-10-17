@@ -129,3 +129,48 @@ Andar novo só faz sentido com **trabalho real** para ele. Um andar sem ferramen
 5. **Escritório 3D:** as mesas são desenhadas a partir da lista de pessoas.
 
 Os testes de "registro único" e de "andar completo" acusam se faltar algum passo.
+
+## Caderno de lições: conhecimento que não se perde
+
+Este caderno é a resposta a "todos com conhecimento sólido, aprendendo sempre, sem perder nada".
+
+### De onde vêm as lições
+
+A colheita é automática, de hora em hora (rotina `licoes`, responsável Roberta, de T&D):
+
+- **Handover:** todo erro, com o que aconteceu, por quê, a regra e como verificar.
+- **Boa prática:** o que o PDCA comprovou.
+- **Laboratório:** toda falha de treino, com a área e a semente, para refazer exatamente o mesmo caso.
+- **Correção do dono:** toda correção que você fez numa conversa.
+- **Manual:** cada seção de `conhecimento/*.md` e dos manuais dos funcionários.
+
+### Quem recebe
+
+- O responsável e todo o andar dele.
+- O guia de liderança vai para a liderança.
+- Os demais manuais vão para todos.
+
+### Ciclo de cada lição para cada pessoa
+
+| Estado | Quando muda | Evidência |
+|---|---|---|
+| atribuída | a lição nasceu e é dela | — |
+| estudada | entrou no caderno e no dossiê | registro na cadeia |
+| avaliada | perguntada com a pergunta-chave, o conhecimento da empresa devolve a lição certa | teste de recuperação |
+| aplicada | **só com prova prática** | caso do laboratório refeito e aprovado, handover verificado pelo PDCA, ou manual de referência |
+
+Sem prova, a lição fica em "avaliada". Ela nunca vira "aplicada" de mentira.
+
+### Governança
+
+- **Nada se apaga.** Gatilhos no banco recusam DELETE nas tabelas `licoes`, `licoes_funcionario` e `registro_conhecimento`. Também recusam UPDATE no conteúdo das lições e na cadeia.
+- **Mudar uma lição cria uma versão nova.** A versão antiga continua guardada. Só você publica versão nova ou arquiva, e sempre com o motivo.
+- **Cadeia de registros.** Cada mudança guarda o hash SHA-256 da anterior. Se alguém mexer por fora, `verificar_integridade` aponta o registro adulterado e a segurança (Wagner) recebe um handover.
+- **Cópias.**
+  - JSONL diário em `logs/conhecimento/`;
+  - PostgreSQL: `robo.memoria_licoes`, `robo.memoria_licoes_funcionario` e `robo.memoria_registro_conhecimento`.
+- **Onde consultar.** A ferramenta "conhecimento" (no chat) consulta as lições antes de dizer "não sei". A tela **Conhecimento** mostra:
+  - o percentual comprovado por pessoa;
+  - o caderno de cada um;
+  - as versões e a trilha de cada lição;
+  - os erros de sistema.
