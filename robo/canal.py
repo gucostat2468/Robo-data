@@ -612,6 +612,15 @@ def responder(texto: str, cfg) -> list[dict]:
     # cálculo amostral/margem com números na mensagem tem prioridade (resposta exata, não texto pronto)
     if (pont_int["amostra"] or "margem" in t) and _numeros(t):
         return [_calculo_amostral(t)]
+    # pedido de cálculo sobre as bases publicadas ("nps por região", "média de valor por loja onde canal = App")
+    if not re.match(r"^(como|o que|qual a diferenca|por que)\b", t):
+        try:
+            from robo.calculos import calcular
+            r = calcular(cfg, texto)
+        except Exception as e:  # cálculo com problema vira resposta honesta, nunca derruba o canal
+            r = {"autor": "canal_nina", "texto": f"Não consegui fazer esse cálculo ({type(e).__name__}: {e})."}
+        if r:
+            return [{**r, "intencao": "calculo"}]
     # manuais e conhecimento em .md escritos por você/pela equipe têm prioridade quando batem melhor
     pontos_md, secao = _buscar_markdown(cfg, t)
     if secao and pontos_md >= 4 and pontos_md > max(melhor_kb[0], melhor_int[1]):
@@ -635,7 +644,8 @@ def responder(texto: str, cfg) -> list[dict]:
              "texto": "Não tenho certeza do que você precisa — prefiro perguntar a chutar. Posso ajudar com: "
                       "\"como está hoje?\", \"quais erros tivemos?\", \"sprint\", \"ideias\", \"banco\", "
                       "\"quem é a equipe?\", dúvidas de Excel (PROCX, SOMASES, tabela dinâmica...), Power BI/DAX, "
-                      "NPS/CSAT, cálculo de amostra e trade marketing (sell-out, share, ruptura). "
+                      "NPS/CSAT, cálculo de amostra e trade marketing (sell-out, share, ruptura), e cálculos sobre as suas "
+                      "bases (\"nps por região\", \"média de valor por loja onde canal = App\"). "
                       "Você também pode chamar alguém pelo nome, ex.: \"Ricardo, como faço uma tabela dinâmica?\""}]
 
 
