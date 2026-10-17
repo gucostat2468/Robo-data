@@ -124,12 +124,20 @@ def teste_etapas_emitidas_em_ordem(planilha_baguncada, cfg_factory):
     etapas = []
     r = processar_arquivo(planilha_baguncada, cfg_factory([REGRA_NPS]), ao_etapa=lambda e, a, **k: etapas.append((e, k)))
     assert r.status == SUCESSO
-    assert [e for e, _ in etapas] == ["leitura", "limpeza", "validacao", "modelagem", "supervisor", "coord_engenharia",
-                                      "publicacao", "analise:perfil", "analise:indicadores", "analise:estatistica",
-                                      "analise:monitoramento", "analise:relator", "coord_analise",
+    assert [e for e, _ in etapas] == ["leitura", "limpeza", "validacao", "modelagem", "supervisor",
+                                      "eng_pleno_tipos", "eng_junior_espacos", "eng_junior_auditoria", "eng_estagiario",
+                                      "coord_engenharia", "publicacao", "eng_pleno_releitura",
+                                      "analise:perfil", "analise:indicadores", "analise:estatistica",
+                                      "analise:monitoramento", "analise:relator",
+                                      "ana_pleno_recalculo", "ana_pleno_base", "ana_junior_faixas", "ana_estagiario",
+                                      "coord_analise", "ger_analise",
                                       "excel_pesquisa", "excel_formulas", "excel_trade", "excel_dinamicas", "excel_supervisor",
-                                      "concluido"]
+                                      "coord_excel", "xl_pleno_formulas", "xl_junior_formatos", "xl_estagiario",
+                                      "gov_pleno_lgpd", "gov_estagiaria", "concluido"]
     assert etapas[-1][1]["status"] == SUCESSO and etapas[-1][1]["linhas"] == 4
+    # todo o quadro conferiu e ninguém achou problema num arquivo correto
+    assert all(x["ok"] for x in r.quadro if x["nivel"] != "estagiario"), [x for x in r.quadro if not x["ok"]]
+    assert r.excel["revisao_ok"] and r.analise["manchete"]
 
 
 def teste_texto_com_igual_nao_vira_formula_ativa(pastas, cfg_factory):

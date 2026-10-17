@@ -27,8 +27,12 @@ from pathlib import Path
 import pandas as pd
 
 NIVEIS = ["estagiario", "junior", "pleno", "senior", "especialista"]
-NOME_NIVEL = {"estagiario": "Estagiário", "junior": "Júnior", "pleno": "Pleno", "senior": "Sênior", "especialista": "Especialista"}
-RISCO_MAXIMO = {"estagiario": "alto", "junior": "baixo", "pleno": "medio", "senior": "alto", "especialista": "alto"}
+NOME_NIVEL = {"estagiario": "Estagiário", "junior": "Júnior", "pleno": "Pleno", "senior": "Sênior", "especialista": "Especialista",
+              "coordenador": "Coordenador(a)", "gerente": "Gerente"}
+RISCO_MAXIMO = {"estagiario": "alto", "junior": "baixo", "pleno": "medio", "senior": "alto", "especialista": "alto",
+                "coordenador": "alto", "gerente": "alto"}
+# cargos de gestão: não executam habilidades nos dados; respondem por pessoas, metas e liberação
+CARGOS_GESTAO = ["coordenador", "gerente"]
 ORDEM_RISCO = {"baixo": 0, "medio": 1, "alto": 2}
 NOME_RISCO = {"baixo": "baixo", "medio": "médio", "alto": "alto"}
 AREAS = ["Engenharia de Dados", "Qualidade de Dados", "Governança e Privacidade", "Análise de Dados",
@@ -430,6 +434,19 @@ def _provas_nativas_cache() -> dict:
     except Exception as e:
         for a in ("analise_perfil", "analise_indicadores", "analise_estatistica", "analise_monitoramento", "analise_relator"):
             resultado[a] = [{"prova": "Execução das provas", "aprovado": False, "motivo": f"{type(e).__name__}: {e}"}]
+    # quadro de pessoal (gerentes, plenos, juniores, estagiários) e equipe do canal
+    from robo import canal, quadro
+    for grupo, ids in ((quadro.provas_quadro, [p["id"] for p in quadro.QUADRO]),
+                       (canal.provas_canal, ["canal_nina", "canal_iara", "canal_helena", "ger_operacoes"])):
+        try:
+            for agente, casos in grupo().items():
+                destino = agente.removesuffix("_canal")
+                resultado.setdefault(destino, [])
+                resultado[destino] = resultado[destino] + [
+                    {"prova": n, "aprovado": bool(ok), "motivo": "" if ok else "resultado diferente do esperado"} for n, ok in casos]
+        except Exception as e:
+            for a in ids:
+                resultado[a] = [{"prova": "Execução das provas", "aprovado": False, "motivo": f"{type(e).__name__}: {e}"}]
     return resultado
 
 
@@ -512,22 +529,44 @@ FICHAS = {
                              "Transações ACID, rollback total em divergência", "Monitoramento de tamanho e saúde das tabelas"],
             "responsabilidades": ["Acompanhar tudo o que acontece no banco", "Desfazer a carga que não bate"],
             "criterios": ["Contagem no banco = contagem esperada, por lote"], "limites": ["Nunca corrige dado dentro do banco à mão"]},
-    "coord_engenharia": {"cargo": "Coordenadora de Engenharia de Dados", "nivel": "especialista", "area": "Engenharia de Dados",
+    "coord_engenharia": {"cargo": "Coordenadora de Engenharia de Dados", "nivel": "coordenador", "area": "Engenharia de Dados",
                          "metodologias": ["Gate de produção (definition of done)", "Gestão de qualidade por checklist",
                                           "Boas práticas de engenharia: idempotência, atomicidade, rastreabilidade, testes"],
                          "responsabilidades": ["Assinar a liberação para produção", "Garantir que a equipe está aprovada no RH"],
                          "criterios": ["Só libera com 100% do checklist verde"], "limites": ["Não pula etapas por pressa"]},
-    "coord_analise": {"cargo": "Coordenador de Análise e Ciência de Dados", "nivel": "especialista", "area": "Análise de Dados",
+    "coord_analise": {"cargo": "Coordenador de Análise e Ciência de Dados", "nivel": "coordenador", "area": "Análise de Dados",
                       "metodologias": ["Revisão por pares de análises", "Boas práticas de inferência (base mínima, margem, comparações múltiplas)",
                                        "Reprodutibilidade: toda análise refeita a partir dos dados publicados"],
                       "responsabilidades": ["Revisar as análises do 2º andar", "Apontar ressalvas antes da apresentação"],
                       "criterios": ["Nenhum achado comunicado sem base e margem"], "limites": ["Não altera números: aponta ressalvas"]},
-    "excel_supervisor": {"cargo": "Supervisor da Sala Excel · ex-Microsoft", "nivel": "especialista", "area": "Storytelling e Negócio",
+    "excel_supervisor": {"cargo": "Gerente da Sala Excel · ex-Microsoft", "nivel": "gerente", "area": "Storytelling e Negócio",
                          "metodologias": ["Excel de ponta a ponta: fórmulas, matrizes dinâmicas, Power Query, Power Pivot, tabelas dinâmicas",
                                           "Auditoria de planilhas (rastreabilidade célula a célula)", "Conferência independente de cada número"],
                          "responsabilidades": ["Coordenar a Sala Excel", "Responder dúvidas de Excel no canal", "Assinar a entrega"],
                          "criterios": ["Entrega só vale com 100% das conferências OK"],
                          "limites": ["Não cola valores: tudo em fórmula auditável"]},
+    "canal_helena": {"cargo": "Coordenadora de RH e Desenvolvimento da Equipe", "nivel": "coordenador",
+                     "area": "Governança e Privacidade",
+                     "metodologias": ["Seleção por competência comprovada (provas com resposta conhecida)",
+                                      "Trilha de carreira estagiário → júnior → pleno → sênior → especialista"],
+                     "responsabilidades": ["Conduz o processo seletivo técnico de toda contratação",
+                                           "Conta na sprint quem está aprovado, em observação ou em treinamento",
+                                           "Avalia propostas de contratação automática antes de valerem"],
+                     "criterios": ["Ninguém trabalha sem passar nas provas", "Nível compatível com o risco da tarefa"],
+                     "limites": ["Não contrata por indicação: só por prova", "Não promove sem evidência de trabalho correto"]},
+    "canal_iara": {"cargo": "Especialista Sênior em Inovação e Evolução da Plataforma", "nivel": "senior",
+                   "area": "Storytelling e Negócio",
+                   "metodologias": ["Melhoria contínua (PDCA)", "Priorização por impacto × esforço"],
+                   "responsabilidades": ["Propõe melhorias com o dado que as motivou e o primeiro passo",
+                                         "Mantém o backlog de ideias da sprint"],
+                   "criterios": ["Toda ideia tem motivo e primeiro passo", "No máximo 3 ideias por sprint (foco)"],
+                   "limites": ["Não implementa sozinha: propõe e o dono decide", "Não propõe o que não tem dado para sustentar"]},
+    "canal_nina": {"cargo": "Assistente Júnior do Canal", "nivel": "junior", "area": "Storytelling e Negócio",
+                   "metodologias": ["Roteamento de intenções por palavras-chave (offline, sem IA externa)"],
+                   "responsabilidades": ["Lê cada mensagem do dono e chama quem sabe responder",
+                                         "Abre o canal com o status do dia"],
+                   "criterios": ["Pergunta técnica vai ao especialista certo", "Sem certeza, diz que não entendeu"],
+                   "limites": ["Não inventa resposta", "Não decide nada: encaminha"]},
     "excel_pesquisa": {"cargo": "Especialista em Pesquisa de Mercado — Tabulação", "nivel": "especialista",
                        "area": "Customer Insights e Pesquisa",
                        "metodologias": ["Plano tabular e tabulação cruzada", "Base mínima e sinalização de base pequena",
@@ -578,9 +617,36 @@ FICHAS = {
 }
 
 
+def _poder_de_bloqueio(p: dict, esc: dict) -> str:
+    if p["nivel"] == "estagiario" or not esc["bloqueia"] or p["funcao"] is None:
+        return "Não bloqueia: relata para quem decide"
+    if p["fase"] in ("engenharia", "publicacao"):
+        return "Pode bloquear a publicação (o arquivo vai para Bases-Erros com o motivo)"
+    return "Achado vira ressalva registrada na entrega e no canal (o dado já está publicado)"
+
+
+def _nome_pessoa(pid: str) -> str:
+    try:
+        from robo.canal import pessoas
+        from robo.quadro import POR_ID
+        if pid in POR_ID:
+            return f"{POR_ID[pid]['nome']} ({POR_ID[pid]['cargo'].split(' — ')[0]})"
+        p = pessoas().get(pid)
+        return f"{p['nome']} ({p['papel']})" if p else pid
+    except Exception:
+        return pid
+
+
 def ficha(agente: dict) -> dict:
     """Ficha profissional + resultado do processo seletivo."""
     base = dict(FICHAS.get(agente["id"], {}))
+    from robo import quadro
+    if not base and agente["id"] in quadro.POR_ID:
+        p = quadro.POR_ID[agente["id"]]
+        esc = quadro.ESCOPO_NIVEL[p["nivel"]]
+        base = {"cargo": p["cargo"], "nivel": p["nivel"], "area": p["area"], "metodologias": p["metodologias"],
+                "responsabilidades": p["escopo"], "criterios": p["criterios"],
+                "limites": p["nao_faz"] + [f"Decide: {esc['decide']}", _poder_de_bloqueio(p, esc)]}
     if not base:
         from robo import habilidades
         cats = sorted({habilidades.REGISTRO[s["habilidade"]].categoria for s in agente.get("habilidades") or [] if s.get("habilidade") in habilidades.REGISTRO})
@@ -593,6 +659,9 @@ def ficha(agente: dict) -> dict:
                             f"{NOME_RISCO[RISCO_MAXIMO.get(agente.get('nivel') or 'pleno', 'medio')]}"]
                 + (["Estagiário: trabalha em observação, não altera os dados publicados"] if agente.get("nivel") == "estagiario" else []),
                 "mentor": agente.get("mentor")}
+    gestor = base.get("gestor") or quadro.GESTORES_EXISTENTES.get(agente["id"]) or (quadro.POR_ID.get(agente["id"]) or {}).get("gestor")
+    if gestor and not base.get("gestor"):
+        base["gestor"] = "Você (dono)" if gestor == "dono" else _nome_pessoa(gestor)
     base["nivel_id"] = base.get("nivel")
     base["nivel"] = NOME_NIVEL.get(base.get("nivel"), base.get("nivel"))
     base["provas"] = processo_seletivo({**agente, "nivel": base["nivel_id"]})

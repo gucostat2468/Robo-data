@@ -58,6 +58,7 @@ class Resultado:
     checklist: dict | None = None
     checklist_analise: dict | None = None
     excel: dict | None = None
+    quadro: list = field(default_factory=list)   # conferências de gerentes, plenos, juniores e estagiários
 
 
 @dataclass
@@ -68,6 +69,29 @@ class _Tratamento:
     modelo: dict | None = None
     linhas_entrada: int = 0
     analisaveis: dict = field(default_factory=dict)   # tabelas limpas ANTES de virar fato/dimensões (2º andar)
+
+
+def _conferencias_equipe(fase: str, ctx, rel, ao_etapa, bloquear: bool) -> list[dict]:
+    """Roda as conferências do quadro de pessoal da fase e registra cada achado no relatório de qualidade.
+
+    bloquear=True (1º andar): achado de pleno/júnior vira ERRO (o arquivo não é publicado).
+    Estagiário sempre fica em observação (AVISO). Gerente nunca bloqueia (AVISO).
+    """
+    from robo import quadro
+    for p in quadro.QUADRO:
+        if p["fase"] == fase and p["funcao"] is not None:
+            _sinal(ao_etapa, p["id"], ctx.arquivo)
+    resultado = quadro.conferir(fase, ctx)
+    for x in resultado:
+        for achado in x["achados"]:
+            texto = f"{x['cargo'].split(' — ')[0]} {x['nome']}: {achado}"
+            if x["nivel"] == "estagiario":
+                rel.aviso(f"Em observação (não bloqueia) — {texto}")
+            elif bloquear and x["bloqueia"]:
+                rel.erro(f"Barrado na conferência da equipe — {texto}")
+            else:
+                rel.aviso(texto)
+    return resultado
 
 
 def _carimbo() -> str:
@@ -267,6 +291,13 @@ def processar_arquivo(caminho: str | Path, cfg: Config, gravar: bool = True, ao_
             log.exception("Conferência do supervisor falhou")
             rel.erro(f"Supervisor de planilhas não conseguiu conferir: {type(e).__name__}: {e}")
 
+    # ---- plenos, juniores e estagiário do 1º andar: segunda conferência independente (antes do banco)
+    from robo import quadro
+    ctx = quadro.Contexto(arquivo=caminho.name, cfg=cfg, regra=t.regra or {}, brutas=t.brutas, analisaveis=t.analisaveis,
+                          tabelas=t.tabelas)
+    if not rel.tem_erros and t.analisaveis:
+        r.quadro += _conferencias_equipe("engenharia", ctx, rel, ao_etapa, bloquear=True)
+
     # ---- carga no banco (antes dos arquivos: se o banco recusar, o arquivo não é publicado)
     if cfg.banco.get("habilitado"):
         from robo.banco import ErroBancoIndisponivel
@@ -284,7 +315,8 @@ def processar_arquivo(caminho: str | Path, cfg: Config, gravar: bool = True, ao_
     if not rel.tem_erros:
         _sinal(ao_etapa, "coord_engenharia", caminho.name)
         r.checklist = producao.checklist_engenharia(rel, conferencias, obter_equipe(cfg), bool(cfg.banco.get("habilitado")),
-                                                    bool(r.tabelas_banco) if cfg.banco.get("habilitado") else None)
+                                                    bool(r.tabelas_banco) if cfg.banco.get("habilitado") else None,
+                                                    equipe_quadro=r.quadro)
         if not r.checklist["liberado"]:
             for i in r.checklist["itens"]:
                 if not i["ok"]:
@@ -293,26 +325,45 @@ def processar_arquivo(caminho: str | Path, cfg: Config, gravar: bool = True, ao_
         else:
             rel.info(f"Liberado para produção pela Coordenadora de Engenharia ({len(r.checklist['itens'])} itens do checklist OK)")
     _sinal(ao_etapa, "publicacao", caminho.name)
-    if rel.tem_erros:
+
+    def reprovar():
         r.status = REPROVADO
         r.linhas_saida = 0
+        r.id = _destino_livre(cfg.erros, f"{r.id}{caminho.suffix}").stem  # mantém o id (lote do banco) se estiver livre
         r.destino_original = _mover(caminho, cfg.erros, f"{r.id}{caminho.suffix}")
         relatorio_txt = r.destino_original.with_name(f"{r.destino_original.stem}_ERROS.txt")
         relatorio_txt.write_text(rel.texto(), encoding="utf-8-sig")
         r.saidas = [relatorio_txt]
         log.warning("REPROVADO %s: %d erro(s). Veja %s", caminho.name, len(rel.erros), relatorio_txt)
+
+    if not rel.tem_erros and str(cfg.saida.get("formato", "xlsx")).lower() != "nenhum":
+        nome_base = caminho.stem + (cfg.saida.get("sufixo") or "")
+        if cfg.saida.get("versionar"):
+            nome_base += f"_{carimbo}"
+        try:
+            r.saidas, avisos = gravar_tabelas(t.tabelas, cfg.tratadas, nome_base, cfg.saida)
+        except PermissionError:
+            _sinal(ao_etapa, "adiado", caminho.name)
+            return _adiar(r, inicio, "o arquivo de saída está aberto (feche o Excel/Power BI)")
+        for a in avisos:
+            rel.aviso(a)
+        # releitura do que foi gravado: se o disco gravou diferente, nada fica publicado
+        ctx.saidas = list(r.saidas)
+        r.quadro += _conferencias_equipe("publicacao", ctx, rel, ao_etapa, bloquear=True)
+        if rel.tem_erros:
+            for saida in r.saidas:
+                Path(saida).unlink(missing_ok=True)
+            if r.tabelas_banco:
+                rel.erro("Atenção: a carga no PostgreSQL já tinha sido confirmada; o lote "
+                         f"{r.id} deve ser conferido/removido pela DBA")
+            r.saidas = []
+
+    if rel.tem_erros:
+        reprovar()
     else:
         nome_base = caminho.stem + (cfg.saida.get("sufixo") or "")
         if cfg.saida.get("versionar"):
             nome_base += f"_{carimbo}"
-        if str(cfg.saida.get("formato", "xlsx")).lower() != "nenhum":
-            try:
-                r.saidas, avisos = gravar_tabelas(t.tabelas, cfg.tratadas, nome_base, cfg.saida)
-            except PermissionError:
-                _sinal(ao_etapa, "adiado", caminho.name)
-                return _adiar(r, inicio, "o arquivo de saída está aberto (feche o Excel/Power BI)")
-            for a in avisos:
-                rel.aviso(a)
         r.status = SUCESSO
         r.destino_original = _mover(caminho, cfg.originais / datetime.now().strftime("%Y-%m"), f"{r.id}{caminho.suffix}")
         _gravar_relatorio_qualidade(cfg, nome_base, rel, t.tabelas, r.checklist)
@@ -324,9 +375,15 @@ def processar_arquivo(caminho: str | Path, cfg: Config, gravar: bool = True, ao_
             r.analise = analisar(t.analisaveis, caminho.name, r.id, cfg, t.regra, ao_etapa)
             if r.analise:
                 log.info("Análise de %s pronta (%s)", caminho.name, Path(r.analise.get("relatorio") or "painel").name)
-                _sinal(ao_etapa, "coord_analise", caminho.name)
                 base_min = int((cfg.dados.get("analise") or {}).get("base_minima", 30))
-                r.checklist_analise = producao.checklist_analise(r.analise, base_min)
+                ctx.analise = r.analise
+                revisao = _conferencias_equipe("analise", ctx, rel, ao_etapa, bloquear=False)
+                r.quadro += revisao
+                _sinal(ao_etapa, "coord_analise", caminho.name)
+                r.checklist_analise = producao.checklist_analise(r.analise, base_min, revisao)
+                _sinal(ao_etapa, "ger_analise", caminho.name)
+                from robo.quadro import manchete
+                r.analise["manchete"] = manchete(r.analise)
         except Exception:
             log.exception("Análise automática de %s falhou (a planilha já está publicada)", caminho.name)
         # 3º andar: Sala Excel monta a entrega com fórmulas e conferência
@@ -336,10 +393,26 @@ def processar_arquivo(caminho: str | Path, cfg: Config, gravar: bool = True, ao_
             r.excel = gerar_entrega(t.analisaveis, caminho.name, chave_base(caminho.name, t.regra), cfg, None, None, ao_etapa)
             if r.excel:
                 log.info("Sala Excel entregou %s (%d conferências)", Path(r.excel["arquivo"]).name, r.excel["conferencias"])
+                ctx.excel = r.excel
+                revisao = _conferencias_equipe("excel", ctx, rel, ao_etapa, bloquear=False)
+                r.quadro += revisao
+                falhas = [f"{x['nome']}: {a}" for x in revisao if x["bloqueia"] and not x["ok"] for a in x["achados"]]
+                r.excel["revisao_ok"] = not falhas
+                r.excel["divergencias"] = falhas
+                if falhas:
+                    log.error("Entrega Excel de %s com divergência: %s", caminho.name, "; ".join(falhas[:3]))
         except Exception:
             log.exception("Sala Excel falhou em %s (a planilha já está publicada)", caminho.name)
+        # 4º andar: governança (dados pessoais) e catálogo de dados
+        try:
+            r.quadro += _conferencias_equipe("governanca", ctx, rel, ao_etapa, bloquear=False)
+        except Exception:
+            log.exception("Governança falhou em %s", caminho.name)
 
     r.duracao = time.perf_counter() - inicio
+    if r.status == SUCESSO:
+        ctx.duracao = r.duracao
+        r.quadro += _conferencias_equipe("fim", ctx, rel, None, bloquear=False)
     _registrar(cfg, r)
     _sinal(ao_etapa, "concluido", caminho.name, status=r.status, linhas=r.linhas_saida,
            erros=len(rel.erros), banco=bool(r.tabelas_banco))
@@ -374,6 +447,7 @@ def _registrar(cfg: Config, r: Resultado):
         "checklist_producao": r.checklist,
         "checklist_analise": r.checklist_analise,
         "excel": r.excel,
+        "quadro": r.quadro,
         "ocorrencias": [o.__dict__ for o in r.relatorio.ocorrencias],
     })
 

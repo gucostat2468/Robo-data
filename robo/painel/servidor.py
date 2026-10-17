@@ -79,7 +79,7 @@ def _ficha_curta(f: dict | None) -> dict | None:
     if not f:
         return None
     p = f.get("provas") or {}
-    return {k: f.get(k) for k in ("cargo", "nivel", "area", "metodologias", "responsabilidades", "criterios", "limites", "mentor")} | \
+    return {k: f.get(k) for k in ("cargo", "nivel", "area", "metodologias", "responsabilidades", "criterios", "limites", "mentor", "gestor")} | \
         {"provas": {"acertos": p.get("acertos", 0), "total": p.get("total", 0), "aprovado": p.get("aprovado", True)}}
 
 
@@ -202,6 +202,15 @@ class Api:
                     "ronda": a["id"] == "excel_supervisor",
                     "prontidao": "" if cfg_excel.get("habilitado", True) else "estudando (Sala Excel pausada nas Configurações)",
                     "ficha": _ficha_curta(rh.ficha({"id": a["id"], "habilidades": []}))} for a in EQUIPE_EXCEL]
+        from robo import quadro
+        from robo.canal import EQUIPE_CANAL
+        equipe += [{"id": p["id"], "nome": p["nome"], "papel": p["papel"], "cor": p["cor"], "descricao": p["descricao"] or
+                    "; ".join(p["escopo"]), "nativo": True, "aceita_habilidades": False, "habilidades": [], "andar": p["andar"],
+                    "ativo": True, "ronda": p["nivel"] == "coordenador", "prontidao": "",
+                    "ficha": _ficha_curta(rh.ficha({"id": p["id"], "habilidades": []}))} for p in quadro.QUADRO]
+        equipe += [{**a, "nativo": True, "aceita_habilidades": False, "habilidades": [], "ativo": True,
+                    "ronda": a["id"] == "canal_helena", "prontidao": "",
+                    "ficha": _ficha_curta(rh.ficha({"id": a["id"], "habilidades": []}))} for a in EQUIPE_CANAL]
         for a in equipe:
             if not a.get("ativo", True):  # agente personalizado pausado pelo dono: segue estudando, não dorme
                 a["ativo"], a["prontidao"] = True, "em treinamento (pausado por você na tela Agentes)"
@@ -209,6 +218,7 @@ class Api:
                 a["prontidao"] = "preparando as tabelas (PostgreSQL ainda não configurado)"
             a.setdefault("prontidao", "")
         excel_hoje = self._excel_hoje(cfg, ok)
+        conferencias_hoje = self._quadro_hoje(cfg, ok + ruim)
         dados.update({
             "equipe": equipe,
             "fila": c.monitor.estado_fila() if c.monitor else [],
@@ -226,22 +236,55 @@ class Api:
                 "excel_supervisor": {"valor": excel_hoje["conferencias"], "rotulo": "conferências de fórmula assinadas hoje"},
                 **{k: {"valor": excel_hoje["entregas"], "rotulo": "entregas Excel hoje"}
                    for k in ("excel_pesquisa", "excel_formulas", "excel_trade", "excel_dinamicas")},
+                **conferencias_hoje,
             },
             "analise_hoje": self._analise_hoje(hoje),
             "excel_hoje": excel_hoje,
+            "canal_hoje": self._canal_hoje(cfg),
         })
         return dados
 
+    def _execucao_resumida(self, cfg, i: str) -> dict:
+        """Partes do JSON da execução usadas no escritório (lidas uma vez só e guardadas em memória)."""
+        cache = self.__dict__.setdefault("_cache_execucoes", {})
+        if i not in cache:
+            exe = historico.ler_execucao(cfg.logs, i) or {}
+            cache[i] = {"excel": exe.get("excel"),
+                        "quadro": [{"id": q["id"], "ok": q["ok"], "achados": len(q.get("achados") or [])}
+                                   for q in exe.get("quadro") or []]}
+        return cache[i]
+
+    def _quadro_hoje(self, cfg, execucoes: list[dict]) -> dict:
+        from robo.quadro import QUADRO
+        feitas = {p["id"]: 0 for p in QUADRO}
+        achados = dict(feitas)
+        for x in execucoes[:300]:
+            for q in self._execucao_resumida(cfg, x.get("id") or "")["quadro"]:
+                if q["id"] in feitas:
+                    feitas[q["id"]] += 1
+                    achados[q["id"]] += q["achados"]
+        return {i: {"valor": feitas[i], "rotulo": f"conferências hoje · {achados[i]} achado(s)"} for i in feitas}
+
+    def _canal_hoje(self, cfg) -> dict:
+        try:
+            from robo.canal import Canal
+            c = Canal(cfg)
+            hoje = datetime.now().strftime("%Y-%m-%d")
+            msgs = [m for m in c.listar(limite=500) if m["data_hora"].startswith(hoje)]
+            numero, ini, fim = c.sprint_de(date.today())
+            return {"mensagens": len(msgs), "sprint": numero, "dias_restantes": (fim - date.today()).days,
+                    "ultima": (msgs[-1]["nome"] + ": " + msgs[-1]["texto"][:140]) if msgs else ""}
+        except Exception:
+            log.debug("canal indisponível", exc_info=True)
+            return {}
+
     def _excel_hoje(self, cfg, aprovados: list[dict]) -> dict:
-        """Entregas da Sala Excel de hoje (lê o JSON de cada execução uma vez só e guarda em memória)."""
-        cache = self.__dict__.setdefault("_cache_excel", {})
+        """Entregas da Sala Excel de hoje."""
         entregas = []
         for x in aprovados[:300]:
-            i = x.get("id") or ""
-            if i not in cache:
-                cache[i] = (historico.ler_execucao(cfg.logs, i) or {}).get("excel")
-            if cache[i]:
-                entregas.append(cache[i])
+            ex = self._execucao_resumida(cfg, x.get("id") or "")["excel"]
+            if ex:
+                entregas.append(ex)
         ultimo = Path(entregas[0]["arquivo"]).name if entregas else None
         return {"entregas": len(entregas), "conferencias": sum(int(e.get("conferencias") or 0) for e in entregas),
                 "ultimo": ultimo}
@@ -372,7 +415,16 @@ class Api:
         from robo.excel import EQUIPE_EXCEL
         sala_excel = [{**a, "nativo": True, "aceita_habilidades": False, "habilidades": [], "ativo": True, "andar": 3,
                        "ficha": rh.ficha({"id": a["id"], "habilidades": []})} for a in EQUIPE_EXCEL]
-        return {"agentes": equipe.lista(), "analistas": analistas, "lideranca": lideranca, "sala_excel": sala_excel, "catalogo": catalogo,
+        from robo import quadro
+        from robo.canal import EQUIPE_CANAL
+        quadro_pessoal = [{"id": p["id"], "nome": p["nome"], "papel": p["papel"], "cor": p["cor"], "andar": p["andar"],
+                           "descricao": p["descricao"] or "; ".join(p["escopo"]), "nativo": True, "aceita_habilidades": False,
+                           "habilidades": [], "ativo": True, "ficha": rh.ficha({"id": p["id"], "habilidades": []})}
+                          for p in quadro.QUADRO]
+        quadro_pessoal += [{**a, "nativo": True, "aceita_habilidades": False, "habilidades": [], "ativo": True,
+                            "ficha": rh.ficha({"id": a["id"], "habilidades": []})} for a in EQUIPE_CANAL]
+        return {"agentes": equipe.lista(), "analistas": analistas, "lideranca": lideranca, "sala_excel": sala_excel,
+                "quadro": quadro_pessoal, "escopos": quadro.ESCOPO_NIVEL, "catalogo": catalogo,
                 "erros_habilidades": list(habilidades.ERROS_CARGA), "posicoes": POSICOES,
                 "rh": {"niveis": [{"id": n, "nome": rh.NOME_NIVEL[n], "risco_maximo": rh.RISCO_MAXIMO[n]} for n in rh.NIVEIS],
                        "areas": rh.AREAS}}

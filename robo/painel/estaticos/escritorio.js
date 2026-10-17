@@ -224,9 +224,12 @@ function criarPlanta(x, z, escala = 1) {
 // ------------------------------------------------------------------ estado da cena
 // ------------------------------------------------------------------ estado da cena (prédio de 2 andares)
 const ALTURA = 4.4; // pé-direito: cada andar fica 4,4 m acima do anterior
-const NOME_ANDAR = { 1: "1º andar · Engenharia de dados", 2: "2º andar · Análise e Qualidade", 3: "3º andar · Sala Excel (Trade e Pesquisa)" };
-const PLACA_ANDAR = { 1: ["1º ANDAR · ENGENHARIA DE DADOS", "#1d3fb0"], 2: ["2º ANDAR · ANÁLISE E QUALIDADE", "#7c3aed"], 3: ["3º ANDAR · SALA EXCEL", "#107c41"] };
-const COR_TV = { 1: ["#0f1b3d", "#1d3fb0"], 2: ["#1e1038", "#6d28d9"], 3: ["#062b18", "#107c41"] };
+const NOME_ANDAR = { 1: "1º andar · Engenharia de dados", 2: "2º andar · Análise e Qualidade", 3: "3º andar · Sala Excel (Trade e Pesquisa)",
+  4: "4º andar · Diretoria, Governança e Canal" };
+const CURTO_ANDAR = { 1: "1º andar", 2: "2º andar", 3: "3º · Excel", 4: "4º · Diretoria" };
+const PLACA_ANDAR = { 1: ["1º ANDAR · ENGENHARIA DE DADOS", "#1d3fb0"], 2: ["2º ANDAR · ANÁLISE E QUALIDADE", "#7c3aed"], 3: ["3º ANDAR · SALA EXCEL", "#107c41"],
+  4: ["4º ANDAR · DIRETORIA E CANAL", "#9a3412"] };
+const COR_TV = { 1: ["#0f1b3d", "#1d3fb0"], 2: ["#1e1038", "#6d28d9"], 3: ["#062b18", "#107c41"], 4: ["#2a0f05", "#9a3412"] };
 const yAndar = (andar) => (andar - 1) * ALTURA;
 const andarDe = (a) => Number(a.andar) || 1;
 // "prédio" conta como acima de todos os andares (mostra todos)
@@ -269,6 +272,7 @@ function montarPredio(equipe) {
     construirAndar(g, andar, porAndar[andar]);
   }
   if (!listaAndares.includes(estado.andarVisivel) && estado.andarVisivel !== "predio") estado.andarVisivel = 1;
+  desenharBotoesAndares();
   construirElevador();
   enquadrarCameras();
   definirAndarVisivel(estado.andarVisivel);
@@ -393,7 +397,7 @@ function construirAndar(g, andar, equipe) {
       estante.add(caixa(0.16, 0.42, 0.34, mat(cores[(i + prat) % 6]), -0.6 + i * 0.22, 0.3 + prat * 0.52, 0.06));
     }
     g.add(estante);
-    const p = placa(andar === 3 ? "Entregas Excel" : "Bases-Relatorios", corPlaca); p.position.set(xLateral, 2.15, zFrente + 0.8); g.add(p);
+    const p = placa(andar === 3 ? "Entregas Excel" : andar === 4 ? "Atas das sprints" : "Bases-Relatorios", corPlaca); p.position.set(xLateral, 2.15, zFrente + 0.8); g.add(p);
     prateleiras[andar] = { local: new THREE.Vector3(xLateral, 1.72, zFrente + 0.8), mundo: new THREE.Vector3(xLateral, yBase + 1.72, zFrente + 0.8) };
     pilhasRelatorios[andar] = [];
     const mesa = new THREE.Group(); mesa.position.set(maxX - 2.2, 0, zFrente + 0.6);
@@ -508,6 +512,13 @@ function enquadrarCameras() {
   if (!estado.iniciado) { const e = enquadramentos[estado.andarVisivel]; camera.position.copy(e.pos); controles.target.copy(e.alvo); controles.update(); }
 }
 
+function desenharBotoesAndares() {
+  const caixa = $("#andares");
+  caixa.innerHTML = listaAndares.map((n) => `<button data-andar="${n}" title="Tecla ${n}">${CURTO_ANDAR[n] || `${n}º andar`}</button>`).join("")
+    + `<button data-andar="predio" title="Tecla P">Prédio</button>`;
+  caixa.querySelectorAll("[data-andar]").forEach((b) => b.classList.toggle("ativo", b.dataset.andar === String(estado.andarVisivel)));
+}
+
 function definirAndarVisivel(andar) {
   estado.andarVisivel = andar;
   const vista = nivelVista(andar);
@@ -536,10 +547,9 @@ function irParaAndar(andar, manual = false) {
 const teclas = new Set();
 addEventListener("keydown", (e) => {
   if (["INPUT", "TEXTAREA", "SELECT"].includes(document.activeElement?.tagName)) return;
-  if (e.code === "Digit1") return irParaAndar(1, true);
-  if (e.code === "Digit2") return irParaAndar(2, true);
-  if (e.code === "Digit3" && listaAndares.includes(3)) return irParaAndar(3, true);
-  if (e.code === "Digit4" || e.code === "KeyP") return irParaAndar("predio", true);
+  const digito = /^Digit(\d)$/.exec(e.code);
+  if (digito && listaAndares.includes(Number(digito[1]))) return irParaAndar(Number(digito[1]), true);
+  if (e.code === "KeyP" || e.code === "Digit0") return irParaAndar("predio", true);
   if (e.code === "KeyF") return alternarSeguir();
   if (e.key === "Escape") return irParaAndar(estado.andarVisivel, true);
   if (["KeyW", "KeyA", "KeyS", "KeyD", "KeyQ", "KeyE", "ArrowUp", "ArrowDown", "ArrowLeft", "ArrowRight", "ShiftLeft", "ShiftRight"].includes(e.code)) {
@@ -593,7 +603,7 @@ function desenharTV(andar) {
   grad.addColorStop(0, c0); grad.addColorStop(1, c1);
   ctx.fillStyle = grad; ctx.fillRect(0, 0, l, a);
   ctx.fillStyle = "rgba(255,255,255,.85)"; ctx.font = "600 34px Segoe UI, system-ui, sans-serif"; ctx.textAlign = "left";
-  ctx.fillText(andar === 1 ? "HOJE NA ENGENHARIA" : andar === 3 ? "HOJE NA SALA EXCEL" : "HOJE NA ANÁLISE", 48, 70);
+  ctx.fillText({ 1: "HOJE NA ENGENHARIA", 2: "HOJE NA ANÁLISE", 3: "HOJE NA SALA EXCEL", 4: "HOJE NA DIRETORIA" }[andar] || "HOJE", 48, 70);
   ctx.textAlign = "right"; ctx.fillStyle = estado.ligado ? "#7fe0b4" : "#f5b445";
   ctx.fillText(estado.ligado ? "● Monitorando" : "● Pausado", l - 48, 70); ctx.textAlign = "left";
   let blocos;
@@ -601,6 +611,9 @@ function desenharTV(andar) {
     const k = estado.kpis || {};
     blocos = [["Aprovados", k.hoje_sucesso ?? 0, "#7fe0b4"], ["Reprovados", k.hoje_reprovado ?? 0, "#ff9a85"],
       ["Na fila", estado.fila.length, "#ffd27a"], ["Linhas", k.hoje_linhas ?? 0, "#a9c1ff"]];
+  } else if (andar === 4) {
+    const c = estado.canalHoje || {};
+    blocos = [["Mensagens hoje", c.mensagens ?? 0, "#fdba74"], [`Sprint ${c.sprint ?? 1}`, c.dias_restantes ?? 0, "#7fe0b4"], ["Pessoas", estado.equipe.length, "#a9c1ff"]];
   } else if (andar === 3) {
     const x = estado.excelHoje || {};
     blocos = [["Entregas", x.entregas ?? 0, "#86efac"], ["Conferências", x.conferencias ?? 0, "#7fe0b4"], ["Divergências", 0, "#ffd27a"]];
@@ -620,6 +633,12 @@ function desenharTV(andar) {
     ctx.fillText(linhas.length ? `Último resumo · ${estado.analiseHoje.ultimo_arquivo}` : "Nenhuma análise hoje ainda", 48, 330, l - 96);
     ctx.font = "400 23px Segoe UI, system-ui, sans-serif"; ctx.fillStyle = "rgba(255,255,255,.8)";
     linhas.forEach((t, i) => ctx.fillText(String(t).trim(), 48, 370 + i * 34, l - 96));
+  } else if (andar === 4) {
+    const c = estado.canalHoje || {};
+    ctx.fillStyle = "rgba(255,255,255,.92)"; ctx.font = "600 26px Segoe UI, system-ui, sans-serif";
+    ctx.fillText(`Faltam ${c.dias_restantes ?? 0} dia(s) para fechar a sprint ${c.sprint ?? 1}`, 48, 330, l - 96);
+    ctx.font = "400 23px Segoe UI, system-ui, sans-serif"; ctx.fillStyle = "rgba(255,255,255,.8)";
+    ctx.fillText(c.ultima || "Canal em silêncio por enquanto — fale com a equipe pelo painel.", 48, 370, l - 96);
   } else if (andar === 3) {
     const x = estado.excelHoje || {};
     ctx.fillStyle = "rgba(255,255,255,.92)"; ctx.font = "600 26px Segoe UI, system-ui, sans-serif";
@@ -682,13 +701,21 @@ const FRASE = {
   excel_pesquisa: "está montando o plano tabular (CONT.SES) de", excel_formulas: "está escrevendo as fórmulas de NPS, CSAT e margem de",
   excel_trade: "está montando o SOMASES de trade (loja, canal, SKU) de", excel_dinamicas: "está organizando o resumo e o guia de uso de",
   excel_supervisor: "está conferindo célula a célula, contra o Python, a entrega de",
+  eng_pleno_tipos: "está conferindo os tipos de cada coluna de", eng_junior_espacos: "está conferindo espaços e linhas vazias de",
+  eng_junior_auditoria: "está conferindo a origem de cada linha de", eng_estagiario: "está rastreando uma amostra (observação) de",
+  eng_pleno_releitura: "está relendo o arquivo gravado de", ana_pleno_recalculo: "está recalculando o NPS, por conta própria, de",
+  ana_pleno_base: "está conferindo as bases pequenas de", ana_junior_faixas: "está conferindo as faixas dos indicadores de",
+  ana_estagiario: "está recontando as bases (observação) de", ger_analise: "está escrevendo a manchete para o dono de",
+  coord_excel: "está conferindo a integridade da entrega Excel de", xl_pleno_formulas: "está conferindo se tudo é fórmula viva em",
+  xl_junior_formatos: "está conferindo formatos e cabeçalhos de", xl_estagiario: "está sorteando conferências (observação) de",
+  gov_pleno_lgpd: "está procurando dados pessoais (LGPD) em", gov_estagiaria: "está atualizando o catálogo de dados com",
 };
-const DURACAO_EXTRA = { supervisor: 2.4, dba: 1.6, coord_engenharia: 2.0, coord_analise: 2.0, excel_supervisor: 2.2 };
+const DURACAO_EXTRA = { supervisor: 2.4, dba: 1.6, coord_engenharia: 2.0, coord_analise: 2.0, excel_supervisor: 2.2, coord_excel: 2.0 };
 
 function idAgente(etapa) {
   if (etapa.startsWith("agente:")) return etapa.slice(7);
   if (etapa.startsWith("analise:")) return `analise_${etapa.slice(8)}`;
-  return ETAPA_NATIVA.has(etapa) ? etapa : null;
+  return ETAPA_NATIVA.has(etapa) || estado.estacoes.has(etapa) ? etapa : null;
 }
 
 function definirSituacao(id, situacao, segundos = 0) {
@@ -708,7 +735,9 @@ function seguirPara(andar) {
 
 function iniciarEvento(ev) {
   const velocidade = estado.filaEventos.length > 12 ? 0.35 : estado.filaEventos.length > 5 ? 0.6 : 1;
-  const dur = (DURACAO[ev.etapa] || 1.5) * velocidade;
+  // conferências do quadro (plenos, juniores, estagiários) são rápidas: a animação acompanha
+  const rapida = /^(eng|ana|xl|gov)_/.test(ev.etapa) || ev.etapa.startsWith("ger_");
+  const dur = (DURACAO[ev.etapa] || (rapida ? 0.9 : 1.5)) * velocidade;
   const curto = ev.arquivo.length > 38 ? `${ev.arquivo.slice(0, 35)}…` : ev.arquivo;
   let doc = estado.documentos.get(ev.arquivo);
 
@@ -785,25 +814,44 @@ function narrar(texto) { $("#hud-agora").textContent = texto; }
 const NOME_SITUACAO = { parado: "de plantão", trabalhando: "trabalhando", ok: "concluiu", erro: "barrou", prontidao: "de prontidão" };
 const CLASSE_SITUACAO = { trabalhando: "trabalhando", ok: "ok", erro: "erro", prontidao: "prontidao" };
 
+function linhaMembro(a) {
+  const e = estado.estacoes.get(a.id); const sit = e?.situacao === "parado" && e.prontidao ? "prontidao" : e?.situacao || "parado";
+  const n = estado.agentesNumeros[a.id];
+  const detalhe = a.prontidao ? a.prontidao : n ? `${num(n.valor)} ${n.rotulo}` : a.habilidades.length ? `${a.habilidades.length} habilidade(s)` : a.papel;
+  return { sit, detalhe };
+}
+
+let estruturaEquipe = "";
 function desenharEquipe() {
-  const html = [];
-  for (const andar of [...listaAndares].reverse()) {
-    const membros = estado.equipe.filter((a) => andarDe(a) === andar);
-    if (!membros.length) continue;
-    html.push(`<h3><button class="link-andar" data-ir-andar="${andar}">${NOME_ANDAR[andar]} (${membros.length})</button></h3>`);
-    for (const a of membros) {
-      const e = estado.estacoes.get(a.id); const sit = e?.situacao === "parado" && e.prontidao ? "prontidao" : e?.situacao || "parado";
-      const n = estado.agentesNumeros[a.id];
-      const detalhe = a.prontidao ? a.prontidao : n ? `${num(n.valor)} ${n.rotulo}` : a.habilidades.length ? `${a.habilidades.length} habilidade(s)` : a.papel;
-      const nivel = a.ficha?.nivel ? `<em class="nivel">${esc(a.ficha.nivel)}</em>` : "";
-      html.push(`<button class="membro ${estado.selecionado === a.id ? "selecionado" : ""}" data-agente="${esc(a.id)}">
-        <span class="avatar" style="background:${esc(a.cor)}">${esc(a.nome.slice(0, 1))}</span>
-        <span class="info"><strong>${esc(a.nome)} · ${esc(a.papel)}</strong><small>${nivel}${esc(detalhe)}</small></span>
-        <span class="estado ${CLASSE_SITUACAO[sit] || ""}">${NOME_SITUACAO[sit]}</span></button>`);
+  const caixa = $("#hud-equipe");
+  const estrutura = JSON.stringify([listaAndares, estado.equipe.map((a) => [a.id, a.nome, a.papel, a.ficha?.nivel])]);
+  if (estrutura !== estruturaEquipe) { // só remonta a lista quando a equipe muda (contratação, troca de andar...)
+    estruturaEquipe = estrutura;
+    const html = [];
+    for (const andar of [...listaAndares].reverse()) {
+      const membros = estado.equipe.filter((a) => andarDe(a) === andar);
+      if (!membros.length) continue;
+      html.push(`<h3><button class="link-andar" data-ir-andar="${andar}">${NOME_ANDAR[andar] || `${andar}º andar`} (${membros.length})</button></h3>`);
+      for (const a of membros) {
+        const nivel = a.ficha?.nivel ? `<em class="nivel">${esc(a.ficha.nivel)}</em>` : "";
+        html.push(`<button class="membro" data-agente="${esc(a.id)}">
+          <span class="avatar" style="background:${esc(a.cor)}">${esc(a.nome.slice(0, 1))}</span>
+          <span class="info"><strong>${esc(a.nome)} · ${esc(a.papel)}</strong><small>${nivel}<span data-detalhe></span></small></span>
+          <span class="estado" data-estado></span></button>`);
+      }
     }
+    html.push(`<div style="padding:10px 14px"><a class="btn pequeno" style="width:100%" href="inicio.html#agentes">Equipe, contratações e habilidades</a></div>`);
+    caixa.innerHTML = html.join("");
   }
-  html.push(`<div style="padding:10px 14px"><a class="btn pequeno" style="width:100%" href="inicio.html#agentes">Equipe, contratações e habilidades</a></div>`);
-  $("#hud-equipe").innerHTML = html.join("");
+  // atualização leve: só textos e classes (o botão não sai do lugar enquanto você clica)
+  for (const b of caixa.querySelectorAll("[data-agente]")) {
+    const a = estado.equipe.find((x) => x.id === b.dataset.agente); if (!a) continue;
+    const { sit, detalhe } = linhaMembro(a);
+    b.classList.toggle("selecionado", estado.selecionado === a.id);
+    const d = b.querySelector("[data-detalhe]"); if (d.textContent !== detalhe) d.textContent = detalhe;
+    const st = b.querySelector("[data-estado]");
+    if (st.textContent !== NOME_SITUACAO[sit]) { st.textContent = NOME_SITUACAO[sit]; st.className = `estado ${CLASSE_SITUACAO[sit] || ""}`; }
+  }
 }
 
 function mostrarFicha(id) {
@@ -818,7 +866,8 @@ function mostrarFicha(id) {
       <button class="btn fantasma pequeno fechar" data-fechar aria-label="Fechar">✕</button></header>
     <div class="chips-colunas">${f.nivel ? `<span class="etiqueta info">${esc(f.nivel)}</span>` : ""}${f.area ? `<span class="etiqueta">${esc(f.area)}</span>` : ""}
       ${f.provas ? `<span class="etiqueta ${f.provas.aprovado ? "sucesso" : "perigo"}">Provas técnicas ${f.provas.acertos}/${f.provas.total}</span>` : ""}
-      <span class="etiqueta">${(NOME_ANDAR[andarDe(a)] || `${andarDe(a)}º andar`).split(" · ")[0]}</span></div>
+      <span class="etiqueta">${(NOME_ANDAR[andarDe(a)] || `${andarDe(a)}º andar`).split(" · ")[0]}</span>
+      ${f.gestor ? `<span class="etiqueta">Responde a ${esc(f.gestor)}</span>` : ""}</div>
     <p>${esc(a.descricao)}</p>
     ${a.prontidao ? `<p class="muted">Agora: ${esc(a.prontidao)}. Ninguém aqui dorme — sem arquivo, a pessoa estuda e revisa o próprio método.</p>` : ""}
     ${n ? `<div><div class="numero">${num(n.valor)}</div><span class="muted">${esc(n.rotulo)}</span></div>` : ""}
@@ -891,7 +940,7 @@ async function atualizar() {
   try {
     const d = await api(`/api/escritorio?desde=${estado.ultimoSeq}`);
     estado.ligado = d.ligado; estado.fila = d.fila || []; estado.agentesNumeros = d.agentes || {};
-    estado.bancoHabilitado = Boolean(d.banco_habilitado); estado.analiseHoje = d.analise_hoje || null; estado.excelHoje = d.excel_hoje || null;
+    estado.bancoHabilitado = Boolean(d.banco_habilitado); estado.analiseHoje = d.analise_hoje || null; estado.excelHoje = d.excel_hoje || null; estado.canalHoje = d.canal_hoje || null;
     const chave = JSON.stringify((d.equipe || []).map((a) => [a.id, a.nome, a.papel, a.cor, a.prontidao, a.andar, a.ronda, a.habilidades.length, a.ficha?.nivel])) + estado.bancoHabilitado;
     if (chave !== estado.chaveEquipe) {
       estado.chaveEquipe = chave; estado.equipe = d.equipe || [];
@@ -910,7 +959,7 @@ async function atualizar() {
     if (!estado.tocando && !estado.filaEventos.length && !estado.documentos.size) {
       narrar(estado.fila.length ? `${estado.fila.length} arquivo(s) aguardando sincronização na recepção` : "Aguardando planilhas em Bases-Limpeza…");
     }
-    atualizarPilhaEntrada(); desenharEquipe(); desenharTV(2); desenharTV(3);
+    atualizarPilhaEntrada(); desenharEquipe(); desenharTV(2); desenharTV(3); desenharTV(4);
   } catch {
     $("#hud-status").innerHTML = `<i class="ponto erro"></i>Sem conexão com o robô`;
   }

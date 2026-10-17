@@ -92,24 +92,29 @@ def agentes_reprovados_no_rh() -> list[str]:
 
 
 def checklist_engenharia(rel, conferencias: list[dict], equipe, banco_habilitado: bool, banco_ok: bool | None,
-                         reprovados: list[str] | None = None) -> dict:
+                         reprovados: list[str] | None = None, equipe_quadro: list[dict] | None = None) -> dict:
     """Assinatura da Coordenadora de Engenharia: só libera com tudo verde."""
     itens: list[dict] = []
     reprovados = agentes_reprovados_no_rh() if reprovados is None else reprovados
     _item(itens, "Equipe aprovada nas provas técnicas do RH", not reprovados, ", ".join(reprovados))
     problemas = {k: v for k, v in (equipe.problemas or {}).items()}
     _item(itens, "Nenhum agente com configuração inválida", not problemas, ", ".join(problemas))
-    _item(itens, "Auditoria sem erros", not [o for o in rel.erros if "Supervisor" not in o.mensagem],
+    _item(itens, "Auditoria sem erros", not [o for o in rel.erros if "Supervisor" not in o.mensagem
+                                             and "conferência da equipe" not in o.mensagem],
           f"{len(rel.erros)} erro(s)")
     _item(itens, "Conferência do supervisor aprovada", all(c["ok"] for c in conferencias if c["bloqueia"]),
           f"{sum(c['ok'] for c in conferencias)}/{len(conferencias)} itens")
+    if equipe_quadro is not None:
+        bloqueios = [f"{x['nome']}: {x['achados'][0]}" for x in equipe_quadro if x["bloqueia"] and not x["ok"]]
+        _item(itens, "Conferências dos plenos e juniores aprovadas", not bloqueios,
+              "; ".join(bloqueios) or f"{len(equipe_quadro)} conferência(s) independentes")
     if banco_habilitado:
         _item(itens, "Reconciliação do DBA no PostgreSQL", bool(banco_ok), "carga conferida antes do commit" if banco_ok else "")
     liberado = all(i["ok"] for i in itens)
     return {"coordenador": "Carla", "liberado": liberado, "itens": itens}
 
 
-def checklist_analise(analise: dict | None, base_minima: int) -> dict | None:
+def checklist_analise(analise: dict | None, base_minima: int, revisao: list[dict] | None = None) -> dict | None:
     """Revisão do Coordenador de Análise: aponta ressalvas, nunca bloqueia (o dado já está publicado)."""
     if not analise:
         return None
@@ -124,6 +129,10 @@ def checklist_analise(analise: dict | None, base_minima: int) -> dict | None:
     destaques = analise.get("_destaques") or []
     fracos = [d for d in destaques if d.get("significativo") and (d.get("n_grupo") or 0) < base_minima]
     _item(itens, f"Nenhum destaque com base menor que {base_minima}", not fracos, bloqueia=False)
+    for x in revisao or []:
+        if x["nivel"] != "estagiario":
+            _item(itens, f"Conferência de {x['nome']} ({x['cargo'].split(' — ')[-1]})", x["ok"], "; ".join(x["achados"][:3]),
+                  bloqueia=False)
     return {"coordenador": "Marcos", "aprovado": all(i["ok"] for i in itens),
             "itens": itens, "ressalvas": [i["item"] for i in itens if not i["ok"]]}
 

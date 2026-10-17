@@ -33,8 +33,8 @@ from robo.limpeza import sem_acento
 log = logging.getLogger("robo")
 
 EQUIPE_EXCEL = [
-    {"id": "excel_supervisor", "nome": "Ricardo", "papel": "Supervisor da Sala Excel", "cor": "#107C41",
-     "descricao": "Veio da Microsoft e conhece o Excel de ponta a ponta. Coordena a sala, responde dúvidas de Excel no "
+    {"id": "excel_supervisor", "nome": "Ricardo", "papel": "Gerente da Sala Excel", "cor": "#107C41",
+     "descricao": "Veio da Microsoft e conhece o Excel de ponta a ponta. Gerencia a sala, responde dúvidas de Excel no "
                   "canal e só assina a entrega quando a aba Conferência fecha 100%."},
     {"id": "excel_pesquisa", "nome": "Pedro", "papel": "Especialista em Pesquisa de Mercado", "cor": "#0E7490",
      "descricao": "Monta o plano tabular: frequência e percentual de cada segmento e, quando há nota, o NPS por segmento, "
@@ -171,8 +171,10 @@ class Entrega:
                 if nps:
                     notas = self.df.loc[mascara, nps].dropna().astype(float)
                     p, d = int((notas >= 9).sum()), int((notas <= 6).sum())
-                    ws.cell(row=linha, column=4, value=f'=COUNTIFS({self._faixa(seg)},{_criterio(v)},{self._faixa(nps)},">=9")').border = BORDA
-                    ws.cell(row=linha, column=5, value=f'=COUNTIFS({self._faixa(seg)},{_criterio(v)},{self._faixa(nps)},"<=6")').border = BORDA
+                    c = ws.cell(row=linha, column=4, value=f'=COUNTIFS({self._faixa(seg)},{_criterio(v)},{self._faixa(nps)},">=9")')
+                    c.number_format, c.border = "#,##0", BORDA
+                    c = ws.cell(row=linha, column=5, value=f'=COUNTIFS({self._faixa(seg)},{_criterio(v)},{self._faixa(nps)},"<=6")')
+                    c.number_format, c.border = "#,##0", BORDA
                     n_resp = f'COUNTIFS({self._faixa(seg)},{_criterio(v)},{self._faixa(nps)},">=0")'
                     c = ws.cell(row=linha, column=6, value=f"=IF({n_resp}=0,\"\",(D{linha}-E{linha})/{n_resp}*100)")
                     c.number_format, c.border = "0.0", BORDA
