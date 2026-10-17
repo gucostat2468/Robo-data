@@ -508,3 +508,50 @@ input[type=color] { width: 100%; height: 36px; padding: 2px; border-radius: var(
 .ok-cartao { border-color: color-mix(in srgb, var(--sucesso) 45%, var(--borda)); color: var(--sucesso); }
 .alerta-cartao { border-color: color-mix(in srgb, var(--alerta, #d97706) 55%, var(--borda)); }
 @media (max-width: 900px) { .canal-layout { grid-template-columns: 1fr; } .canais { position: static; flex-direction: row; overflow-x: auto; } .msg { max-width: 100%; } }
+
+/* ---------------------------------------------------------------- central de dados */
+.kpis { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 12px; margin-bottom: 14px; }
+.kpi { padding: 14px 16px; display: flex; flex-direction: column; gap: 4px; }
+.kpi span { font-size: 12.5px; color: var(--texto-3); }
+.kpi strong { font-size: 28px; font-weight: 700; font-variant-numeric: tabular-nums; }
+.kpi small { color: var(--texto-3); font-size: 12px; }
+.kpi.ok strong { color: var(--sucesso); }
+.kpi.ruim strong { color: var(--perigo); }
+.grade-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-bottom: 14px; }
+.grade-2 > .cartao, .cartao.cartao-pad { padding: 14px 16px; }
+.cartao-titulo { font-weight: 650; margin-bottom: 10px; }
+.grafico-dias { width: 100%; height: auto; }
+.barra-motivo { display: grid; grid-template-columns: minmax(0, 1fr) 120px 28px; gap: 8px; align-items: center; margin: 6px 0; font-size: 13px; }
+.barra-motivo span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.barra-motivo b { height: 10px; border-radius: 6px; background: var(--perigo); opacity: .75; }
+.barra-motivo em { font-style: normal; font-weight: 700; text-align: right; }
+.areas-central { display: grid; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); gap: 12px; margin-bottom: 14px; }
+.area-central { padding: 12px 14px; display: flex; flex-direction: column; gap: 3px; }
+.area-central small { color: var(--texto-3); font-size: 11.5px; text-transform: uppercase; letter-spacing: .04em; }
+.area-central span { font-size: 13px; color: var(--texto-2); }
+.area-central.ruim { border-color: color-mix(in srgb, var(--perigo) 50%, var(--borda)); }
+.conteudo .pagina > .cartao { padding: 14px 16px; margin-bottom: 14px; }
+tr.clicavel { cursor: pointer; }
+tr.clicavel:hover { background: var(--superficie-2); }
+
+/* ---------------------------------------------------------------- estratégia */
+.abas-est { margin-bottom: 14px; flex-wrap: wrap; }
+.kanban { display: grid; grid-template-columns: repeat(4, minmax(220px, 1fr)); gap: 12px; align-items: start; }
+.kanban-col { background: var(--superficie-2); border-radius: 12px; padding: 10px; display: flex; flex-direction: column; gap: 8px; min-height: 120px; }
+.kanban-cab { font-weight: 650; display: flex; align-items: center; gap: 8px; }
+.item-est { padding: 10px 12px; display: flex; flex-direction: column; gap: 5px; }
+.item-est.automatico { border-left: 3px solid var(--info); }
+.item-est.dono { border-left: 3px solid var(--primaria); }
+.item-topo { display: flex; flex-wrap: wrap; gap: 4px; }
+.item-acoes { display: flex; gap: 6px; align-items: center; margin-top: 4px; }
+.item-acoes select { flex: 1; min-width: 0; }
+.alinhamento { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 12px; }
+.alinhamento .cartao { padding: 14px 16px; display: flex; flex-direction: column; gap: 6px; }
+.trilhas { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 8px; }
+.trilha { display: flex; flex-direction: column; gap: 3px; border: 1px solid var(--borda); border-radius: 10px; padding: 8px 10px; }
+.manual-md { padding: 18px 24px; max-width: 920px; }
+.manual-md h2 { margin: 0 0 8px; } .manual-md h3 { margin: 18px 0 6px; font-size: 16px; } .manual-md p { margin: 6px 0; color: var(--texto-2); }
+@media (max-width: 1100px) { .kanban { grid-template-columns: repeat(2, minmax(200px, 1fr)); } .grade-2 { grid-template-columns: 1fr; } }
+@media (max-width: 640px) { .kanban { grid-template-columns: 1fr; } }
+.conteudo .pagina > .cartao { overflow-x: auto; }
+.conteudo .pagina > .cartao .tabela td { white-space: normal; overflow-wrap: anywhere; }

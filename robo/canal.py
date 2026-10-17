@@ -22,6 +22,14 @@ from pathlib import Path
 
 from robo import historico
 
+
+def _num_br(v) -> float:
+    """Número do histórico (gravado com vírgula decimal: '0,3')."""
+    try:
+        return float(str(v or 0).replace(".", "").replace(",", ".")) if "," in str(v or "") else float(v or 0)
+    except ValueError:
+        return 0.0
+
 CANAIS = {
     "geral": "Geral (tudo e todos)",
     "engenharia": "Engenharia de dados (1º andar)",
@@ -800,7 +808,7 @@ def boletim_diario(cfg, dia: date) -> str:
     ok = [x for x in h if x.get("status") == "sucesso"]
     ruim = [x for x in h if x.get("status") == "reprovado"]
     linhas = sum(int(x.get("linhas_saida") or 0) for x in ok)
-    lentos = [x for x in ok if float(x.get("duracao_seg") or 0) > float((cfg.dados.get("quadro") or {}).get("sla_segundos", 120))]
+    lentos = [x for x in ok if _num_br(x.get("duracao_seg")) > float((cfg.dados.get("quadro") or {}).get("sla_segundos", 120))]
     return (f"Boletim de {dia.strftime('%d/%m')}: {len(h)} arquivo(s), {len(ok)} publicado(s) ({_num(linhas)} linhas), "
             f"{len(ruim)} barrado(s)" + (f", {len(lentos)} acima do prazo" if lentos else ", todos dentro do prazo") + ". "
             + ("Prioridade de amanhã: tratar os barrados na origem." if ruim else "Sem pendências para amanhã."))

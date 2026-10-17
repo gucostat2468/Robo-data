@@ -506,6 +506,65 @@ class Api:
         c.sincronizar()
         return {"mensagens": c.publicar_sprint()}
 
+    # ------------------------------------------------------------ central de dados e estratégia
+    def central(self, q) -> dict:
+        from robo import central
+        return central.montar(self.cfg, int(q.get("dias", ["1"])[0] or 1))
+
+    def estrategia(self, _q) -> dict:
+        from robo import estrategia, treinamento
+        from robo.canal import Canal, pessoas
+        cfg = self.cfg
+        itens = sorted(estrategia.ler_backlog(cfg), key=lambda i: (i["status"] == "feito", -i.get("prioridade", 0)))
+        gente = pessoas()
+        for i in itens:
+            i["responsavel_nome"] = gente.get(i.get("responsavel"), {}).get("nome", i.get("responsavel") or "—")
+        avs = estrategia.ler_avaliacoes(cfg, 12)
+        treinos = treinamento.historico(cfg, 12)
+        numero, ini, fim = Canal(cfg).sprint_de(date.today())
+        return {"backlog": itens, "alinhamento": estrategia.alinhamento(cfg, itens), "status": estrategia.NOME_STATUS,
+                "sprint": {"numero": numero, "inicio": ini.isoformat(), "fim": fim.isoformat(),
+                           "dias_restantes": (fim - date.today()).days},
+                "avaliacao": avs[-1] if avs else None,
+                "avaliacoes": [{"data_hora": a["data_hora"], "aprovados": a["aprovados"], "total": a["total"]} for a in avs],
+                "treinamento": treinos[-1] if treinos else None,
+                "treinamentos": [{"data_hora": t["data_hora"], "aprovados": t["aprovados"], "total": t["total"]} for t in treinos],
+                "trilhas": estrategia.trilhas(cfg),
+                "pessoas": sorted([{"id": k, "nome": v["nome"], "papel": v["papel"]} for k, v in gente.items() if k != "dono"],
+                                  key=lambda p: p["nome"])}
+
+    def estrategia_item(self, b) -> dict:
+        from robo import estrategia
+        try:
+            return {"item": estrategia.salvar_item(self.cfg, b.get("item") or {})}
+        except (ValueError, TypeError) as e:
+            raise ErroApi(str(e))
+
+    def estrategia_excluir(self, b) -> dict:
+        from robo import estrategia
+        estrategia.excluir_item(self.cfg, str(b.get("id", "")))
+        return {"ok": True}
+
+    def estrategia_avaliar(self, _b) -> dict:
+        from robo import estrategia
+        r = estrategia.avaliar_todos(self.cfg)
+        estrategia.sincronizar(self.cfg)
+        return {"aprovados": r["aprovados"], "total": r["total"]}
+
+    def estrategia_treinar(self, _b) -> dict:
+        from robo import estrategia
+        r = estrategia.treinar_todos(self.cfg)
+        estrategia.sincronizar(self.cfg)
+        return {"aprovados": r["aprovados"], "total": r["total"]}
+
+    def estrategia_sincronizar(self, _b) -> dict:
+        from robo import estrategia
+        return estrategia.sincronizar(self.cfg)
+
+    def boas_praticas(self, _q) -> dict:
+        arq = RAIZ_PROJETO / "conhecimento" / "boas_praticas.md"
+        return {"texto": arq.read_text(encoding="utf-8") if arq.exists() else ""}
+
     # ------------------------------------------------------------ TI (5º andar)
     def ti(self, _q) -> dict:
         from robo import ti
@@ -757,6 +816,7 @@ ROTAS_GET = {
     "/api/estado": Api.estado, "/api/escritorio": Api.escritorio, "/api/agentes": Api.agentes, "/api/historico": Api.historico, "/api/execucao": Api.execucao,
     "/api/reprovados": Api.reprovados, "/api/log": Api.log, "/api/config": Api.config,
     "/api/banco/resumo": Api.banco_resumo, "/api/canal": Api.canal, "/api/ti": Api.ti,
+    "/api/central": Api.central, "/api/estrategia": Api.estrategia, "/api/boas-praticas": Api.boas_praticas,
     "/api/agentes/manual": Api.agente_manual_ler, "/api/consultas": Api.consultas, "/api/consulta": Api.consulta,
 }
 ROTAS_POST = {
@@ -767,7 +827,10 @@ ROTAS_POST = {
     "/api/banco/modelos": Api.banco_modelos, "/api/manutencao": Api.manutencao,
     "/api/consultas/executar": Api.consulta_executar, "/api/agentes/salvar": Api.agente_salvar,
     "/api/agentes/excluir": Api.agente_excluir, "/api/agentes/manual/salvar": Api.agente_manual,
-    "/api/canal/enviar": Api.canal_enviar, "/api/canal/sprint": Api.canal_sprint, "/api/ti/ronda": Api.ti_ronda, "/api/inicializacao": Api.inicializacao, "/api/atalhos": Api.atalhos, "/api/sair": Api.sair,
+    "/api/canal/enviar": Api.canal_enviar, "/api/canal/sprint": Api.canal_sprint, "/api/ti/ronda": Api.ti_ronda,
+    "/api/estrategia/item": Api.estrategia_item, "/api/estrategia/excluir": Api.estrategia_excluir,
+    "/api/estrategia/avaliar": Api.estrategia_avaliar, "/api/estrategia/treinar": Api.estrategia_treinar,
+    "/api/estrategia/sincronizar": Api.estrategia_sincronizar, "/api/inicializacao": Api.inicializacao, "/api/atalhos": Api.atalhos, "/api/sair": Api.sair,
 }
 ROTAS_UPLOAD = {"/api/testar": Api.testar, "/api/enviar": Api.enviar}
 

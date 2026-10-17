@@ -126,6 +126,19 @@ class ControleRobo:
                 Canal(self.cfg).sincronizar()
             except Exception:
                 log.exception("Falha ao sincronizar o canal da equipe")
+        # estratégia: avaliação técnica + treinamento uma vez por sprint (em segundo plano: leva alguns segundos)
+        if agora - getattr(self, "_ultima_estrategia", 0) >= 3600 and not getattr(self, "_estrategia_rodando", False):
+            self._ultima_estrategia, self._estrategia_rodando = agora, True
+
+            def _rodar(cfg=self.cfg):
+                try:
+                    from robo import estrategia
+                    estrategia.rotina(cfg)
+                except Exception:
+                    log.exception("Falha na rotina de estratégia (avaliação/treinamento)")
+                finally:
+                    self._estrategia_rodando = False
+            threading.Thread(target=_rodar, name="robo-estrategia", daemon=True).start()
         from robo.ti import _c as cfg_ti
         if agora - getattr(self, "_ultima_ronda_ti", 0) >= 60 * float(cfg_ti(self.cfg)["intervalo_minutos"]):
             self._ultima_ronda_ti = agora

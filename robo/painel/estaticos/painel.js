@@ -6,6 +6,8 @@
 
 // ------------------------------------------------------------------ ícones (traço 24x24)
 const ICONES = {
+  grafico: '<path d="M4 20V10"/><path d="M10 20V4"/><path d="M16 20v-7"/><path d="M22 20H2"/>',
+  alvo: '<circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5"/><circle cx="12" cy="12" r="1"/>',
   chat: '<path d="M21 12a8 8 0 0 1-11.6 7.1L4 21l1.9-5.4A8 8 0 1 1 21 12z"/><path d="M8.5 11h7"/><path d="M8.5 14.5h4.5"/>',
   escudo: '<path d="M12 3 4.5 6v6c0 4.4 3.2 8.2 7.5 9 4.3-.8 7.5-4.6 7.5-9V6z"/><path d="m9 12 2 2 4-4"/>',
   home: '<path d="M3 10.5 12 3l9 7.5"/><path d="M5 9.5V21h14V9.5"/><path d="M10 21v-6h4v6"/>',
@@ -141,6 +143,8 @@ const E = {
   organograma: null,
   canal: null, canalAtual: "geral", canalAutor: "", canalTipo: "", canalDias: 0, canalBusca: "", canalRascunho: "",
   ti: null,
+  central: null, centralDias: 1,
+  estrategia: null, abaEstrategia: "prioridades", filtroAndarEst: "", boasPraticas: null, editandoItem: null,
 };
 
 const STATUS = {
@@ -162,6 +166,8 @@ const PAGINAS = {
   atividade: { titulo: "Atividade", render: renderAtividade },
   canal: { titulo: "Canal da equipe", render: renderCanal, carregar: carregarCanal },
   ti: { titulo: "TI e segurança", render: renderTI, carregar: carregarTI },
+  central: { titulo: "Central de dados", render: renderCentral, carregar: carregarCentral },
+  estrategia: { titulo: "Estratégia", render: renderEstrategia, carregar: carregarEstrategia },
   configuracoes: { titulo: "Configurações", render: renderConfig, carregar: carregarConfig },
 };
 
@@ -1045,6 +1051,198 @@ async function enviarCanal() {
   $("#canal-texto")?.focus();
 }
 
+// ------------------------------------------------------------------ central de dados (tempo real)
+async function carregarCentral() {
+  try { E.central = await api(`/api/central?dias=${E.centralDias}`); } catch (e) { avisar(e.message, "erro"); }
+}
+
+function barrasDias(serie) {
+  const max = Math.max(1, ...serie.map((d) => d.aprovados + d.reprovados));
+  const l = 560, a = 150, w = l / serie.length;
+  const barras = serie.map((d, i) => {
+    const ha = (d.aprovados / max) * (a - 24), hr = (d.reprovados / max) * (a - 24), x = i * w + 4;
+    const dia = d.dia.slice(8, 10) + "/" + d.dia.slice(5, 7);
+    return `<g><title>${dia}: ${d.aprovados} aprovado(s), ${d.reprovados} reprovado(s)</title>
+      <rect x="${x}" y="${a - 18 - ha}" width="${w - 8}" height="${ha}" rx="3" fill="var(--sucesso)"/>
+      <rect x="${x}" y="${a - 18 - ha - hr}" width="${w - 8}" height="${hr}" rx="3" fill="var(--perigo)"/>
+      <text x="${x + (w - 8) / 2}" y="${a - 4}" text-anchor="middle" font-size="10" fill="var(--texto-3)">${dia}</text></g>`;
+  }).join("");
+  return `<svg viewBox="0 0 ${l} ${a}" class="grafico-dias" role="img" aria-label="Aprovados e reprovados por dia">${barras}</svg>`;
+}
+
+function renderCentral() {
+  const periodos = [[1, "Hoje"], [7, "7 dias"], [30, "30 dias"]];
+  const acoes = `<div class="segmentado">${periodos.map(([d, t]) => `<button data-acao="central-dias" data-dias="${d}" class="${E.centralDias === d ? "ativo" : ""}">${t}</button>`).join("")}</div>`;
+  const c = E.central;
+  if (!c) return cabecalho("Central de dados", "", acoes) + `<div class="carregando">Carregando…</div>`;
+  const t = c.totais, a = c.areas;
+  const kpi = (rotulo, valor, classe = "", sub = "") => `<div class="cartao kpi ${classe}"><span>${rotulo}</span><strong>${valor}</strong>${sub ? `<small>${sub}</small>` : ""}</div>`;
+  const maxMotivo = Math.max(1, ...c.motivos.map((m) => m.vezes));
+  return cabecalho("Central de dados", `Ao vivo · atualizado às ${esc(c.atualizado_em)} · tudo vem do histórico real do robô`, acoes) +
+    `<section class="kpis">
+      ${kpi("Planilhas recebidas", num(t.recebidos))}
+      ${kpi("Aprovadas (acertos)", num(t.aprovados), "ok")}
+      ${kpi("Reprovadas (erradas)", num(t.reprovados), t.reprovados ? "ruim" : "")}
+      ${kpi("Taxa de aprovação", t.taxa_aprovacao === null ? "—" : `${String(t.taxa_aprovacao).replace(".", ",")}%`)}
+      ${kpi("Linhas publicadas", num(t.linhas_publicadas), "", `${num(t.linhas_removidas)} removidas com motivo`)}
+      ${kpi("Tempo médio", t.tempo_medio === null ? "—" : `${String(t.tempo_medio).replace(".", ",")} s`, "", `${num(t.avisos)} aviso(s)`)}
+    </section>
+    <div class="grade-2">
+      <div class="cartao"><div class="cartao-titulo">Últimos 14 dias <small class="muted">· verde aprovadas, vermelho reprovadas</small></div>${barrasDias(c.serie)}</div>
+      <div class="cartao"><div class="cartao-titulo">Por que barramos</div>
+        ${c.motivos.length ? c.motivos.map((m) => `<div class="barra-motivo"><span title="${esc(m.motivo)}">${esc(m.motivo)}</span><b style="width:${(m.vezes / maxMotivo) * 100}%"></b><em>${m.vezes}</em></div>`).join("")
+          : `<p class="muted">Nenhuma reprovação no período.</p>`}
+        ${c.quem_barrou.length ? `<div class="chips-colunas" style="margin-top:10px">${c.quem_barrou.map((q) => `<span class="etiqueta">${esc(q.quem)}: ${q.vezes}</span>`).join("")}</div>` : ""}</div>
+    </div>
+    <section class="areas-central">
+      ${[["1", "Engenharia", `${num(a["1"].aprovados)} aprovadas · ${num(a["1"].reprovados)} barradas · ${num(a["1"].linhas)} linhas`],
+        ["2", "Análise", `${num(a["2"].bases_analisadas)} bases analisadas · ${num(a["2"].alertas)} alerta(s) · ${num(a["2"].com_ressalva)} com ressalva`],
+        ["3", "Sala Excel", `${num(a["3"].entregas)} entregas · ${num(a["3"].conferencias)} conferências · ${num(a["3"].divergencias)} divergência(s)`],
+        ["4", "Governança", `${num(a["4"].dados_pessoais)} coluna(s) com possível dado pessoal`],
+        ["5", "TI", a["5"].saudavel === false ? `ALERTA: ${esc((a["5"].alertas || [])[0] || "")}` : a["5"].saudavel ? "sistema saudável" : "aguardando a primeira ronda"]]
+        .map(([n, tit, txt]) => `<div class="cartao area-central ${n === "5" && a["5"].saudavel === false ? "ruim" : ""}"><small>${n}º andar</small><strong>${tit}</strong><span>${txt}</span></div>`).join("")}
+    </section>
+    <div class="cartao"><div class="cartao-titulo">Planilhas erradas ${c.erradas.length ? `<small class="muted">· clique para ver cada erro com a linha do Excel</small>` : ""}</div>
+      ${c.erradas.length ? `<table class="tabela"><thead><tr><th>Arquivo</th><th>Quando</th><th>Quem barrou</th><th>Motivo principal</th></tr></thead><tbody>
+        ${c.erradas.map((x) => `<tr class="clicavel" data-acao="ver-execucao" data-id="${esc(x.id)}"><td><strong>${esc(x.arquivo)}</strong><br><small class="muted">${x.erros} erro(s)</small></td>
+          <td>${esc(dataCurta(x.data_hora))}</td><td>${esc(x.quem_barrou || "—")}</td>
+          <td>${esc(x.motivo || "")}${(x.exemplos || []).length ? `<br><small class="muted">${esc(x.exemplos.join(" · "))}</small>` : ""}</td></tr>`).join("")}</tbody></table>`
+        : `<p class="muted">Nenhuma planilha errada no período. 👏</p>`}</div>
+    <div class="grade-2">
+      <div class="cartao"><div class="cartao-titulo">Análises (manchetes da gerente Patrícia)</div>
+        ${c.analises.length ? `<ul class="lista-ficha">${c.analises.map((x) => `<li><strong>${esc(x.base || x.arquivo)}</strong> · ${esc(x.manchete)}${x.ressalvas ? ` <span class="etiqueta alerta">${x.ressalvas} ressalva(s)</span>` : ""}</li>`).join("")}</ul>`
+          : `<p class="muted">Nenhuma análise no período.</p>`}
+        ${c.alertas_analise.length ? `<div class="secao-titulo" style="margin-top:10px">Alertas do monitoramento</div><ul class="lista-ficha">${c.alertas_analise.map((x) => `<li><strong>${esc(x.base)}</strong>: ${esc(x.mensagem)}</li>`).join("")}</ul>` : ""}</div>
+      <div class="cartao"><div class="cartao-titulo">Acertos recentes</div>
+        ${c.acertos.length ? `<table class="tabela"><tbody>${c.acertos.map((x) => `<tr class="clicavel" data-acao="ver-execucao" data-id="${esc(x.id)}"><td>${esc(x.arquivo)}</td><td>${num(x.linhas)} linhas</td><td>${esc(dataCurta(x.data_hora))}</td></tr>`).join("")}</tbody></table>`
+          : `<p class="muted">Nenhuma aprovação no período.</p>`}</div>
+    </div>
+    <div class="cartao"><div class="cartao-titulo">Conferências da equipe no período <small class="muted">· achados = problemas que a pessoa encontrou</small></div>
+      ${c.pessoas.length ? `<table class="tabela"><thead><tr><th>Pessoa</th><th>Andar</th><th>Conferências</th><th>Achados</th></tr></thead><tbody>
+        ${c.pessoas.map((p) => `<tr><td>${esc(p.nome)}</td><td>${p.andar}º</td><td>${num(p.conferencias)}</td><td>${p.achados ? `<span class="etiqueta alerta">${num(p.achados)}</span>` : "0"}</td></tr>`).join("")}</tbody></table>`
+        : `<p class="muted">Sem conferências no período.</p>`}</div>`;
+}
+
+// ------------------------------------------------------------------ estratégia
+async function carregarEstrategia() {
+  try {
+    E.estrategia = await api("/api/estrategia");
+    if (E.abaEstrategia === "boas" && !E.boasPraticas) E.boasPraticas = (await api("/api/boas-praticas")).texto;
+  } catch (e) { avisar(e.message, "erro"); }
+}
+
+function markdown(md) {
+  const inline = (t) => esc(t).replace(/\*\*(.+?)\*\*/g, "<b>$1</b>").replace(/`(.+?)`/g, "<code>$1</code>");
+  const out = []; let lista = false;
+  for (const linha of String(md || "").split("\n")) {
+    if (/^\s*-\s+/.test(linha)) { if (!lista) { out.push("<ul class='lista-ficha'>"); lista = true; } out.push(`<li>${inline(linha.replace(/^\s*-\s+/, ""))}</li>`); continue; }
+    if (lista) { out.push("</ul>"); lista = false; }
+    if (/^#\s/.test(linha)) out.push(`<h2>${inline(linha.slice(2))}</h2>`);
+    else if (/^##\s/.test(linha)) out.push(`<h3>${inline(linha.slice(3))}</h3>`);
+    else if (linha.trim()) out.push(`<p>${inline(linha)}</p>`);
+  }
+  if (lista) out.push("</ul>");
+  return out.join("");
+}
+
+const ABAS_EST = [["prioridades", "Prioridades da sprint"], ["alinhamento", "Alinhamento dos andares"], ["avaliacoes", "Avaliações técnicas"],
+  ["treinamentos", "Treinamentos"], ["boas", "Boas práticas"]];
+
+function renderEstrategia() {
+  const es = E.estrategia;
+  const acoes = `<button class="btn" data-acao="est-sincronizar">${icone("historico")}Atualizar com os dados</button>
+    <button class="btn primario" data-acao="est-novo">${icone("mais")}Nova prioridade</button>`;
+  if (!es) return cabecalho("Estratégia", "", acoes) + `<div class="carregando">Carregando…</div>`;
+  const sp = es.sprint;
+  const abas = `<div class="segmentado abas-est">${ABAS_EST.map(([id, t]) => `<button data-acao="est-aba" data-aba="${id}" class="${E.abaEstrategia === id ? "ativo" : ""}">${t}</button>`).join("")}</div>`;
+  const corpo = { prioridades: estPrioridades, alinhamento: estAlinhamento, avaliacoes: estAvaliacoes, treinamentos: estTreinamentos,
+    boas: () => `<div class="cartao manual-md">${E.boasPraticas ? markdown(E.boasPraticas) : "Carregando…"}</div>` }[E.abaEstrategia]();
+  return cabecalho("Estratégia", `Sprint ${sp.numero}: ${esc(dataBr(sp.inicio))} a ${esc(dataBr(sp.fim))} · faltam ${sp.dias_restantes} dia(s). Prioridade = impacto × urgência ÷ esforço.`, acoes) + abas + corpo;
+}
+
+function estPrioridades() {
+  const es = E.estrategia;
+  const filtro = E.filtroAndarEst ? Number(E.filtroAndarEst) : 0;
+  const itens = es.backlog.filter((i) => !filtro || Number(i.andar) === filtro);
+  const colunas = Object.entries(es.status);
+  return `<div class="filtros-canal" style="padding:0 0 12px"><select id="est-andar"><option value="">Todos os andares</option>
+      ${[1, 2, 3, 4, 5].map((n) => `<option value="${n}" ${filtro === n ? "selected" : ""}>${esc(NOME_ANDAR_PAINEL[n])}</option>`).join("")}</select>
+      <span class="muted">${itens.filter((i) => i.status !== "feito").length} aberta(s) · itens automáticos nascem dos dados e se fecham sozinhos quando o problema some</span></div>
+    <div class="kanban">${colunas.map(([st, nome]) => {
+      const lista = itens.filter((i) => i.status === st);
+      return `<div class="kanban-col"><div class="kanban-cab">${esc(nome)} <b class="contador">${lista.length}</b></div>
+        ${lista.map((i) => `<article class="cartao item-est ${i.origem}">
+          <div class="item-topo"><span class="etiqueta ${i.prioridade >= 8 ? "perigo" : i.prioridade >= 4 ? "alerta" : ""}">prioridade ${String(i.prioridade).replace(".", ",")}</span>
+            <span class="etiqueta">${i.andar}º andar</span>${i.origem === "automatico" ? `<span class="etiqueta info">dos dados</span>` : `<span class="etiqueta">seu</span>`}</div>
+          <strong>${esc(i.titulo)}</strong>
+          ${i.motivo ? `<small class="muted">${esc(i.motivo)}</small>` : ""}
+          <small>Responsável: <b>${esc(i.responsavel_nome)}</b> · I${i.impacto} U${i.urgencia} E${i.esforco}</small>
+          ${i.resolvido_sozinho ? `<small class="muted">Resolvido: a condição não aparece mais nos dados.</small>` : ""}
+          <div class="item-acoes"><select data-status-item="${esc(i.id)}">${colunas.map(([k, v]) => `<option value="${k}" ${k === i.status ? "selected" : ""}>${esc(v)}</option>`).join("")}</select>
+            <button class="btn pequeno fantasma" data-acao="est-editar" data-id="${esc(i.id)}">${icone("ajustes")}</button>
+            ${i.origem === "dono" ? `<button class="btn pequeno fantasma" data-acao="est-excluir" data-id="${esc(i.id)}">${icone("lixeira")}</button>` : ""}</div>
+        </article>`).join("") || `<p class="muted" style="padding:6px">—</p>`}</div>`;
+    }).join("")}</div>`;
+}
+
+function estAlinhamento() {
+  return `<section class="alinhamento">${E.estrategia.alinhamento.map((a) => `<div class="cartao"><small class="muted">${esc(NOME_ANDAR_PAINEL[a.andar] || `${a.andar}º andar`)}</small>
+      <strong>Gerente: ${esc(a.gerente)}</strong>${a.travados ? `<span class="etiqueta perigo">${a.travados} travado(s)</span>` : ""}
+      ${a.prioridades.length ? `<ol class="lista-ficha">${a.prioridades.map((p) => `<li><b>${esc(p.titulo)}</b><br><small class="muted">${esc(p.responsavel)} · ${esc(p.status)} · prioridade ${String(p.prioridade).replace(".", ",")}</small></li>`).join("")}</ol>`
+        : `<p class="muted">Nenhuma prioridade aberta neste andar.</p>`}</div>`).join("")}</section>`;
+}
+
+function estAvaliacoes() {
+  const es = E.estrategia, av = es.avaliacao;
+  const topo = `<div class="acoes" style="margin-bottom:12px"><button class="btn primario" data-acao="est-avaliar">${icone("ok")}Aplicar avaliação técnica agora</button>
+    <span class="muted">Reaplica do zero as provas de todo o quadro (caso correto + erro plantado). Roda sozinha a cada sprint.</span></div>`;
+  if (!av) return topo + `<div class="cartao vazio"><p>Nenhuma avaliação ainda.</p></div>`;
+  const filtro = E.filtroAndarEst ? Number(E.filtroAndarEst) : 0;
+  const pessoas = av.pessoas.filter((p) => !filtro || Number(p.andar) === filtro);
+  return topo + `<div class="grade-2"><div class="cartao kpi ${av.aprovados === av.total ? "ok" : "ruim"}"><span>Última avaliação (${esc(dataCurta(av.data_hora))})</span>
+      <strong>${av.aprovados}/${av.total}</strong><small>pessoas aprovadas</small></div>
+    <div class="cartao"><div class="cartao-titulo">Histórico</div>${es.avaliacoes.slice().reverse().map((x) => `<div>${esc(dataCurta(x.data_hora))}: <b>${x.aprovados}/${x.total}</b></div>`).join("")}</div></div>
+    <div class="cartao"><table class="tabela"><thead><tr><th>Pessoa</th><th>Andar</th><th>Nível</th><th>Provas</th><th>Resultado</th></tr></thead><tbody>
+      ${pessoas.map((p) => `<tr><td>${esc(p.nome)}</td><td>${p.andar}º</td><td>${esc(p.nivel || "")}</td><td>${p.acertos}/${p.total}</td>
+        <td>${p.aprovado ? `<span class="etiqueta sucesso">aprovado</span>` : `<span class="etiqueta perigo">reprovado</span><br><small>${esc((p.bloqueios || []).join("; "))}</small>`}</td></tr>`).join("")}</tbody></table></div>`;
+}
+
+function estTreinamentos() {
+  const es = E.estrategia, t = es.treinamento;
+  const topo = `<div class="acoes" style="margin-bottom:12px"><button class="btn primario" data-acao="est-treinar">${icone("frasco")}Rodar treinamento agora</button>
+    <span class="muted">Planilhas difíceis geradas na hora e processadas pelo robô de verdade, numa pasta separada (não toca a produção).</span></div>`;
+  if (!t) return topo + `<div class="cartao vazio"><p>Nenhum treinamento ainda.</p></div>`;
+  return topo + `<div class="grade-2"><div class="cartao kpi ${t.aprovados === t.total ? "ok" : "ruim"}"><span>Último treinamento (${esc(dataCurta(t.data_hora))})</span>
+      <strong>${t.aprovados}/${t.total}</strong><small>casos difíceis dominados · ${String(t.segundos).replace(".", ",")} s</small></div>
+    <div class="cartao"><div class="cartao-titulo">Histórico</div>${es.treinamentos.slice().reverse().map((x) => `<div>${esc(dataCurta(x.data_hora))}: <b>${x.aprovados}/${x.total}</b></div>`).join("")}</div></div>
+    <div class="cartao"><div class="cartao-titulo">Casos difíceis</div><table class="tabela"><thead><tr><th>Caso</th><th>Problema real</th><th>Quem domina</th><th>Resultado</th></tr></thead><tbody>
+      ${t.casos.map((c) => `<tr><td><strong>${esc(c.titulo)}</strong></td><td><small>${esc(c.problema)}</small></td>
+        <td><small>${esc(c.responsaveis.map((r) => (es.trilhas.find((x) => x.id === r) || {}).nome || r).join(", "))}</small></td>
+        <td>${c.ok ? `<span class="etiqueta sucesso">dominado</span>` : `<span class="etiqueta perigo">falhou</span><br><small>${esc(c.falhas.join("; "))}</small>`}</td></tr>`).join("")}</tbody></table></div>
+    <div class="cartao"><div class="cartao-titulo">Trilha de cada pessoa</div><div class="trilhas">${es.trilhas.map((p) => `<div class="trilha"><strong>${esc(p.nome)}</strong><small class="muted">${esc(p.papel)}</small>
+      <span class="etiqueta ${p.dominados === p.total ? "sucesso" : "alerta"}">${p.dominados}/${p.total} casos</span></div>`).join("")}</div></div>`;
+}
+
+function editorItem(i) {
+  const es = E.estrategia;
+  const sel = (id, v) => `<select id="${id}">${[1, 2, 3, 4, 5].map((n) => `<option ${Number(v) === n ? "selected" : ""}>${n}</option>`).join("")}</select>`;
+  return `<div class="gaveta-cab"><div style="flex:1"><div class="muted">${i.id ? (i.origem === "automatico" ? "Prioridade vinda dos dados" : "Sua prioridade") : "Nova prioridade"}</div>
+      <h2>${esc(i.titulo || "Nova prioridade")}</h2></div><button class="btn fantasma" data-acao="fechar-gaveta" aria-label="Fechar">${icone("x")}</button></div>
+    <div class="gaveta-corpo"><div class="form">
+      <label class="inteiro">O que precisa ser feito<input type="text" id="it-titulo" value="${esc(i.titulo || "")}" ${i.origem === "automatico" ? "readonly" : ""}></label>
+      <label class="inteiro">Por quê (motivo)<input type="text" id="it-motivo" value="${esc(i.motivo || "")}"></label>
+      <label>Andar<select id="it-andar">${[1, 2, 3, 4, 5].map((n) => `<option value="${n}" ${Number(i.andar || 1) === n ? "selected" : ""}>${esc(NOME_ANDAR_PAINEL[n])}</option>`).join("")}</select></label>
+      <label>Responsável<select id="it-resp">${es.pessoas.map((p) => `<option value="${esc(p.id)}" ${i.responsavel === p.id ? "selected" : ""}>${esc(p.nome)} · ${esc(p.papel)}</option>`).join("")}</select></label>
+      <label>Impacto (1 a 5)${sel("it-impacto", i.impacto || 3)}<small>Quanto melhora o resultado se for feito.</small></label>
+      <label>Urgência (1 a 5)${sel("it-urgencia", i.urgencia || 3)}<small>Quanto custa esperar.</small></label>
+      <label>Esforço (1 a 5)${sel("it-esforco", i.esforco || 3)}<small>Quanto trabalho dá (maior = mais difícil).</small></label>
+      <label>Situação<select id="it-status">${Object.entries(es.status).map(([k, v]) => `<option value="${k}" ${(i.status || "a_fazer") === k ? "selected" : ""}>${esc(v)}</option>`).join("")}</select></label>
+    </div>
+    ${(i.historico || []).length ? `<div><div class="secao-titulo">Histórico</div><ul class="lista-ficha">${i.historico.map((h) => `<li>${esc(h)}</li>`).join("")}</ul></div>` : ""}
+    <div class="acoes" style="justify-content:flex-end"><button class="btn" data-acao="fechar-gaveta">Cancelar</button>
+      <button class="btn primario" data-acao="est-salvar" data-id="${esc(i.id || "")}">${icone("ok")}Salvar</button></div></div>`;
+}
+
 // ------------------------------------------------------------------ TI e segurança (5º andar)
 async function carregarTI() {
   try { E.ti = await api("/api/ti"); } catch (e) { avisar(e.message, "erro"); }
@@ -1148,6 +1346,37 @@ const ACOES = {
     await carregarCanal(); desenhar();
   }),
   "canal-sugestao": (el) => { E.canalRascunho = el.dataset.texto; enviarCanal(); },
+  "central-dias": async (el) => { E.centralDias = Number(el.dataset.dias); await carregarCentral(); desenhar(); },
+  "est-aba": async (el) => { E.abaEstrategia = el.dataset.aba; await carregarEstrategia(); desenhar(); },
+  "est-novo": () => { abrirGaveta(editorItem({ andar: 1, impacto: 3, urgencia: 3, esforco: 3, status: "a_fazer", responsavel: "ger_engenharia" })); },
+  "est-editar": (el) => { const i = E.estrategia.backlog.find((x) => x.id === el.dataset.id); if (i) abrirGaveta(editorItem(i)); },
+  "est-salvar": (el) => comCarregando(el, async () => {
+    const item = { id: el.dataset.id || undefined, titulo: $("#it-titulo").value, motivo: $("#it-motivo").value, andar: Number($("#it-andar").value),
+      responsavel: $("#it-resp").value, impacto: Number($("#it-impacto").value), urgencia: Number($("#it-urgencia").value),
+      esforco: Number($("#it-esforco").value), status: $("#it-status").value };
+    await api("/api/estrategia/item", { corpo: { item } });
+    avisar("Prioridade salva.", "sucesso"); fecharGaveta(); await carregarEstrategia(); desenhar();
+  }),
+  "est-excluir": async (el) => {
+    const ok = await confirmar({ titulo: "Excluir esta prioridade?", texto: "Ela sai do backlog.", botao: "Excluir", perigo: true });
+    if (!ok) return;
+    await api("/api/estrategia/excluir", { corpo: { id: el.dataset.id } }); await carregarEstrategia(); desenhar();
+  },
+  "est-sincronizar": (el) => comCarregando(el, async () => {
+    const r = await api("/api/estrategia/sincronizar", { corpo: {} });
+    avisar(`${r.novos} prioridade(s) nova(s) vinda(s) dos dados · ${r.resolvidos} resolvida(s) sozinha(s).`, "sucesso");
+    await carregarEstrategia(); desenhar();
+  }),
+  "est-avaliar": (el) => comCarregando(el, async () => {
+    const r = await api("/api/estrategia/avaliar", { corpo: {} });
+    avisar(`Avaliação técnica: ${r.aprovados}/${r.total} pessoas aprovadas.`, r.aprovados === r.total ? "sucesso" : "erro");
+    await carregarEstrategia(); desenhar();
+  }),
+  "est-treinar": (el) => comCarregando(el, async () => {
+    const r = await api("/api/estrategia/treinar", { corpo: {} });
+    avisar(`Treinamento: ${r.aprovados}/${r.total} casos difíceis dominados.`, r.aprovados === r.total ? "sucesso" : "erro");
+    await carregarEstrategia(); desenhar();
+  }),
   "ti-ronda": (el) => comCarregando(el, async () => { E.ti = await api("/api/ti/ronda", { corpo: {} }); desenhar(); avisar("Ronda de TI concluída."); }),
   "editar-agente": (el) => { const a = E.equipe.agentes.find((x) => x.id === el.dataset.id); if (a) abrirEditor(a); },
   "abrir-catalogo": () => { coletarEditor(); E.catalogoAberto = true; redesenharEditor(); $("#busca-habilidade")?.focus(); },
@@ -1238,6 +1467,12 @@ document.addEventListener("input", (e) => {
   }
 });
 document.addEventListener("change", async (e) => {
+  if (e.target.dataset.statusItem) {
+    try { await api("/api/estrategia/item", { corpo: { item: { id: e.target.dataset.statusItem, status: e.target.value } } }); }
+    catch (err) { avisar(err.message, "erro"); }
+    await carregarEstrategia(); desenhar(); return;
+  }
+  if (e.target.id === "est-andar") { E.filtroAndarEst = e.target.value; desenhar(); return; }
   const mapa = { "canal-autor": "canalAutor", "canal-tipo": "canalTipo", "canal-dias": "canalDias" };
   if (mapa[e.target.id]) { E[mapa[e.target.id]] = e.target.value; await carregarCanal(); desenhar(); }
 });
@@ -1293,6 +1528,11 @@ window.addEventListener("hashchange", () => irPara(location.hash.slice(1)));
   irPara(location.hash.slice(1) || "inicio");
   setInterval(atualizarEstado, 2000);
   setInterval(async () => { if (E.pagina === "canal") { await carregarCanal(); atualizarMensagens(); } }, 4000);
+  setInterval(async () => {  // central de dados ao vivo (não redesenha enquanto você interage com um campo)
+    if (E.pagina !== "central") return;
+    await carregarCentral();
+    if (!["SELECT", "INPUT"].includes(document.activeElement?.tagName)) desenharSemPerderFoco();
+  }, 3000);
   setInterval(atualizarLog, 2000);
   atualizarLog();
 })();
