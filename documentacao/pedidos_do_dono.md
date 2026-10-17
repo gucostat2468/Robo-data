@@ -53,4 +53,12 @@ Legenda: ✅ feito e testado · 🟡 feito em parte · ⏳ pendente
 | 47 | Alguém pensando no futuro com a memória | ✅ | Iara (`robo/ideias.py`) |
 | 48 | RH bem definido, novos andares | ✅ | `documentacao/rh_e_desenvolvimento.md` |
 | 49 | Qualquer tipo de banco de dados | 🟡 | PostgreSQL e SQLite hoje; SQL Server/MySQL exigem driver (ver resposta) |
+| 50 | Diretores e heads em cada área, com escopo pesquisado | ✅ | `robo/lideranca.py`, `conhecimento/lideranca_e_gestao.md` (com fontes) |
+| 51 | Cientistas de dados | ✅ | Vinícius (drivers), Carolina (segmentação), Lucas (anomalias) — `robo/ciencia.py` |
+| 52 | Sala de RH completa | ✅ | Marta (CHRO), Juliana (head), Helena, Priscila, Roberta, Mauro, Tiago, Bianca |
+| 53 | Conversa natural e organizada | ✅ | frase em português primeiro, detalhes em seções recolhíveis |
+| 54 | Como confiar nos resultados | ✅ | auditoria semanal dos heads + conferência no banco + scorecard + revisor independente |
+| 55 | Como está a empresa agora / onde tudo é registrado | ✅ | página Raio-X da empresa |
+| 56 | Funcionar bem só com o notebook aberto | ✅ | rotinas registradas, recuperação do que atrasou e resumo de abertura |
+| 57 | Liderança que desenvolve pessoas (lifelong learning) | ✅ | Project Oxygen, SBI, 1:1, 70-20-10, PDI e promoção |
 | 38 | IA opcional sem fingir | 🟡 | `robo/ia.py`: só modelo local, desligado; ainda não usado nas respostas |

@@ -393,6 +393,9 @@ def decidir(cfg, aprovacao_id: str, aprovado: bool, motivo: str = "", em_segundo
     if alvo and alvo["modelo"] == "desligamento":
         from robo import reuniao
         return reuniao.decidir_desligamento(cfg, aprovacao_id, aprovado, motivo)
+    if alvo and alvo["modelo"] == "promocao":
+        from robo import reuniao
+        return reuniao.decidir_promocao(cfg, aprovacao_id, aprovado, motivo)
     a = tb.decidir(aprovacao_id, aprovado, "dono", motivo)
     s = tb.solicitacao(a["solicitacao_id"])
     if s and s["estado"] == "aguardando_aprovacao":

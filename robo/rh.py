@@ -28,11 +28,11 @@ import pandas as pd
 
 NIVEIS = ["estagiario", "junior", "pleno", "senior", "especialista"]
 NOME_NIVEL = {"estagiario": "Estagiário", "junior": "Júnior", "pleno": "Pleno", "senior": "Sênior", "especialista": "Especialista",
-              "coordenador": "Coordenador(a)", "gerente": "Gerente"}
+              "coordenador": "Coordenador(a)", "gerente": "Gerente", "head": "Head", "diretor": "Diretor(a)"}
 RISCO_MAXIMO = {"estagiario": "alto", "junior": "baixo", "pleno": "medio", "senior": "alto", "especialista": "alto",
-                "coordenador": "alto", "gerente": "alto"}
+                "coordenador": "alto", "gerente": "alto", "head": "alto", "diretor": "alto"}
 # cargos de gestão: não executam habilidades nos dados; respondem por pessoas, metas e liberação
-CARGOS_GESTAO = ["coordenador", "gerente"]
+CARGOS_GESTAO = ["coordenador", "gerente", "head", "diretor"]
 ORDEM_RISCO = {"baixo": 0, "medio": 1, "alto": 2}
 NOME_RISCO = {"baixo": "baixo", "medio": "médio", "alto": "alto"}
 AREAS = ["Engenharia de Dados", "Qualidade de Dados", "Governança e Privacidade", "Análise de Dados",
@@ -437,7 +437,9 @@ def _provas_nativas_cache() -> dict:
     # quadro de pessoal (gerentes, plenos, juniores, estagiários) e equipe do canal
     from robo import canal, quadro
     from robo import ti
+    from robo import lideranca
     for grupo, ids in ((quadro.provas_quadro, [p["id"] for p in quadro.QUADRO]), (ti.provas_ti, list(ti.POR_ID)),
+                       (lideranca.provas, list(lideranca.POR_ID)),
                        (canal.provas_canal, ["canal_nina", "canal_iara", "canal_helena", "ger_operacoes"])):
         try:
             for agente, casos in grupo().items():
@@ -647,7 +649,11 @@ def _nome_pessoa(pid: str) -> str:
 def ficha(agente: dict) -> dict:
     """Ficha profissional + resultado do processo seletivo."""
     base = dict(FICHAS.get(agente["id"], {}))
-    from robo import quadro, ti
+    from robo import lideranca, organizacao, quadro, ti
+    if not base and agente["id"] in lideranca.POR_ID:
+        p = lideranca.POR_ID[agente["id"]]
+        base = {"cargo": p["cargo"], "nivel": p["nivel"], "area": p["area"], "metodologias": p["metodologias"],
+                "responsabilidades": p["escopo"], "criterios": p["criterios"], "limites": p["nao_faz"]}
     if not base and agente["id"] in ti.POR_ID:
         p = ti.POR_ID[agente["id"]]
         esc = quadro.ESCOPO_NIVEL[p["nivel"]]
@@ -674,8 +680,8 @@ def ficha(agente: dict) -> dict:
                             f"{NOME_RISCO[RISCO_MAXIMO.get(agente.get('nivel') or 'pleno', 'medio')]}"]
                 + (["Estagiário: trabalha em observação, não altera os dados publicados"] if agente.get("nivel") == "estagiario" else []),
                 "mentor": agente.get("mentor")}
-    gestor = base.get("gestor") or quadro.GESTORES_EXISTENTES.get(agente["id"]) or (quadro.POR_ID.get(agente["id"]) or {}).get("gestor")
-    if gestor and not base.get("gestor"):
+    gestor = organizacao.gestor_de(agente["id"]) or base.get("gestor")
+    if gestor and (not base.get("gestor") or agente["id"] in lideranca.NOVOS_GESTORES):
         base["gestor"] = "Você (dono)" if gestor == "dono" else _nome_pessoa(gestor)
     base["nivel_id"] = base.get("nivel")
     base["nivel"] = NOME_NIVEL.get(base.get("nivel"), base.get("nivel"))

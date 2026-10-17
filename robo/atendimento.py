@@ -104,6 +104,26 @@ def _texto_contrato(c: dict) -> str:
 
 def _escolher_ferramenta(t: str, ctx: dict) -> str | None:
     """Ferramenta para uma pergunta (não tarefa). Ordem: mais específica primeiro."""
+    if re.search(r"como (esta|anda|vai|funciona) (a |nossa )?empresa|raio.?x|panorama geral|visao geral da empresa", t):
+        return "raio_x"
+    if re.search(r"scorecard|indicadores da (area|diretoria)|farol|metas da area|como esta a (minha )?area", t):
+        return "scorecard"
+    if re.search(r"auditori|audite|confiar nos resultados|confiavel|confiabilidade", t):
+        return "auditoria"
+    if re.search(r"driver|o que mais (influencia|impacta|pesa)|o que (influencia|impacta)|fatores do (nps|csat)", t):
+        return "drivers"
+    if re.search(r"segment(e|ar|acao|os) (os |de |dos )?clientes|cluster|grupos de clientes|perfis de clientes|personas?", t):
+        return "segmentacao"
+    if re.search(r"anomal|outlier|fora do padrao|valores estranhos|valores absurdos", t):
+        return "anomalias"
+    if re.search(r"people analytics|indicadores de pessoas|headcount|quantos funcionarios", t):
+        return "people_analytics"
+    if re.search(r"desempenho|performance|quem (esta|ta) (mal|abaixo)", t):
+        return "desempenho"
+    if re.search(r"trilha|plano de desenvolvimento|\bpdi\b|desenvolver (a equipe|o time|as pessoas)|70.?20.?10", t):
+        return "desenvolvimento"
+    if re.search(r"contrata|recrutamento|selecao|vagas|experiencia de 3|efetiva", t):
+        return "recrutamento"
     if re.search(r"como (esta|anda|vai) (o |a )?(andar|time|equipe|area|setor)|status do andar|reuniao|"
                  r"o que (deu|esta dando) (certo|errado)|plano de acao|pdca", t):
         return "reuniao_andar"
@@ -212,7 +232,7 @@ def _responder(cfg, tb, conversa_id, contrato, texto, ctx, arquivo) -> tuple[lis
     pergunta = _aplicar_correcoes(pergunta, ctx)
     ferr = _escolher_ferramenta(t, ctx)
     params = {"pergunta": pergunta, "arquivo": ctx.get("arquivo"), "base": ctx.get("base")}
-    if ferr == "reuniao_andar":
+    if ferr in ("reuniao_andar", "scorecard", "auditoria"):
         params = {"andar": contrato["andar"]}
     if not ferr:
         from robo.canal import INTENCOES, _pontuar
@@ -265,7 +285,7 @@ def _com_ferramenta(cfg, tb, conversa_id, contrato, texto, ferr, params, pronto=
         if not executor:
             return msgs, _registrar_pergunta(tb, contrato, texto, conversa_id, msgs)
         pronto = None  # o colega executa de novo, com o próprio contrato
-    r = pronto or ferramentas.executar(ferr, cfg, **params)
+    r = pronto or ferramentas.executar(ferr, cfg, **{**params, "quem": executor})
     autor = executor
     if ferr == "calcular" and r["ok"]:
         tb.atualizar_contexto(conversa_id, ultimo_calculo=pergunta)

@@ -23,12 +23,14 @@ DONO = "dono"
 
 # andar → canal do andar e líder (o líder de cada andar é definido só em contratacao.LIDER_DO_ANDAR)
 CANAL_DO_ANDAR = {1: "engenharia", 2: "analise", 3: "excel", 4: "geral", 5: "ti"}
-NOME_ANDAR = {1: "Engenharia de Dados", 2: "Análise e Customer Insights", 3: "Sala Excel",
-              4: "Diretoria, governança e canal", 5: "TI, DevOps e segurança"}
+NOME_ANDAR = {1: "Engenharia de Dados", 2: "Analytics e Ciência de Dados", 3: "Sala Excel e BI",
+              4: "Operações, governança, canal e Pessoas (RH)", 5: "TI, DevOps e segurança"}
 
 # Permissões por nível. "altera_dados" = pode executar ferramenta que muda arquivo publicado (sempre com aprovação do
 # dono); "aprova" = pode ser revisor independente de trabalho alheio.
 PERMISSOES_NIVEL = {
+    "diretor": {"le_dados": True, "calcula": True, "altera_dados": False, "aprova": True, "risco_maximo": "medio"},
+    "head": {"le_dados": True, "calcula": True, "altera_dados": True, "aprova": True, "risco_maximo": "alto"},
     "gerente": {"le_dados": True, "calcula": True, "altera_dados": False, "aprova": True, "risco_maximo": "medio"},
     "coordenador": {"le_dados": True, "calcula": True, "altera_dados": True, "aprova": True, "risco_maximo": "alto"},
     "especialista": {"le_dados": True, "calcula": True, "altera_dados": True, "aprova": True, "risco_maximo": "alto"},
@@ -51,7 +53,9 @@ FERRAMENTAS_ANDAR = {
 }
 # Ferramentas extras por pessoa (especialidade)
 LIDERES = ["ger_engenharia", "coord_engenharia", "ger_analise", "coord_analise", "excel_supervisor", "coord_excel",
-           "ger_operacoes", "canal_helena", "ger_ti", "coord_devops"]
+           "ger_operacoes", "canal_helena", "ger_ti", "coord_devops",
+           "dir_dados", "dir_analytics", "dir_operacoes", "dir_pessoas", "dir_tecnologia",
+           "head_engenharia", "head_ciencia", "head_bi", "head_governanca", "head_rh", "head_ti"]
 FERRAMENTAS_PESSOA = {
     "recepcao": ["publicar_planilha"], "coord_engenharia": ["publicar_planilha", "calcular"],
     "supervisor": ["calcular"], "dba": ["consulta_sql"], "banco": ["consulta_sql"],
@@ -66,6 +70,9 @@ ENCAMINHAR = {
     "resumo_executivo": "analise_relator", "diagnosticar_planilha": "coord_engenharia",
     "publicar_planilha": "recepcao", "consulta_sql": "dba", "dados_pessoais": "gov_pleno_lgpd",
     "ronda_ti": "coord_devops", "organizacao": "canal_helena", "reuniao_andar": "ger_operacoes", "ideias": "canal_iara",
+    "scorecard": "dir_operacoes", "auditoria": "head_engenharia", "drivers": "cd_senior_drivers",
+    "segmentacao": "cd_pleno_segmentos", "anomalias": "cd_junior_anomalias", "recrutamento": "rh_rs",
+    "desenvolvimento": "rh_td", "desempenho": "rh_desempenho", "people_analytics": "rh_people", "raio_x": "dir_operacoes",
     "conhecimento": "canal_nina", "historico": "canal_nina",
 }
 
@@ -120,6 +127,10 @@ def _fixos() -> tuple:
           for x in QUADRO]
     p += [{"id": x["id"], "nome": x["nome"], "papel": _papel_curto(x["cargo"]), "andar": 5, "grupo": "ti", "canal": "ti",
            "cor": x.get("cor"), "descricao": "; ".join(x.get("escopo") or [])} for x in EQUIPE_TI]
+    from robo.lideranca import EQUIPE as LIDERANCA
+    p += [{"id": x["id"], "nome": x["nome"], "papel": _papel_curto(x["cargo"]), "andar": x["andar"], "grupo": "lideranca",
+           "canal": "lideranca" if x["nivel"] in ("diretor", "head") else ("rh" if x["id"].startswith("rh_") else CANAL_DO_ANDAR[x["andar"]]),
+           "cor": x.get("cor"), "descricao": x["descricao"]} for x in LIDERANCA]
     return tuple(p)
 
 
@@ -148,19 +159,23 @@ def por_id(cfg=None) -> dict[str, dict]:
 
 
 def nivel_de(pid: str, pessoa: dict | None = None) -> str:
-    from robo import quadro, rh, ti
-    f = rh.FICHAS.get(pid) or quadro.POR_ID.get(pid) or ti.POR_ID.get(pid) or {}
+    from robo import lideranca, quadro, rh, ti
+    f = rh.FICHAS.get(pid) or quadro.POR_ID.get(pid) or ti.POR_ID.get(pid) or lideranca.POR_ID.get(pid) or {}
     return f.get("nivel") or (pessoa or {}).get("nivel") or "pleno"
 
 
 def area_de(pid: str) -> str:
-    from robo import quadro, rh, ti
-    f = rh.FICHAS.get(pid) or quadro.POR_ID.get(pid) or ti.POR_ID.get(pid) or {}
+    from robo import lideranca, quadro, rh, ti
+    f = rh.FICHAS.get(pid) or quadro.POR_ID.get(pid) or ti.POR_ID.get(pid) or lideranca.POR_ID.get(pid) or {}
     return f.get("area") or ""
 
 
 def gestor_de(pid: str) -> str | None:
-    from robo import quadro, ti
+    from robo import lideranca, quadro, ti
+    if pid in lideranca.NOVOS_GESTORES:  # gerentes que passaram a ter head ou diretor acima
+        return lideranca.NOVOS_GESTORES[pid]
+    if pid in lideranca.POR_ID:
+        return lideranca.POR_ID[pid]["gestor"]
     if pid in ti.GESTORES:
         return ti.GESTORES[pid]
     if pid in quadro.GESTORES_EXISTENTES:
@@ -190,7 +205,9 @@ def revisor_de(pid: str, cfg=None) -> str:
 
 
 def ferramentas_de(pid: str, andar: int) -> list[str]:
+    from robo import lideranca
     fs = list(FERRAMENTAS_COMUNS) + FERRAMENTAS_ANDAR.get(int(andar or 1), []) + FERRAMENTAS_PESSOA.get(pid, [])
+    fs += (lideranca.POR_ID.get(pid) or {}).get("ferramentas", [])
     if pid in LIDERES:
         fs.append("reuniao_andar")  # gerentes e coordenadores respondem pela situação do andar a qualquer momento
     return list(dict.fromkeys(fs))
@@ -246,7 +263,10 @@ def contrato(pid: str, cfg=None) -> dict | None:
                               "Faltou dado para responder com certeza (pergunta ao dono em vez de chutar)"],
         "revisor": revisor, "revisor_nome": nome_de(revisor),
         "fontes_conhecimento": ["conhecimento/*.md", f"agentes/{pid}.md (manual, se existir)",
-                                "base de conhecimento do canal", "histórico de execuções"],
+                                "base de conhecimento do canal", "histórico de execuções",
+                                "handovers e boas práticas da área (memória da empresa)"]
+                               + (["conhecimento/lideranca_e_gestao.md (Project Oxygen, SBI, 70-20-10, PDI, promoção)"]
+                                  if pid in LIDERES or nivel in ("gerente", "coordenador", "head", "diretor") else []),
     }
 
 

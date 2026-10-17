@@ -313,6 +313,15 @@ MINIMO_EVENTOS = 5
 TAXA_MINIMA = 70.0
 
 
+def situacao(acertos: int, erros: int) -> str:
+    """Regra única de desempenho (política de RH): sem dados, ok, atenção ou insuficiente."""
+    n = acertos + erros
+    if n < MINIMO_EVENTOS:
+        return "sem_dados" if not n else ("atencao" if erros else "ok")
+    taxa = 100 * acertos / n
+    return "insuficiente" if taxa < TAXA_MINIMA else "atencao" if taxa < 90 else "ok"
+
+
 def desempenho(cfg, dias: int = 7, ate: datetime | None = None) -> list[dict]:
     """Por funcionário: acertos, erros, taxa e situação (ok / sem dados / atenção / insuficiente)."""
     ate = ate or datetime.now()
@@ -334,12 +343,8 @@ def desempenho(cfg, dias: int = 7, ate: datetime | None = None) -> list[dict]:
         d = por.get(p["id"], {"acertos": 0, "erros": 0, "aprendizados": 0, "ultimos_erros": []})
         n = d["acertos"] + d["erros"]
         taxa = round(100 * d["acertos"] / n, 1) if n else None
-        if n < MINIMO_EVENTOS:
-            situacao = "sem_dados" if not n else ("atencao" if d["erros"] else "ok")
-        else:
-            situacao = "insuficiente" if taxa < TAXA_MINIMA else "atencao" if taxa < 90 else "ok"
         saida.append({"id": p["id"], "nome": p["nome"], "andar": p["andar"], "grupo": p["grupo"], **d, "eventos": n,
-                      "taxa": taxa, "situacao": situacao, "pode_ser_desligado": p["grupo"] == "contratado"})
+                      "taxa": taxa, "situacao": situacao(d["acertos"], d["erros"]), "pode_ser_desligado": p["grupo"] == "contratado"})
     return saida
 
 

@@ -10,6 +10,8 @@ diz de onde veio: conhecimento, cálculo, execução, ferramenta, hipótese, con
 
 | Nível | Pode | Não pode |
 |---|---|---|
+| Diretor(a) | responder pelo resultado da área (scorecard com meta e farol), propor ao dono | executar etapa, decidir no lugar do dono |
+| Head | autoridade técnica: auditoria semanal por amostragem, padrões da área | aprovar o próprio trabalho |
 | Gerente | responder pelo andar, aprovar trabalho alheio | executar etapa operacional, aprovar o próprio trabalho |
 | Coordenador | liberar para produção, revisar | refazer o trabalho da equipe |
 | Especialista e sênior | etapas críticas; alterar dados **com a sua aprovação** | aprovar a própria entrega |
@@ -18,6 +20,20 @@ diz de onde veio: conhecimento, cálculo, execução, ferramenta, hipótese, con
 | Estagiário | observar, calcular, relatar | alterar, aprovar ou bloquear qualquer coisa |
 
 Só você promove, muda permissão e decide desligamento (`organizacao.pode_alterar_permissoes`).
+
+### Liderança por área (desde 17/10/2026)
+
+| Andar | Diretor(a) | Head | Abaixo |
+|---|---|---|---|
+| 1º Engenharia de Dados | Beatriz (CDO) | Eduardo | Marcelo (gerente) → Carla (coord.) → engenheiros |
+| 2º Analytics e Ciência de Dados | Rogério | Natália (Ciência de Dados) | Patrícia, Marcos; cientistas Vinícius, Carolina, Lucas |
+| 3º Sala Excel e BI | Rogério | Felipe (BI e Excel) | Ricardo, Sílvia e especialistas |
+| 4º Operações e Governança | Cláudia | Simone (Governança) | Renata, Vitor, Lara, canal |
+| 4º Pessoas (RH) | Marta (CHRO) | Juliana (Gente e Gestão) | Helena (coord.) → Priscila (R&S), Roberta (T&D), Mauro (desempenho), Tiago (people analytics), Bianca (estagiária) |
+| 5º TI | Alexandre (CTO) | André (Infra e Segurança) | Gustavo, Fernanda e equipe |
+
+O escopo de cada cargo foi baseado em fontes públicas confiáveis. A lista com os links está em
+`conhecimento/lideranca_e_gestao.md`, que a liderança consulta no chat.
 
 ## 2. Contratação
 
@@ -50,6 +66,21 @@ Tudo entra na memória de cada um. Prova reprovada vira erro e handover para o R
 
 Limite: estudar não muda o código sozinho. O que muda o comportamento é a regra aplicada, no `config.yaml` ou no
 código com teste. A rodada garante que nada disso se perca e que a liderança veja quem está caindo.
+
+## 4b. Promoção
+
+A reunião semanal sugere a promoção de contratados com 20 ou mais trabalhos em 30 dias, 95% ou mais de acerto
+e sem plano de melhoria. Você aprova em Solicitações. O RH reaplica o processo seletivo no nível novo: se a pessoa
+não tiver competência para o risco do nível, a promoção é recusada com o motivo.
+
+## 4c. Como confiar nos resultados
+
+1. **Prova técnica de todos.** Ninguém trabalha reprovado.
+2. **Conferência no banco.** Cada cálculo é refeito em SQL; uma divergência vira hipótese, nunca número.
+3. **Auditoria semanal dos heads.** Cada head sorteia até 3 entregas da área e refaz por outro caminho; achado
+   vira handover.
+4. **Scorecard da diretoria.** Mede o resultado com meta e farol, calculado dos registros.
+5. **Revisor independente.** Toda tarefa é revisada por alguém que não a executou.
 
 ## 5. PDCA contínuo e boas práticas
 

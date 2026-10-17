@@ -616,9 +616,9 @@ async function carregarAgentes() {
   } catch (e) { avisar(e.message, "erro"); }
 }
 
-const NOME_ANDAR_PAINEL = { 1: "1º andar · Engenharia de dados", 2: "2º andar · Análise e qualidade", 3: "3º andar · Sala Excel",
-  4: "4º andar · Diretoria, governança e canal", 5: "5º andar · TI, DevOps e segurança" };
-const ORDEM_NIVEL = ["Gerente", "Coordenador(a)", "Especialista", "Sênior", "Pleno", "Júnior", "Estagiário"];
+const NOME_ANDAR_PAINEL = { 1: "1º andar · Engenharia de dados", 2: "2º andar · Analytics e ciência de dados", 3: "3º andar · Sala Excel e BI",
+  4: "4º andar · Operações, governança e Pessoas (RH)", 5: "5º andar · TI, DevOps e segurança" };
+const ORDEM_NIVEL = ["Diretor(a)", "Head", "Gerente", "Coordenador(a)", "Especialista", "Sênior", "Pleno", "Júnior", "Estagiário"];
 
 function renderOrganograma() {
   const gente = E.organograma || [];

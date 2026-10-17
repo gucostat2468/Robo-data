@@ -18,7 +18,26 @@ const etiquetaEstado = (s, nome) => `<span class="etiqueta ${COR_ESTADO[s] || ""
 Object.assign(E, { conversa: null, conversaPessoa: null, conversaAnexo: null, solic: null, filtroSolic: { dias: "30" }, memoria: null });
 
 // ------------------------------------------------------------------ conversa com um funcionário
+// texto do funcionário → abertura em destaque + seções recolhíveis ("## Título" no texto)
+function formatarMensagem(texto) {
+  const negrito = (t) => esc(t).replace(/\*\*(.+?)\*\*/g, "<b>$1</b>");
+  const [abertura, ...secoes] = String(texto || "").split(/\n\n## /);
+  return `<div style="white-space:normal"><div class="msg-abertura" style="white-space:pre-wrap;line-height:1.55">${negrito(abertura)}</div>` +
+    secoes.map((s) => { const [titulo, ...corpo] = s.split("\n");
+      return `<details style="margin-top:8px"><summary style="cursor:pointer;font-weight:600">${esc(titulo)}</summary>
+        <div style="white-space:pre-wrap;margin-top:6px;font-size:13px;line-height:1.5">${negrito(corpo.join("\n"))}</div></details>`; }).join("") + "</div>";
+}
+
+async function nomesDaEquipe() {
+  if (!E.nomes) {
+    try { E.nomes = Object.fromEntries((await api("/api/funcionarios")).funcionarios.map((p) => [p.id, `${p.nome} · ${p.papel}`])); }
+    catch { E.nomes = {}; }
+  }
+  return E.nomes;
+}
+
 async function abrirConversa(pid, conversaId = null) {
+  await nomesDaEquipe();
   let ficha;
   try { ficha = await api(`/api/funcionario?id=${encodeURIComponent(pid)}`); } catch (e) { return avisar(e.message, "erro"); }
   E.conversaPessoa = ficha; E.conversaAnexo = null;
@@ -29,12 +48,12 @@ async function abrirConversa(pid, conversaId = null) {
 function desenharConversa() {
   const f = E.conversaPessoa; if (!f) return;
   const c = f.contrato, conv = E.conversa;
-  const nomeDe = (id) => id === "dono" ? "Você" : id === c.id ? c.nome : id;
+  const nomeDe = (id) => id === "dono" ? "Você" : id === c.id ? c.nome : (E.nomes?.[id] || id);
   const msgs = (conv?.mensagens || []).map((m) => `<div class="msg ${m.autor === "dono" ? "minha" : ""}">
       <div class="msg-cab"><strong>${esc(nomeDe(m.autor))}</strong>${m.autor !== "dono" ? etiquetaNatureza(m.natureza) : ""}
         ${m.solicitacao_id && m.solicitacao_id.startsWith("TAR") ? `<button class="btn pequeno" data-acao="ver-solicitacao" data-id="${esc(m.solicitacao_id)}">Ver tarefa</button>` : ""}
         <time>${esc(dataT(m.criada_em))}</time></div>
-      <div class="msg-texto">${esc(m.texto)}</div>
+      <div class="msg-texto">${m.autor === "dono" ? esc(m.texto) : formatarMensagem(m.texto)}</div>
       ${m.dados?.evidencia ? `<div class="muted" style="font-size:12px;margin-top:4px">Evidência: ${esc(m.dados.evidencia)}</div>` : ""}
       ${m.dados?.encaminhado_para ? `<div style="margin-top:6px"><button class="btn pequeno" data-acao="conversar" data-id="${esc(m.dados.encaminhado_para)}">Conversar direto com quem faz</button></div>` : ""}
     </div>`).join("");
@@ -261,13 +280,60 @@ function renderChat() {
       <p class="muted" style="margin:6px 0 0">${p.andar}º andar${p.area ? ` · ${esc(p.area)}` : ""}${p.lider ? " · coordenação" : ""}</p></article>`).join("") || `<p class="muted">Ninguém com esses filtros.</p>`}</section>`;
 }
 
+// ------------------------------------------------------------------ raio-x da empresa (agora)
+async function carregarRaioX() {
+  try { E.raio = await api("/api/raio-x"); } catch (e) { avisar(e.message, "erro"); }
+}
+
+const FAROL = { verde: "🟢", amarelo: "🟡", vermelho: "🔴", cinza: "⚪" };
+
+function renderRaioX() {
+  const r = E.raio;
+  const acoes = `<button class="btn" data-acao="auditar">${icone("busca")}Rodar auditorias agora</button>
+    <button class="btn" data-acao="recarregar-raio">${icone("recarregar")}Atualizar</button>`;
+  if (!r) return cabecalho("Raio-X da empresa", "", acoes) + `<div class="carregando">Lendo todos os registros…</div>`;
+  const s = r.sessoes[0];
+  const nomes = E.nomes || {};
+  const sc = r.scorecards.map((d) => `<div class="cartao"><div class="cartao-corpo">
+      <strong>${esc(nomes[d.diretor] || d.nome)}</strong>
+      <p style="margin:6px 0">${esc(d.parecer)}</p>
+      <ul class="lista-ficha">${d.indicadores.map((i) => `<li>${FAROL[i.farol]} ${esc(i.indicador)}: <b>${esc(i.valor_texto)}</b> <span class="muted">(meta ${esc(i.meta)})</span></li>`).join("")}</ul>
+      <button class="btn pequeno" data-acao="conversar" data-id="${esc(d.diretor)}">${icone("chat")}Conversar</button></div></div>`).join("");
+  const rot = r.rotinas.map((x) => `<tr><td><b>${esc(x.nome)}</b><br><small class="muted">${esc(x.descricao)}</small></td>
+      <td>${esc(nomes[x.responsavel] || x.responsavel)}</td><td>${x.ultima_execucao ? esc(dataT(x.ultima_execucao)) : "nunca"}</td>
+      <td>${x.ultimo_status === "erro" ? `<span class="etiqueta perigo">erro</span>` : x.atrasada ? `<span class="etiqueta alerta">atrasada</span>` : `<span class="etiqueta sucesso">em dia</span>`}
+      ${x.detalhe ? `<br><small class="muted">${esc(x.detalhe.slice(0, 120))}</small>` : ""}</td></tr>`).join("");
+  const aud = r.auditorias.slice(0, 12).map((a) => `<li>${a.aprovada ? "🟢" : "🔴"} <b>${esc(nomes[a.head] || a.head)}</b> · ${esc(a.area)} · ${esc(dataT(a.data_hora))}:
+      ${a.achados.length ? esc(a.achados.slice(0, 2).join("; ")) : `${a.conferidos} item(ns) conferido(s), tudo certo`}</li>`).join("");
+  return cabecalho("Raio-X da empresa", "Como a empresa está agora, lido direto de todos os registros. Nada aqui é estimado.", acoes) +
+    `<section class="cartao"><div class="cartao-corpo"><div class="secao-titulo">Agora</div>
+      <div style="white-space:pre-wrap;line-height:1.6">${esc(r.resumo)}</div>
+      ${s ? `<p class="muted" style="margin-bottom:0">Abertura desta sessão: ${esc(s.briefing || "")}</p>` : ""}</div></section>
+    <div class="secao-titulo" style="margin-top:14px">Scorecard de cada diretoria</div>
+    <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:12px">${sc}</div>
+    <div class="secao-titulo" style="margin-top:14px">Auditorias por amostragem dos heads (confiança nos resultados)</div>
+    <ul class="lista-ficha">${aud || "<li>Nenhuma auditoria ainda. Elas rodam uma vez por semana, ou clique em “Rodar auditorias agora”.</li>"}</ul>
+    <div class="secao-titulo" style="margin-top:14px">Rotinas (o que roda sozinho enquanto o notebook está aberto)</div>
+    <div class="tabela-envoltorio"><table class="tabela"><thead><tr><th>Rotina</th><th>Responsável</th><th>Última execução</th><th>Situação</th></tr></thead><tbody>${rot}</tbody></table></div>
+    <div class="secao-titulo" style="margin-top:14px">Onde cada coisa fica registrada</div>
+    <ul class="lista-ficha">${Object.entries(r.onde_fica).map(([k, v]) => `<li><b>${esc(k)}</b>: <span class="mono">${esc(v)}</span></li>`).join("")}</ul>
+    <div class="secao-titulo" style="margin-top:14px">Sessões (notebook aberto)</div>
+    <ul class="lista-ficha">${r.sessoes.map((x) => `<li>${esc(dataT(x.aberto_em))} — ligado ${x.horas_ligado} h${x.desligado_antes_horas != null ? ` · antes ficou desligado ${x.desligado_antes_horas} h` : ""}</li>`).join("")}</ul>`;
+}
+
 // ------------------------------------------------------------------ registro de páginas e ações
 Object.assign(PAGINAS, {
   solicitacoes: { titulo: "Solicitações", render: renderSolicitacoes, carregar: carregarSolicitacoes },
   memoria: { titulo: "Memória e reuniões", render: renderMemoria, carregar: carregarMemoria },
   chat: { titulo: "Chat da empresa", render: renderChat, carregar: carregarChat },
+  raio: { titulo: "Raio-X da empresa", render: renderRaioX, carregar: async () => { await nomesDaEquipe(); await carregarRaioX(); } },
 });
 Object.assign(ACOES, {
+  "recarregar-raio": async () => { await carregarRaioX(); desenhar(); },
+  auditar: (el) => comCarregando(el, async () => { const r = await api("/api/auditorias/rodar", { corpo: {} });
+    const ruins = (r.auditorias || []).filter((a) => !a.aprovada).length;
+    avisar(ruins ? `${ruins} auditoria(s) acharam problema: veja abaixo.` : "Auditorias concluídas: tudo certo.", ruins ? "erro" : "sucesso");
+    await carregarRaioX(); desenhar(); }),
   "ao-vivo": async (el) => { E.aoVivoAndar = el.dataset.andar; E.aoVivo = null; desenhar();
     try { E.aoVivo = await api(`/api/reuniao/ao-vivo?andar=${el.dataset.andar}`); } catch (e) { avisar(e.message, "erro"); } desenhar(); },
   "estudo-rodar": (el) => comCarregando(el, async () => { const r = await api("/api/estudo/rodar", { corpo: {} });

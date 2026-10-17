@@ -253,6 +253,11 @@ class Api:
                     "descricao": "; ".join(p["escopo"]), "nativo": True, "aceita_habilidades": False, "habilidades": [],
                     "ativo": True, "ronda": p["nivel"] == "coordenador", "prontidao": "",
                     "ficha": _ficha_curta(rh.ficha({"id": p["id"], "habilidades": []}))} for p in ti.EQUIPE_TI]
+        from robo import lideranca
+        equipe += [{"id": p["id"], "nome": p["nome"], "papel": p["papel"], "cor": p["cor"], "andar": p["andar"],
+                    "descricao": p["descricao"], "nativo": True, "aceita_habilidades": False, "habilidades": [], "ativo": True,
+                    "ronda": p["nivel"] in ("head",), "prontidao": "",
+                    "ficha": _ficha_curta(rh.ficha({"id": p["id"], "habilidades": []}))} for p in lideranca.EQUIPE]
         for a in equipe:
             if not a.get("ativo", True):  # agente personalizado pausado pelo dono: segue estudando, não dorme
                 a["ativo"], a["prontidao"] = True, "em treinamento (pausado por você na tela Agentes)"
@@ -963,6 +968,19 @@ class Api:
             raise ErroApi(str(e))
         return {"ok": True}
 
+    def raio_x(self, q) -> dict:
+        from robo import lideranca, raio_x
+        r = raio_x.montar(self.cfg)
+        r["scorecards"] = [lideranca.scorecard(self.cfg, d) for d in
+                           ("dir_dados", "dir_analytics", "dir_operacoes", "dir_pessoas", "dir_tecnologia")]
+        r["resumo"] = raio_x.texto(r)
+        return r
+
+    def auditorias_rodar(self, _b) -> dict:
+        from robo import auditoria, rotinas
+        res = rotinas.executar(self.cfg, "auditoria", lambda: auditoria.auditar_todos(self.cfg))
+        return {"auditorias": res}
+
     def reuniao_ao_vivo(self, q) -> dict:
         from robo import reuniao
         andar = q.get("andar", [""])[0]
@@ -998,7 +1016,7 @@ ROTAS_GET = {
     "/api/agentes/manual": Api.agente_manual_ler, "/api/consultas": Api.consultas, "/api/consulta": Api.consulta,
     "/api/funcionarios": Api.funcionarios, "/api/funcionario": Api.funcionario, "/api/conversa": Api.conversa,
     "/api/solicitacoes": Api.solicitacoes, "/api/solicitacao": Api.solicitacao, "/api/memoria": Api.memoria_resumo,
-    "/api/reuniao/ao-vivo": Api.reuniao_ao_vivo,
+    "/api/reuniao/ao-vivo": Api.reuniao_ao_vivo, "/api/raio-x": Api.raio_x,
 }
 ROTAS_POST = {
     "/api/robo/ligar": Api.ligar, "/api/robo/pausar": Api.pausar, "/api/robo/processar-agora": Api.processar_agora,
@@ -1015,6 +1033,7 @@ ROTAS_POST = {
     "/api/conversa/enviar": Api.conversa_enviar, "/api/solicitacoes/criar": Api.solicitacao_criar,
     "/api/aprovacoes/decidir": Api.aprovacao_decidir, "/api/solicitacoes/cancelar": Api.solicitacao_cancelar,
     "/api/handovers/estado": Api.handover_estado, "/api/reuniao/gerar": Api.reuniao_gerar, "/api/estudo/rodar": Api.estudo_rodar,
+    "/api/auditorias/rodar": Api.auditorias_rodar,
     "/api/memoria/exportar": Api.memoria_exportar, "/api/memoria/sincronizar": Api.memoria_sincronizar,
 }
 ROTAS_UPLOAD = {"/api/testar": Api.testar, "/api/enviar": Api.enviar, "/api/conversa/anexar": Api.anexar}

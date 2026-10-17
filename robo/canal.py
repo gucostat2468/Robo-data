@@ -528,7 +528,7 @@ INTENCOES = {
 }
 
 
-PALAVRAS_VAZIAS = set("""como para qual quais quem onde quando porque sobre esta este essa esse isso isto voce voces
+PALAVRAS_VAZIAS = set("""funciona funcionam pessoa pessoas como para qual quais quem onde quando porque sobre esta este essa esse isso isto voce voces
 fazer faco pode podem tenho temos preciso quero queria seria muito mais menos entre pela pelo pelos pelas numa num
 uma umas dos das nos nas com sem que nao sim tem ter""".split())
 
@@ -567,7 +567,9 @@ def _buscar_markdown(cfg, t: str) -> tuple[int, dict | None]:
         titulo, corpo = normalizar(sec["titulo"]), normalizar(sec["corpo"])
         achados = {w for w in termos if w in titulo or w in corpo}
         pontos = sum(3 if w in titulo else 1 for w in achados)
-        if len(achados) >= 2 and pontos > melhor[0]:
+        # duas palavras em comum, ou uma palavra forte (6+ letras) que está no título da seção
+        forte = any(len(w) >= 6 and w in titulo for w in achados)
+        if (len(achados) >= 2 or forte) and pontos > melhor[0]:
             melhor = (pontos, sec)
     return melhor
 

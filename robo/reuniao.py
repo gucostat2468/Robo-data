@@ -145,8 +145,9 @@ def gerar(cfg, ate: datetime | None = None, publicar: bool = True, registrar: bo
             aprovacoes.append(tb.pedir_aprovacao(sid, f"Desligar {d['nome']}: {d['taxa']}% de acerto em {d['eventos']} evento(s), "
                                                       "já esteve em plano de melhoria", "alto", "canal_helena",
                                                  etapa_id=f"desligar:{pid}"))
+    promocoes = _sugerir_promocoes(cfg, tb, ate, pdi)
     ata = {"inicio": desde.isoformat(timespec="seconds"), "fim": ate.isoformat(timespec="seconds"), "andares": andares,
-           "pdi": pdi, "propostas_desligamento": propostas, "defeitos_de_codigo": defeitos, "aprovacoes": aprovacoes,
+           "promocoes_sugeridas": promocoes, "pdi": pdi, "propostas_desligamento": propostas, "defeitos_de_codigo": defeitos, "aprovacoes": aprovacoes,
            "desempenho": sorted(desemp.values(), key=lambda d: (d["taxa"] is None, d["taxa"] or 0))}
     rid = f"REU-{ate:%Y%m%d-%H%M%S}"
     arq = _gravar_md(cfg, rid, ata, gente)
@@ -214,6 +215,64 @@ def _publicar(cfg, ata, acoes, gente):
                           "WHERE id=?", (item["id"], x["handover"]))
     except Exception:
         log.exception("Não consegui levar o plano de ação para o backlog")
+
+
+PROMOCAO_MIN_EVENTOS, PROMOCAO_MIN_TAXA = 20, 95.0
+
+
+def _sugerir_promocoes(cfg, tb, ate, pdi) -> list[dict]:
+    """Contratados com 20+ trabalhos em 30 dias, 95%+ de acerto e sem PDI: a liderança sugere, o dono decide."""
+    from robo.rh import NIVEIS
+    sugestoes = []
+    for d in memoria.desempenho(cfg, 30, ate):
+        if not d["pode_ser_desligado"] or d["id"] in pdi or d["eventos"] < PROMOCAO_MIN_EVENTOS or (d["taxa"] or 0) < PROMOCAO_MIN_TAXA:
+            continue
+        atual = organizacao.nivel_de(d["id"], organizacao.por_id(cfg).get(d["id"]))
+        if atual not in NIVEIS or NIVEIS.index(atual) == len(NIVEIS) - 1:
+            continue
+        sugestoes.append({"id": d["id"], "nome": d["nome"], "de": atual, "para": NIVEIS[NIVEIS.index(atual) + 1],
+                          "taxa": d["taxa"], "eventos": d["eventos"]})
+    if sugestoes:
+        sid = tb.criar_solicitacao("tarefa", "Promoções sugeridas na reunião semanal", "Critérios: 20+ trabalhos em 30 dias, "
+                                   "95%+ de acerto, sem plano de melhoria", "automatica", "dir_pessoas", 4, "media", modelo="promocao")
+        tb.mudar_estado(sid, "em_triagem", "dir_pessoas")
+        tb.mudar_estado(sid, "planejada", "dir_pessoas", plano={"promover": sugestoes})
+        tb.mudar_estado(sid, "aguardando_aprovacao", "dir_pessoas")
+        for x in sugestoes:
+            x["aprovacao"] = tb.pedir_aprovacao(sid, f"Promover {x['nome']} de {x['de']} para {x['para']}: {x['taxa']}% de acerto "
+                                                     f"em {x['eventos']} trabalho(s) nos últimos 30 dias", "medio", "dir_pessoas",
+                                                etapa_id=f"promover:{x['id']}:{x['para']}")
+    return sugestoes
+
+
+def decidir_promocao(cfg, aprovacao_id: str, aprovado: bool, motivo: str = "") -> dict:
+    """Promoção aprovada pelo dono: o RH reaplica o processo seletivo no nível novo antes de efetivar."""
+    tb = Trabalho(cfg)
+    a = tb.decidir(aprovacao_id, aprovado, "dono", motivo)
+    _, pid, novo = (str(a.get("etapa_id") or "") + "::").split(":")[:3]
+    feito, recusa = False, ""
+    if aprovado and pid:
+        from robo.agentes import ErroAgente
+        from robo.pipeline import obter_equipe
+        equipe = obter_equipe(cfg)
+        agente = next((x for x in equipe.personalizados if x["id"] == pid), None)
+        if not agente:
+            recusa = "funcionário não encontrado entre os contratados"
+        else:
+            try:
+                equipe.salvar({**agente, "nivel": novo})
+                feito = True
+                memoria.experiencia(cfg, pid, "treinamento", f"Promovido(a) a {novo} (decisão do dono)", "rh", aprovacao_id, tb=tb)
+            except ErroAgente as e:
+                recusa = f"o processo seletivo no nível {novo} não aprovou: {e}"
+                memoria.experiencia(cfg, pid, "aprendizado", f"Promoção a {novo} barrada pelo processo seletivo", "rh",
+                                    aprovacao_id, recusa, tb)
+    s = tb.solicitacao(a["solicitacao_id"])
+    if s and not [x for x in s["aprovacoes"] if x["estado"] == "pendente"] and s["estado"] == "aguardando_aprovacao":
+        tb.mudar_estado(s["id"], "na_fila", "dono")
+        tb.mudar_estado(s["id"], "em_execucao", "dono")
+        tb.mudar_estado(s["id"], "concluida", "dono", "Decisões de promoção registradas")
+    return {**a, "promovido": feito, "motivo_recusa": recusa}
 
 
 def decidir_desligamento(cfg, aprovacao_id: str, aprovado: bool, motivo: str = "") -> dict:

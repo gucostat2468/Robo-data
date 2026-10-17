@@ -131,69 +131,64 @@ class ControleRobo:
             except Exception:
                 log.exception("Não consegui retomar as tarefas pendentes")
 
+        sessao = None
+        if self.cfg:
+            try:  # resumo de abertura: quanto tempo ficou desligado, fila e rotinas atrasadas
+                from robo import rotinas
+                fila = len(self.monitor.estado_fila()) if self.monitor else 0
+                abertura = rotinas.abrir_sessao(self.cfg, fila)
+                sessao = abertura["sessao"]
+                from robo.canal import Canal
+                Canal(self.cfg).postar("ger_operacoes", "Abertura do dia — " + abertura["briefing"], "geral", tipo="boletim")
+            except Exception:
+                log.exception("Não consegui registrar a abertura da sessão")
+
         def _laco_rotinas():
             while True:
                 try:
                     self._rotinas()
+                    if sessao:
+                        from robo import rotinas
+                        rotinas.batimento(self.cfg, sessao)
                 except Exception:
                     log.exception("Erro nas rotinas da empresa")
                 time.sleep(15)
         threading.Thread(target=_laco_rotinas, name="robo-rotinas", daemon=True).start()
 
     def _rotinas(self):
-        """Rotinas da empresa que não dependem de arquivo novo: canal (a cada minuto) e ronda de TI (a cada 30 min)."""
+        """Rotinas da empresa que não dependem de arquivo novo. Cada execução fica registrada (robo/rotinas.py)."""
         if not self.cfg:
             return
+        from robo import rotinas
+        cfg = self.cfg
         agora = time.time()
         if agora - getattr(self, "_ultimo_canal", 0) >= 60:
             self._ultimo_canal = agora
-            try:
-                from robo.canal import Canal
-                Canal(self.cfg).sincronizar()
-            except Exception:
-                log.exception("Falha ao sincronizar o canal da equipe")
-        # estratégia: avaliação técnica + treinamento uma vez por sprint (em segundo plano: leva alguns segundos)
+            from robo.canal import Canal
+            rotinas.executar(cfg, "canal", lambda: Canal(cfg).sincronizar())
+        # rotinas pesadas em segundo plano (avaliação, backup, estudo, reunião…): cada uma decide se está na hora
         if agora - getattr(self, "_ultima_estrategia", 0) >= 3600 and not getattr(self, "_estrategia_rodando", False):
             self._ultima_estrategia, self._estrategia_rodando = agora, True
 
-            def _rodar(cfg=self.cfg):
+            def _rodar():
+                from robo import auditoria, backup, desenvolvimento, estrategia, memoria, reuniao
                 try:
-                    from robo import estrategia
-                    estrategia.rotina(cfg)
-                except Exception:
-                    log.exception("Falha na rotina de estratégia (avaliação/treinamento)")
-                try:
-                    from robo import backup
-                    backup.rotina(cfg)  # Dora: backup diário do PostgreSQL (guarda os últimos 7)
-                except Exception:
-                    log.exception("Falha na rotina de backup do PostgreSQL")
-                try:
-                    from robo import memoria
-                    memoria.sincronizar_postgres(cfg)  # memória de todos os funcionários também no PostgreSQL
-                except Exception:
-                    log.exception("Falha ao copiar a memória para o PostgreSQL (segue no SQLite)")
-                try:
-                    from robo import desenvolvimento, memoria
-                    memoria.checar_pdca(cfg)          # etapa C do PDCA: o que foi corrigido e não voltou vira boa prática
-                    desenvolvimento.rotina(cfg)       # rodada de estudo de todos (duas vezes por semana)
-                except Exception:
-                    log.exception("Falha no PDCA/rodada de estudo")
-                try:
-                    from robo import reuniao
-                    reuniao.rotina(cfg)  # reunião semanal da liderança (uma por semana)
-                except Exception:
-                    log.exception("Falha na reunião semanal da liderança")
+                    rotinas.executar(cfg, "estrategia", lambda: estrategia.rotina(cfg))
+                    rotinas.executar(cfg, "backup", lambda: backup.rotina(cfg))
+                    rotinas.executar(cfg, "memoria_pg", lambda: (memoria.sincronizar_postgres(cfg)
+                                                                 if cfg.banco.get("habilitado") else None))
+                    rotinas.executar(cfg, "pdca", lambda: memoria.checar_pdca(cfg)["verificados"])
+                    rotinas.executar(cfg, "estudo", lambda: desenvolvimento.rotina(cfg))
+                    rotinas.executar(cfg, "auditoria", lambda: auditoria.rotina(cfg))
+                    rotinas.executar(cfg, "reuniao", lambda: reuniao.rotina(cfg))
                 finally:
                     self._estrategia_rodando = False
             threading.Thread(target=_rodar, name="robo-estrategia", daemon=True).start()
         from robo.ti import _c as cfg_ti
-        if agora - getattr(self, "_ultima_ronda_ti", 0) >= 60 * float(cfg_ti(self.cfg)["intervalo_minutos"]):
+        if agora - getattr(self, "_ultima_ronda_ti", 0) >= 60 * float(cfg_ti(cfg)["intervalo_minutos"]):
             self._ultima_ronda_ti = agora
-            try:
-                from robo.ti import ronda
-                ronda(self.cfg)
-            except Exception:
-                log.exception("Falha na ronda de TI")
+            from robo.ti import ronda
+            rotinas.executar(cfg, "ronda_ti", lambda: ronda(cfg))
 
     def processar_agora(self) -> bool:
         if not self.monitor:

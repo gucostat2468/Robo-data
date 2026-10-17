@@ -207,7 +207,7 @@ def teste_calculo_conferido_no_postgres_e_modo_manual(planilha_baguncada, cfg_fa
     assert processar_arquivo(planilha_baguncada, cfg).status == SUCESSO
     r = ferramentas.executar("calcular", cfg, pergunta="nps por curso")
     assert r["dados"]["conferencia"] == "conferido", r["texto"]
-    assert "✅ Conferido no PostgreSQL" in r["texto"] and "CONT.SES(Tabela[nota_nps];\">=9\"" in r["texto"]
+    assert "✅ Conferi o mesmo número no PostgreSQL" in r["texto"] and "CONT.SES(Tabela[nota_nps];\">=9\"" in r["texto"]
     assert "GROUP BY \"curso\"" in r["dados"]["sql"]
     for pergunta in ("média de valor_mensalidade por uf", "quantos por modalidade", "soma de valor_mensalidade",
                      "mediana de nota_nps"):

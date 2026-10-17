@@ -225,9 +225,9 @@ function criarPlanta(x, z, escala = 1) {
 // ------------------------------------------------------------------ estado da cena
 // ------------------------------------------------------------------ estado da cena (prédio de 2 andares)
 const ALTURA = 4.4; // pé-direito: cada andar fica 4,4 m acima do anterior
-const NOME_ANDAR = { 1: "1º andar · Engenharia de dados", 2: "2º andar · Análise e Qualidade", 3: "3º andar · Sala Excel (Trade e Pesquisa)",
-  4: "4º andar · Diretoria, Governança e Canal", 5: "5º andar · TI, DevOps e Segurança" };
-const CURTO_ANDAR = { 1: "1º andar", 2: "2º andar", 3: "3º · Excel", 4: "4º · Diretoria", 5: "5º · TI" };
+const NOME_ANDAR = { 1: "1º andar · Engenharia de dados", 2: "2º andar · Analytics e Ciência de Dados", 3: "3º andar · Sala Excel e BI",
+  4: "4º andar · Operações, Governança e Pessoas (RH)", 5: "5º andar · TI, DevOps e Segurança" };
+const CURTO_ANDAR = { 1: "1º · Dados", 2: "2º · Analytics", 3: "3º · Excel/BI", 4: "4º · Operações e RH", 5: "5º · TI" };
 const PLACA_ANDAR = { 1: ["1º ANDAR · ENGENHARIA DE DADOS", "#1d3fb0"], 2: ["2º ANDAR · ANÁLISE E QUALIDADE", "#7c3aed"], 3: ["3º ANDAR · SALA EXCEL", "#107c41"],
   4: ["4º ANDAR · DIRETORIA E CANAL", "#9a3412"], 5: ["5º ANDAR · TI E SEGURANÇA", "#111827"] };
 const COR_TV = { 1: ["#0f1b3d", "#1d3fb0"], 2: ["#1e1038", "#6d28d9"], 3: ["#062b18", "#107c41"], 4: ["#2a0f05", "#9a3412"], 5: ["#05070d", "#1f2937"] };
