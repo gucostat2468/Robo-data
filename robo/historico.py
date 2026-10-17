@@ -27,7 +27,23 @@ def pasta_execucoes(pasta_logs: Path) -> Path:
 
 
 def registrar(pasta_logs: Path, linha: dict) -> None:
+    """Acrescenta uma linha ao histórico. Se o CSV estiver aberto no Excel, a linha vai para uma fila
+    (historico_pendente.jsonl) e entra no CSV na próxima gravação — nada se perde e o robô não trava."""
     pasta_logs.mkdir(parents=True, exist_ok=True)
+    pendente = pasta_logs / "historico_pendente.jsonl"
+    linhas = []
+    if pendente.exists():
+        linhas = [json.loads(l) for l in pendente.read_text(encoding="utf-8").splitlines() if l.strip()]
+    linhas.append(linha)
+    try:
+        _gravar_linhas(pasta_logs, linhas)
+        pendente.unlink(missing_ok=True)
+    except PermissionError:
+        with open(pendente, "a", encoding="utf-8") as f:
+            f.write(json.dumps(linha, ensure_ascii=False, default=str) + "\n")
+
+
+def _gravar_linhas(pasta_logs: Path, linhas: list[dict]) -> None:
     arquivo = arquivo_historico(pasta_logs)
     if arquivo.exists():
         with open(arquivo, encoding="utf-8-sig") as f:
@@ -39,7 +55,8 @@ def registrar(pasta_logs: Path, linha: dict) -> None:
         w = csv.writer(f, delimiter=";")
         if novo:
             w.writerow(CABECALHO)
-        w.writerow([linha.get(c, "") for c in CABECALHO])
+        for linha in linhas:
+            w.writerow([linha.get(c, "") for c in CABECALHO])
 
 
 def ler(pasta_logs: Path, limite: int | None = None) -> list[dict]:
@@ -49,6 +66,9 @@ def ler(pasta_logs: Path, limite: int | None = None) -> list[dict]:
         return []
     with open(arquivo, encoding="utf-8-sig", newline="") as f:
         linhas = list(csv.DictReader(f, delimiter=";"))
+    pendente = pasta_logs / "historico_pendente.jsonl"
+    if pendente.exists():  # linhas que esperam o CSV ser fechado no Excel também aparecem no painel
+        linhas += [{k: str(v) for k, v in json.loads(l).items()} for l in pendente.read_text(encoding="utf-8").splitlines() if l.strip()]
     linhas.reverse()
     return linhas[:limite] if limite else linhas
 

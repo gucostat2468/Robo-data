@@ -71,6 +71,34 @@ class _Tratamento:
     analisaveis: dict = field(default_factory=dict)   # tabelas limpas ANTES de virar fato/dimensões (2º andar)
 
 
+def _guardar_anteriores(pasta: Path, nome_base: str, seguranca: Path) -> list[tuple[Path, Path]]:
+    """Copia os arquivos já publicados com este nome para uma pasta de segurança (em logs/, fora do alcance
+    do Power BI) antes de sobrescrever."""
+    if not pasta.exists():
+        return []
+    pares = []
+    for p in pasta.iterdir():
+        if p.is_file() and (p.name.startswith(f"{nome_base}.") or p.name.startswith(f"{nome_base}__")):
+            seguranca.mkdir(parents=True, exist_ok=True)
+            copia = seguranca / p.name
+            shutil.copy2(p, copia)
+            pares.append((p, copia))
+    return pares
+
+
+def _restaurar_anteriores(pares: list[tuple[Path, Path]]) -> None:
+    for original, copia in pares:
+        if copia.exists():
+            shutil.copy2(copia, original)
+            copia.unlink(missing_ok=True)
+
+
+def _descartar_anteriores(pares: list[tuple[Path, Path]]) -> None:
+    """A versão nova passou na releitura: as cópias de segurança não são mais necessárias."""
+    for _, copia in pares:
+        copia.unlink(missing_ok=True)
+
+
 def _conferencias_equipe(fase: str, ctx, rel, ao_etapa, bloquear: bool) -> list[dict]:
     """Roda as conferências do quadro de pessoal da fase e registra cada achado no relatório de qualidade.
 
@@ -172,8 +200,12 @@ def _tratar(caminho: Path, cfg: Config, rel: Relatorio, ao_etapa=None) -> _Trata
     equipe = obter_equipe(cfg)
     unica = len(t.brutas) == 1
     t.modelo = t.regra.get("modelo") if unica else None
+    usados: set[str] = set()
     for aba, bruto in t.brutas.items():
         nome = normalizar_nome_coluna(cfg.saida["nome_aba"]) if unica else normalizar_nome_coluna(aba)
+        while nome in usados:  # "Vendas" e "vendas " viram o mesmo nome: a segunda ganha _2, _3…
+            nome = f"{nome}_{len([u for u in usados if u.startswith(nome)]) + 1}"
+        usados.add(nome)
         rel.info(f"Aba '{aba}' lida: cabeçalho na linha {bruto.attrs.get('linha_cabecalho', '?')}, "
                  f"{len(bruto)} linhas, {len(bruto.columns)} colunas", tabela=nome)
         if len(bruto.attrs.get("abas_empilhadas") or []) > 1:
@@ -346,11 +378,18 @@ def processar_arquivo(caminho: str | Path, cfg: Config, gravar: bool = True, ao_
         nome_base = caminho.stem + (cfg.saida.get("sufixo") or "")
         if cfg.saida.get("versionar"):
             nome_base += f"_{carimbo}"
+        # guarda a versão publicada anterior: se a nova for reprovada na releitura, a anterior volta
+        anteriores = _guardar_anteriores(cfg.tratadas, nome_base, Path(cfg.logs) / "versao_anterior")
         try:
             r.saidas, avisos = gravar_tabelas(t.tabelas, cfg.tratadas, nome_base, cfg.saida)
         except PermissionError:
+            _restaurar_anteriores(anteriores)
             _sinal(ao_etapa, "adiado", caminho.name)
             return _adiar(r, inicio, "o arquivo de saída está aberto (feche o Excel/Power BI)")
+        except Exception as e:  # ex.: formato de saída inválido no config.yaml — reprova em vez de tentar para sempre
+            _restaurar_anteriores(anteriores)
+            rel.erro(f"Não consegui gravar a saída: {e}")
+            r.saidas, avisos = [], []
         for a in avisos:
             rel.aviso(a)
         # releitura do que foi gravado: se o disco gravou diferente, nada fica publicado
@@ -359,10 +398,13 @@ def processar_arquivo(caminho: str | Path, cfg: Config, gravar: bool = True, ao_
         if rel.tem_erros:
             for saida in r.saidas:
                 Path(saida).unlink(missing_ok=True)
+            _restaurar_anteriores(anteriores)
             if r.tabelas_banco:
                 rel.erro("Atenção: a carga no PostgreSQL já tinha sido confirmada; o lote "
                          f"{r.id} deve ser conferido/removido pela DBA")
             r.saidas = []
+        else:
+            _descartar_anteriores(anteriores)
 
     if rel.tem_erros:
         reprovar()

@@ -36,9 +36,11 @@ def eh_candidato(caminho: Path) -> bool:
 
 
 def pode_abrir(caminho: Path) -> bool:
-    """No Windows, abrir para escrita falha se o Excel estiver com o arquivo aberto."""
+    """No Windows, abrir para escrita falha se o Excel estiver com o arquivo aberto.
+    Arquivo marcado como "somente leitura" não pode ser aberto para escrita nunca: nele, basta conseguir ler."""
+    import os
     try:
-        with open(caminho, "rb+"):
+        with open(caminho, "rb" if not os.access(caminho, os.W_OK) else "rb+"):
             return True
     except (PermissionError, OSError):
         return False

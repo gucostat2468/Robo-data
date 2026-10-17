@@ -265,6 +265,9 @@ def carregar_config(caminho: str | Path | None = None, sobrescrever: dict | None
         base = caminho.resolve().parent
     else:
         base = RAIZ_PROJETO
+        if caminho != ARQUIVO_CONFIG_PADRAO and not sobrescrever:
+            import logging
+            logging.getLogger("robo").warning("Arquivo de configuração %s não existe: usando os valores padrão", caminho)
     dados = _mesclar(PADROES, dados_usuario)
     if sobrescrever:
         dados = _mesclar(dados, sobrescrever)

@@ -323,6 +323,11 @@ def limpar_tabela(df: pd.DataFrame, tabela: str, cfg: dict, regra: dict, rel: Re
         if faltando:
             rel.aviso("Colunas para renomear não encontradas", tabela=tabela, exemplos=faltando)
         df = df.rename(columns=renomear)
+        repetidas = sorted({c for c in df.columns if list(df.columns).count(c) > 1})
+        if repetidas:
+            rel.erro("A regra 'renomear' criou colunas com o mesmo nome (o novo nome já existia)", tabela=tabela,
+                     exemplos=repetidas)
+            df.columns = _nomes_unicos(list(df.columns))
     remover = [normalizar_nome_coluna(c) for c in (regra.get("remover_colunas") or [])]
     remover = [c for c in remover if c in df.columns]
     if remover:
