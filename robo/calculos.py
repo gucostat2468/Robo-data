@@ -188,14 +188,18 @@ def _comparar_nps(grupos) -> str:
     (v1, m1, g1), (v2, m2, g2) = max(validos), min(validos)
     dif, margem_dif = v1 - v2, math.sqrt(m1 ** 2 + m2 ** 2)  # teste de diferença entre duas proporções independentes (95%)
     if dif > margem_dif:
-        return (f"Conclusão: {g1} ({_f1(v1)}) está de fato acima de {g2} ({_f1(v2)}): a diferença de {_f1(dif)} pts "
-                f"é maior que a margem da diferença (±{_f1(margem_dif)} pts, 95% de confiança).")
-    return (f"Conclusão: a diferença entre {g1} ({_f1(v1)}) e {g2} ({_f1(v2)}) é de {_f1(dif)} pts, menor que a margem da "
-            f"diferença (±{_f1(margem_dif)} pts): pode ser acaso. Não comunique como ranking.")
+        return (f"Conclusão: {g1} ({_f0(v1)}) está de fato acima de {g2} ({_f0(v2)}): a diferença de {_f0(dif)} pts "
+                f"é maior que a margem da diferença (±{_f0(margem_dif)} pts, 95% de confiança).")
+    return (f"Conclusão: a diferença entre {g1} ({_f0(v1)}) e {g2} ({_f0(v2)}) é de {_f0(dif)} pts, menor que a margem da "
+            f"diferença (±{_f0(margem_dif)} pts): pode ser acaso. Não comunique como ranking.")
+
+
+def _f0(v) -> str:
+    return f"{v:.0f}".replace("-0", "0") if isinstance(v, float) and not math.isnan(v) else _fmt(v)
 
 
 def _nps_explicado(s: pd.Series) -> str:
-    """NPS com a conta aberta: % promotores − % detratores, com quantidades, neutros e margem."""
+    """NPS sem casas decimais, com a conta aberta: % promotores − % detratores, quantidades, neutros e margem."""
     v = pd.to_numeric(s, errors="coerce").dropna()
     n = len(v)
     if not n:
@@ -204,8 +208,8 @@ def _nps_explicado(s: pd.Series) -> str:
     neu = n - prom - det
     nps, _, margem = _nps(v)
     pp, pd_, pn = 100 * prom / n, 100 * det / n, 100 * neu / n
-    return (f"NPS {_f1(nps)} = {_f1(pp)}% promotores ({prom}) − {_f1(pd_)}% detratores ({det}); "
-            f"neutros {_f1(pn)}% ({neu}); n={n}; margem ±{_f1(margem)} pts"
+    return (f"NPS {_f0(nps)} = {_f1(pp)}% promotores ({prom}) − {_f1(pd_)}% detratores ({det}) = {_f1(nps)}, "
+            f"arredondado para {_f0(nps)}; neutros {_f1(pn)}% ({neu}); n={n}; margem ±{_f0(margem)} pts"
             + (" ⚠ base pequena (menos de 30): use com cautela" if n < 30 else ""))
 
 
@@ -296,6 +300,7 @@ def calcular(cfg, pergunta: str, fontes: dict | None = None) -> dict | None:
         (por.append(c) if c else nao_achei.append(x))
     dados = df
     filtros_txt = []
+    filtros_ok = []  # (coluna real, sinal, valor) — usados para refazer a conta no banco e montar o passo a passo
     for col_txt, sinal, valor in pedido["filtros"]:
         c = _achar_coluna(col_txt, colunas)
         if not c:
@@ -315,6 +320,7 @@ def calcular(cfg, pergunta: str, fontes: dict | None = None) -> dict | None:
             iguais = serie.astype(str).map(_norm) == alvo
             mask = ~iguais if sinal == "!=" else iguais
         dados = dados[mask.fillna(False)]
+        filtros_ok.append((c, sinal, valor))
         filtros_txt.append(f"{c} {sinal} {valor if not isinstance(valor, float) else _fmt(valor)}")
     if nao_achei:
         sugestoes = "; ".join(f"'{x}' → talvez {difflib.get_close_matches(normalizar_nome_coluna(x), colunas, n=2, cutoff=0.4) or 'nenhuma parecida'}"
@@ -340,7 +346,9 @@ def calcular(cfg, pergunta: str, fontes: dict | None = None) -> dict | None:
     titulo, tabela = _executar(op, dados, metricas, por)
     contexto = f"Base {base} ({arquivo}), {_milhar(len(dados))} linha(s)" + (
         f", filtro: {'; '.join(filtros_txt)}" if filtros_txt else "") + "."
-    return {"autor": pedido["autor"], "texto": f"{titulo} — {contexto}\n{tabela}"}
+    return {"autor": pedido["autor"], "texto": f"{titulo} — {contexto}\n{tabela}",
+            "calc": {"op": op, "metricas": metricas, "por": por, "filtros": filtros_ok, "base": base, "arquivo": arquivo,
+                     "fonte": "arquivo" if fontes else "publicada", "dados": dados}}
 
 
 def _coluna_indicador(op: str, df: pd.DataFrame) -> str | None:

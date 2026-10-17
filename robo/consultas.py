@@ -72,8 +72,13 @@ def ler(id_consulta: str, pasta: Path = PASTA_PADRAO) -> dict:
 
 
 def executar(banco, id_consulta: str, pasta: Path = PASTA_PADRAO, limite: int = LIMITE_LINHAS) -> dict:
-    """Roda a consulta em transação SOMENTE LEITURA com tempo limite de 60 s."""
-    texto = caminho_seguro(id_consulta, pasta).read_text(encoding="utf-8-sig")
+    """Roda a consulta da biblioteca em transação SOMENTE LEITURA com tempo limite de 60 s."""
+    return executar_texto(banco, caminho_seguro(id_consulta, pasta).read_text(encoding="utf-8-sig"), limite)
+
+
+def executar_texto(banco, texto: str, limite: int = LIMITE_LINHAS) -> dict:
+    """Roda qualquer SQL de leitura escrito pelo dono. A proteção é do próprio PostgreSQL: a transação é aberta
+    como READ ONLY, então INSERT/UPDATE/DELETE/CREATE/DROP são recusados pelo banco, não por uma lista de palavras."""
     sem_comentarios = re.sub(r"--[^\n]*|/\*.*?\*/", " ", texto, flags=re.S)
     if re.search(r"\b(commit|rollback|begin|start\s+transaction|savepoint|set\s+(session|transaction))\b",
                  sem_comentarios, re.IGNORECASE):

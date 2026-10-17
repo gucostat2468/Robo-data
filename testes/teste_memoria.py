@@ -112,6 +112,6 @@ def teste_nps_mostra_a_conta_e_a_conclusao():
     from robo import calculos
     df = pd.DataFrame({"nota_nps": [10, 9, 9, 8, 7, 6, 3, 10, 0, 9] * 10, "curso": ["A", "B"] * 50})
     _, texto = calculos._executar("nps", df, ["nota_nps"], ["curso"])
-    assert "Total: NPS 20,0 = 50,0% promotores (50) − 30,0% detratores (30)" in texto
-    assert "neutros 20,0% (20)" in texto and "Conclusão: B (40,0) está de fato acima de A (0,0)" in texto
+    assert "Total: NPS 20 = 50,0% promotores (50) − 30,0% detratores (30) = 20,0, arredondado para 20" in texto
+    assert "neutros 20,0% (20)" in texto and "Conclusão: B (40) está de fato acima de A (0)" in texto
     assert "Como ler: NPS = % de promotores" in texto

@@ -177,7 +177,7 @@ class Entrega:
                     c.number_format, c.border = "#,##0", BORDA
                     n_resp = f'COUNTIFS({self._faixa(seg)},{_criterio(v)},{self._faixa(nps)},">=0")'
                     c = ws.cell(row=linha, column=6, value=f"=IF({n_resp}=0,\"\",(D{linha}-E{linha})/{n_resp}*100)")
-                    c.number_format, c.border = "0.0", BORDA
+                    c.number_format, c.border = "0", BORDA  # NPS sem casas decimais (padrão da casa)
                     ws.cell(row=linha, column=7, value=f'=IF({n_resp}<30,"sim","não")').border = BORDA
                     self._conferir(f"[{seg}] promotores de {v}", "Plano tabular", f"D{linha}", p)
                     self._conferir(f"[{seg}] detratores de {v}", "Plano tabular", f"E{linha}", d)
@@ -216,7 +216,7 @@ class Entrega:
                      ("Detratores (0-6)", f'=COUNTIF({faixa},"<=6")', "#,##0", d),
                      ("% Promotores", "=IF(B5=0,0,B6/B5)", "0.0%", p / n if n else 0),
                      ("% Detratores", "=IF(B5=0,0,B7/B5)", "0.0%", d / n if n else 0),
-                     ("NPS", "=(B8-B9)*100", "0.0", 100 * (p - d) / n if n else 0),
+                     ("NPS", "=(B8-B9)*100", "0", 100 * (p - d) / n if n else 0),
                      ("Margem de erro (± pts, 95%)", "=IF(B5=0,0,1.96*SQRT((B8+B9-(B8-B9)^2)/B5)*100)", "0.0",
                       100 * 1.96 * math.sqrt(((p + d) / n - ((p - d) / n) ** 2) / n) if n else 0)]
             leituras = ["Notas preenchidas", "Notas 9 e 10", "Notas de 0 a 6", "", "", "%Promotores − %Detratores",

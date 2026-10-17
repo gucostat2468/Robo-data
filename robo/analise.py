@@ -426,7 +426,8 @@ class Analise:
                 linhas.append(f"Período ({datas[0]}): {d.min():%d/%m/%Y} a {d.max():%d/%m/%Y}.")
         if not self.indicadores.empty:
             for _, r in self.indicadores[self.indicadores["segmento"] == "Total"].iterrows():
-                txt = f"{r['indicador']}: {r['valor']:.1f} (margem ±{r['margem']:.1f} pts; n={int(r['n'])})"
+                casas = 0 if r["indicador"] == "NPS" else 1  # NPS sem casas decimais (padrão da casa)
+                txt = f"{r['indicador']}: {r['valor']:.{casas}f} (margem ±{r['margem']:.{casas}f} pts; n={int(r['n'])})"
                 if r["indicador"] == "NPS":
                     txt += f" — {r['pct_promotores']:.0f}% promotores e {r['pct_detratores']:.0f}% detratores"
                 linhas.append(txt + ".")

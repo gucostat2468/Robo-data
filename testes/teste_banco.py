@@ -199,3 +199,38 @@ def teste_memoria_dos_funcionarios_vai_para_o_postgres(planilha_baguncada, cfg_f
     memoria.registrar_execucao(cfg, r)  # de novo: recorrência atualiza a mesma linha no PostgreSQL
     memoria.sincronizar_postgres(cfg)
     assert _q(banco_cfg, "SELECT max(recorrencias) FROM robo.memoria_handovers")[0][0] == 2
+
+
+def teste_calculo_conferido_no_postgres_e_modo_manual(planilha_baguncada, cfg_factory, banco_cfg):
+    from robo import conferencia, ferramentas
+    cfg = cfg_factory([REGRA_NPS], banco=banco_cfg)
+    assert processar_arquivo(planilha_baguncada, cfg).status == SUCESSO
+    r = ferramentas.executar("calcular", cfg, pergunta="nps por curso")
+    assert r["dados"]["conferencia"] == "conferido", r["texto"]
+    assert "✅ Conferido no PostgreSQL" in r["texto"] and "CONT.SES(Tabela[nota_nps];\">=9\"" in r["texto"]
+    assert "GROUP BY \"curso\"" in r["dados"]["sql"]
+    for pergunta in ("média de valor_mensalidade por uf", "quantos por modalidade", "soma de valor_mensalidade",
+                     "mediana de nota_nps"):
+        assert ferramentas.executar("calcular", cfg, pergunta=pergunta)["dados"]["conferencia"] == "conferido", pergunta
+    # divergência de verdade: alguém muda o banco por fora → o robô percebe e não chama o número de confiável
+    import re
+    tabela = re.search(r"FROM (\S+)", r["dados"]["sql"]).group(1)
+    _q(banco_cfg, f"UPDATE {tabela} SET nota_nps = 0 WHERE curso = 'Direito' RETURNING 1")
+    r = ferramentas.executar("calcular", cfg, pergunta="nps por curso")
+    assert r["dados"]["conferencia"] == "divergente" and r["natureza"] == "hipotese" and "DIVERGÊNCIA" in r["texto"]
+    from robo import memoria
+    assert any(h["responsavel"] == "dba" for h in memoria.handovers(cfg))
+
+
+def teste_dora_roda_select_livre_somente_leitura(planilha_baguncada, cfg_factory, banco_cfg):
+    from robo import atendimento
+    cfg = cfg_factory([REGRA_NPS], banco=banco_cfg)
+    processar_arquivo(planilha_baguncada, cfg)
+    r = atendimento.conversar(cfg, "dba", "SELECT count(*) AS total FROM robo.lotes")
+    assert r["respostas"][-1]["natureza"] == "execucao" and "total" in r["respostas"][-1]["texto"]
+    r = atendimento.conversar(cfg, "dba", "WITH x AS (DELETE FROM robo.lotes RETURNING 1) SELECT count(*) FROM x")
+    assert r["respostas"][-1]["natureza"] == "limitacao"  # o próprio banco recusa: transação somente leitura
+    assert _q(banco_cfg, "SELECT count(*) FROM robo.lotes")[0][0] >= 1
+    r = atendimento.conversar(cfg, "infra_pleno", "SELECT 1")  # Rodrigo (TI) não tem SQL no contrato: encaminha
+    assert r["respostas"][0]["natureza"] == "limitacao" and r["respostas"][1]["autor"] == "dba"
+    assert r["respostas"][1]["natureza"] == "execucao"

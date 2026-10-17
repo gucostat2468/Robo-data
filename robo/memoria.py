@@ -63,6 +63,9 @@ CATEGORIAS = [
     (r"conferencia da equipe|coordenadora de engenharia", 1, "coord_engenharia",
      "Conferência do quadro barrou a produção", "Seguir o achado da conferência (tipos, espaços, auditoria, amostra)",
      "Checklist da coordenadora verde na próxima carga"),
+    (r"divergencia entre calculadora e postgresql", 1, "dba", "O mesmo cálculo deu números diferentes em dois caminhos",
+     "Dora compara a consulta SQL com a calculadora linha a linha, acha a causa (tipo, nulo, linha duplicada, arquivo "
+     "diferente) e cria um teste automatizado com o caso", "A mesma pergunta volta a dar 'Conferido no PostgreSQL'"),
     (r"postgresql", 1, "dba", "Carga no banco recusada", "Ver a mensagem do PostgreSQL; ajustar tipo da coluna ou a conexão",
      "Próxima carga confirmada pela Dora"),
     (r"gravar a saida|formato .* nao suportado", 1, "publicacao", "Arquivo de saída ou de entrada em formato/estado errado",

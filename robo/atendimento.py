@@ -34,7 +34,7 @@ def _norm(t: str) -> str:
 def _msg(autor: str, r: dict, **extra) -> dict:
     return {"autor": autor, "texto": r["texto"], "natureza": r["natureza"], "natureza_nome": r["natureza_nome"],
             "evidencia": r.get("evidencia", ""), "dados": {k: v for k, v in (r.get("dados") or {}).items()
-                                                           if k in ("autor", "pergunta", "fonte", "aprovaria", "achados")},
+                                                           if k in ("autor", "pergunta", "fonte", "aprovaria", "achados", "conferencia")},
             **extra}
 
 
@@ -190,6 +190,10 @@ def _responder(cfg, tb, conversa_id, contrato, texto, ctx, arquivo) -> tuple[lis
         msgs = [_msg(pid, r)]
         return msgs, _registrar_pergunta(tb, contrato, texto, conversa_id, msgs)
 
+    # SQL escrito pelo dono: roda em transação somente leitura (quem tem consulta_sql no contrato; os outros encaminham)
+    if re.match(r"^\s*(select|with)\b", texto, re.IGNORECASE):
+        return _com_ferramenta(cfg, tb, conversa_id, contrato, texto, "consulta_sql", {"sql": texto.strip().rstrip(";")})
+
     # pedido com objetivo → tarefa ou projeto
     tipo = orquestrador.classificar(texto)
     if tipo in ("tarefa", "projeto"):
@@ -235,7 +239,12 @@ def _responder(cfg, tb, conversa_id, contrato, texto, ctx, arquivo) -> tuple[lis
         msgs = [_msg(pid, r)]
         return msgs, _registrar_pergunta(tb, contrato, texto, conversa_id, msgs)
 
-    # a ferramenta está no meu contrato? se não, encaminho para quem tem (e o colega responde aqui)
+    return _com_ferramenta(cfg, tb, conversa_id, contrato, texto, ferr, params, pronto, pergunta)
+
+
+def _com_ferramenta(cfg, tb, conversa_id, contrato, texto, ferr, params, pronto=None, pergunta=None):
+    """Executa com a ferramenta se ela está no contrato; se não, encaminha para quem tem (e o colega responde aqui)."""
+    pid = contrato["id"]
     msgs = []
     executor = pid
     if not organizacao.pode_usar(pid, ferr, cfg):

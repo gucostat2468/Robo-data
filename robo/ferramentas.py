@@ -149,7 +149,24 @@ def f_calcular(cfg, pergunta: str = "", arquivo: str | None = None, base: str | 
         return resultado(False, "limitacao", "Não reconheci um pedido de cálculo. Exemplos: \"nps por região\", "
                                              "\"média de valor por loja onde canal = App\", \"percentual de modalidade\".")
     calculou = "\n" in r["texto"] or " — Base " in r["texto"]
-    return resultado(calculou, "calculo" if calculou else "limitacao", r["texto"], {"autor": r["autor"], "pergunta": texto},
+    if not calculou or not r.get("calc"):
+        return resultado(calculou, "calculo" if calculou else "limitacao", r["texto"], {"autor": r["autor"], "pergunta": texto},
+                         evidencia=origem)
+    from robo import conferencia
+    conf = conferencia.conferir(cfg, r["calc"])
+    natureza = "calculo"
+    if conf["status"] == "conferido":
+        origem += "; conferido no PostgreSQL por SQL independente"
+    elif conf["status"] == "divergente":  # número não confiável: avisa, registra e manda para a DBA
+        natureza = "hipotese"
+        try:
+            from robo import memoria
+            memoria.handover(cfg, "Divergência entre calculadora e PostgreSQL: " + "; ".join(conf["diferencas"][:3]),
+                             r["calc"]["base"], "dba", texto)
+        except Exception:
+            pass
+    return resultado(True, natureza, r["texto"] + "\n\n" + conferencia.texto(conf),
+                     {"autor": r["autor"], "pergunta": texto, "conferencia": conf["status"], "sql": conf["sql"]},
                      evidencia=origem)
 
 
@@ -228,9 +245,21 @@ def f_dados_pessoais(cfg, arquivo: str | None = None, base: str | None = None, *
     return resultado(True, "execucao", texto, {"achados": achados}, evidencia=f"verificação LGPD (amostra de 200 valores) em {nome}")
 
 
-def f_consulta_sql(cfg, consulta: str | None = None, **_) -> dict:
+def f_consulta_sql(cfg, consulta: str | None = None, sql: str | None = None, **_) -> dict:
     from robo import consultas
     from robo.banco import Banco
+    if sql:
+        if not cfg.banco.get("habilitado"):
+            return resultado(False, "limitacao", "O PostgreSQL não está habilitado nas Configurações, então não rodei o SQL.")
+        try:
+            r = consultas.executar_texto(Banco(cfg.banco, cfg.base), sql)
+        except Exception as e:
+            return resultado(False, "limitacao", f"O banco recusou o SQL: {consultas.explicar_erro(str(e))}")
+        linhas = [" | ".join(map(str, l)) for l in r["linhas"][:30]]
+        return resultado(True, "execucao", f"{len(r['linhas'])} linha(s){' (cortado em 1.000)' if r['truncado'] else ''} em "
+                         f"{r['duracao']} s, somente leitura.\n" + " | ".join(r["colunas"]) + "\n" + "\n".join(linhas),
+                         {"colunas": r["colunas"], "linhas": [list(map(str, l)) for l in r["linhas"][:200]], "sql": sql},
+                         evidencia="PostgreSQL, transação READ ONLY (o banco recusa qualquer alteração)")
     if not consulta:
         itens = consultas.listar()
         return resultado(True, "ferramenta", "Consultas disponíveis:\n" + "\n".join(f"• {i['id']} — {i['titulo']}" for i in itens[:40]),
