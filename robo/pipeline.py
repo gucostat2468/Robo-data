@@ -54,6 +54,7 @@ class Resultado:
     destino_original: Path | None = None
     id: str = ""
     motivo_adiamento: str = ""
+    analise: dict | None = None
 
 
 @dataclass
@@ -63,6 +64,7 @@ class _Tratamento:
     regra: dict = field(default_factory=dict)
     modelo: dict | None = None
     linhas_entrada: int = 0
+    analisaveis: dict = field(default_factory=dict)   # tabelas limpas ANTES de virar fato/dimensões (2º andar)
 
 
 def _carimbo() -> str:
@@ -154,6 +156,7 @@ def _tratar(caminho: Path, cfg: Config, rel: Relatorio, ao_etapa=None) -> _Trata
         validar_tabela(limpo, nome, t.regra, rel)
         limpo = equipe.executar("validacao", limpo, rel, nome, caminho.name, ao_etapa)
         limpo = equipe.executar("modelagem", limpo, rel, nome, caminho.name, ao_etapa)
+        t.analisaveis[nome] = limpo
         _sinal(ao_etapa, "modelagem", caminho.name)
         for nome_final, df in modelar(limpo, nome, t.modelo, rel).items():
             t.tabelas[nome_final] = df.reset_index(drop=True)
@@ -285,6 +288,14 @@ def processar_arquivo(caminho: str | Path, cfg: Config, gravar: bool = True, ao_
         _gravar_relatorio_qualidade(cfg, nome_base, rel, t.tabelas)
         destinos = [p.name for p in r.saidas] + r.tabelas_banco
         log.info("OK %s -> %s (%d linhas, %d aviso(s))", caminho.name, ", ".join(destinos), r.linhas_saida, len(rel.avisos))
+        # 2º andar: análise automática. Já está publicado; aqui nada pode reprovar ou travar.
+        try:
+            from robo.analise import analisar
+            r.analise = analisar(t.analisaveis, caminho.name, r.id, cfg, t.regra, ao_etapa)
+            if r.analise:
+                log.info("Análise de %s pronta (%s)", caminho.name, Path(r.analise.get("relatorio") or "painel").name)
+        except Exception:
+            log.exception("Análise automática de %s falhou (a planilha já está publicada)", caminho.name)
 
     r.duracao = time.perf_counter() - inicio
     _registrar(cfg, r)
@@ -317,6 +328,7 @@ def _registrar(cfg: Config, r: Resultado):
         "original": str(r.destino_original) if r.destino_original else None,
         "saidas": [str(p) for p in r.saidas], "tabelas_banco": r.tabelas_banco,
         "tabelas": _resumo_tabelas(r.tabelas) if r.status == SUCESSO else [],
+        "analise": r.analise,
         "ocorrencias": [o.__dict__ for o in r.relatorio.ocorrencias],
     })
 

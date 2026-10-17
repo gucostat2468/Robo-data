@@ -210,91 +210,152 @@ function criarPlanta(x, z, escala = 1) {
 }
 
 // ------------------------------------------------------------------ estado da cena
+// ------------------------------------------------------------------ estado da cena (prédio de 2 andares)
+const ALTURA = 4.4; // pé-direito: o 2º andar fica 4,4 m acima do 1º
+const NOME_ANDAR = { 1: "1º andar · Engenharia de dados", 2: "2º andar · Análise e Qualidade" };
 const estado = {
   equipe: [], estacoes: new Map(), ultimoSeq: 0, iniciado: false, chaveEquipe: "",
   fila: [], filaEventos: [], tocando: null, documentos: new Map(), selecionado: null,
-  ligado: false, bancoHabilitado: false, agentesNumeros: {}, kpis: null,
+  ligado: false, bancoHabilitado: false, agentesNumeros: {}, kpis: null, analiseHoje: null,
+  andarVisivel: 1, seguir: true, ultimoManual: 0,
 };
 let raiz = new THREE.Group(); cena.add(raiz);
-let caixaEntrada, caixaTratadas, caixaErros, pilhaEntrada = [], pilhaTratadas = [], pilhaErros = [], tvTextura, tvCanvas, leds = [];
+const andares = { 1: null, 2: null };
+let geo = null, elevador = null;
+let caixaEntrada, caixaTratadas, caixaErros, prateleira, pilhaEntrada = [], pilhaTratadas = [], pilhaErros = [], pilhaRelatorios = [], leds = [];
+const tvs = {};
 const clicaveis = [];
-
 const ETAPA_NATIVA = new Set(["recepcao", "leitura", "limpeza", "validacao", "modelagem", "banco", "publicacao"]);
 
-function montarEscritorio(equipe) {
+function montarPredio(equipe) {
   cena.remove(raiz); raiz = new THREE.Group(); cena.add(raiz);
   estado.estacoes.clear(); clicaveis.length = 0; leds = [];
-  pilhaEntrada = []; pilhaTratadas = []; pilhaErros = [];
-
-  const n = equipe.length, porFileira = Math.ceil(n / 2), espaco = 3.9;
+  pilhaEntrada = []; pilhaTratadas = []; pilhaErros = []; pilhaRelatorios = [];
+  const eq1 = equipe.filter((a) => a.andar !== 2), eq2 = equipe.filter((a) => a.andar === 2);
+  const porFileira = Math.max(3, Math.ceil(eq1.length / 2), Math.ceil(eq2.length / 2)), espaco = 3.9;
   const colX = (c) => (c - (porFileira - 1) / 2) * espaco;
-  const zFundo = -1.5, zFrente = 3.3;
   const minX = colX(0) - 6.2, maxX = colX(porFileira - 1) + 4.2;
-  const largura = maxX - minX, profundidade = 11.5, zParede = -4.6;
-
-  // piso, tapete do fluxo, paredes e janelas
-  const piso = caixa(largura, 0.2, profundidade, mat(ESCURO ? "#3b3631" : "#e7dccb"), (minX + maxX) / 2, -0.1, zParede + profundidade / 2, false);
-  piso.receiveShadow = true; raiz.add(piso);
-  for (let i = 0; i < Math.floor(largura / 1.2); i++) {
-    raiz.add(caixa(0.02, 0.005, profundidade, mat(ESCURO ? "#35302b" : "#dccfbb"), minX + i * 1.2, 0.003, zParede + profundidade / 2, false));
+  geo = { colX, porFileira, minX, maxX, largura: maxX - minX, zFundo: -1.5, zFrente: 3.3, zParede: -4.6, profundidade: 11.5,
+          xElevador: minX + 1.3, zElevador: -4.6 + 1.25 };
+  for (const andar of [1, 2]) {
+    const g = new THREE.Group(); g.position.y = andar === 1 ? 0 : ALTURA; raiz.add(g);
+    andares[andar] = g;
+    construirAndar(g, andar, andar === 1 ? eq1 : eq2);
   }
-  raiz.add(caixa(largura - 3, 0.01, 0.9, mat(ESCURO ? "#2b3550" : "#cdd8ea"), (minX + maxX) / 2 + 0.6, 0.01, zFundo + 1.55, false));
-  raiz.add(caixa(largura - 3, 0.01, 0.9, mat(ESCURO ? "#2b3550" : "#cdd8ea"), (minX + maxX) / 2 + 0.6, 0.01, zFrente + 1.55, false));
-  const corParede = mat(ESCURO ? "#262c39" : "#f3efe8");
-  raiz.add(caixa(largura, 3.6, 0.2, corParede, (minX + maxX) / 2, 1.8, zParede, false));
-  raiz.add(caixa(0.2, 3.6, profundidade, corParede, minX, 1.8, zParede + profundidade / 2, false));
-  raiz.add(caixa(largura, 0.14, 0.24, mat(ESCURO ? "#1d222d" : "#d9d2c6"), (minX + maxX) / 2, 0.07, zParede + 0.02, false));
+  construirElevador();
+  enquadrarCameras();
+  definirAndarVisivel(estado.andarVisivel);
+}
+
+function construirAndar(g, andar, equipe) {
+  const { colX, minX, maxX, largura, zFundo, zFrente, zParede, profundidade, xElevador, zElevador } = geo;
+  const yBase = andar === 1 ? 0 : ALTURA;
+  const cx = (minX + maxX) / 2, cz = zParede + profundidade / 2;
+
+  // piso (no 2º andar é uma laje com o vão do elevador)
+  if (andar === 1) {
+    g.add(caixa(largura, 0.2, profundidade, mat(ESCURO ? "#3b3631" : "#e7dccb"), cx, -0.1, cz, false));
+    for (let i = 0; i < Math.floor(largura / 1.2); i++) g.add(caixa(0.02, 0.005, profundidade, mat(ESCURO ? "#35302b" : "#dccfbb"), minX + i * 1.2, 0.003, cz, false));
+  } else {
+    const carpete = mat(ESCURO ? "#2c3342" : "#dde3ec");
+    const xVao = xElevador + 0.95, zVao = zElevador + 0.95;
+    g.add(caixa(maxX - xVao, 0.3, profundidade, carpete, (xVao + maxX) / 2, -0.15, cz, false));
+    g.add(caixa(xVao - minX, 0.3, zParede + profundidade - zVao, carpete, (minX + xVao) / 2, -0.15, (zVao + zParede + profundidade) / 2, false));
+    for (let i = 1; i < Math.floor(profundidade / 1.5); i++) g.add(caixa(largura - 2, 0.004, 0.02, mat(ESCURO ? "#363e50" : "#cfd6e2"), cx + 1, 0.003, zParede + i * 1.5, false));
+    g.add(caixa(largura, 0.1, 0.08, mat(ESCURO ? "#3d4558" : "#c7ced9"), cx, 0.55, zParede + profundidade, false)); // guarda-corpo baixo
+    // borda da laje (fachada): esconde o andar de baixo quando você está no 2º andar
+    g.add(caixa(largura, 1.3, 0.3, mat(ESCURO ? "#30384a" : "#e4e8ef"), cx, -0.8, zParede + profundidade - 0.05, false));
+  }
+  g.add(caixa(largura - 3, 0.01, 0.9, mat(ESCURO ? "#2b3550" : "#cdd8ea"), cx + 0.6, 0.01, zFundo + 1.55, false));
+  g.add(caixa(largura - 3, 0.01, 0.9, mat(ESCURO ? "#2b3550" : "#cdd8ea"), cx + 0.6, 0.01, zFrente + 1.55, false));
+
+  // paredes, rodapé e janelas
+  const corParede = mat(andar === 1 ? (ESCURO ? "#262c39" : "#f3efe8") : (ESCURO ? "#232a38" : "#eef2f7"));
+  const altParede = andar === 1 ? ALTURA : 3.6;
+  g.add(caixa(largura, altParede, 0.2, corParede, cx, altParede / 2, zParede, false));
+  g.add(caixa(0.2, altParede, profundidade, corParede, minX, altParede / 2, cz, false));
+  g.add(caixa(largura, 0.14, 0.24, mat(ESCURO ? "#1d222d" : "#d9d2c6"), cx, 0.07, zParede + 0.02, false));
   const vidro = new THREE.MeshStandardMaterial({ color: ESCURO ? "#24345e" : "#bfe0ff", emissive: ESCURO ? "#1b2a55" : "#a8d4ff", emissiveIntensity: ESCURO ? 0.7 : 0.35 });
-  for (const x of [minX + 3.2, maxX - 3.2]) {
-    raiz.add(caixa(3.2, 1.8, 0.05, vidro, x, 2.0, zParede + 0.12, false));
-    raiz.add(caixa(3.4, 0.08, 0.1, mat("#ffffff"), x, 1.06, zParede + 0.14, false));
-    raiz.add(caixa(0.06, 1.8, 0.08, mat("#ffffff"), x, 2.0, zParede + 0.14, false));
+  for (const x of [minX + 4.4, maxX - 3.2]) {
+    g.add(caixa(3.2, 1.8, 0.05, vidro, x, 2.0, zParede + 0.12, false));
+    g.add(caixa(3.4, 0.08, 0.1, mat("#ffffff"), x, 1.06, zParede + 0.14, false));
+    g.add(caixa(0.06, 1.8, 0.08, mat("#ffffff"), x, 2.0, zParede + 0.14, false));
   }
+  const placaAndar = placa(andar === 1 ? "1º ANDAR · ENGENHARIA DE DADOS" : "2º ANDAR · ANÁLISE E QUALIDADE", andar === 1 ? "#1d3fb0" : "#7c3aed");
+  placaAndar.scale.set(4.2, 0.98, 1); placaAndar.position.set(cx, 3.35, zParede + 0.3); g.add(placaAndar);
 
-  // TV com os números do dia
-  tvCanvas = document.createElement("canvas"); tvCanvas.width = 1024; tvCanvas.height = 512;
-  tvTextura = new THREE.CanvasTexture(tvCanvas); tvTextura.colorSpace = THREE.SRGBColorSpace;
-  raiz.add(caixa(4.3, 2.35, 0.1, mat("#15181f"), (minX + maxX) / 2, 2.25, zParede + 0.14, false));
-  const tela = new THREE.Mesh(new THREE.PlaneGeometry(4.1, 2.15), new THREE.MeshBasicMaterial({ map: tvTextura, toneMapped: false }));
-  tela.position.set((minX + maxX) / 2, 2.25, zParede + 0.2); raiz.add(tela);
-  desenharTV();
+  // TV do andar
+  const canvas = document.createElement("canvas"); canvas.width = 1024; canvas.height = 512;
+  const textura = new THREE.CanvasTexture(canvas); textura.colorSpace = THREE.SRGBColorSpace;
+  tvs[andar] = { canvas, textura };
+  g.add(caixa(4.3, 2.35, 0.1, mat("#15181f"), cx + 4.6, 2.05, zParede + 0.14, false));
+  const tela = new THREE.Mesh(new THREE.PlaneGeometry(4.1, 2.15), new THREE.MeshBasicMaterial({ map: textura, toneMapped: false }));
+  tela.position.set(cx + 4.6, 2.05, zParede + 0.2); g.add(tela);
+  desenharTV(andar);
 
-  // caixa de entrada (Bases-Limpeza)
-  const xEntrada = colX(0) - 3.4;
-  const mesaEntrada = new THREE.Group();
-  mesaEntrada.add(caixa(1.4, 0.06, 0.9, mat("#f7f4ef"), 0, 0.76, 0));
-  for (const [x, z] of [[-0.62, -0.38], [0.62, -0.38], [-0.62, 0.38], [0.62, 0.38]]) mesaEntrada.add(caixa(0.06, 0.74, 0.06, mat("#8b6b4a"), x, 0.37, z));
-  mesaEntrada.add(caixa(0.7, 0.12, 0.5, mat("#f0b429"), 0, 0.85, 0));
-  mesaEntrada.position.set(xEntrada, 0, zFundo + 0.3); raiz.add(mesaEntrada);
-  const pEntrada = placa("Bases-Limpeza", "#b7791f"); pEntrada.position.set(xEntrada, 1.75, zFundo + 0.3); raiz.add(pEntrada);
-  caixaEntrada = new THREE.Vector3(xEntrada, 0.93, zFundo + 0.3);
+  const xLateral = colX(0) - 3.4;
+  if (andar === 1) {
+    const mesaEntrada = new THREE.Group();
+    mesaEntrada.add(caixa(1.4, 0.06, 0.9, mat("#f7f4ef"), 0, 0.76, 0));
+    for (const [x, z] of [[-0.62, -0.38], [0.62, -0.38], [-0.62, 0.38], [0.62, 0.38]]) mesaEntrada.add(caixa(0.06, 0.74, 0.06, mat("#8b6b4a"), x, 0.37, z));
+    mesaEntrada.add(caixa(0.7, 0.12, 0.5, mat("#f0b429"), 0, 0.85, 0));
+    mesaEntrada.position.set(xLateral, 0, zFundo + 0.3); g.add(mesaEntrada);
+    const p = placa("Bases-Limpeza", "#b7791f"); p.position.set(xLateral, 1.75, zFundo + 0.3); g.add(p);
+    caixaEntrada = new THREE.Vector3(xLateral, 0.93, zFundo + 0.3);
+    const caixote = (cor, z, texto) => {
+      const c = new THREE.Group();
+      c.add(caixa(1.2, 0.7, 0.9, mat(cor), 0, 0.35, 0)); c.add(caixa(1.05, 0.05, 0.75, mat("#ffffff"), 0, 0.71, 0, false));
+      c.position.set(xLateral, 0, z); g.add(c);
+      const pl = placa(texto, cor); pl.position.set(xLateral, 1.45, z); g.add(pl);
+      return new THREE.Vector3(xLateral, 0.74, z);
+    };
+    caixaTratadas = caixote("#16a34a", zFrente + 0.1, "Bases-Tratadas");
+    caixaErros = caixote("#dc2626", zFrente + 1.6, "Bases-Erros");
+    const sofa = new THREE.Group(); sofa.position.set(maxX - 1.6, 0, zFrente + 0.4); sofa.rotation.y = -Math.PI / 2;
+    sofa.add(caixa(2.2, 0.42, 0.85, mat("#5b6b8c"), 0, 0.3, 0)); sofa.add(caixa(2.2, 0.6, 0.22, mat("#56658a"), 0, 0.62, -0.32));
+    g.add(sofa);
+  } else {
+    // estante de relatórios (Bases-Relatorios) e sala de reunião
+    const estante = new THREE.Group(); estante.position.set(xLateral, 0, zFrente + 0.8);
+    estante.add(caixa(1.6, 1.7, 0.5, mat(ESCURO ? "#4a3b2f" : "#a47c55"), 0, 0.85, 0));
+    const cores = ["#ef4444", "#3b82f6", "#22c55e", "#f59e0b", "#8b5cf6", "#0ea5e9"];
+    for (let prat = 0; prat < 3; prat++) for (let i = 0; i < 6; i++) {
+      estante.add(caixa(0.16, 0.42, 0.34, mat(cores[(i + prat) % 6]), -0.6 + i * 0.22, 0.3 + prat * 0.52, 0.06));
+    }
+    g.add(estante);
+    const p = placa("Bases-Relatorios", "#7c3aed"); p.position.set(xLateral, 2.15, zFrente + 0.8); g.add(p);
+    prateleira = { local: new THREE.Vector3(xLateral, 1.72, zFrente + 0.8), mundo: new THREE.Vector3(xLateral, ALTURA + 1.72, zFrente + 0.8) };
+    const mesa = new THREE.Group(); mesa.position.set(maxX - 2.2, 0, zFrente + 0.6);
+    mesa.add(cilindro(1.0, 1.0, 0.06, mat("#f7f4ef"), 0, 0.76, 0, 32)); mesa.add(cilindro(0.08, 0.12, 0.74, mat("#8b6b4a"), 0, 0.37, 0));
+    for (let i = 0; i < 5; i++) { const c = criarCadeira(); const a = (i / 5) * Math.PI * 2; c.position.set(Math.cos(a) * 1.35, 0, Math.sin(a) * 1.35); c.rotation.y = -a - Math.PI / 2; mesa.add(c); }
+    g.add(mesa);
+    // quadro com gráfico na parede lateral
+    const quadro = texturaTexto((ctx, l, a) => {
+      ctx.fillStyle = "#ffffff"; ctx.fillRect(0, 0, l, a);
+      ctx.fillStyle = "#334155"; ctx.font = "700 40px Segoe UI, system-ui"; ctx.fillText("Evolução do NPS", 30, 60);
+      [42, 47, 39, 51, 55, 58].forEach((v, i) => { ctx.fillStyle = i === 5 ? "#7c3aed" : "#a5b4fc"; ctx.fillRect(40 + i * 75, 300 - v * 4, 50, v * 4); });
+    }, 512, 320);
+    const lousa = new THREE.Mesh(new THREE.PlaneGeometry(2.4, 1.5), new THREE.MeshStandardMaterial({ map: quadro }));
+    lousa.position.set(minX + 0.13, 1.9, zFrente - 0.6); lousa.rotation.y = Math.PI / 2; g.add(lousa);
+  }
+  g.add(criarPlanta(minX + 0.8, zParede + 3.0, 1.1));
+  g.add(criarPlanta(maxX - 0.8, zParede + 0.8, 1.1));
+  g.add(criarPlanta(maxX - 0.8, zFrente + 2.6, 0.9));
 
-  // caixas de saída (Bases-Tratadas e Bases-Erros)
-  const xSaida = colX(0) - 3.4;
-  const caixote = (cor, z, texto) => {
-    const g = new THREE.Group();
-    g.add(caixa(1.2, 0.7, 0.9, mat(cor), 0, 0.35, 0));
-    g.add(caixa(1.05, 0.05, 0.75, mat("#ffffff"), 0, 0.71, 0, false));
-    g.position.set(xSaida, 0, z); raiz.add(g);
-    const p = placa(texto, cor); p.position.set(xSaida, 1.45, z); raiz.add(p);
-    return new THREE.Vector3(xSaida, 0.74, z);
-  };
-  caixaTratadas = caixote("#16a34a", zFrente + 0.1, "Bases-Tratadas");
-  caixaErros = caixote("#dc2626", zFrente + 1.6, "Bases-Erros");
-
-  // estações: fileira do fundo da esquerda para a direita; da frente, da direita para a esquerda
+  // estações dos agentes: fileira do fundo da esquerda para a direita; da frente, da direita para a esquerda
+  const porFileira = Math.max(1, Math.ceil(equipe.length / 2));
   equipe.forEach((ag, i) => {
     const fundo = i < porFileira;
     const coluna = fundo ? i : porFileira - 1 - (i - porFileira);
     const x = colX(coluna), z = fundo ? zFundo : zFrente;
     const semente = hashTexto(ag.id);
-    const grupo = new THREE.Group(); grupo.position.set(x, 0, z); raiz.add(grupo);
+    const grupo = new THREE.Group(); grupo.position.set(x, 0, z); g.add(grupo);
     const mesa = criarMesa(ag.cor); mesa.grupo.position.z = 0.72; grupo.add(mesa.grupo);
     const cadeira = criarCadeira(); cadeira.position.z = -0.12; grupo.add(cadeira);
     const p = criarPersonagem(ag.cor, semente); grupo.add(p.grupo);
-    const sub = !ag.ativo ? "desligado" : ag.id === "banco" && !estado.bancoHabilitado ? "banco desligado" : ag.papel;
-    const etiqueta = rotulo(ag.nome, sub, ag.cor); etiqueta.position.set(0, 2.45, 0); grupo.add(etiqueta);
-    etiqueta.scale.set(2.6, 0.81, 1);
+    const nivel = ag.ficha?.nivel ? ` · ${ag.ficha.nivel}` : "";
+    const sub = !ag.ativo ? "desligado" : ag.id === "banco" && !estado.bancoHabilitado ? "banco desligado" : `${ag.papel}${nivel}`;
+    const etiqueta = rotulo(ag.nome, sub, ag.cor); etiqueta.position.set(0, 2.45, 0); etiqueta.scale.set(2.6, 0.81, 1); grupo.add(etiqueta);
     const anel = new THREE.Mesh(new THREE.TorusGeometry(0.3, 0.035, 8, 40), new THREE.MeshStandardMaterial({ color: ag.cor, emissive: ag.cor, emissiveIntensity: 0.8 }));
     anel.rotation.x = Math.PI / 2; anel.position.y = 1.98; anel.visible = false; grupo.add(anel);
     const ok = selo("✓", "#16a34a"), erro = selo("!", "#dc2626"), zz = selo("z", "#94a3b8");
@@ -309,82 +370,195 @@ function montarEscritorio(equipe) {
       grupo.add(rack);
     }
     if (i % 3 === 1) grupo.add(criarPlanta(-1.1, -0.7, 0.55));
-    p.grupo.traverse((o) => { if (o.isMesh) { o.userData.agente = ag.id; clicaveis.push(o); } });
-    mesa.grupo.traverse((o) => { if (o.isMesh) { o.userData.agente = ag.id; clicaveis.push(o); } });
+    for (const parte of [p.grupo, mesa.grupo]) parte.traverse((o) => { if (o.isMesh) { o.userData.agente = ag.id; clicaveis.push(o); } });
     const inativo = !ag.ativo || (ag.id === "banco" && !estado.bancoHabilitado);
     if (inativo) { mesa.tampa.rotation.x = 1.45; zz.visible = true; }
     estado.estacoes.set(ag.id, {
-      agente: ag, grupo, p, mesa, anel, etiqueta, selos: { ok, erro, zz }, inativo, semente,
-      mesaPos: new THREE.Vector3(x + 0.52, 0.86, z + 0.77), situacao: inativo ? "desligado" : "parado", ate: 0, trabalho: 0,
+      agente: ag, andar, grupo, p, mesa, anel, etiqueta, selos: { ok, erro, zz }, inativo, semente,
+      mesaPos: new THREE.Vector3(x + 0.52, yBase + 0.86, z + 0.77), situacao: inativo ? "desligado" : "parado", ate: 0,
     });
   });
-
-  // decoração
-  raiz.add(criarPlanta(minX + 0.8, zParede + 0.8, 1.2));
-  raiz.add(criarPlanta(maxX - 0.8, zParede + 0.8, 1.1));
-  raiz.add(criarPlanta(maxX - 0.8, zFrente + 2.6, 0.9));
-  const sofa = new THREE.Group(); sofa.position.set(maxX - 1.6, 0, zFrente + 0.4); sofa.rotation.y = -Math.PI / 2;
-  sofa.add(caixa(2.2, 0.42, 0.85, mat("#5b6b8c"), 0, 0.3, 0)); sofa.add(caixa(2.2, 0.6, 0.22, mat("#56658a"), 0, 0.62, -0.32));
-  raiz.add(sofa);
-
-  enquadrarCamera(minX, maxX, zParede);
 }
 
-let enquadramento = null;
-function enquadrarCamera(minX, maxX, zParede) {
-  const largura = maxX - minX;
+function construirElevador() {
+  const { xElevador: x, zElevador: z } = geo;
+  const vidro = new THREE.MeshStandardMaterial({ color: "#9ec5ff", transparent: true, opacity: 0.18, depthWrite: false, roughness: 0.1 });
+  const altura = ALTURA + 3.6, poco = new THREE.Group();
+  poco.add(caixa(1.7, altura, 0.04, vidro, x, altura / 2, z + 0.85, false));
+  poco.add(caixa(0.04, altura, 1.7, vidro, x + 0.85, altura / 2, z, false));
+  for (const [dx, dz] of [[-0.85, -0.85], [0.85, -0.85], [-0.85, 0.85], [0.85, 0.85]]) poco.add(caixa(0.07, altura, 0.07, mat("#64748b"), x + dx, altura / 2, z + dz));
+  raiz.add(poco);
+  const cabine = new THREE.Group();
+  cabine.add(caixa(1.5, 0.08, 1.5, mat("#475569"), 0, 0.04, 0));
+  cabine.add(caixa(1.5, 0.08, 1.5, mat("#475569"), 0, 2.3, 0));
+  cabine.add(caixa(1.5, 2.3, 0.05, mat(ESCURO ? "#334155" : "#cbd5e1"), 0, 1.15, -0.72));
+  const luz = new THREE.Mesh(new THREE.BoxGeometry(0.8, 0.03, 0.3), new THREE.MeshStandardMaterial({ color: "#fff7d6", emissive: "#fff7d6", emissiveIntensity: 1.2 }));
+  luz.position.y = 2.24; cabine.add(luz);
+  cabine.position.set(x, 0, z); raiz.add(cabine);
+  for (const andar of [1, 2]) {
+    const p = placa(`Elevador · ${andar}º`, "#475569"); p.scale.set(1.9, 0.44, 1);
+    p.position.set(x + 0.2, (andar === 1 ? 0 : ALTURA) + 2.75, z + 1.0); (andar === 1 ? raiz : andares[2]).add(p);
+    if (andar === 2) p.position.y = 2.75;
+  }
+  elevador = { cabine, x, z };
+}
+const pontoElevador = (andar) => new THREE.Vector3(geo.xElevador, (andar === 1 ? 0 : ALTURA) + 1.0, geo.zElevador);
+
+// ------------------------------------------------------------------ câmera, andares e caminhada
+let enquadramentos = {};
+function enquadrarCameras() {
+  const { minX, maxX, largura, zParede } = geo;
   const temPainel = innerWidth >= 900;
-  // o painel da equipe ocupa ~300 px à direita: desloca o centro para o escritório caber na área livre
   const cx = (minX + maxX) / 2 + (temPainel ? largura * 300 / innerWidth * 0.32 : 0);
   const aspecto = innerWidth / innerHeight;
   const dist = Math.max(17, largura * (aspecto < 1.6 ? 1.18 : 1.04)) * (temPainel ? 1.08 : 1.3);
-  enquadramento = { pos: new THREE.Vector3(cx + 1.2, dist * 0.6, zParede + 4.8 + dist * 0.8), alvo: new THREE.Vector3(cx + 0.8, 0.4, zParede + 5.6) };
-  if (!estado.iniciado) { camera.position.copy(enquadramento.pos); controles.target.copy(enquadramento.alvo); controles.update(); }
+  for (const andar of [1, 2]) {
+    const y = andar === 1 ? 0 : ALTURA;
+    enquadramentos[andar] = { pos: new THREE.Vector3(cx + 1.2, y + dist * 0.6, zParede + 4.8 + dist * 0.8), alvo: new THREE.Vector3(cx + 0.8, y + 0.4, zParede + 5.6) };
+  }
+  enquadramentos.predio = { pos: new THREE.Vector3(cx + 2, ALTURA * 1.3 + dist * 0.18, zParede + 6 + dist * 1.15), alvo: new THREE.Vector3(cx + 0.8, ALTURA * 0.8, zParede + 5) };
+  if (!estado.iniciado) { const e = enquadramentos[estado.andarVisivel]; camera.position.copy(e.pos); controles.target.copy(e.alvo); controles.update(); }
 }
 
-// ------------------------------------------------------------------ TV
-function desenharTV() {
-  if (!tvCanvas) return;
-  const ctx = tvCanvas.getContext("2d"), l = 1024, a = 512, k = estado.kpis || {};
-  const grad = ctx.createLinearGradient(0, 0, l, a); grad.addColorStop(0, "#0f1b3d"); grad.addColorStop(1, "#1d3fb0");
+function definirAndarVisivel(andar) {
+  estado.andarVisivel = andar;
+  if (andares[2]) andares[2].visible = andar !== 1;
+  // no 2º andar, as placas e etiquetas do 1º não aparecem "flutuando" por baixo
+  andares[1]?.traverse((o) => { if (o.isSprite) o.visible = andar !== 2; });
+  document.querySelectorAll("#andares [data-andar]").forEach((b) => b.classList.toggle("ativo", b.dataset.andar === String(andar)));
+}
+
+function irParaAndar(andar, manual = false) {
+  if (manual) estado.ultimoManual = performance.now();
+  const destino = enquadramentos[andar]; if (!destino) return;
+  const subindo = andar !== 1;
+  if (subindo) definirAndarVisivel(andar); // mostra o 2º andar antes de a câmera subir
+  voo = { t0: performance.now(), dur: 1100, dePos: camera.position.clone(), deAlvo: controles.target.clone(),
+          paraPos: destino.pos.clone(), paraAlvo: destino.alvo.clone(), aoTerminar: subindo ? null : () => definirAndarVisivel(andar) };
+  if (!subindo) estado.andarVisivel = andar;
+  document.querySelectorAll("#andares [data-andar]").forEach((b) => b.classList.toggle("ativo", b.dataset.andar === String(andar)));
+  $("#hud-ficha").hidden = true; estado.selecionado = null; desenharEquipe();
+}
+
+const teclas = new Set();
+addEventListener("keydown", (e) => {
+  if (["INPUT", "TEXTAREA", "SELECT"].includes(document.activeElement?.tagName)) return;
+  if (e.code === "Digit1") return irParaAndar(1, true);
+  if (e.code === "Digit2") return irParaAndar(2, true);
+  if (e.code === "Digit3") return irParaAndar("predio", true);
+  if (e.code === "KeyF") return alternarSeguir();
+  if (e.key === "Escape") return irParaAndar(estado.andarVisivel, true);
+  if (["KeyW", "KeyA", "KeyS", "KeyD", "KeyQ", "KeyE", "ArrowUp", "ArrowDown", "ArrowLeft", "ArrowRight", "ShiftLeft", "ShiftRight"].includes(e.code)) {
+    teclas.add(e.code); if (e.code.startsWith("Arrow")) e.preventDefault();
+  }
+});
+addEventListener("keyup", (e) => teclas.delete(e.code));
+addEventListener("blur", () => teclas.clear());
+
+function caminhar(dt) {
+  if (!teclas.size || !geo) return;
+  const rapido = teclas.has("ShiftLeft") || teclas.has("ShiftRight") ? 2.4 : 1;
+  const frente = controles.target.clone().sub(camera.position); frente.y = 0;
+  if (frente.lengthSq() < 1e-6) return;
+  frente.normalize();
+  const direita = new THREE.Vector3().crossVectors(frente, new THREE.Vector3(0, 1, 0));
+  const mov = new THREE.Vector3();
+  if (teclas.has("KeyW") || teclas.has("ArrowUp")) mov.add(frente);
+  if (teclas.has("KeyS") || teclas.has("ArrowDown")) mov.sub(frente);
+  if (teclas.has("KeyD") || teclas.has("ArrowRight")) mov.add(direita);
+  if (teclas.has("KeyA") || teclas.has("ArrowLeft")) mov.sub(direita);
+  if (mov.lengthSq()) {
+    mov.normalize().multiplyScalar(7 * rapido * dt);
+    const alvo = controles.target.clone().add(mov);
+    alvo.x = Math.min(geo.maxX, Math.max(geo.minX, alvo.x));
+    alvo.z = Math.min(geo.zParede + geo.profundidade, Math.max(geo.zParede, alvo.z));
+    camera.position.add(alvo.clone().sub(controles.target)); controles.target.copy(alvo);
+  }
+  const giro = (teclas.has("KeyQ") ? 1 : 0) - (teclas.has("KeyE") ? 1 : 0);
+  if (giro) {
+    const desloc = camera.position.clone().sub(controles.target);
+    desloc.applyAxisAngle(new THREE.Vector3(0, 1, 0), giro * 1.4 * dt);
+    camera.position.copy(controles.target).add(desloc);
+  }
+  voo = null; estado.ultimoManual = performance.now();
+}
+controles.addEventListener("start", () => { estado.ultimoManual = performance.now(); voo = null; });
+
+function alternarSeguir() {
+  estado.seguir = !estado.seguir;
+  const b = $("#btn-seguir"); if (b) { b.classList.toggle("ativo", estado.seguir); b.setAttribute("aria-pressed", String(estado.seguir)); }
+  avisar(estado.seguir ? "A câmera vai acompanhar o documento entre os andares." : "Câmera livre: ela não troca de andar sozinha.");
+}
+
+// ------------------------------------------------------------------ TVs
+function desenharTV(andar) {
+  const tv = tvs[andar]; if (!tv) return;
+  const ctx = tv.canvas.getContext("2d"), l = 1024, a = 512;
+  const grad = ctx.createLinearGradient(0, 0, l, a);
+  grad.addColorStop(0, andar === 1 ? "#0f1b3d" : "#1e1038"); grad.addColorStop(1, andar === 1 ? "#1d3fb0" : "#6d28d9");
   ctx.fillStyle = grad; ctx.fillRect(0, 0, l, a);
-  ctx.fillStyle = "rgba(255,255,255,.85)"; ctx.font = "600 34px Segoe UI, system-ui, sans-serif";
-  ctx.fillText("HOJE NO ESCRITÓRIO", 48, 70);
+  ctx.fillStyle = "rgba(255,255,255,.85)"; ctx.font = "600 34px Segoe UI, system-ui, sans-serif"; ctx.textAlign = "left";
+  ctx.fillText(andar === 1 ? "HOJE NA ENGENHARIA" : "HOJE NA ANÁLISE", 48, 70);
   ctx.textAlign = "right"; ctx.fillStyle = estado.ligado ? "#7fe0b4" : "#f5b445";
   ctx.fillText(estado.ligado ? "● Monitorando" : "● Pausado", l - 48, 70); ctx.textAlign = "left";
-  const blocos = [["Aprovados", k.hoje_sucesso ?? 0, "#7fe0b4"], ["Reprovados", k.hoje_reprovado ?? 0, "#ff9a85"],
-    ["Na fila", estado.fila.length, "#ffd27a"], ["Linhas", k.hoje_linhas ?? 0, "#a9c1ff"]];
+  let blocos;
+  if (andar === 1) {
+    const k = estado.kpis || {};
+    blocos = [["Aprovados", k.hoje_sucesso ?? 0, "#7fe0b4"], ["Reprovados", k.hoje_reprovado ?? 0, "#ff9a85"],
+      ["Na fila", estado.fila.length, "#ffd27a"], ["Linhas", k.hoje_linhas ?? 0, "#a9c1ff"]];
+  } else {
+    const h = estado.analiseHoje || {};
+    blocos = [["Bases", h.bases ?? 0, "#f0abfc"], ["Diferenças reais", h.destaques ?? 0, "#7fe0b4"], ["Alertas", h.alertas ?? 0, "#ffd27a"]];
+  }
   blocos.forEach(([t, v, c], i) => {
-    const x = 48 + i * 238;
-    ctx.fillStyle = "rgba(255,255,255,.08)"; retanguloArredondado(ctx, x, 120, 216, 300, 20); ctx.fill();
-    ctx.fillStyle = c; ctx.font = "700 92px Segoe UI, system-ui, sans-serif"; ctx.fillText(num(v), x + 22, 290, 180);
-    ctx.fillStyle = "rgba(255,255,255,.8)"; ctx.font = "500 34px Segoe UI, system-ui, sans-serif"; ctx.fillText(t, x + 22, 360);
+    const x = 48 + i * 238, alto = andar === 1 ? 300 : 170;
+    ctx.fillStyle = "rgba(255,255,255,.08)"; retanguloArredondado(ctx, x, 110, 216, alto, 20); ctx.fill();
+    ctx.fillStyle = c; ctx.font = `700 ${andar === 1 ? 92 : 72}px Segoe UI, system-ui, sans-serif`; ctx.fillText(num(v), x + 22, andar === 1 ? 280 : 200, 180);
+    ctx.fillStyle = "rgba(255,255,255,.8)"; ctx.font = "500 30px Segoe UI, system-ui, sans-serif"; ctx.fillText(t, x + 22, andar === 1 ? 350 : 255, 190);
   });
-  ctx.fillStyle = "rgba(255,255,255,.55)"; ctx.font = "400 26px Segoe UI, system-ui, sans-serif";
-  ctx.fillText(`Atualizado ${new Date().toLocaleTimeString("pt-BR")}`, 48, 475);
-  if (tvTextura) tvTextura.needsUpdate = true;
+  if (andar === 2) {
+    const linhas = (estado.analiseHoje?.ultimo_resumo || []).slice(1, 5);
+    ctx.fillStyle = "rgba(255,255,255,.92)"; ctx.font = "600 26px Segoe UI, system-ui, sans-serif";
+    ctx.fillText(linhas.length ? `Último resumo · ${estado.analiseHoje.ultimo_arquivo}` : "Nenhuma análise hoje ainda", 48, 330, l - 96);
+    ctx.font = "400 23px Segoe UI, system-ui, sans-serif"; ctx.fillStyle = "rgba(255,255,255,.8)";
+    linhas.forEach((t, i) => ctx.fillText(String(t).trim(), 48, 370 + i * 34, l - 96));
+  } else {
+    ctx.fillStyle = "rgba(255,255,255,.55)"; ctx.font = "400 26px Segoe UI, system-ui, sans-serif";
+    ctx.fillText(`Atualizado ${new Date().toLocaleTimeString("pt-BR")}`, 48, 475);
+  }
+  tv.textura.needsUpdate = true;
 }
 
-// ------------------------------------------------------------------ documentos (papel que anda entre as mesas)
+// ------------------------------------------------------------------ documentos (com elevador)
 function novoDocumento(arquivo) {
   const g = new THREE.Group();
   g.add(caixa(0.34, 0.02, 0.44, mat("#ffffff"), 0, 0, 0));
   const faixa = caixa(0.34, 0.025, 0.08, new THREE.MeshStandardMaterial({ color: "#2654d9" }), 0, 0.002, -0.17);
-  g.add(faixa);
-  g.position.copy(caixaEntrada); raiz.add(g);
-  const doc = { arquivo, g, faixa, de: g.position.clone(), para: g.position.clone(), t0: 0, dur: 0 };
+  g.add(faixa); g.position.copy(caixaEntrada); raiz.add(g);
+  const doc = { arquivo, g, faixa, andar: 1, rota: [] };
   estado.documentos.set(arquivo, doc);
   return doc;
 }
-function moverDocumento(doc, destino, dur) {
-  doc.de = doc.g.position.clone(); doc.para = destino.clone(); doc.t0 = performance.now(); doc.dur = dur;
+// devolve a duração total (ms); troca de andar passa pelo elevador
+function moverDocumento(doc, destino, dur, andarDestino = doc.andar) {
+  doc.rota = [];
+  if (andarDestino !== doc.andar) {
+    doc.rota.push({ para: pontoElevador(doc.andar), dur: Math.max(500, dur * 0.5), salto: true });
+    doc.rota.push({ para: pontoElevador(andarDestino), dur: 1500, vertical: true });
+    doc.rota.push({ para: destino.clone(), dur: Math.max(500, dur * 0.6), salto: true });
+    doc.andar = andarDestino;
+  } else {
+    doc.rota.push({ para: destino.clone(), dur, salto: true });
+  }
+  return doc.rota.reduce((t, s) => t + s.dur, 0);
 }
-function empilhar(pilha, base, cor) {
+function empilhar(pilha, base, cor, pai = raiz) {
   const folha = caixa(0.34, 0.02, 0.44, mat(cor), base.x + (Math.random() - 0.5) * 0.12, base.y + 0.01 + pilha.length * 0.025, base.z + (Math.random() - 0.5) * 0.1);
-  folha.rotation.y = (Math.random() - 0.5) * 0.4; raiz.add(folha); pilha.push(folha);
-  if (pilha.length > 14) raiz.remove(pilha.shift());
+  folha.rotation.y = (Math.random() - 0.5) * 0.4; pai.add(folha); pilha.push(folha);
+  if (pilha.length > 14) pai.remove(pilha.shift());
 }
 function atualizarPilhaEntrada() {
+  if (!caixaEntrada) return;
   const alvo = Math.min(8, Math.max(0, estado.fila.length - (estado.tocando ? 1 : 0)));
   while (pilhaEntrada.length > alvo) raiz.remove(pilhaEntrada.pop());
   while (pilhaEntrada.length < alvo) empilhar(pilhaEntrada, caixaEntrada, "#ffffff");
@@ -395,10 +569,14 @@ const DURACAO = { recepcao: 1.2, leitura: 1.6, limpeza: 1.8, validacao: 1.6, mod
 const FRASE = {
   recepcao: "recebeu", leitura: "está lendo", limpeza: "está limpando", validacao: "está auditando",
   modelagem: "está modelando para o Power BI", banco: "está carregando no PostgreSQL", publicacao: "está publicando",
+  analise_perfil: "está traçando o perfil de", analise_indicadores: "está calculando os indicadores de",
+  analise_estatistica: "está testando o que é diferença real em", analise_monitoramento: "está comparando com as cargas anteriores",
+  analise_relator: "está escrevendo o resumo executivo de",
 };
 
 function idAgente(etapa) {
   if (etapa.startsWith("agente:")) return etapa.slice(7);
+  if (etapa.startsWith("analise:")) return `analise_${etapa.slice(8)}`;
   return ETAPA_NATIVA.has(etapa) ? etapa : null;
 }
 
@@ -412,28 +590,42 @@ function definirSituacao(id, situacao, segundos = 0) {
   desenharEquipe();
 }
 
+function seguirPara(andar) {
+  const livre = performance.now() - estado.ultimoManual > 8000;
+  if (estado.seguir && livre && estado.andarVisivel !== "predio" && estado.andarVisivel !== andar) irParaAndar(andar);
+}
+
 function iniciarEvento(ev) {
-  const velocidade = estado.filaEventos.length > 10 ? 0.35 : estado.filaEventos.length > 4 ? 0.6 : 1;
-  const dur = (DURACAO[ev.etapa] || 1.4) * velocidade;
+  const velocidade = estado.filaEventos.length > 12 ? 0.35 : estado.filaEventos.length > 5 ? 0.6 : 1;
+  const dur = (DURACAO[ev.etapa] || 1.5) * velocidade;
   const curto = ev.arquivo.length > 38 ? `${ev.arquivo.slice(0, 35)}…` : ev.arquivo;
   let doc = estado.documentos.get(ev.arquivo);
 
   if (ev.etapa === "concluido" || ev.etapa === "adiado") {
     doc = doc || novoDocumento(ev.arquivo);
-    const pub = "publicacao";
+    let total, final;
     if (ev.etapa === "adiado") {
-      doc.faixa.material.color.set("#f59e0b"); moverDocumento(doc, caixaEntrada, dur * 1000);
-      definirSituacao(pub, "parado"); narrar(`⏳ ${curto} adiado — o robô tenta de novo em instantes`);
+      doc.faixa.material.color.set("#f59e0b"); total = moverDocumento(doc, caixaEntrada, dur * 1000, 1); final = "entrada";
+      definirSituacao("publicacao", "parado"); narrar(`⏳ ${curto} adiado — o robô tenta de novo em instantes`);
     } else if (ev.status === "sucesso") {
-      doc.faixa.material.color.set("#16a34a"); moverDocumento(doc, caixaTratadas.clone().add(new THREE.Vector3(0, 0.3, 0)), dur * 1000);
-      definirSituacao(pub, "ok", 2.2);
-      narrar(`✅ ${curto} aprovado — ${num(ev.linhas)} linhas prontas em Bases-Tratadas${ev.banco ? " e no PostgreSQL" : ""}`);
+      doc.faixa.material.color.set("#16a34a");
+      if (doc.andar === 2) {
+        total = moverDocumento(doc, prateleira.mundo, dur * 1000, 2); final = "relatorios";
+        empilhar(pilhaTratadas, caixaTratadas, "#dcfce7");
+        definirSituacao("analise_relator", "ok", 2.2);
+        narrar(`✅ ${curto} aprovado — ${num(ev.linhas)} linhas em Bases-Tratadas${ev.banco ? " e no PostgreSQL" : ""}; análise em Bases-Relatorios`);
+      } else {
+        total = moverDocumento(doc, caixaTratadas.clone().add(new THREE.Vector3(0, 0.3, 0)), dur * 1000, 1); final = "tratadas";
+        definirSituacao("publicacao", "ok", 2.2);
+        narrar(`✅ ${curto} aprovado — ${num(ev.linhas)} linhas prontas em Bases-Tratadas${ev.banco ? " e no PostgreSQL" : ""}`);
+      }
     } else {
-      doc.faixa.material.color.set("#dc2626"); moverDocumento(doc, caixaErros.clone().add(new THREE.Vector3(0, 0.3, 0)), dur * 1000);
-      definirSituacao("validacao", "erro", 3); definirSituacao(pub, "parado");
+      doc.faixa.material.color.set("#dc2626"); total = moverDocumento(doc, caixaErros.clone().add(new THREE.Vector3(0, 0.3, 0)), dur * 1000, 1); final = "erros";
+      definirSituacao("validacao", "erro", 3); definirSituacao("publicacao", "parado");
       narrar(`⛔ ${curto} reprovado — ${num(ev.erros)} erro(s). Veja em Reprovados no painel`);
     }
-    estado.tocando = { ev, fim: performance.now() + dur * 1000, doc, final: ev.etapa === "adiado" ? "entrada" : ev.status === "sucesso" ? "tratadas" : "erros" };
+    seguirPara(doc.andar);
+    estado.tocando = { ev, fim: performance.now() + Math.max(dur * 1000, total + 200), doc, final };
     return;
   }
 
@@ -442,12 +634,14 @@ function iniciarEvento(ev) {
   if (!est) { estado.tocando = { ev, fim: performance.now() + 50 }; return; }
   doc = doc || novoDocumento(ev.arquivo);
   doc.faixa.material.color.set(est.agente.cor);
-  moverDocumento(doc, est.mesaPos, Math.min(900, dur * 450));
+  const trocaAndar = est.andar !== doc.andar;
+  const deslocamento = moverDocumento(doc, est.mesaPos, Math.min(900, dur * 450), est.andar);
+  seguirPara(est.andar);
   estado.equipe.forEach((a) => { const e = estado.estacoes.get(a.id); if (e && e.situacao === "trabalhando") definirSituacao(a.id, e.inativo ? "desligado" : "parado"); });
   definirSituacao(id, "trabalhando");
-  const frase = FRASE[ev.etapa] || "está trabalhando em";
-  narrar(`${est.agente.nome} (${est.agente.papel || "agente"}) ${frase} ${curto}`);
-  estado.tocando = { ev, fim: performance.now() + dur * 1000, id };
+  const frase = FRASE[id] || FRASE[ev.etapa] || "está trabalhando em";
+  narrar(`${trocaAndar ? "⬆ Subiu para a análise · " : ""}${est.agente.nome} (${est.agente.papel || "agente"}) ${frase} ${curto}`);
+  estado.tocando = { ev, fim: performance.now() + dur * 1000 + (trocaAndar ? deslocamento : 0), id };
 }
 
 function finalizarEvento() {
@@ -458,27 +652,34 @@ function finalizarEvento() {
     raiz.remove(t.doc.g); estado.documentos.delete(t.doc.arquivo);
     if (t.final === "tratadas") empilhar(pilhaTratadas, caixaTratadas, "#dcfce7");
     else if (t.final === "erros") empilhar(pilhaErros, caixaErros, "#fee2e2");
+    else if (t.final === "relatorios") empilhar(pilhaRelatorios, prateleira.local, "#ede9fe", andares[2]);
   }
 }
 
 function narrar(texto) { $("#hud-agora").textContent = texto; }
 
-// ------------------------------------------------------------------ interface lateral (equipe e ficha)
+// ------------------------------------------------------------------ interface lateral (equipe e ficha profissional)
 const NOME_SITUACAO = { parado: "livre", trabalhando: "trabalhando", ok: "concluiu", erro: "barrou", desligado: "desligado" };
 const CLASSE_SITUACAO = { trabalhando: "trabalhando", ok: "ok", erro: "erro", desligado: "desligado" };
 
 function desenharEquipe() {
-  const html = [`<h3>Equipe (${estado.equipe.length})</h3>`];
-  for (const a of estado.equipe) {
-    const e = estado.estacoes.get(a.id); const sit = e?.situacao || "parado";
-    const n = estado.agentesNumeros[a.id];
-    const detalhe = n ? `${num(n.valor)} ${n.rotulo}` : a.skills.length ? `${a.skills.length} skill(s)` : a.papel;
-    html.push(`<button class="membro ${estado.selecionado === a.id ? "selecionado" : ""}" data-agente="${esc(a.id)}">
-      <span class="avatar" style="background:${esc(a.cor)}">${esc(a.nome.slice(0, 1))}</span>
-      <span class="info"><strong>${esc(a.nome)} · ${esc(a.papel)}</strong><small>${esc(detalhe)}</small></span>
-      <span class="estado ${CLASSE_SITUACAO[sit] || ""}">${NOME_SITUACAO[sit]}</span></button>`);
+  const html = [];
+  for (const andar of [2, 1]) {
+    const membros = estado.equipe.filter((a) => (a.andar === 2 ? 2 : 1) === andar);
+    if (!membros.length) continue;
+    html.push(`<h3><button class="link-andar" data-ir-andar="${andar}">${NOME_ANDAR[andar]} (${membros.length})</button></h3>`);
+    for (const a of membros) {
+      const e = estado.estacoes.get(a.id); const sit = e?.situacao || "parado";
+      const n = estado.agentesNumeros[a.id];
+      const detalhe = n ? `${num(n.valor)} ${n.rotulo}` : a.skills.length ? `${a.skills.length} skill(s)` : a.papel;
+      const nivel = a.ficha?.nivel ? `<em class="nivel">${esc(a.ficha.nivel)}</em>` : "";
+      html.push(`<button class="membro ${estado.selecionado === a.id ? "selecionado" : ""}" data-agente="${esc(a.id)}">
+        <span class="avatar" style="background:${esc(a.cor)}">${esc(a.nome.slice(0, 1))}</span>
+        <span class="info"><strong>${esc(a.nome)} · ${esc(a.papel)}</strong><small>${nivel}${esc(detalhe)}</small></span>
+        <span class="estado ${CLASSE_SITUACAO[sit] || ""}">${NOME_SITUACAO[sit]}</span></button>`);
+    }
   }
-  html.push(`<div style="padding:10px 14px"><a class="btn pequeno" style="width:100%" href="index.html#agentes">Gerenciar agentes e skills</a></div>`);
+  html.push(`<div style="padding:10px 14px"><a class="btn pequeno" style="width:100%" href="index.html#agentes">Equipe, contratações e skills</a></div>`);
   $("#hud-equipe").innerHTML = html.join("");
 }
 
@@ -487,15 +688,25 @@ function mostrarFicha(id) {
   const ficha = $("#hud-ficha");
   if (!a) { ficha.hidden = true; estado.selecionado = null; desenharEquipe(); return; }
   estado.selecionado = id;
-  const n = estado.agentesNumeros[id];
+  const n = estado.agentesNumeros[id], f = a.ficha || {};
+  const lista = (titulo, itens) => itens?.length ? `<div><div class="secao-titulo">${titulo}</div><ul class="ficha-lista">${itens.map((x) => `<li>${esc(x)}</li>`).join("")}</ul></div>` : "";
   ficha.innerHTML = `<header><span class="avatar" style="background:${esc(a.cor)}">${esc(a.nome.slice(0, 1))}</span>
-      <div><h2>${esc(a.nome)}</h2><span class="muted">${esc(a.papel)}${a.nativo ? " · nativo" : ""}</span></div>
+      <div><h2>${esc(a.nome)}</h2><span class="muted">${esc(f.cargo || a.papel)}</span></div>
       <button class="btn fantasma pequeno fechar" data-fechar aria-label="Fechar">✕</button></header>
+    <div class="chips-colunas">${f.nivel ? `<span class="etiqueta info">${esc(f.nivel)}</span>` : ""}${f.area ? `<span class="etiqueta">${esc(f.area)}</span>` : ""}
+      ${f.provas ? `<span class="etiqueta ${f.provas.aprovado ? "sucesso" : "perigo"}">Provas técnicas ${f.provas.acertos}/${f.provas.total}</span>` : ""}
+      <span class="etiqueta">${NOME_ANDAR[a.andar === 2 ? 2 : 1].split(" · ")[0]}</span></div>
     <p>${esc(a.descricao)}</p>
     ${n ? `<div><div class="numero">${num(n.valor)}</div><span class="muted">${esc(n.rotulo)}</span></div>` : ""}
-    ${a.aceita_skills ? `<div><div class="secao-titulo">Skills</div>${a.skills.length ? `<div class="chips-colunas">${a.skills.map((s) => `<span class="chip-coluna">${esc(s)}</span>`).join("")}</div>` : `<p class="muted">Nenhuma skill extra.</p>`}</div>
-      <a class="btn" href="index.html#agentes">Configurar skills</a>` : `<p class="muted">Agente de infraestrutura: não usa skills de dados.</p>`}`;
+    ${lista("Metodologias e referências", f.metodologias)}
+    ${lista("Responsabilidades", f.responsabilidades)}
+    ${lista("Critérios de qualidade", f.criterios)}
+    ${lista("O que não faz (limites)", f.limites)}
+    ${a.aceita_skills ? `<div><div class="secao-titulo">Skills</div>${a.skills.length ? `<div class="chips-colunas">${a.skills.map((s) => `<span class="chip-coluna">${esc(s)}</span>`).join("")}</div>` : `<p class="muted">Nenhuma skill extra.</p>`}</div>` : ""}
+    <a class="btn" href="index.html#agentes">Ver ficha completa no painel</a>`;
   ficha.hidden = false;
+  const est = estado.estacoes.get(id);
+  if (est && est.andar !== estado.andarVisivel && estado.andarVisivel !== "predio") definirAndarVisivel(est.andar);
   focarAgente(id);
   desenharEquipe();
 }
@@ -503,20 +714,19 @@ function mostrarFicha(id) {
 let voo = null;
 function focarAgente(id) {
   const e = estado.estacoes.get(id); if (!e) return;
-  const alvo = e.grupo.position.clone().add(new THREE.Vector3(0, 1.2, 0.4));
+  const alvo = new THREE.Vector3(); e.grupo.getWorldPosition(alvo); alvo.add(new THREE.Vector3(0, 1.2, 0.4));
+  estado.ultimoManual = performance.now();
   voo = { t0: performance.now(), dur: 900, dePos: camera.position.clone(), deAlvo: controles.target.clone(),
           paraPos: alvo.clone().add(new THREE.Vector3(1.6, 3.4, 6.4)), paraAlvo: alvo };
 }
-function visaoGeral() {
-  if (!enquadramento) return;
-  voo = { t0: performance.now(), dur: 900, dePos: camera.position.clone(), deAlvo: controles.target.clone(),
-          paraPos: enquadramento.pos.clone(), paraAlvo: enquadramento.alvo.clone() };
-  $("#hud-ficha").hidden = true; estado.selecionado = null; desenharEquipe();
-}
 
-$("#hud-equipe").addEventListener("click", (e) => { const b = e.target.closest("[data-agente]"); if (b) mostrarFicha(b.dataset.agente); });
-$("#hud-ficha").addEventListener("click", (e) => { if (e.target.closest("[data-fechar]")) visaoGeral(); });
-$("#btn-camera").addEventListener("click", visaoGeral);
+$("#hud-equipe").addEventListener("click", (e) => {
+  const andar = e.target.closest("[data-ir-andar]"); if (andar) return irParaAndar(Number(andar.dataset.irAndar), true);
+  const b = e.target.closest("[data-agente]"); if (b) mostrarFicha(b.dataset.agente);
+});
+$("#hud-ficha").addEventListener("click", (e) => { if (e.target.closest("[data-fechar]")) irParaAndar(estado.andarVisivel, true); });
+$("#andares").addEventListener("click", (e) => { const b = e.target.closest("[data-andar]"); if (b) irParaAndar(b.dataset.andar === "predio" ? "predio" : Number(b.dataset.andar), true); });
+$("#btn-seguir").addEventListener("click", alternarSeguir);
 $("#btn-agora").addEventListener("click", async () => {
   try { await api("/api/robo/processar-agora", {}); avisar("Processando a fila agora…"); } catch (e) { avisar(e.message, "erro"); }
 });
@@ -530,42 +740,43 @@ $("#btn-enviar").addEventListener("click", () => {
   input.click();
 });
 
-// clique em um agente na cena
+// clique em um agente na cena (só o que está visível)
 const raio = new THREE.Raycaster(), ponteiro = new THREE.Vector2();
+const visivel = (o) => { for (let x = o; x; x = x.parent) if (!x.visible) return false; return true; };
+const alvoNoPonteiro = () => raio.intersectObjects(clicaveis, false).find((i) => visivel(i.object));
 let arrastou = false, inicioClique = null;
 renderer.domElement.addEventListener("pointerdown", (e) => { inicioClique = [e.clientX, e.clientY]; arrastou = false; });
 renderer.domElement.addEventListener("pointermove", (e) => {
   if (inicioClique && Math.hypot(e.clientX - inicioClique[0], e.clientY - inicioClique[1]) > 5) arrastou = true;
   ponteiro.set((e.clientX / innerWidth) * 2 - 1, -(e.clientY / innerHeight) * 2 + 1);
   raio.setFromCamera(ponteiro, camera);
-  renderer.domElement.style.cursor = raio.intersectObjects(clicaveis, false).length ? "pointer" : "grab";
+  renderer.domElement.style.cursor = alvoNoPonteiro() ? "pointer" : "grab";
 });
 renderer.domElement.addEventListener("pointerup", (e) => {
+  inicioClique = null;
   if (arrastou) return;
   ponteiro.set((e.clientX / innerWidth) * 2 - 1, -(e.clientY / innerHeight) * 2 + 1);
   raio.setFromCamera(ponteiro, camera);
-  const alvo = raio.intersectObjects(clicaveis, false)[0];
+  const alvo = alvoNoPonteiro();
   if (alvo) mostrarFicha(alvo.object.userData.agente);
 });
-addEventListener("resize", () => { camera.aspect = innerWidth / innerHeight; camera.updateProjectionMatrix(); renderer.setSize(innerWidth, innerHeight); });
-document.addEventListener("keydown", (e) => { if (e.key === "Escape") visaoGeral(); });
+addEventListener("resize", () => { camera.aspect = innerWidth / innerHeight; camera.updateProjectionMatrix(); renderer.setSize(innerWidth, innerHeight); if (geo) enquadrarCameras(); });
 
 // ------------------------------------------------------------------ dados do robô
 async function atualizar() {
   try {
     const d = await api(`/api/escritorio?desde=${estado.ultimoSeq}`);
     estado.ligado = d.ligado; estado.fila = d.fila || []; estado.agentesNumeros = d.agentes || {};
-    estado.bancoHabilitado = Boolean(d.banco_habilitado);
-    const chave = JSON.stringify((d.equipe || []).map((a) => [a.id, a.nome, a.papel, a.cor, a.ativo, a.skills.length])) + estado.bancoHabilitado;
+    estado.bancoHabilitado = Boolean(d.banco_habilitado); estado.analiseHoje = d.analise_hoje || null;
+    const chave = JSON.stringify((d.equipe || []).map((a) => [a.id, a.nome, a.papel, a.cor, a.ativo, a.andar, a.skills.length, a.ficha?.nivel])) + estado.bancoHabilitado;
     if (chave !== estado.chaveEquipe) {
       estado.chaveEquipe = chave; estado.equipe = d.equipe || [];
       estado.documentos.forEach((doc) => raiz.remove(doc.g)); estado.documentos.clear();
-      montarEscritorio(estado.equipe);
+      montarPredio(estado.equipe);
     }
     const agora = Date.now() / 1000;
     for (const ev of d.eventos || []) {
-      // ao abrir, não repete o que já aconteceu há mais de 20 s
-      if (!estado.iniciado && agora - ev.ts > 20) continue;
+      if (!estado.iniciado && agora - ev.ts > 20) continue; // ao abrir, não repete o que já passou
       estado.filaEventos.push(ev);
     }
     estado.ultimoSeq = Math.max(estado.ultimoSeq, d.ultimo_seq || 0);
@@ -575,26 +786,29 @@ async function atualizar() {
     if (!estado.tocando && !estado.filaEventos.length && !estado.documentos.size) {
       narrar(estado.fila.length ? `${estado.fila.length} arquivo(s) aguardando sincronização na recepção` : "Aguardando planilhas em Bases-Limpeza…");
     }
-    atualizarPilhaEntrada(); desenharEquipe();
+    atualizarPilhaEntrada(); desenharEquipe(); desenharTV(2);
   } catch {
     $("#hud-status").innerHTML = `<i class="ponto erro"></i>Sem conexão com o robô`;
   }
 }
 async function atualizarTV() {
-  try { estado.kpis = (await api("/api/estado")).kpis; desenharTV(); } catch { /* tenta de novo */ }
+  try { estado.kpis = (await api("/api/estado")).kpis; desenharTV(1); } catch { /* tenta de novo */ }
 }
 
 // ------------------------------------------------------------------ animação
 const relogio = new THREE.Clock();
+let ultimoQuadro = performance.now();
 function animar() {
   requestAnimationFrame(animar);
   const t = relogio.getElapsedTime(), agora = performance.now();
+  const dt = Math.min(0.05, (agora - ultimoQuadro) / 1000); ultimoQuadro = agora;
 
   if (!estado.tocando && estado.filaEventos.length) iniciarEvento(estado.filaEventos.shift());
   if (estado.tocando && agora >= estado.tocando.fim) finalizarEvento();
 
   for (const [id, e] of estado.estacoes) {
     if (e.ate && agora > e.ate) definirSituacao(id, e.inativo ? "desligado" : "parado");
+    if (e.andar === 2 && !andares[2]?.visible) continue;
     const fase = e.semente % 100;
     const { tronco, cabeca, bracos } = e.p;
     if (e.situacao === "trabalhando") {
@@ -605,9 +819,7 @@ function animar() {
       e.anel.rotation.z += 0.08;
       tronco.position.y = 0.66 + Math.abs(Math.sin(t * 9)) * 0.012;
     } else if (e.situacao === "erro") {
-      bracos[1].rotation.x = -2.9 + Math.sin(t * 8) * 0.15;
-      bracos[0].rotation.x = -1.15;
-      cabeca.rotation.x = -0.1;
+      bracos[1].rotation.x = -2.9 + Math.sin(t * 8) * 0.15; bracos[0].rotation.x = -1.15; cabeca.rotation.x = -0.1;
     } else if (e.situacao === "ok") {
       bracos[0].rotation.x = -2.6; bracos[1].rotation.x = -2.6;
       tronco.position.y = 0.66 + Math.abs(Math.sin(t * 6)) * 0.05;
@@ -622,7 +834,8 @@ function animar() {
       tronco.position.y = 0.66 + Math.sin(t * 1.6 + fase) * 0.006;
     }
     for (const s of [e.selos.ok, e.selos.erro]) if (s.visible) s.position.y = 2.0 + Math.sin(t * 4) * 0.05;
-    const distancia = camera.position.distanceTo(e.grupo.position);
+    const pos = new THREE.Vector3(); e.grupo.getWorldPosition(pos);
+    const distancia = camera.position.distanceTo(pos);
     e.etiqueta.material.opacity = id === estado.selecionado ? 1 : Math.min(1, Math.max(0, (distancia - 5) / 4));
   }
   const bancoTrabalhando = estado.estacoes.get("banco")?.situacao === "trabalhando";
@@ -632,19 +845,23 @@ function animar() {
   });
 
   for (const doc of estado.documentos.values()) {
-    if (!doc.dur) continue;
-    const k = Math.min(1, (agora - doc.t0) / doc.dur), s = k * k * (3 - 2 * k);
-    doc.g.position.lerpVectors(doc.de, doc.para, s);
-    doc.g.position.y += Math.sin(Math.PI * s) * 1.1;
-    doc.g.rotation.y = Math.sin(Math.PI * s) * 0.6;
-    if (k >= 1) doc.dur = 0;
+    doc.g.visible = doc.andar === 1 || Boolean(andares[2]?.visible);
+    const seg = doc.rota[0];
+    if (!seg) continue;
+    if (!seg.t0) { seg.t0 = agora; seg.de = doc.g.position.clone(); }
+    const k = Math.min(1, (agora - seg.t0) / seg.dur), s = k * k * (3 - 2 * k);
+    doc.g.position.lerpVectors(seg.de, seg.para, s);
+    if (seg.salto) { doc.g.position.y += Math.sin(Math.PI * s) * 1.1; doc.g.rotation.y = Math.sin(Math.PI * s) * 0.6; }
+    if (seg.vertical && elevador) { elevador.cabine.position.y = doc.g.position.y - 1.0; doc.g.visible = true; }
+    if (k >= 1) doc.rota.shift();
   }
 
+  caminhar(dt);
   if (voo) {
     const k = Math.min(1, (agora - voo.t0) / voo.dur), s = k * k * (3 - 2 * k);
     camera.position.lerpVectors(voo.dePos, voo.paraPos, s);
     controles.target.lerpVectors(voo.deAlvo, voo.paraAlvo, s);
-    if (k >= 1) voo = null;
+    if (k >= 1) { const fim = voo.aoTerminar; voo = null; if (fim) fim(); }
   }
   controles.update();
   renderer.render(cena, camera);

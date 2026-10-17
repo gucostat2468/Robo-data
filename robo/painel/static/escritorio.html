@@ -18,10 +18,15 @@
     <img src="robo.svg" width="28" height="28" alt="">
     <div><strong>Escritório dos Robôs</strong><span id="hud-status"><i class="ponto"></i>Conectando…</span></div>
   </div>
+  <div class="segmentado andares" id="andares" role="group" aria-label="Andar">
+    <button data-andar="1" class="ativo" title="Tecla 1">1º andar</button>
+    <button data-andar="2" title="Tecla 2">2º andar</button>
+    <button data-andar="predio" title="Tecla 3">Prédio</button>
+  </div>
   <div class="acoes">
+    <button class="btn ativo" id="btn-seguir" aria-pressed="true" title="Tecla F: a câmera acompanha o documento entre os andares"><svg class="icone" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3"/></svg>Seguir documento</button>
     <button class="btn" id="btn-enviar"><svg class="icone" viewBox="0 0 24 24"><path d="M12 16V4"/><path d="m7 9 5-5 5 5"/><path d="M4 16v3a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1v-3"/></svg>Enviar planilha</button>
     <button class="btn" id="btn-agora"><svg class="icone" viewBox="0 0 24 24"><path d="M13 2 4 14h7l-1 8 9-12h-7z"/></svg>Processar agora</button>
-    <button class="btn" id="btn-camera" title="Voltar à visão geral"><svg class="icone" viewBox="0 0 24 24"><path d="M3 7V5a2 2 0 0 1 2-2h2M17 3h2a2 2 0 0 1 2 2v2M21 17v2a2 2 0 0 1-2 2h-2M7 21H5a2 2 0 0 1-2-2v-2"/></svg>Visão geral</button>
   </div>
 </header>
 
@@ -31,7 +36,7 @@
 
 <footer class="hud-rodape">
   <div class="hud-agora" id="hud-agora">Aguardando planilhas em Bases-Limpeza…</div>
-  <div class="hud-dica">Arraste para girar · role para aproximar · clique num agente para saber o que ele faz</div>
+  <div class="hud-dica">W A S D ou setas: andar · Q/E: girar · Shift: mais rápido · 1, 2, 3: andares · arraste para girar · role para aproximar · clique num agente para ver a ficha</div>
 </footer>
 
 <div class="sem-3d" id="sem-3d" hidden>

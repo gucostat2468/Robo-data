@@ -170,10 +170,15 @@ class Api:
         soma = lambda lista, campo: sum(int(x.get(campo) or 0) for x in lista)
         com_banco = [x for x in ok if "tratado." in (x.get("saidas") or "")]
         from robo.pipeline import obter_equipe
+        from robo.analise import ANALISTAS, PADRAO_ANALISE
         equipe = [{"id": a["id"], "nome": a["nome"], "papel": a.get("papel", ""), "cor": a.get("cor", "#64748B"),
                    "descricao": a.get("descricao", ""), "nativo": a.get("nativo", False), "ativo": a.get("ativo", True),
                    "skills": [s.get("skill") for s in a.get("skills", []) if s.get("ativo", True)],
-                   "aceita_skills": a.get("aceita_skills", True)} for a in obter_equipe(cfg).lista()]
+                   "aceita_skills": a.get("aceita_skills", True), "andar": 1} for a in obter_equipe(cfg).lista()]
+        cfg_analise = {**PADRAO_ANALISE, **(cfg.dados.get("analise") or {})}
+        desligados = set(cfg_analise.get("analistas_desligados") or [])
+        equipe += [{**a, "id": f"analise_{a['id']}", "nativo": True, "aceita_skills": False, "skills": [], "andar": 2,
+                    "ativo": bool(cfg_analise.get("habilitado", True)) and a["id"] not in desligados} for a in ANALISTAS]
         dados.update({
             "equipe": equipe,
             "fila": c.monitor.estado_fila() if c.monitor else [],
@@ -187,9 +192,48 @@ class Api:
                 "banco": {"valor": soma(com_banco, "linhas_saida"), "rotulo": "linhas carregadas hoje",
                           "inativo": not cfg.banco.get("habilitado")},
                 "publicacao": {"valor": len(ok), "rotulo": "planilhas publicadas hoje"},
+                **self._numeros_analise(hoje),
             },
+            "analise_hoje": self._analise_hoje(hoje),
         })
         return dados
+
+    def _analises_do_dia(self, hoje: str) -> list[dict]:
+        pasta = self.cfg.logs / "analises"
+        if not pasta.exists():
+            return []
+        itens = []
+        for arq in sorted(pasta.glob("2*.json"), key=lambda p: p.stat().st_mtime, reverse=True)[:200]:
+            if datetime.fromtimestamp(arq.stat().st_mtime).strftime("%Y-%m-%d") != hoje:
+                break
+            try:
+                itens.append(json.loads(arq.read_text(encoding="utf-8")))
+            except (OSError, json.JSONDecodeError):
+                continue
+        return itens
+
+    def _numeros_analise(self, hoje: str) -> dict:
+        a = self._analises_do_dia(hoje)
+        conta = lambda chave, filtro=lambda x: True: sum(1 for d in a for x in (d.get(chave) or []) if filtro(x))
+        return {
+            "analise_perfil": {"valor": conta("perfil"), "rotulo": "colunas descritas hoje"},
+            "analise_indicadores": {"valor": conta("indicadores", lambda x: x.get("segmento") == "Total"),
+                                    "rotulo": "indicadores calculados hoje"},
+            "analise_estatistica": {"valor": conta("destaques", lambda x: x.get("significativo")),
+                                    "rotulo": "diferenças reais encontradas hoje"},
+            "analise_monitoramento": {"valor": conta("alertas", lambda x: x.get("nivel") == "atenção"),
+                                      "rotulo": "alertas de atenção hoje"},
+            "analise_relator": {"valor": len(a), "rotulo": "resumos escritos hoje"},
+        }
+
+    def _analise_hoje(self, hoje: str) -> dict:
+        a = self._analises_do_dia(hoje)
+        ultimo = a[0] if a else None
+        return {"bases": len(a),
+                "destaques": sum(1 for d in a for x in (d.get("destaques") or []) if x.get("significativo")),
+                "alertas": sum(1 for d in a for x in (d.get("alertas") or []) if x.get("nivel") == "atenção"),
+                "ultimo_arquivo": ultimo.get("arquivo") if ultimo else None,
+                "ultimo_resumo": [r.get("resumo_executivo") for r in (ultimo.get("resumo") or [])][:7] if ultimo else []}
 
     def historico(self, q) -> dict:
         limite = int(q.get("limite", ["500"])[0])

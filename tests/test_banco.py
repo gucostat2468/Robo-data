@@ -85,6 +85,11 @@ def test_elt_completo_bruto_tratado_analitico(planilha_baguncada, cfg_factory, b
     lotes = _q(banco_cfg, "SELECT status, linhas_saida FROM robo.lotes")
     assert lotes == [("sucesso", 4)]
     assert _q(banco_cfg, "SELECT count(*) FROM tratado.dim_calendario")[0][0] == 365
+    # 2º andar: análise gravada no schema analise, ligada ao lote
+    nps = _q(banco_cfg, "SELECT valor, n FROM analise.indicadores WHERE indicador = 'NPS' AND segmento = 'Total'")
+    assert nps and nps[0][1] == 4
+    assert _q(banco_cfg, "SELECT count(*) FROM analise.resumo")[0][0] >= 2
+    assert _q(banco_cfg, "SELECT DISTINCT lote_id FROM analise.perfil") == [(r.id,)]
 
 
 def test_reprocessar_mesmo_arquivo_nao_duplica(pastas, cfg_factory, banco_cfg):

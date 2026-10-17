@@ -66,3 +66,14 @@ body.escritorio { overflow: hidden; background: #dfe6ef; }
   .hud-rodape { right: 16px; }
   .hud-topo .acoes .btn span, #btn-camera { display: none; }
 }
+
+.hud-topo .andares { box-shadow: var(--sombra); background: color-mix(in srgb, var(--superficie) 90%, transparent); backdrop-filter: blur(8px); }
+.hud-topo .btn.ativo { background: var(--primaria-suave); color: var(--primaria); border-color: color-mix(in srgb, var(--primaria) 40%, var(--borda)); }
+.hud-equipe h3 { margin: 0; }
+.link-andar { border: 0; background: transparent; padding: 0; font: inherit; color: inherit; text-transform: inherit; letter-spacing: inherit; cursor: pointer; }
+.link-andar:hover { color: var(--primaria); }
+.membro .nivel { font-style: normal; font-weight: 700; color: var(--primaria); margin-right: 6px; }
+.hud-ficha { max-height: calc(100vh - 170px); overflow-y: auto; }
+.ficha-lista { margin: 0; padding-left: 18px; color: var(--texto-2); font-size: 13px; }
+.ficha-lista li { margin: 2px 0; }
+@media (max-width: 1200px) { .hud-topo .acoes .btn:not(#btn-agora) { padding: 0 10px; } }

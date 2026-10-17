@@ -78,6 +78,16 @@ PADROES: dict = {
         "modo_carga_padrao": "por_arquivo",
         "tempo_limite_conexao": 5,
     },
+    # 2º andar: análise automática após cada publicação (ver robo/analise.py)
+    "analise": {
+        "habilitado": True,
+        "base_minima": 30,
+        "confianca": 0.95,
+        "max_categorias": 30,
+        "max_segmentos": 10,
+        "variacao_alerta_pct": 30,
+        "analistas_desligados": [],
+    },
     "painel": {
         "porta": 8765,
         "ligar_robo_ao_abrir": True,
