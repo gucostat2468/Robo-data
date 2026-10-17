@@ -73,7 +73,7 @@ class ErroAgente(Exception):
 
 def _padrao_agente(dados: dict) -> dict:
     a = {"id": "", "nome": "", "papel": "", "descricao": "", "cor": "#64748B", "posicao": "limpeza", "ordem": 50,
-         "ativo": True, "aplicar_em": ["*"], "skills": []}
+         "ativo": True, "aplicar_em": ["*"], "skills": [], "nivel": "pleno", "area": "", "cargo": "", "mentor": ""}
     a.update({k: v for k, v in (dados or {}).items() if v is not None})
     if isinstance(a["aplicar_em"], str):
         a["aplicar_em"] = [p.strip() for p in a["aplicar_em"].split(",") if p.strip()] or ["*"]
@@ -97,6 +97,10 @@ def validar_agente(a: dict, nativo: bool = False) -> list[str]:
             problemas.append(f"posição inválida (use: {', '.join(POSICOES)})")
         if not re.match(r"^#[0-9a-fA-F]{6}$", str(a.get("cor", ""))):
             problemas.append("cor inválida (use o formato #RRGGBB)")
+    from robo import rh
+    nivel = a.get("nivel") or "pleno"
+    if not nativo and nivel not in rh.NIVEIS:
+        problemas.append(f"nível inválido (use: {', '.join(rh.NIVEIS)})")
     for i, s in enumerate(a.get("skills") or [], 1):
         sk = catalogo_skills.REGISTRO.get(s.get("skill", ""))
         if sk is None:
@@ -106,7 +110,34 @@ def validar_agente(a: dict, nativo: bool = False) -> list[str]:
             catalogo_skills.preparar_parametros(sk, s.get("parametros") or {})
         except catalogo_skills.ErroSkill as e:
             problemas.append(f"skill {i} ({sk.nome}): {e}")
+            continue
+        if s.get("ativo", True) and not nativo and nivel in rh.NIVEIS:
+            risco = rh.risco_de(sk.id, s.get("parametros"))
+            if not rh.nivel_permite(nivel, risco):
+                problemas.append(f"skill {i} ({sk.nome}) tem risco {rh.NOME_RISCO[risco]} e o nível "
+                                 f"{rh.NOME_NIVEL[nivel]} não permite: promova o agente ou passe a tarefa a um sênior")
     return problemas
+
+
+def _diferencas(antes: pd.DataFrame, depois: pd.DataFrame) -> str:
+    partes = []
+    if len(depois) != len(antes):
+        partes.append(f"{len(antes)} → {len(depois)} linhas")
+    novas = [c for c in depois.columns if c not in antes.columns]
+    saidas = [c for c in antes.columns if c not in depois.columns]
+    if novas:
+        partes.append(f"criaria {', '.join(novas)}")
+    if saidas:
+        partes.append(f"removeria {', '.join(saidas)}")
+    comuns = [c for c in antes.columns if c in depois.columns]
+    idx = antes.index.intersection(depois.index)
+    alteradas = 0
+    for c in comuns:
+        a, b = antes.loc[idx, c].astype(object), depois.loc[idx, c].astype(object)
+        alteradas += int((~((a == b) | (a.isna() & b.isna()))).sum())
+    if alteradas:
+        partes.append(f"alteraria {alteradas} célula(s)")
+    return "; ".join(partes) or "nenhuma alteração"
 
 
 class Equipe:
@@ -140,7 +171,13 @@ class Equipe:
                         self.problemas[arq.stem] = p
                 continue
             a = _padrao_agente({**dados, "id": dados.get("id") or arq.stem})
-            if p := validar_agente(a):
+            p = validar_agente(a)
+            if not p and a.get("ativo", True):
+                from robo import rh
+                selecao = rh.processo_seletivo(a)
+                if not selecao["aprovado"]:
+                    p = ["não aprovado no processo seletivo técnico"] + selecao["bloqueios"]
+            if p:
                 self.problemas[a["id"]] = p
             self.personalizados.append(a)
         self.personalizados.sort(key=lambda a: (POSICOES.index(a["posicao"]) if a["posicao"] in POSICOES else 9,
@@ -148,6 +185,7 @@ class Equipe:
 
     def lista(self) -> list[dict]:
         """Todos os agentes, na ordem em que trabalham (usada pelo painel e pelo escritório 3D)."""
+        from robo import rh
         resultado = []
         for n in NATIVOS:
             item = {**deepcopy(n), "nativo": True, "ativo": True, "aplicar_em": ["*"],
@@ -155,6 +193,9 @@ class Equipe:
                     "problemas": self.problemas.get(n["id"], [])}
             extras = [{**deepcopy(a), "nativo": False, "aceita_skills": True, "problemas": self.problemas.get(a["id"], [])}
                       for a in self.personalizados if a["posicao"] == n["id"]]
+            item["ficha"] = rh.ficha(item)
+            for x in extras:
+                x["ficha"] = rh.ficha(x)
             if n["id"] == "modelagem":
                 resultado += extras + [item]  # agentes "modelagem" trabalham ANTES da modelagem nativa
             else:
@@ -180,6 +221,15 @@ class Equipe:
                     ao_etapa(f"agente:{a['id']}", arquivo)
                 except Exception:
                     pass
+            if a.get("nivel") == "estagiario":
+                # MODO OBSERVAÇÃO: o estagiário trabalha numa cópia; o dado publicado não muda
+                from robo.relatorio import Relatorio
+                rel_obs = Relatorio(arquivo)
+                copia = self._executar_skills(df.copy(), a["skills"], rel_obs, tabela, arquivo, f"{a['nome']} (estagiário)")
+                achados = [f"{o.nivel}: {o.mensagem}" for o in rel_obs.ocorrencias if o.nivel != "INFO"]
+                rel.info(f"Estagiário {a['nome']} em observação (nada foi alterado): {_diferencas(df, copia)}"
+                         + (f"; encontraria {len(achados)} ocorrência(s)" if achados else ""), tabela=tabela, exemplos=achados)
+                continue
             antes = len(df)
             df = self._executar_skills(df, a["skills"], rel, tabela, arquivo, f"{a['nome']} ({a['papel'] or 'agente'})")
             rel.info(f"Agente {a['nome']} concluiu {len([s for s in a['skills'] if s.get('ativo', True)])} skill(s): "
@@ -207,12 +257,16 @@ class Equipe:
         problemas = validar_agente(a, nativo=nativo)
         if problemas:
             raise ErroAgente("; ".join(problemas))
+        from robo import rh
+        selecao = rh.processo_seletivo({**a, "nivel": a.get("nivel") if not nativo else "especialista"})
+        if not selecao["aprovado"]:
+            raise ErroAgente("Não aprovado no processo seletivo técnico: " + "; ".join(selecao["bloqueios"]))
         self.pasta.mkdir(parents=True, exist_ok=True)
         if nativo:
             conteudo = {"skills": a["skills"]}
         else:
-            conteudo = {k: a[k] for k in ("id", "nome", "papel", "descricao", "cor", "posicao", "ordem", "ativo",
-                                          "aplicar_em", "skills")}
+            conteudo = {k: a[k] for k in ("id", "nome", "papel", "cargo", "nivel", "area", "mentor", "descricao", "cor",
+                                          "posicao", "ordem", "ativo", "aplicar_em", "skills")}
         texto = ("# Agente do Robô de Planilhas — editado pelo painel (pode editar à mão também)\n"
                  + yaml.safe_dump(conteudo, allow_unicode=True, sort_keys=False, default_flow_style=False))
         (self.pasta / f"{agente_id}.yaml").write_text(texto, encoding="utf-8")

@@ -259,6 +259,7 @@ class Banco:
         """Grava o conteúdo original (texto) de cada aba em bruto.<base>[_<aba>]."""
         schema = self.schemas["bruto"]
         gravadas = []
+        self.esperado_bruto: dict[str, int] = {}
         varias = len(brutas) > 1
         for aba, df in brutas.items():
             tabela = f"{base}_{normalizar_nome_coluna(aba)}" if varias else base
@@ -280,6 +281,7 @@ class Banco:
             tipos = self._garantir_tabela(conn, schema, tabela, tipos)
             self._apagar(conn, schema, tabela, "_arquivo_origem = %s", (arquivo,))
             self._copiar(conn, schema, tabela, dados, tipos)
+            self.esperado_bruto[tabela] = len(dados)
             gravadas.append(f"{schema}.{tabela}")
         return gravadas
 
@@ -294,6 +296,8 @@ class Banco:
 
         tabelas = {n: df.copy() for n, df in tabelas.items()}
         gravadas = []
+        self.esperado_tratado: dict[tuple, int] = {}
+        self.chaves_estrangeiras: list[tuple] = []
 
         # 1) dimensões: chaves estáveis entre cargas (o mesmo curso mantém o mesmo id para sempre)
         for nome, df in list(tabelas.items()):
@@ -335,8 +339,38 @@ class Banco:
                     raise ErroCargaDados(f"Modo 'mesclar' precisa de 'chave' com colunas existentes (recebi {chave})")
                 self._apagar_por_chave(conn, schema, tabela, df, chave)
             self._copiar(conn, schema, tabela, df, tipos)
+            self.esperado_tratado[(schema, tabela)] = len(df)
+            for nome_dim, dim in tabelas.items():
+                if nome_dim in dims_cfg and dim.columns[0] in df.columns:
+                    self.chaves_estrangeiras.append((schema, tabela, dim.columns[0], nome_dim))
             gravadas.append(f"{schema}.{tabela}")
         return gravadas
+
+    def reconciliar(self, conn, lote_id: str, esperado_bruto: dict[str, int]) -> list[str]:
+        """DBA: confere DENTRO da transação (antes do commit) se o banco recebeu exatamente o esperado.
+        Levanta ErroCargaDados se algo não bater — a carga inteira é desfeita."""
+        _, sql = _psycopg()
+        conferidos, divergencias = [], []
+        alvos = [((self.schemas["bruto"], t), n) for t, n in esperado_bruto.items()] + list(getattr(self, "esperado_tratado", {}).items())
+        for (schema, tabela), n in alvos:
+            obtido = conn.execute(sql.SQL("SELECT count(*) FROM {} WHERE _lote_id = %s").format(
+                sql.Identifier(schema, tabela)), (lote_id,)).fetchone()[0]
+            if obtido != n:
+                divergencias.append(f"{schema}.{tabela}: esperado {n}, no banco {obtido}")
+            else:
+                conferidos.append(f"{schema}.{tabela} ({n})")
+        for schema, fato, chave, dim in getattr(self, "chaves_estrangeiras", []):
+            orfas = conn.execute(sql.SQL(
+                "SELECT count(*) FROM {} f LEFT JOIN {} d ON f.{} = d.{} WHERE f._lote_id = %s AND f.{} IS NOT NULL AND d.{} IS NULL"
+            ).format(sql.Identifier(schema, fato), sql.Identifier(schema, dim), sql.Identifier(chave), sql.Identifier(chave),
+                     sql.Identifier(chave), sql.Identifier(chave)), (lote_id,)).fetchone()[0]
+            if orfas:
+                divergencias.append(f"{schema}.{fato}.{chave}: {orfas} chave(s) sem correspondência em {dim}")
+            else:
+                conferidos.append(f"integridade {fato} → {dim}")
+        if divergencias:
+            raise ErroCargaDados("DBA barrou a carga na reconciliação: " + "; ".join(divergencias))
+        return conferidos
 
     def _apagar_por_chave(self, conn, schema, tabela, df, chave):
         _, sql = _psycopg()

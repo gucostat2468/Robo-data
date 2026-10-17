@@ -55,6 +55,8 @@ class Resultado:
     id: str = ""
     motivo_adiamento: str = ""
     analise: dict | None = None
+    checklist: dict | None = None
+    checklist_analise: dict | None = None
 
 
 @dataclass
@@ -175,7 +177,8 @@ def _resumo_tabelas(tabelas: dict) -> list[dict]:
             for n, df in tabelas.items()]
 
 
-def _carregar_banco(cfg: Config, caminho: Path, t: _Tratamento, rel: Relatorio, lote_id: str, aprovado: bool) -> list[str]:
+def _carregar_banco(cfg: Config, caminho: Path, t: _Tratamento, rel: Relatorio, lote_id: str, aprovado: bool,
+                    ao_etapa=None) -> list[str]:
     """Uma transação por arquivo. Levanta ErroBancoIndisponivel (adiar) ou registra erro no relatório (reprovar)."""
     from robo.banco import Banco, ErroCargaDados
 
@@ -192,6 +195,9 @@ def _carregar_banco(cfg: Config, caminho: Path, t: _Tratamento, rel: Relatorio, 
                 if aprovado:
                     gravadas += banco.carregar_tratado(conn, base, t.tabelas, caminho.name, lote_id,
                                                        t.regra.get("destino") or {}, t.modelo)
+                    _sinal(ao_etapa, "dba", caminho.name)
+                    conferidos = banco.reconciliar(conn, lote_id, getattr(banco, "esperado_bruto", {}))
+                    rel.info(f"DBA conferiu no PostgreSQL antes do commit: {', '.join(conferidos)}")
                     modelos = banco.executar_modelos(conn)
                     if modelos:
                         rel.info(f"Modelos SQL executados na camada analítica: {', '.join(modelos)}")
@@ -249,12 +255,23 @@ def processar_arquivo(caminho: str | Path, cfg: Config, gravar: bool = True, ao_
     pasta_arquivo_morto = cfg.erros if rel.tem_erros else cfg.originais / datetime.now().strftime("%Y-%m")
     r.id = _destino_livre(pasta_arquivo_morto, f"{carimbo}_{caminho.name}").stem
 
+    # ---- portão de produção: conferência independente do supervisor (quem faz não é quem aprova)
+    from robo import producao
+    conferencias = []
+    if not rel.tem_erros and t.analisaveis:
+        _sinal(ao_etapa, "supervisor", caminho.name)
+        try:
+            conferencias = producao.conferencia_supervisor(t, rel, cfg, caminho.name)
+        except Exception as e:
+            log.exception("Conferência do supervisor falhou")
+            rel.erro(f"Supervisor de planilhas não conseguiu conferir: {type(e).__name__}: {e}")
+
     # ---- carga no banco (antes dos arquivos: se o banco recusar, o arquivo não é publicado)
     if cfg.banco.get("habilitado"):
         from robo.banco import ErroBancoIndisponivel
         _sinal(ao_etapa, "banco", caminho.name)
         try:
-            r.tabelas_banco = _carregar_banco(cfg, caminho, t, rel, r.id, aprovado=not rel.tem_erros)
+            r.tabelas_banco = _carregar_banco(cfg, caminho, t, rel, r.id, aprovado=not rel.tem_erros, ao_etapa=ao_etapa)
         except ErroBancoIndisponivel as e:
             _sinal(ao_etapa, "adiado", caminho.name)
             return _adiar(r, inicio, f"PostgreSQL indisponível: {e}")
@@ -262,6 +279,18 @@ def processar_arquivo(caminho: str | Path, cfg: Config, gravar: bool = True, ao_
             log.exception("Falha inesperada no banco ao carregar %s", caminho.name)
             rel.erro(f"Falha inesperada no PostgreSQL: {type(e).__name__}: {e}")
 
+    r.checklist = None
+    if not rel.tem_erros:
+        _sinal(ao_etapa, "coord_engenharia", caminho.name)
+        r.checklist = producao.checklist_engenharia(rel, conferencias, obter_equipe(cfg), bool(cfg.banco.get("habilitado")),
+                                                    bool(r.tabelas_banco) if cfg.banco.get("habilitado") else None)
+        if not r.checklist["liberado"]:
+            for i in r.checklist["itens"]:
+                if not i["ok"]:
+                    rel.erro(f"Coordenadora de Engenharia não liberou para produção: {i['item']}"
+                             + (f" — {i['detalhe']}" if i["detalhe"] else ""))
+        else:
+            rel.info(f"Liberado para produção pela Coordenadora de Engenharia ({len(r.checklist['itens'])} itens do checklist OK)")
     _sinal(ao_etapa, "publicacao", caminho.name)
     if rel.tem_erros:
         r.status = REPROVADO
@@ -285,7 +314,7 @@ def processar_arquivo(caminho: str | Path, cfg: Config, gravar: bool = True, ao_
                 rel.aviso(a)
         r.status = SUCESSO
         r.destino_original = _mover(caminho, cfg.originais / datetime.now().strftime("%Y-%m"), f"{r.id}{caminho.suffix}")
-        _gravar_relatorio_qualidade(cfg, nome_base, rel, t.tabelas)
+        _gravar_relatorio_qualidade(cfg, nome_base, rel, t.tabelas, r.checklist)
         destinos = [p.name for p in r.saidas] + r.tabelas_banco
         log.info("OK %s -> %s (%d linhas, %d aviso(s))", caminho.name, ", ".join(destinos), r.linhas_saida, len(rel.avisos))
         # 2º andar: análise automática. Já está publicado; aqui nada pode reprovar ou travar.
@@ -294,6 +323,9 @@ def processar_arquivo(caminho: str | Path, cfg: Config, gravar: bool = True, ao_
             r.analise = analisar(t.analisaveis, caminho.name, r.id, cfg, t.regra, ao_etapa)
             if r.analise:
                 log.info("Análise de %s pronta (%s)", caminho.name, Path(r.analise.get("relatorio") or "painel").name)
+                _sinal(ao_etapa, "coord_analise", caminho.name)
+                base_min = int((cfg.dados.get("analise") or {}).get("base_minima", 30))
+                r.checklist_analise = producao.checklist_analise(r.analise, base_min)
         except Exception:
             log.exception("Análise automática de %s falhou (a planilha já está publicada)", caminho.name)
 
@@ -328,17 +360,22 @@ def _registrar(cfg: Config, r: Resultado):
         "original": str(r.destino_original) if r.destino_original else None,
         "saidas": [str(p) for p in r.saidas], "tabelas_banco": r.tabelas_banco,
         "tabelas": _resumo_tabelas(r.tabelas) if r.status == SUCESSO else [],
-        "analise": r.analise,
+        "analise": {k: v for k, v in (r.analise or {}).items() if not k.startswith("_")} or None,
+        "checklist_producao": r.checklist,
+        "checklist_analise": r.checklist_analise,
         "ocorrencias": [o.__dict__ for o in r.relatorio.ocorrencias],
     })
 
 
-def _gravar_relatorio_qualidade(cfg: Config, nome_base: str, rel: Relatorio, tabelas: dict):
+def _gravar_relatorio_qualidade(cfg: Config, nome_base: str, rel: Relatorio, tabelas: dict, checklist: dict | None = None):
     """Relatório de qualidade + dicionário de dados ficam em Bases-Relatorios (fora da pasta que o Power BI lê)."""
     try:
         cfg.relatorios.mkdir(parents=True, exist_ok=True)
         with pd.ExcelWriter(cfg.relatorios / f"{nome_base}_qualidade.xlsx", engine="openpyxl") as w:
             rel.para_dataframe().to_excel(w, sheet_name="log_qualidade", index=False)
             dicionario_dados(tabelas).to_excel(w, sheet_name="dicionario_dados", index=False)
+            if checklist:
+                from robo.producao import tabela_checklist
+                tabela_checklist(checklist).to_excel(w, sheet_name="checklist_producao", index=False)
     except PermissionError:
         log.warning("Relatório de qualidade de %s não foi atualizado (arquivo aberto).", nome_base)

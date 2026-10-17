@@ -124,7 +124,7 @@ def test_etapas_emitidas_em_ordem(planilha_baguncada, cfg_factory):
     etapas = []
     r = processar_arquivo(planilha_baguncada, cfg_factory([REGRA_NPS]), ao_etapa=lambda e, a, **k: etapas.append((e, k)))
     assert r.status == SUCESSO
-    assert [e for e, _ in etapas] == ["leitura", "limpeza", "validacao", "modelagem", "publicacao",
-                                      "analise:perfil", "analise:indicadores", "analise:estatistica",
-                                      "analise:monitoramento", "analise:relator", "concluido"]
+    assert [e for e, _ in etapas] == ["leitura", "limpeza", "validacao", "modelagem", "supervisor", "coord_engenharia",
+                                      "publicacao", "analise:perfil", "analise:indicadores", "analise:estatistica",
+                                      "analise:monitoramento", "analise:relator", "coord_analise", "concluido"]
     assert etapas[-1][1]["status"] == SUCESSO and etapas[-1][1]["linhas"] == 4

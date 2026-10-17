@@ -492,7 +492,9 @@ def analisar(tabelas: dict[str, pd.DataFrame], arquivo: str, id_execucao: str, c
     if not resultados:
         return None
     saidas = _gravar(resultados, cfg, id_execucao)
-    return {"base": base, "arquivo": arquivo, "resumo": [l for a in resultados for l in a.resumo], **saidas}
+    registros = lambda attr: [x for a in resultados if not getattr(a, attr).empty for x in getattr(a, attr).to_dict("records")]
+    return {"base": base, "arquivo": arquivo, "resumo": [l for a in resultados for l in a.resumo],
+            "_indicadores": registros("indicadores"), "_destaques": registros("destaques"), **saidas}
 
 
 def _gravar(resultados: list[Analise], cfg, id_execucao: str) -> dict:

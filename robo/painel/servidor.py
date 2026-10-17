@@ -75,6 +75,14 @@ def _fmt(v) -> str:
     return str(v)
 
 
+def _ficha_curta(f: dict | None) -> dict | None:
+    if not f:
+        return None
+    p = f.get("provas") or {}
+    return {k: f.get(k) for k in ("cargo", "nivel", "area", "metodologias", "responsabilidades", "criterios", "limites", "mentor")} | \
+        {"provas": {"acertos": p.get("acertos", 0), "total": p.get("total", 0), "aprovado": p.get("aprovado", True)}}
+
+
 def _ocorrencias(rel_ou_lista) -> list[dict]:
     itens = rel_ou_lista.ocorrencias if hasattr(rel_ou_lista, "ocorrencias") else rel_ou_lista
     return [o.__dict__ if hasattr(o, "__dict__") else o for o in itens]
@@ -174,11 +182,17 @@ class Api:
         equipe = [{"id": a["id"], "nome": a["nome"], "papel": a.get("papel", ""), "cor": a.get("cor", "#64748B"),
                    "descricao": a.get("descricao", ""), "nativo": a.get("nativo", False), "ativo": a.get("ativo", True),
                    "skills": [s.get("skill") for s in a.get("skills", []) if s.get("ativo", True)],
-                   "aceita_skills": a.get("aceita_skills", True), "andar": 1} for a in obter_equipe(cfg).lista()]
+                   "aceita_skills": a.get("aceita_skills", True), "andar": 1, "ficha": _ficha_curta(a.get("ficha"))}
+                  for a in obter_equipe(cfg).lista()]
         cfg_analise = {**PADRAO_ANALISE, **(cfg.dados.get("analise") or {})}
         desligados = set(cfg_analise.get("analistas_desligados") or [])
+        from robo import rh
+        from robo.producao import SUPERVISORES
+        equipe += [{**a, "nativo": True, "aceita_skills": False, "skills": [], "ativo": a["id"] != "dba" or bool(cfg.banco.get("habilitado")),
+                    "ficha": _ficha_curta(rh.ficha({"id": a["id"], "skills": []}))} for a in SUPERVISORES]
         equipe += [{**a, "id": f"analise_{a['id']}", "nativo": True, "aceita_skills": False, "skills": [], "andar": 2,
-                    "ativo": bool(cfg_analise.get("habilitado", True)) and a["id"] not in desligados} for a in ANALISTAS]
+                    "ativo": bool(cfg_analise.get("habilitado", True)) and a["id"] not in desligados,
+                    "ficha": _ficha_curta(rh.ficha({"id": f"analise_{a['id']}", "skills": []}))} for a in ANALISTAS]
         dados.update({
             "equipe": equipe,
             "fila": c.monitor.estado_fila() if c.monitor else [],
@@ -312,8 +326,19 @@ class Api:
         from robo.agentes import POSICOES
         from robo.pipeline import obter_equipe
         equipe = obter_equipe(self.cfg)
-        return {"agentes": equipe.lista(), "catalogo": skills.catalogo(), "erros_skills": list(skills.ERROS_CARGA),
-                "posicoes": POSICOES}
+        from robo import rh
+        from robo.analise import ANALISTAS
+        catalogo = [{**s, "risco": rh.RISCO_BASE.get(s["id"], "medio"), "provas": len(rh.provas_da_skill(s["id"]))}
+                    for s in skills.catalogo()]
+        from robo.producao import SUPERVISORES
+        analistas = [{**a, "id": f"analise_{a['id']}", "nativo": True, "aceita_skills": False, "skills": [], "andar": 2,
+                      "ativo": True, "ficha": rh.ficha({"id": f"analise_{a['id']}", "skills": []})} for a in ANALISTAS]
+        lideranca = [{**a, "nativo": True, "aceita_skills": False, "skills": [], "ativo": True,
+                      "ficha": rh.ficha({"id": a["id"], "skills": []})} for a in SUPERVISORES]
+        return {"agentes": equipe.lista(), "analistas": analistas, "lideranca": lideranca, "catalogo": catalogo,
+                "erros_skills": list(skills.ERROS_CARGA), "posicoes": POSICOES,
+                "rh": {"niveis": [{"id": n, "nome": rh.NOME_NIVEL[n], "risco_maximo": rh.RISCO_MAXIMO[n]} for n in rh.NIVEIS],
+                       "areas": rh.AREAS}}
 
     def agente_salvar(self, b) -> dict:
         from robo.agentes import ErroAgente

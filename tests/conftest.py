@@ -56,3 +56,12 @@ REGRA_NPS = {
     "texto": {"uf": "maiusculo"},
     "valores_permitidos": {"uf": ["SP", "RJ", "MG"]},
 }
+
+
+@pytest.fixture(autouse=True)
+def _limpar_skills_personalizadas():
+    """Cada teste começa só com o catálogo nativo (skills personalizadas não vazam entre testes)."""
+    yield
+    from robo import skills
+    for sid in [k for k, v in skills.REGISTRO.items() if v.origem == "personalizada"]:
+        skills.REGISTRO.pop(sid, None)
