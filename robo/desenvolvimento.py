@@ -65,6 +65,9 @@ def estudar(cfg, anunciar: bool = True) -> dict:
         trocas = interacoes.trocar_experiencias(cfg)
     except Exception:
         trocas = []
+    # caderno de lições: todo aprendizado vira lição, cada pessoa estuda, é testada e comprova na prática
+    from robo import licoes
+    rodada_licoes = licoes.rodada(cfg)
     aprovados = sum(r["prova_ok"] for r in resultado)
     tb.lembrar("estudo_rodada", datetime.now().strftime("%Y-%m-%d"),
                f"{len(resultado)} funcionário(s) estudaram; {aprovados} aprovados na prova", "desenvolvimento")
@@ -76,7 +79,8 @@ def estudar(cfg, anunciar: bool = True) -> dict:
                               "do andar. Tudo ficou na memória de cada um.", "rh", tipo="treinamento")
         except Exception:
             pass
-    return {"funcionarios": len(resultado), "aprovados": aprovados, "trocas": len(trocas), "pessoas": resultado}
+    return {"funcionarios": len(resultado), "aprovados": aprovados, "trocas": len(trocas), "licoes": rodada_licoes,
+            "pessoas": resultado}
 
 
 def rotina(cfg) -> dict | None:

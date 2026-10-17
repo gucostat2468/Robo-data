@@ -10,6 +10,8 @@ A empresa só trabalha com o notebook aberto. Por isso:
 
 from __future__ import annotations
 
+import logging
+
 import time
 from contextlib import contextmanager
 from datetime import datetime, timedelta
@@ -23,6 +25,7 @@ ROTINAS = {
     "backup": ("dba", "Backup do PostgreSQL (guarda os 7 últimos)", 24),
     "memoria_pg": ("dba", "Cópia da memória de todos os funcionários para o PostgreSQL", 1),
     "pdca": ("ger_operacoes", "Etapa C do PDCA: o que foi corrigido e não voltou vira boa prática", 1),
+    "licoes": ("rh_td", "Caderno de lições: colhe o que a empresa aprendeu, cada pessoa estuda, é testada e comprova", 1),
     "estudo": ("canal_helena", "Rodada de estudo de todos os funcionários (2x por semana)", 84),
     "reuniao": ("ger_operacoes", "Reunião semanal da liderança, andar por andar", 24 * 7),
     "auditoria": ("dir_dados", "Auditoria por amostragem dos heads (confiança nos resultados)", 24 * 7),
@@ -69,6 +72,7 @@ def executar(cfg, nome: str, funcao) -> object:
                 detalhe = _resumo(r)
         except Exception as e:
             status, detalhe = "erro", f"{type(e).__name__}: {e}"
+            logging.getLogger("robo").exception("Rotina %s falhou: %s", nome, e)  # vira registro permanente (erros.py)
         segundos = seg()
     with tb.tx() as c:
         if status != "em_dia":

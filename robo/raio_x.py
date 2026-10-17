@@ -20,6 +20,9 @@ ONDE = {
     "Reuniões": "logs/trabalho.db → reunioes + logs/reunioes/<id>.md",
     "Auditorias dos heads": "logs/trabalho.db → auditorias",
     "Laboratório (treino contínuo)": "logs/trabalho.db → laboratorio_exercicios e laboratorio_medidas; PostgreSQL: schema laboratorio",
+    "Caderno de lições (conhecimento)": "logs/trabalho.db → licoes, licoes_funcionario e registro_conhecimento (cadeia com hash; "
+                                        "nada se apaga) + logs/conhecimento/licoes_AAAAMMDD.jsonl + PostgreSQL robo.memoria_licoes",
+    "Erros de sistema (permanente)": "logs/trabalho.db → erros_sistema (não pode ser apagado; cada tipo vira handover)",
     "Conversas entre funcionários": "logs/trabalho.db → interacoes (e o canal da equipe)",
     "Canal da equipe": "logs/canal/mensagens.jsonl",
 }
@@ -56,6 +59,13 @@ def montar(cfg) -> dict:
     except Exception:
         lab, conversas_internas = {"rodadas": 0, "por_pessoa": [], "por_area": {}, "ultimas": []}, []
     ses = rotinas.sessoes(cfg, 10)
+    from robo import erros, licoes
+    lp = licoes.painel(cfg)
+    lic = {"licoes": lp["licoes"], "por_origem": lp["por_origem"], "atribuicoes": lp["atribuicoes"],
+           "integridade": lp["integridade"], "menos_aplicadas": lp["pessoas"][:5]}
+    errs = erros.listar(cfg, 500)
+    erros_sis = {"tipos": len(errs), "abertos": sum(e["estado"] != "resolvido" for e in errs),
+                 "ocorrencias": sum(e["ocorrencias"] for e in errs), "ultimos": errs[:5]}
     return {
         "agora": datetime.now().isoformat(timespec="seconds"),
         "pessoas": {"total": len(gente), "por_andar": {a: sum(1 for p in gente if p["andar"] == a) for a in organizacao.NOME_ANDAR},
@@ -72,6 +82,7 @@ def montar(cfg) -> dict:
         "rotinas": estado_rotinas,
         "laboratorio": lab, "interacoes": conversas_internas,
         "sessoes": ses,
+        "conhecimento": lic, "erros_sistema": erros_sis,
         "onde_fica": ONDE,
     }
 
@@ -102,5 +113,16 @@ def texto(r: dict) -> str:
     if lab.get("rodadas"):
         erros = sum(p["erros"] for p in lab["por_pessoa"])
         linhas.append(f"Laboratório na semana: {lab['rodadas']} exercício(s) em {len(lab['por_area'])} área(s), {erros} etapa(s) com erro.")
+    k = r.get("conhecimento") or {}
+    if k:
+        at = k["atribuicoes"]
+        total = sum(at.values()) or 1
+        linhas.append(f"Caderno de lições: {k['licoes']} lição(ões) ativas; {round(100 * at.get('aplicada', 0) / total)}% das "
+                      f"atribuições já comprovadas na prática; cadeia de registros "
+                      f"{'íntegra' if k['integridade']['integra'] else 'QUEBRADA — possível adulteração'}.")
+    e = r.get("erros_sistema") or {}
+    if e:
+        linhas.append(f"Erros de sistema: {e['abertos']} tipo(s) em aberto ({e['ocorrencias']} ocorrência(s) registradas no total)."
+                      if e["tipos"] else "Erros de sistema: nenhum registrado.")
     linhas.append("Rotinas atrasadas: " + ", ".join(atrasadas) + "." if atrasadas else "Todas as rotinas estão em dia.")
     return "\n".join(linhas)

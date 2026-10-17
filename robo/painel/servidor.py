@@ -1031,6 +1031,69 @@ class Api:
         from robo import memoria
         return memoria.sincronizar_postgres(self.cfg)
 
+    # ------------------------------------------------------------------ caderno de lições e erros de sistema
+    # Quem usa o painel é o dono (entrou com a senha): só daqui saem lição manual, versão nova e arquivamento.
+    def conhecimento(self, _q) -> dict:
+        from robo import licoes
+        return licoes.painel(self.cfg)
+
+    def conhecimento_caderno(self, q) -> dict:
+        from robo import licoes, organizacao
+        pid = q.get("id", [""])[0]
+        if pid not in organizacao.por_id(self.cfg):
+            raise ErroApi("Funcionário não encontrado.", 404)
+        return licoes.caderno(self.cfg, pid)
+
+    def conhecimento_licao(self, q) -> dict:
+        from robo import licoes
+        d = licoes.detalhe(self.cfg, q.get("id", [""])[0])
+        if not d:
+            raise ErroApi("Lição não encontrada.", 404)
+        return d
+
+    def conhecimento_buscar(self, q) -> dict:
+        from robo import licoes
+        return {"licoes": licoes.buscar(self.cfg, q.get("q", [""])[0], q.get("funcionario", [None])[0] or None, 20)}
+
+    def conhecimento_rodar(self, _b) -> dict:
+        from robo import licoes, rotinas
+        r = rotinas.executar(self.cfg, "licoes", lambda: licoes.rodada(self.cfg))
+        licoes.exportar(self.cfg)
+        return r or {}
+
+    def conhecimento_criar(self, b) -> dict:
+        from robo import licoes
+        campos = {k: str(b.get(k) or "").strip() for k in ("titulo", "conteudo", "pergunta", "como_aplicar", "publico")}
+        if not (campos["titulo"] and campos["conteudo"]):
+            raise ErroApi("A lição precisa de título e conteúdo.")
+        andar = int(b["andar"]) if str(b.get("andar") or "").isdigit() else None
+        lid = licoes.criar(self.cfg, "dono", f"{campos['titulo']}|{datetime.now().isoformat()}", campos["titulo"],
+                           campos["conteudo"], campos["pergunta"] or campos["titulo"],
+                           campos["como_aplicar"] or "usar nas respostas e no trabalho", andar, None,
+                           campos["publico"] if campos["publico"] in ("andar", "todos", "lideranca") else "todos", "dono")
+        return {"id": lid}
+
+    def conhecimento_versao(self, b) -> dict:
+        from robo import licoes
+        conteudo, motivo = str(b.get("conteudo") or "").strip(), str(b.get("motivo") or "").strip()
+        if not (conteudo and motivo):
+            raise ErroApi("Versão nova exige o conteúdo e o motivo da mudança.")
+        return {"id": licoes.nova_versao(self.cfg, str(b.get("id") or ""), conteudo, motivo, "dono")}
+
+    def conhecimento_arquivar(self, b) -> dict:
+        from robo import licoes
+        licoes.arquivar(self.cfg, str(b.get("id") or ""), str(b.get("motivo") or ""), "dono")
+        return {"ok": True}
+
+    def erros_sistema(self, _q) -> dict:
+        from robo import erros
+        return {"erros": erros.listar(self.cfg)}
+
+    def erros_resolver(self, b) -> dict:
+        from robo import erros
+        erros.marcar_resolvido(self.cfg, int(b.get("id") or 0), "dono")
+        return {"ok": True}
+
 
 ROTAS_GET = {
     "/api/ping": lambda api, q: {"app": "robo-planilhas", "versao": __version__},
@@ -1043,6 +1106,9 @@ ROTAS_GET = {
     "/api/solicitacoes": Api.solicitacoes, "/api/solicitacao": Api.solicitacao, "/api/memoria": Api.memoria_resumo,
     "/api/reuniao/ao-vivo": Api.reuniao_ao_vivo, "/api/raio-x": Api.raio_x,
     "/api/reuniao/sala": Api.sala_ver, "/api/reuniao/salas": Api.salas,
+    "/api/conhecimento": Api.conhecimento, "/api/conhecimento/caderno": Api.conhecimento_caderno,
+    "/api/conhecimento/licao": Api.conhecimento_licao, "/api/conhecimento/buscar": Api.conhecimento_buscar,
+    "/api/erros": Api.erros_sistema,
 }
 ROTAS_POST = {
     "/api/robo/ligar": Api.ligar, "/api/robo/pausar": Api.pausar, "/api/robo/processar-agora": Api.processar_agora,
@@ -1062,6 +1128,9 @@ ROTAS_POST = {
     "/api/auditorias/rodar": Api.auditorias_rodar,
     "/api/reuniao/sala/abrir": Api.sala_abrir, "/api/reuniao/sala/falar": Api.sala_falar,
     "/api/memoria/exportar": Api.memoria_exportar, "/api/memoria/sincronizar": Api.memoria_sincronizar,
+    "/api/conhecimento/rodar": Api.conhecimento_rodar, "/api/conhecimento/criar": Api.conhecimento_criar,
+    "/api/conhecimento/versao": Api.conhecimento_versao, "/api/conhecimento/arquivar": Api.conhecimento_arquivar,
+    "/api/erros/resolver": Api.erros_resolver,
 }
 ROTAS_UPLOAD = {"/api/testar": Api.testar, "/api/enviar": Api.enviar, "/api/conversa/anexar": Api.anexar}
 

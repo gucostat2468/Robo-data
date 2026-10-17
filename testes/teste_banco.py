@@ -199,6 +199,14 @@ def teste_memoria_dos_funcionarios_vai_para_o_postgres(planilha_baguncada, cfg_f
     memoria.registrar_execucao(cfg, r)  # de novo: recorrência atualiza a mesma linha no PostgreSQL
     memoria.sincronizar_postgres(cfg)
     assert _q(banco_cfg, "SELECT max(recorrencias) FROM robo.memoria_handovers")[0][0] == 2
+    # caderno de lições e cadeia de registros também vão para o banco (e a cópia bate com o SQLite)
+    from robo import licoes
+    licoes.rodada(cfg)
+    s = memoria.sincronizar_postgres(cfg)
+    assert s["licoes"] > 0 and s["licoes_funcionario"] > 0
+    assert _q(banco_cfg, "SELECT count(*) FROM robo.memoria_registro_conhecimento")[0][0] == s["registro_conhecimento"]
+    ultimo = _q(banco_cfg, "SELECT hash FROM robo.memoria_registro_conhecimento ORDER BY id DESC LIMIT 1")[0][0]
+    assert ultimo == licoes.verificar_integridade(cfg)["ultimo_hash"]
 
 
 def teste_calculo_conferido_no_postgres_e_modo_manual(planilha_baguncada, cfg_factory, banco_cfg):

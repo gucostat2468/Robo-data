@@ -81,7 +81,7 @@ def _pasta_artefatos(cfg, ref: str) -> Path:
 
 
 # ----------------------------------------------------------------------------- ferramentas
-def f_conhecimento(cfg, pergunta: str = "", **_) -> dict:
+def f_conhecimento(cfg, pergunta: str = "", quem: str | None = None, **_) -> dict:
     from robo import canal
     t = canal.normalizar(pergunta)
     pont = [(canal._pontuar(t, v["chaves"]), i) for i, v in enumerate(canal.CONHECIMENTO)]
@@ -101,6 +101,13 @@ def f_conhecimento(cfg, pergunta: str = "", **_) -> dict:
         v = canal.CONHECIMENTO[melhor[1]]
         return resultado(True, "conhecimento", v["texto"], {"fonte": "base de conhecimento do canal", "autor": v["autor"]},
                          evidencia="base de conhecimento do canal (robo/canal.py)")
+    from robo import licoes
+    achadas = licoes.buscar(cfg, pergunta, quem) or licoes.buscar(cfg, pergunta)
+    if achadas:
+        l = achadas[0]
+        corpo = l["conteudo"] if len(l["conteudo"]) <= 1500 else l["conteudo"][:1500].rsplit(" ", 1)[0] + "…"
+        return resultado(True, "conhecimento", f"{l['titulo']}\n\n{corpo}", {"fonte": l["id"], "versao": l["versao"]},
+                         evidencia=f"caderno de lições {l['id']} (v{l['versao']}, origem {l['origem_tipo']})")
     return resultado(False, "limitacao", "Não tenho isso registrado no conhecimento da empresa (manuais e base do canal). "
                                          "Prefiro dizer que não sei a inventar. Se quiser, escreva a resposta em "
                                          "conhecimento/*.md e eu passo a usar.")
@@ -651,4 +658,6 @@ def executar(id_ferramenta: str, cfg, **params) -> dict:
     try:
         return f.executar(cfg, **params)
     except Exception as e:
+        import logging
+        logging.getLogger("robo").exception("Ferramenta %s falhou: %s", id_ferramenta, e)  # registro permanente (erros.py)
         return resultado(False, "limitacao", f"{f.nome} falhou ({type(e).__name__}: {e}). Nada foi dado como concluído.")

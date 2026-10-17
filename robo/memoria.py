@@ -366,10 +366,15 @@ def dossie(cfg, pid: str) -> dict | None:
     with tb.tx() as conn:
         conversas = conn.execute("SELECT COUNT(*) FROM conversas WHERE funcionario=?", (pid,)).fetchone()[0]
         tarefas = conn.execute("SELECT COUNT(DISTINCT solicitacao_id) FROM etapas WHERE funcionario=?", (pid,)).fetchone()[0]
+    from robo import licoes
+    cad = licoes.caderno(cfg, pid)
     return {"contrato": c, "experiencias": exps, "desempenho_30d": d30, "conversas": conversas, "tarefas": tarefas,
+            "caderno": {k: cad[k] for k in ("total", "por_estado", "pct_aplicada")} | {"licoes": cad["licoes"][:60]},
             "handovers_da_area": handovers(cfg, c["andar"], abertos=True, limite=30),
-            "onde_pesquisa": c["fontes_conhecimento"] + ["handovers da área (regras aprendidas com erros)"],
+            "onde_pesquisa": c["fontes_conhecimento"] + ["handovers da área (regras aprendidas com erros)",
+                                                         "caderno de lições (logs/trabalho.db → licoes)"],
             "onde_registra": [f"logs/trabalho.db → experiencias (funcionario = {pid})", "logs/trabalho.db → handovers",
+                              f"logs/trabalho.db → licoes_funcionario (funcionario = {pid}) + registro_conhecimento",
                               f"logs/memoria/{pid}.md (dossiê exportado)"]}
 
 
@@ -392,6 +397,10 @@ def exportar_dossie(cfg, pid: str) -> Path | None:
                                                           for x in d["experiencias"][:50]]
     md += ["", "## Handovers abertos da área", ""] + [f"- {h['id']} ({h['recorrencias']}x): {h['erro']} → {h['regra']}"
                                                        for h in d["handovers_da_area"]]
+    cad = d["caderno"]
+    md += ["", f"## Caderno de lições ({cad['total']} · {cad['pct_aplicada']}% aplicadas)", "",
+           " · ".join(f"{k}: {v}" for k, v in cad["por_estado"].items()), ""]
+    md += [f"- [{l['estado']}] {l['titulo']} (v{l['versao']}, {l['origem_tipo']})" for l in cad["licoes"][:40]]
     pasta = Path(cfg.logs) / "memoria"
     pasta.mkdir(parents=True, exist_ok=True)
     arq = pasta / f"{pid}.md"
@@ -409,11 +418,32 @@ TABELAS_PG = {
                   "criado_em TIMESTAMP, ultima_ocorrencia TIMESTAMP, atualizado_em TIMESTAMP",
                   ["id", "andar", "area", "responsavel", "detectado_por", "erro", "causa", "regra", "como_verificar", "exemplo",
                    "recorrencias", "estado", "backlog_id", "criado_em", "ultima_ocorrencia", "atualizado_em"]),
+    # caderno de lições (robo/licoes.py) e erros de sistema (robo/erros.py): também ficam no banco da empresa
+    "licoes": ("id TEXT PRIMARY KEY, origem_tipo TEXT, origem_ref TEXT, versao INT, substitui TEXT, andar INT, publico TEXT, "
+               "titulo TEXT, conteudo TEXT, pergunta TEXT, como_aplicar TEXT, autor TEXT, criada_em TIMESTAMP, arquivada INT, "
+               "motivo_arquivo TEXT",
+               ["id", "origem_tipo", "origem_ref", "versao", "substitui", "andar", "publico", "titulo", "conteudo", "pergunta",
+                "como_aplicar", "autor", "criada_em", "arquivada", "motivo_arquivo"]),
+    "licoes_funcionario": ("licao_id TEXT, funcionario TEXT, estado TEXT, atribuida_em TIMESTAMP, estudada_em TIMESTAMP, "
+                           "avaliada_em TIMESTAMP, aplicada_em TIMESTAMP, evidencia TEXT, tentativas INT, "
+                           "PRIMARY KEY (licao_id, funcionario)",
+                           ["licao_id", "funcionario", "estado", "atribuida_em", "estudada_em", "avaliada_em", "aplicada_em",
+                            "evidencia", "tentativas"]),
+    "registro_conhecimento": ("id BIGINT PRIMARY KEY, data_hora TIMESTAMP, tipo TEXT, ref TEXT, quem TEXT, dados TEXT, "
+                              "hash_anterior TEXT, hash TEXT",
+                              ["id", "data_hora", "tipo", "ref", "quem", "dados", "hash_anterior", "hash"]),
+    "erros_sistema": ("id BIGINT PRIMARY KEY, impressao TEXT, primeira TIMESTAMP, ultima TIMESTAMP, ocorrencias INT, modulo TEXT, "
+                      "funcao TEXT, tipo TEXT, mensagem TEXT, traceback_primeiro TEXT, traceback_ultimo TEXT, handover_id TEXT, "
+                      "estado TEXT",
+                      ["id", "impressao", "primeira", "ultima", "ocorrencias", "modulo", "funcao", "tipo", "mensagem",
+                       "traceback_primeiro", "traceback_ultimo", "handover_id", "estado"]),
 }
+CHAVE_PG = {"licoes_funcionario": ["licao_id", "funcionario"]}
 
 
 def sincronizar_postgres(cfg) -> dict:
-    """Copia a memória (experiências e handovers) para o schema de controle do PostgreSQL (padrão: robo).
+    """Copia a memória (experiências, handovers, lições, cadeia de registros e erros de sistema) para o schema de controle
+    do PostgreSQL (padrão: robo).
     O SQLite continua sendo a fonte: funciona com o banco desligado e nada se perde; quando o banco volta, a cópia
     alcança. Tudo numa transação: ou entra tudo, ou nada."""
     if not cfg.banco.get("habilitado"):
@@ -422,7 +452,9 @@ def sincronizar_postgres(cfg) -> dict:
     from robo.banco import Banco
     b = Banco(cfg.banco, cfg.base)
     schema = b.schemas["controle"]
-    tb = Trabalho(cfg)
+    from robo import erros, licoes
+    tb = licoes._tb(cfg)
+    erros._tb(cfg)
     copiados = {}
     with b.conectar() as conn:
         with conn.transaction():
@@ -432,10 +464,12 @@ def sincronizar_postgres(cfg) -> dict:
                 conn.execute(sql.SQL("CREATE TABLE IF NOT EXISTS {} (" + ddl + ")").format(tabela))
                 with tb.tx() as c:
                     linhas = [tuple(r[x] for x in cols) for r in c.execute(f"SELECT {', '.join(cols)} FROM {nome}")]
-                atualizar = sql.SQL(", ").join(sql.SQL("{0} = EXCLUDED.{0}").format(sql.Identifier(x)) for x in cols[1:])
-                comando = sql.SQL("INSERT INTO {} ({}) VALUES ({}) ON CONFLICT (id) DO UPDATE SET {}").format(
+                chave = CHAVE_PG.get(nome, ["id"])
+                atualizar = sql.SQL(", ").join(sql.SQL("{0} = EXCLUDED.{0}").format(sql.Identifier(x))
+                                               for x in cols if x not in chave)
+                comando = sql.SQL("INSERT INTO {} ({}) VALUES ({}) ON CONFLICT ({}) DO UPDATE SET {}").format(
                     tabela, sql.SQL(", ").join(map(sql.Identifier, cols)), sql.SQL(", ").join(sql.Placeholder() * len(cols)),
-                    atualizar)
+                    sql.SQL(", ").join(map(sql.Identifier, chave)), atualizar)
                 with conn.cursor() as cur:
                     cur.executemany(comando, linhas)
                 copiados[nome] = len(linhas)

@@ -65,8 +65,9 @@ class ControleRobo:
             self.cfg.criar_pastas()
             self.monitor = Monitor(self.cfg, ao_processar=self._apos_processar, ao_etapa=self._registrar_etapa)
             self.erro_config = None
-            from robo import orquestrador
+            from robo import erros, orquestrador
             orquestrador.AO_EVENTO = self._registrar_etapa  # tarefas da central aparecem no escritório 3D
+            erros.instalar(self.cfg)                        # todo ERRO de log vira registro permanente + handover
         except ErroConfig as e:
             self.cfg, self.monitor, self.erro_config = None, None, str(e)
             log.error("Configuração: %s", e)
@@ -171,13 +172,14 @@ class ControleRobo:
             self._ultima_estrategia, self._estrategia_rodando = agora, True
 
             def _rodar():
-                from robo import auditoria, backup, desenvolvimento, estrategia, memoria, reuniao
+                from robo import auditoria, backup, desenvolvimento, estrategia, licoes, memoria, reuniao
                 try:
                     rotinas.executar(cfg, "estrategia", lambda: estrategia.rotina(cfg))
                     rotinas.executar(cfg, "backup", lambda: backup.rotina(cfg))
                     rotinas.executar(cfg, "memoria_pg", lambda: (memoria.sincronizar_postgres(cfg)
                                                                  if cfg.banco.get("habilitado") else None))
                     rotinas.executar(cfg, "pdca", lambda: memoria.checar_pdca(cfg)["verificados"])
+                    rotinas.executar(cfg, "licoes", lambda: licoes.rotina(cfg))
                     rotinas.executar(cfg, "estudo", lambda: desenvolvimento.rotina(cfg))
                     rotinas.executar(cfg, "auditoria", lambda: auditoria.rotina(cfg))
                     rotinas.executar(cfg, "reuniao", lambda: reuniao.rotina(cfg))

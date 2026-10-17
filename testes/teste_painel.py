@@ -192,3 +192,27 @@ def teste_hash_da_senha():
     h = gerar_hash("minha-senha-123")
     assert h.startswith("pbkdf2_sha256$200000$") and "minha-senha" not in h
     assert conferir_hash("minha-senha-123", h) and not conferir_hash("minha-senha-124", h)
+
+
+def teste_conhecimento_e_erros_pelo_painel(painel):
+    base, _ = painel
+    s, r = chamar(base, "/api/conhecimento/rodar", {})
+    assert s == 200 and r["integridade"]["integra"] and r["estudada"] > 0
+    s, k = chamar(base, "/api/conhecimento")
+    assert s == 200 and k["licoes"] > 0 and k["pessoas"]
+    s, novo = chamar(base, "/api/conhecimento/criar", {"titulo": "NPS sempre inteiro", "conteudo": "NPS com 0 casas decimais.",
+                                                       "pergunta": "casas decimais do NPS", "publico": "todos"})
+    assert s == 200 and novo["id"]
+    s, l = chamar(base, f"/api/conhecimento/licao?id={novo['id']}")
+    assert s == 200 and len(l["pessoas"]) == k["pessoas"].__len__() and l["trilha"]
+    assert chamar(base, "/api/conhecimento/versao", {"id": novo["id"], "conteudo": "x", "motivo": ""})[0] == 400
+    s, v = chamar(base, "/api/conhecimento/versao", {"id": novo["id"], "conteudo": "NPS inteiro (ARRED 0).", "motivo": "fórmula"})
+    assert s == 200 and v["id"].endswith(".v2")
+    s, b = chamar(base, "/api/conhecimento/buscar?q=casas%20decimais%20NPS")
+    assert s == 200 and b["licoes"][0]["id"] == v["id"]  # a versão antiga saiu da busca; a nova entrou
+    assert chamar(base, "/api/conhecimento/caderno?id=leitura")[0] == 200
+    assert chamar(base, "/api/conhecimento/caderno?id=ninguem")[0] == 404
+    s, e = chamar(base, "/api/erros")
+    assert s == 200 and isinstance(e["erros"], list)
+    with urllib.request.urlopen(base + "/conhecimento.js") as r:
+        assert b"renderConhecimento" in r.read()
