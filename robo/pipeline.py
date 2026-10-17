@@ -408,6 +408,15 @@ def processar_arquivo(caminho: str | Path, cfg: Config, gravar: bool = True, ao_
             r.quadro += _conferencias_equipe("governanca", ctx, rel, ao_etapa, bloquear=False)
         except Exception:
             log.exception("Governança falhou em %s", caminho.name)
+        # RH: conta observações dos estagiários e contrata quando os dados mostram demanda comprovada
+        try:
+            from robo import contratacao
+            contratacao.registrar_observacoes(cfg, rel)
+            contratacao.avaliar_experiencias(cfg)  # fim dos 3 meses de experiência
+            for a in contratacao.avaliar(cfg, caminho.name, t.regra, t.analisaveis):
+                rel.info(f"RH contratou {a['nome']} ({a['cargo']}) em observação: {a['descricao']}")
+        except Exception:
+            log.exception("Contratação automática falhou em %s", caminho.name)
 
     r.duracao = time.perf_counter() - inicio
     if r.status == SUCESSO:

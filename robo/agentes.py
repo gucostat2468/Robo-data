@@ -41,6 +41,8 @@ log = logging.getLogger("robo")
 
 POSICOES = ["limpeza", "validacao", "modelagem"]
 RE_ID = re.compile(r"^[a-z][a-z0-9_]{1,39}$")
+ANDAR_MAXIMO = 9  # o prédio cresce: contratar para o 5º andar cria o 5º andar no escritório 3D
+TAMANHO_MAXIMO_MANUAL = 50_000
 
 NATIVOS = [
     {"id": "recepcao", "nome": "Rita", "papel": "Recepção", "cor": "#F59E0B", "aceita_habilidades": False,
@@ -73,7 +75,8 @@ class ErroAgente(Exception):
 
 def _padrao_agente(dados: dict) -> dict:
     a = {"id": "", "nome": "", "papel": "", "descricao": "", "cor": "#64748B", "posicao": "limpeza", "ordem": 50,
-         "ativo": True, "aplicar_em": ["*"], "habilidades": [], "nivel": "pleno", "area": "", "cargo": "", "mentor": ""}
+         "ativo": True, "aplicar_em": ["*"], "habilidades": [], "nivel": "pleno", "area": "", "cargo": "", "mentor": "",
+         "andar": 1, "contratado_por": "dono", "contratante": "", "contratado_em": "", "fim_experiencia": ""}
     a.update({k: v for k, v in (dados or {}).items() if v is not None})
     # compatibilidade com arquivos antigos, escritos quando "habilidade" se chamava "skill"
     if a.get("skills") and not (dados or {}).get("habilidades"):
@@ -103,6 +106,11 @@ def validar_agente(a: dict, nativo: bool = False) -> list[str]:
             problemas.append(f"posição inválida (use: {', '.join(POSICOES)})")
         if not re.match(r"^#[0-9a-fA-F]{6}$", str(a.get("cor", ""))):
             problemas.append("cor inválida (use o formato #RRGGBB)")
+        try:
+            if not 1 <= int(a.get("andar") or 1) <= ANDAR_MAXIMO:
+                raise ValueError
+        except (TypeError, ValueError):
+            problemas.append(f"andar inválido (de 1 a {ANDAR_MAXIMO}; um andar novo aparece no prédio sozinho)")
     from robo import rh
     nivel = a.get("nivel") or "pleno"
     if not nativo and nivel not in rh.NIVEIS:
@@ -197,8 +205,8 @@ class Equipe:
             item = {**deepcopy(n), "nativo": True, "ativo": True, "aplicar_em": ["*"],
                     "posicao": n["id"], "habilidades": deepcopy(self.habilidades_nativos.get(n["id"], [])),
                     "problemas": self.problemas.get(n["id"], [])}
-            extras = [{**deepcopy(a), "nativo": False, "aceita_habilidades": True, "problemas": self.problemas.get(a["id"], [])}
-                      for a in self.personalizados if a["posicao"] == n["id"]]
+            extras = [{**deepcopy(a), "nativo": False, "aceita_habilidades": True, "problemas": self.problemas.get(a["id"], []),
+                       "manual": self.manual(a["id"])} for a in self.personalizados if a["posicao"] == n["id"]]
             item["ficha"] = rh.ficha(item)
             for x in extras:
                 x["ficha"] = rh.ficha(x)
@@ -271,13 +279,35 @@ class Equipe:
         if nativo:
             conteudo = {"habilidades": a["habilidades"]}
         else:
-            conteudo = {k: a[k] for k in ("id", "nome", "papel", "cargo", "nivel", "area", "mentor", "descricao", "cor",
-                                          "posicao", "ordem", "ativo", "aplicar_em", "habilidades")}
+            a["andar"] = int(a.get("andar") or 1)
+            conteudo = {k: a[k] for k in ("id", "nome", "papel", "cargo", "nivel", "area", "mentor", "andar", "contratado_por", "contratante",
+                                          "contratado_em", "fim_experiencia",
+                                          "descricao", "cor", "posicao", "ordem", "ativo", "aplicar_em", "habilidades")}
         texto = ("# Agente do Robô de Planilhas — editado pelo painel (pode editar à mão também)\n"
                  + yaml.safe_dump(conteudo, allow_unicode=True, sort_keys=False, default_flow_style=False))
         (self.pasta / f"{agente_id}.yaml").write_text(texto, encoding="utf-8")
+        if dados.get("manual") is not None:
+            self.salvar_manual(agente_id, dados["manual"])
         self.carregar()
         return a
+
+    def salvar_manual(self, agente_id: str, texto: str) -> None:
+        """Manual de procedimentos em Markdown (agentes/<id>.md). Vale para qualquer pessoa do prédio."""
+        if not RE_ID.match(str(agente_id)):
+            raise ErroAgente("id inválido")
+        manual = str(texto or "")[:TAMANHO_MAXIMO_MANUAL].strip()
+        self.pasta.mkdir(parents=True, exist_ok=True)
+        arq_md = self.pasta / f"{agente_id}.md"
+        if manual:
+            arq_md.write_text(manual + "\n", encoding="utf-8")
+        elif arq_md.exists():
+            arq_md.unlink()
+
+    def manual(self, agente_id: str) -> str:
+        arq = self.pasta / f"{agente_id}.md"
+        if not RE_ID.match(agente_id) or not arq.exists():
+            return ""
+        return arq.read_text(encoding="utf-8")[:TAMANHO_MAXIMO_MANUAL]
 
     def excluir(self, agente_id: str):
         if agente_id in IDS_NATIVOS:
@@ -288,4 +318,7 @@ class Equipe:
         lixeira = self.pasta / "_excluidos"
         lixeira.mkdir(exist_ok=True)
         arq.replace(lixeira / arq.name)
+        md = self.pasta / f"{agente_id}.md"
+        if md.exists():
+            md.replace(lixeira / md.name)
         self.carregar()
