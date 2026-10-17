@@ -179,6 +179,9 @@ function renderMemoria() {
   const hos = m.handovers.map((h) => `<div class="ocorrencia ${h.estado === "reaberto" ? "erro" : h.estado === "verificado" ? "" : "aviso"}"><div class="principal">
       <strong>${esc(h.erro)}</strong> <span class="etiqueta">${h.recorrencias}x</span>
       <div class="muted">${esc(h.id)} · ${esc(h.area)} · responsável ${esc(h.responsavel)} · causa: ${esc(h.causa)}</div>
+      <div><b>Por que aconteceu:</b> ${esc(h.por_que_aconteceu)}</div>
+      <div><b>Por que ainda não foi resolvido:</b> ${esc(h.por_que_nao_resolvido)}</div>
+      <div><b>Quem precisa agir:</b> ${esc(h.quem_precisa_agir)}${h.simples ? ` <span class="etiqueta sucesso">erro simples</span>` : ""}${h.escalado ? ` <span class="etiqueta perigo">escalado para ${esc(h.escalado_para)}</span>` : ""}</div>
       <div><b>Para não repetir:</b> ${esc(h.regra)}</div><div class="muted"><b>Como verificar:</b> ${esc(h.como_verificar)}</div></div>
       <select data-handover="${esc(h.id)}">${["aberto", "em_aplicacao", "aplicado", "verificado", "reaberto"].map((e) => `<option ${e === h.estado ? "selected" : ""} value="${e}">${e.replace("_", " ")}</option>`).join("")}</select></div>`).join("");
   const r = m.reunioes[0];
@@ -187,7 +190,7 @@ function renderMemoria() {
       <div class="grade-2" style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:6px">
         <div><div class="secao-titulo">Deu certo</div><ul class="lista-ficha">${a.deu_certo.map((x) => `<li>${esc(x)}</li>`).join("")}</ul></div>
         <div><div class="secao-titulo">Deu errado</div><ul class="lista-ficha">${a.deu_errado.map((x) => `<li>${esc(x)}</li>`).join("")}</ul></div></div>
-      <div class="secao-titulo">Plano de ação</div><ul class="lista-ficha">${a.plano_de_acao.map((x) => `<li>${esc(x.acao)} — <b>${esc(x.responsavel_nome || x.responsavel)}</b>, até ${esc(x.prazo)} <span class="muted">(${esc(x.motivo)})</span></li>`).join("") || "<li>Nada novo a corrigir.</li>"}</ul>
+      <div class="secao-titulo">Plano de ação</div><ul class="lista-ficha">${a.plano_de_acao.map((x) => `<li>${x.simples ? `<span class="etiqueta sucesso">simples</span> ` : ""}${esc(x.acao)} — <b>${esc(x.quem_precisa_agir || x.responsavel_nome || x.responsavel)}</b>, até ${esc(x.prazo)} <span class="muted">(${esc(x.motivo)})</span></li>`).join("") || "<li>Nada novo a corrigir.</li>"}</ul>
     </div></div>`).join("") : `<p class="muted">Nenhuma reunião ainda. Ela acontece sozinha uma vez por semana, ou clique em “Fazer a reunião semanal agora”.</p>`;
   return cabecalho("Memória e reuniões", "O que cada funcionário acertou, errou e aprendeu (com a origem de cada fato), os handovers de cada área — todo erro vira regra para não repetir — e a reunião semanal da liderança.", acoes) +
     `<div class="dica">${icone("info")}<p>Desempenho insuficiente (pelo menos 5 eventos e menos de 70% de acerto): 1ª reunião = plano de melhoria; 2ª = proposta de desligamento, que <b>só você</b> aprova em Solicitações.

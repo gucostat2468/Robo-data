@@ -172,6 +172,61 @@ def _nps(s: pd.Series) -> tuple[float, int, float]:
     return 100 * (p - d), n, 100 * 1.96 * math.sqrt(max(p + d - (p - d) ** 2, 0) / n)
 
 
+def _f1(v) -> str:
+    return f"{v:.1f}".replace(".", ",") if isinstance(v, float) and not math.isnan(v) else _fmt(v)
+
+
+def _comparar_nps(grupos) -> str:
+    """Maior × menor NPS entre grupos com pelo menos 30 respostas: a diferença é real ou pode ser acaso?"""
+    validos = []
+    for chave, sub in grupos:
+        v, n, m = _nps(sub)
+        if n >= 30 and not math.isnan(v):
+            validos.append((v, m, " / ".join(map(str, chave)) if isinstance(chave, tuple) else str(chave)))
+    if len(validos) < 2:
+        return "Conclusão: poucos grupos com 30 respostas ou mais; não dá para afirmar diferença entre eles."
+    (v1, m1, g1), (v2, m2, g2) = max(validos), min(validos)
+    dif, margem_dif = v1 - v2, math.sqrt(m1 ** 2 + m2 ** 2)  # teste de diferença entre duas proporções independentes (95%)
+    if dif > margem_dif:
+        return (f"Conclusão: {g1} ({_f1(v1)}) está de fato acima de {g2} ({_f1(v2)}): a diferença de {_f1(dif)} pts "
+                f"é maior que a margem da diferença (±{_f1(margem_dif)} pts, 95% de confiança).")
+    return (f"Conclusão: a diferença entre {g1} ({_f1(v1)}) e {g2} ({_f1(v2)}) é de {_f1(dif)} pts, menor que a margem da "
+            f"diferença (±{_f1(margem_dif)} pts): pode ser acaso. Não comunique como ranking.")
+
+
+def _nps_explicado(s: pd.Series) -> str:
+    """NPS com a conta aberta: % promotores − % detratores, com quantidades, neutros e margem."""
+    v = pd.to_numeric(s, errors="coerce").dropna()
+    n = len(v)
+    if not n:
+        return "sem notas válidas"
+    prom, det = int((v >= 9).sum()), int((v <= 6).sum())
+    neu = n - prom - det
+    nps, _, margem = _nps(v)
+    pp, pd_, pn = 100 * prom / n, 100 * det / n, 100 * neu / n
+    return (f"NPS {_f1(nps)} = {_f1(pp)}% promotores ({prom}) − {_f1(pd_)}% detratores ({det}); "
+            f"neutros {_f1(pn)}% ({neu}); n={n}; margem ±{_f1(margem)} pts"
+            + (" ⚠ base pequena (menos de 30): use com cautela" if n < 30 else ""))
+
+
+EXPLICA_NPS = ("Como ler: NPS = % de promotores (notas 9 e 10) − % de detratores (notas 0 a 6). Os neutros (7 e 8) não "
+               "entram na subtração, mas contam no total, então diluem o resultado. Vai de −100 a +100. A margem é de 95% "
+               "de confiança. Para comparar dois grupos, a diferença entre eles precisa ser maior que a margem da diferença "
+               "(raiz da soma dos quadrados das duas margens); se não for, pode ser acaso.")
+EXPLICA_CSAT = ("Como ler: CSAT (top-2-box) = % de quem deu as duas notas mais altas da escala (4 e 5 numa escala de 1 a 5) "
+                "sobre o total de quem respondeu.")
+
+
+def _csat_explicado(s: pd.Series) -> str:
+    v = pd.to_numeric(s, errors="coerce").dropna()
+    if not len(v):
+        return "sem notas válidas"
+    escala = 5 if v.max() <= 5 else 7 if v.max() <= 7 else 10
+    sat = int((v >= escala - 1).sum())
+    return (f"CSAT {_f1(100 * sat / len(v))}% = {sat} de {len(v)} deram nota {escala - 1} ou {escala} (escala até {escala})"
+            + (" ⚠ base pequena (menos de 30)" if len(v) < 30 else ""))
+
+
 def _csat(s: pd.Series) -> tuple[float, int]:
     v = pd.to_numeric(s, errors="coerce").dropna()
     if not len(v):
@@ -322,11 +377,9 @@ def _executar(op: str, df: pd.DataFrame, metricas: list[str], por: list[str]) ->
 
     def calc(sub: pd.DataFrame):
         if op == "nps":
-            v, n, m = _nps(sub[col])
-            return f"{_fmt(v)} (±{_fmt(m)}, n={n})" + (" ⚠ base pequena" if 0 < n < 30 else "")
+            return _nps_explicado(sub[col])
         if op == "csat":
-            v, n = _csat(sub[col])
-            return f"{_fmt(v)}% (n={n})" + (" ⚠ base pequena" if 0 < n < 30 else "")
+            return _csat_explicado(sub[col])
         if op == "contagem":
             return f"{len(sub):,}".replace(",", ".")
         if op == "distintos":
@@ -350,12 +403,19 @@ def _executar(op: str, df: pd.DataFrame, metricas: list[str], por: list[str]) ->
         dist = df[alvo[0]].value_counts(normalize=True, dropna=False).head(15) * 100
         return (f"Percentual de {alvo[0]}", "\n".join(f"{k}: {_fmt(float(v))}%" for k, v in dist.items()))
     titulo = f"{nome_op}" + (f" de {col}" if col else "") + (f" por {', '.join(por)}" if por else "")
+    explica = {"nps": EXPLICA_NPS, "csat": EXPLICA_CSAT}.get(op)
     if not por:
-        return titulo, calc(df)
+        return titulo, calc(df) + (f"\n{explica}" if explica else "")
+    if explica:  # total primeiro, para comparar cada grupo com a média geral
+        linhas.append(f"Total: {calc(df)}")
     grupos = list(df.groupby(por, dropna=True, observed=True))
     for chave, sub in sorted(grupos, key=lambda g: -len(g[1]))[:15]:
         rotulo = " / ".join(map(str, chave)) if isinstance(chave, tuple) else str(chave)
         linhas.append(f"{rotulo}: {calc(sub)}")
     if len(grupos) > 15:
         linhas.append(f"… e mais {len(grupos) - 15} grupo(s)")
+    if op == "nps":
+        linhas.append(_comparar_nps([(k, sub[col]) for k, sub in grupos]))
+    if explica:
+        linhas.append(explica)
     return titulo, "\n".join(linhas)

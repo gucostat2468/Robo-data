@@ -151,7 +151,47 @@ def handovers(cfg, andar: int | None = None, abertos: bool = False, limite: int 
     if abertos:
         sql += " AND estado IN ('aberto','em_aplicacao','reaberto')"
     with Trabalho(cfg).tx() as c:
-        return [dict(r) for r in c.execute(sql + " ORDER BY recorrencias DESC, ultima_ocorrencia DESC LIMIT ?", args + [limite])]
+        linhas = [dict(r) for r in c.execute(sql + " ORDER BY recorrencias DESC, ultima_ocorrencia DESC LIMIT ?", args + [limite])]
+    gente = organizacao.por_id(cfg)
+    return [h | explicar(h, gente) for h in linhas]
+
+
+# erros que dependem de quem gera a planilha (o robô não pode "consertar" dado na origem: seria inventar dado)
+RESPONSAVEIS_ORIGEM = {"validacao", "leitura", "limpeza"}
+# erros simples: corrigidos em minutos numa configuração do painel
+SIMPLES = ("configuracao invalida", "formato", "gravar a saida")
+ESCALAR_APOS = 3
+
+
+def explicar(h: dict, gente: dict | None = None) -> dict:
+    """Por que aconteceu, por que ainda não foi resolvido, quem precisa agir e se é simples."""
+    gente = gente or {}
+    nome = lambda x: (gente.get(x) or {}).get("nome", x)  # noqa: E731
+    texto = _norm(h.get("erro", ""))
+    simples = any(x in texto for x in SIMPLES)
+    origem = h.get("responsavel") in RESPONSAVEIS_ORIGEM and not simples
+    por_que = h.get("causa", "") + (f" Exemplo: {h['exemplo']}." if h.get("exemplo") else "")
+    estado = h.get("estado")
+    if estado == "reaberto":
+        nao_resolvido = (f"Foi marcado como corrigido, mas voltou a acontecer em {str(h.get('ultima_ocorrencia'))[:16]}. "
+                         "A correção aplicada não atacou a causa: é preciso rever a regra.")
+    elif estado == "em_aplicacao":
+        nao_resolvido = (f"Já está no backlog da Estratégia (item {h.get('backlog_id') or '—'}) com {nome(h.get('responsavel'))}, "
+                         "mas ninguém marcou como aplicado ainda.")
+    elif estado in ("aplicado", "verificado"):
+        nao_resolvido = "Resolvido: não voltou a acontecer desde a correção." if estado == "verificado" else             "Correção aplicada; falta confirmar na próxima carga que o erro não voltou."
+    else:
+        nao_resolvido = ("Ainda ninguém começou a correção: o handover existe desde "
+                         f"{str(h.get('criado_em'))[:10]} e entra no backlog, com responsável e prazo, na próxima reunião semanal.")
+    if origem and estado not in ("aplicado", "verificado"):
+        nao_resolvido += (" Este erro está no DADO que chega: o robô barra e avisa, mas não muda dado da origem (seria "
+                          "inventar informação). Resolve quem gera a planilha, ou você, se decidir mudar a regra.")
+    quem = ("Você (no painel, em minutos)" if simples else
+            "Quem gera a planilha (ou você, mudando a regra)" if origem else nome(h.get("responsavel")))
+    escalado = int(h.get("recorrencias") or 0) >= ESCALAR_APOS and estado not in ("aplicado", "verificado")
+    return {"por_que_aconteceu": por_que, "por_que_nao_resolvido": nao_resolvido, "quem_precisa_agir": quem,
+            "simples": simples, "na_origem": origem, "escalado": escalado,
+            "escalado_para": nome(organizacao.lider_do_andar(h.get("andar") or 1)) if escalado else None}
 
 
 def experiencias(cfg, funcionario: str | None = None, desde: str | None = None, ate: str | None = None,

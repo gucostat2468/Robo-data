@@ -91,3 +91,27 @@ def teste_cargo_fixo_ruim_vira_defeito_de_codigo_e_contratado_vai_a_pdi_e_propos
     from robo import orquestrador
     r = orquestrador.decidir(cfg, a2["aprovacoes"][0], False, "dar mais uma chance")
     assert r["estado"] == "recusada" and not r["desligado"]
+
+
+def teste_handover_explica_por_que_e_por_que_nao_foi_resolvido(planilha_baguncada, cfg):
+    r = processar_arquivo(planilha_baguncada, cfg)
+    for _ in range(3):
+        memoria.registrar_execucao(cfg, r)
+    h = next(x for x in memoria.handovers(cfg) if "lista permitida" in x["erro"])
+    assert h["por_que_aconteceu"] and "ninguém começou" in h["por_que_nao_resolvido"]
+    assert h["na_origem"] and "não muda dado da origem" in h["por_que_nao_resolvido"]
+    assert h["escalado"] and h["escalado_para"] == "Carla"  # repetiu 3 vezes: sobe para a líder do 1º andar
+    simples = memoria.explicar({"erro": "Agente Vera está com configuração inválida", "responsavel": "coord_engenharia",
+                                "estado": "aberto", "causa": "x", "andar": 1, "recorrencias": 1})
+    assert simples["simples"] and simples["quem_precisa_agir"].startswith("Você")
+
+
+def teste_nps_mostra_a_conta_e_a_conclusao():
+    import pandas as pd
+
+    from robo import calculos
+    df = pd.DataFrame({"nota_nps": [10, 9, 9, 8, 7, 6, 3, 10, 0, 9] * 10, "curso": ["A", "B"] * 50})
+    _, texto = calculos._executar("nps", df, ["nota_nps"], ["curso"])
+    assert "Total: NPS 20,0 = 50,0% promotores (50) − 30,0% detratores (30)" in texto
+    assert "neutros 20,0% (20)" in texto and "Conclusão: B (40,0) está de fato acima de A (0,0)" in texto
+    assert "Como ler: NPS = % de promotores" in texto

@@ -95,11 +95,15 @@ def gerar(cfg, ate: datetime | None = None, publicar: bool = True) -> dict:
         certo += [f"{d['nome']}: {d['acertos']} acerto(s)" for d in destaques]
         hos = memoria.handovers(cfg, andar, abertos=True, limite=50)
         semana = [h for h in hos if h["ultima_ocorrencia"] >= desde.isoformat()]
-        errado += [f"{h['erro'][:120]} ({h['recorrencias']}x)" for h in semana[:5]]
+        errado += [f"{h['erro'][:120]} ({h['recorrencias']}x) — por quê: {h['por_que_aconteceu'][:160]} "
+                   f"Por que não foi resolvido: {h['por_que_nao_resolvido']}"
+                   + (f" ESCALADO para {h['escalado_para']} (repetiu {h['recorrencias']} vezes)." if h["escalado"] else "")
+                   for h in semana[:5]]
         acoes = []
         for h in semana[:5]:
             resp = h["responsavel"] if h["responsavel"] in gente else lider
             acoes.append({"acao": h["regra"], "motivo": f"{h['id']}: {h['erro'][:150]}", "responsavel": resp,
+                          "quem_precisa_agir": h["quem_precisa_agir"], "simples": h["simples"],
                           "responsavel_nome": (gente.get(resp) or {}).get("nome", resp),
                           "verificacao": h["como_verificar"], "prazo": (ate + timedelta(days=DIAS)).strftime("%d/%m/%Y"),
                           "handover": h["id"], "andar": andar})
