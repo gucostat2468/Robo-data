@@ -817,6 +817,7 @@ def criar_manipulador(api: Api):
             if caminho not in ROTAS_POST:
                 return self._json({"erro": "rota inexistente"}, 404)
             if tamanho > LIMITE_JSON:
+                self.close_connection = True  # não lê o corpo gigante: responde e encerra a conexão
                 return self._json({"erro": "requisição grande demais"}, 413)
             try:
                 corpo = json.loads(self.rfile.read(tamanho) or b"{}") if tamanho else {}
