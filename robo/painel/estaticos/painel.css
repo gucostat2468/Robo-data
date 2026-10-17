@@ -464,3 +464,47 @@ details.conhecimento pre { white-space: pre-wrap; font-family: var(--fonte); mar
 .catalogo button small { display: block; color: var(--texto-3); font-size: 12px; margin-top: 2px; }
 .catalogo .grupo { grid-column: 1 / -1; font-size: 12px; font-weight: 700; color: var(--texto-3); text-transform: uppercase; letter-spacing: .04em; margin-top: 6px; }
 input[type=color] { width: 100%; height: 36px; padding: 2px; border-radius: var(--raio-p); border: 1px solid var(--borda-forte); background: var(--superficie); }
+
+/* ---------------------------------------------------------------- organograma */
+.organograma { display: flex; flex-direction: column; gap: 10px; margin-bottom: 18px; }
+.andar-org { padding: 0; }
+.andar-org > summary { display: flex; flex-wrap: wrap; gap: 6px 14px; align-items: baseline; padding: 14px 18px; cursor: pointer; list-style: none; }
+.andar-org > summary::-webkit-details-marker { display: none; }
+.niveis-org { display: flex; flex-direction: column; gap: 12px; padding: 0 18px 16px; }
+.nivel-nome { font-size: 11.5px; font-weight: 700; text-transform: uppercase; letter-spacing: .05em; color: var(--texto-3); margin-bottom: 6px; }
+.nivel-org { display: flex; flex-wrap: wrap; gap: 8px; align-items: flex-start; }
+.nivel-org .nivel-nome { width: 100%; }
+.pessoa-org { display: flex; align-items: center; gap: 10px; min-width: 240px; max-width: 340px; flex: 1 1 260px; text-align: left;
+  border: 1px solid var(--borda); border-radius: 10px; padding: 8px 10px; background: var(--superficie); cursor: pointer; font: inherit; color: inherit; }
+.pessoa-org:hover { border-color: var(--primaria); }
+.pessoa-org > span:nth-child(2) { flex: 1; min-width: 0; display: flex; flex-direction: column; }
+.pessoa-org small { font-size: 12px; color: var(--texto-2); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.lista-ficha { margin: 0; padding-left: 18px; color: var(--texto-2); }
+
+/* ---------------------------------------------------------------- canal */
+.canal-layout { display: grid; grid-template-columns: 240px 1fr; gap: 16px; align-items: start; }
+.canais { display: flex; flex-direction: column; gap: 4px; position: sticky; top: 12px; }
+.canais button { display: flex; flex-direction: column; align-items: flex-start; gap: 2px; text-align: left; padding: 8px 12px; border-radius: 10px;
+  border: 1px solid transparent; background: transparent; cursor: pointer; font: inherit; color: inherit; }
+.canais button small { color: var(--texto-3); font-size: 12px; }
+.canais button:hover { background: var(--superficie-2); }
+.canais button.ativo { background: var(--primaria-suave); border-color: color-mix(in srgb, var(--primaria) 30%, var(--borda)); }
+.conversa { display: flex; flex-direction: column; min-height: 70vh; padding: 0; overflow: hidden; }
+.filtros-canal { display: flex; flex-wrap: wrap; gap: 8px; padding: 12px; border-bottom: 1px solid var(--borda); }
+.filtros-canal select { max-width: 230px; }
+.filtros-canal .campo-busca { flex: 1; min-width: 180px; max-width: none; }
+.mensagens { flex: 1; overflow-y: auto; max-height: 58vh; padding: 14px; display: flex; flex-direction: column; gap: 10px; }
+.msg { max-width: 82%; padding: 10px 14px; border-radius: 14px; background: var(--superficie-2); border: 1px solid var(--borda); }
+.msg.minha { align-self: flex-end; background: var(--primaria-suave); }
+.msg.tipo-alerta { border-color: color-mix(in srgb, var(--perigo) 45%, var(--borda)); }
+.msg.tipo-sprint { border-left: 4px solid var(--primaria); }
+.msg-cab { display: flex; flex-wrap: wrap; align-items: baseline; gap: 6px 8px; margin-bottom: 4px; }
+.msg-cab small { color: var(--texto-3); }
+.msg-cab time { margin-left: auto; font-size: 12px; color: var(--texto-3); }
+.msg-texto { white-space: pre-wrap; line-height: 1.45; }
+.sugestoes { display: flex; flex-wrap: wrap; gap: 6px; padding: 8px 12px; border-top: 1px solid var(--borda); }
+.caixa-texto { display: flex; gap: 8px; padding: 12px; border-top: 1px solid var(--borda); align-items: flex-end; }
+.caixa-texto textarea { flex: 1; resize: vertical; min-height: 44px; }
+.ok-cartao { border-color: color-mix(in srgb, var(--sucesso) 45%, var(--borda)); color: var(--sucesso); }
+.alerta-cartao { border-color: color-mix(in srgb, var(--alerta, #d97706) 55%, var(--borda)); }
+@media (max-width: 900px) { .canal-layout { grid-template-columns: 1fr; } .canais { position: static; flex-direction: row; overflow-x: auto; } .msg { max-width: 100%; } }

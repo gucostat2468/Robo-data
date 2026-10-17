@@ -225,11 +225,11 @@ function criarPlanta(x, z, escala = 1) {
 // ------------------------------------------------------------------ estado da cena (prédio de 2 andares)
 const ALTURA = 4.4; // pé-direito: cada andar fica 4,4 m acima do anterior
 const NOME_ANDAR = { 1: "1º andar · Engenharia de dados", 2: "2º andar · Análise e Qualidade", 3: "3º andar · Sala Excel (Trade e Pesquisa)",
-  4: "4º andar · Diretoria, Governança e Canal" };
-const CURTO_ANDAR = { 1: "1º andar", 2: "2º andar", 3: "3º · Excel", 4: "4º · Diretoria" };
+  4: "4º andar · Diretoria, Governança e Canal", 5: "5º andar · TI, DevOps e Segurança" };
+const CURTO_ANDAR = { 1: "1º andar", 2: "2º andar", 3: "3º · Excel", 4: "4º · Diretoria", 5: "5º · TI" };
 const PLACA_ANDAR = { 1: ["1º ANDAR · ENGENHARIA DE DADOS", "#1d3fb0"], 2: ["2º ANDAR · ANÁLISE E QUALIDADE", "#7c3aed"], 3: ["3º ANDAR · SALA EXCEL", "#107c41"],
-  4: ["4º ANDAR · DIRETORIA E CANAL", "#9a3412"] };
-const COR_TV = { 1: ["#0f1b3d", "#1d3fb0"], 2: ["#1e1038", "#6d28d9"], 3: ["#062b18", "#107c41"], 4: ["#2a0f05", "#9a3412"] };
+  4: ["4º ANDAR · DIRETORIA E CANAL", "#9a3412"], 5: ["5º ANDAR · TI E SEGURANÇA", "#111827"] };
+const COR_TV = { 1: ["#0f1b3d", "#1d3fb0"], 2: ["#1e1038", "#6d28d9"], 3: ["#062b18", "#107c41"], 4: ["#2a0f05", "#9a3412"], 5: ["#05070d", "#1f2937"] };
 const yAndar = (andar) => (andar - 1) * ALTURA;
 const andarDe = (a) => Number(a.andar) || 1;
 // "prédio" conta como acima de todos os andares (mostra todos)
@@ -397,7 +397,7 @@ function construirAndar(g, andar, equipe) {
       estante.add(caixa(0.16, 0.42, 0.34, mat(cores[(i + prat) % 6]), -0.6 + i * 0.22, 0.3 + prat * 0.52, 0.06));
     }
     g.add(estante);
-    const p = placa(andar === 3 ? "Entregas Excel" : andar === 4 ? "Atas das sprints" : "Bases-Relatorios", corPlaca); p.position.set(xLateral, 2.15, zFrente + 0.8); g.add(p);
+    const p = placa({ 3: "Entregas Excel", 4: "Atas das sprints", 5: "Servidor local" }[andar] || "Bases-Relatorios", corPlaca); p.position.set(xLateral, 2.15, zFrente + 0.8); g.add(p);
     prateleiras[andar] = { local: new THREE.Vector3(xLateral, 1.72, zFrente + 0.8), mundo: new THREE.Vector3(xLateral, yBase + 1.72, zFrente + 0.8) };
     pilhasRelatorios[andar] = [];
     const mesa = new THREE.Group(); mesa.position.set(maxX - 2.2, 0, zFrente + 0.6);
@@ -603,7 +603,7 @@ function desenharTV(andar) {
   grad.addColorStop(0, c0); grad.addColorStop(1, c1);
   ctx.fillStyle = grad; ctx.fillRect(0, 0, l, a);
   ctx.fillStyle = "rgba(255,255,255,.85)"; ctx.font = "600 34px Segoe UI, system-ui, sans-serif"; ctx.textAlign = "left";
-  ctx.fillText({ 1: "HOJE NA ENGENHARIA", 2: "HOJE NA ANÁLISE", 3: "HOJE NA SALA EXCEL", 4: "HOJE NA DIRETORIA" }[andar] || "HOJE", 48, 70);
+  ctx.fillText({ 1: "HOJE NA ENGENHARIA", 2: "HOJE NA ANÁLISE", 3: "HOJE NA SALA EXCEL", 4: "HOJE NA DIRETORIA", 5: "SAÚDE DO SISTEMA" }[andar] || "HOJE", 48, 70);
   ctx.textAlign = "right"; ctx.fillStyle = estado.ligado ? "#7fe0b4" : "#f5b445";
   ctx.fillText(estado.ligado ? "● Monitorando" : "● Pausado", l - 48, 70); ctx.textAlign = "left";
   let blocos;
@@ -611,6 +611,10 @@ function desenharTV(andar) {
     const k = estado.kpis || {};
     blocos = [["Aprovados", k.hoje_sucesso ?? 0, "#7fe0b4"], ["Reprovados", k.hoje_reprovado ?? 0, "#ff9a85"],
       ["Na fila", estado.fila.length, "#ffd27a"], ["Linhas", k.hoje_linhas ?? 0, "#a9c1ff"]];
+  } else if (andar === 5) {
+    const t = estado.ti || {};
+    blocos = [["Status", t.saudavel === false ? "ALERTA" : t.saudavel ? "OK" : "—", t.saudavel === false ? "#ff9a85" : "#7fe0b4"],
+      ["Alertas", (t.alertas || []).length, "#ffd27a"], ["Pessoas de TI", estado.equipe.filter((a) => andarDe(a) === 5).length, "#a9c1ff"]];
   } else if (andar === 4) {
     const c = estado.canalHoje || {};
     blocos = [["Mensagens hoje", c.mensagens ?? 0, "#fdba74"], [`Sprint ${c.sprint ?? 1}`, c.dias_restantes ?? 0, "#7fe0b4"], ["Pessoas", estado.equipe.length, "#a9c1ff"]];
@@ -624,7 +628,7 @@ function desenharTV(andar) {
   blocos.forEach(([t, v, c], i) => {
     const x = 48 + i * 238, alto = andar === 1 ? 300 : 170;
     ctx.fillStyle = "rgba(255,255,255,.08)"; retanguloArredondado(ctx, x, 110, 216, alto, 20); ctx.fill();
-    ctx.fillStyle = c; ctx.font = `700 ${andar === 1 ? 92 : 72}px Segoe UI, system-ui, sans-serif`; ctx.fillText(num(v), x + 22, andar === 1 ? 280 : 200, 180);
+    ctx.fillStyle = c; ctx.font = `700 ${andar === 1 ? 92 : typeof v === "string" ? 60 : 72}px Segoe UI, system-ui, sans-serif`; ctx.fillText(typeof v === "string" ? v : num(v), x + 22, andar === 1 ? 280 : 200, 180);
     ctx.fillStyle = "rgba(255,255,255,.8)"; ctx.font = "500 30px Segoe UI, system-ui, sans-serif"; ctx.fillText(t, x + 22, andar === 1 ? 350 : 255, 190);
   });
   if (andar === 2) {
@@ -633,6 +637,12 @@ function desenharTV(andar) {
     ctx.fillText(linhas.length ? `Último resumo · ${estado.analiseHoje.ultimo_arquivo}` : "Nenhuma análise hoje ainda", 48, 330, l - 96);
     ctx.font = "400 23px Segoe UI, system-ui, sans-serif"; ctx.fillStyle = "rgba(255,255,255,.8)";
     linhas.forEach((t, i) => ctx.fillText(String(t).trim(), 48, 370 + i * 34, l - 96));
+  } else if (andar === 5) {
+    const t = estado.ti || {};
+    ctx.fillStyle = "rgba(255,255,255,.92)"; ctx.font = "600 26px Segoe UI, system-ui, sans-serif";
+    ctx.fillText(t.data_hora ? `Última ronda de TI · ${t.data_hora.slice(11, 16)}` : "Primeira ronda de TI em andamento", 48, 330, l - 96);
+    ctx.font = "400 23px Segoe UI, system-ui, sans-serif"; ctx.fillStyle = "rgba(255,255,255,.8)";
+    (t.alertas?.length ? t.alertas.slice(0, 3) : ["Disco, dependências, logs e segurança verificados."]).forEach((x, i) => ctx.fillText(x, 48, 370 + i * 34, l - 96));
   } else if (andar === 4) {
     const c = estado.canalHoje || {};
     ctx.fillStyle = "rgba(255,255,255,.92)"; ctx.font = "600 26px Segoe UI, system-ui, sans-serif";
@@ -817,7 +827,7 @@ const CLASSE_SITUACAO = { trabalhando: "trabalhando", ok: "ok", erro: "erro", pr
 function linhaMembro(a) {
   const e = estado.estacoes.get(a.id); const sit = e?.situacao === "parado" && e.prontidao ? "prontidao" : e?.situacao || "parado";
   const n = estado.agentesNumeros[a.id];
-  const detalhe = a.prontidao ? a.prontidao : n ? `${num(n.valor)} ${n.rotulo}` : a.habilidades.length ? `${a.habilidades.length} habilidade(s)` : a.papel;
+  const detalhe = a.prontidao ? a.prontidao : n ? `${typeof n.valor === "string" ? n.valor : num(n.valor)} ${n.rotulo}` : a.habilidades.length ? `${a.habilidades.length} habilidade(s)` : a.papel;
   return { sit, detalhe };
 }
 
@@ -870,7 +880,7 @@ function mostrarFicha(id) {
       ${f.gestor ? `<span class="etiqueta">Responde a ${esc(f.gestor)}</span>` : ""}</div>
     <p>${esc(a.descricao)}</p>
     ${a.prontidao ? `<p class="muted">Agora: ${esc(a.prontidao)}. Ninguém aqui dorme — sem arquivo, a pessoa estuda e revisa o próprio método.</p>` : ""}
-    ${n ? `<div><div class="numero">${num(n.valor)}</div><span class="muted">${esc(n.rotulo)}</span></div>` : ""}
+    ${n ? `<div><div class="numero">${typeof n.valor === "string" ? esc(n.valor) : num(n.valor)}</div><span class="muted">${esc(n.rotulo)}</span></div>` : ""}
     ${lista("Metodologias e referências", f.metodologias)}
     ${lista("Responsabilidades", f.responsabilidades)}
     ${lista("Critérios de qualidade", f.criterios)}
@@ -940,7 +950,7 @@ async function atualizar() {
   try {
     const d = await api(`/api/escritorio?desde=${estado.ultimoSeq}`);
     estado.ligado = d.ligado; estado.fila = d.fila || []; estado.agentesNumeros = d.agentes || {};
-    estado.bancoHabilitado = Boolean(d.banco_habilitado); estado.analiseHoje = d.analise_hoje || null; estado.excelHoje = d.excel_hoje || null; estado.canalHoje = d.canal_hoje || null;
+    estado.bancoHabilitado = Boolean(d.banco_habilitado); estado.analiseHoje = d.analise_hoje || null; estado.excelHoje = d.excel_hoje || null; estado.canalHoje = d.canal_hoje || null; estado.ti = d.ti || null;
     const chave = JSON.stringify((d.equipe || []).map((a) => [a.id, a.nome, a.papel, a.cor, a.prontidao, a.andar, a.ronda, a.habilidades.length, a.ficha?.nivel])) + estado.bancoHabilitado;
     if (chave !== estado.chaveEquipe) {
       estado.chaveEquipe = chave; estado.equipe = d.equipe || [];
@@ -959,7 +969,7 @@ async function atualizar() {
     if (!estado.tocando && !estado.filaEventos.length && !estado.documentos.size) {
       narrar(estado.fila.length ? `${estado.fila.length} arquivo(s) aguardando sincronização na recepção` : "Aguardando planilhas em Bases-Limpeza…");
     }
-    atualizarPilhaEntrada(); desenharEquipe(); desenharTV(2); desenharTV(3); desenharTV(4);
+    atualizarPilhaEntrada(); desenharEquipe(); desenharTV(2); desenharTV(3); desenharTV(4); desenharTV(5);
   } catch {
     $("#hud-status").innerHTML = `<i class="ponto erro"></i>Sem conexão com o robô`;
   }

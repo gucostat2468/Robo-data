@@ -6,6 +6,8 @@
 
 // ------------------------------------------------------------------ ícones (traço 24x24)
 const ICONES = {
+  chat: '<path d="M21 12a8 8 0 0 1-11.6 7.1L4 21l1.9-5.4A8 8 0 1 1 21 12z"/><path d="M8.5 11h7"/><path d="M8.5 14.5h4.5"/>',
+  escudo: '<path d="M12 3 4.5 6v6c0 4.4 3.2 8.2 7.5 9 4.3-.8 7.5-4.6 7.5-9V6z"/><path d="m9 12 2 2 4-4"/>',
   home: '<path d="M3 10.5 12 3l9 7.5"/><path d="M5 9.5V21h14V9.5"/><path d="M10 21v-6h4v6"/>',
   alerta: '<path d="M10.3 3.9 2.4 18a2 2 0 0 0 1.7 3h15.8a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z"/><path d="M12 9v4"/><path d="M12 17h.01"/>',
   historico: '<path d="M3 12a9 9 0 1 0 3-6.7"/><path d="M3 4v5h5"/><path d="M12 7v5l3 2"/>',
@@ -136,6 +138,9 @@ const E = {
   equipe: null, editando: null, catalogoAberto: false, buscaHabilidade: "",
   consultas: null, consultaAtual: null, resultadoConsulta: null, buscaConsulta: "",
   log: [], logSeq: 0, logFiltro: "todos", autoRolar: true,
+  organograma: null,
+  canal: null, canalAtual: "geral", canalAutor: "", canalTipo: "", canalDias: 0, canalBusca: "", canalRascunho: "",
+  ti: null,
 };
 
 const STATUS = {
@@ -153,8 +158,10 @@ const PAGINAS = {
   testar: { titulo: "Testar planilha", render: renderTestar },
   banco: { titulo: "Banco de dados", render: renderBanco, carregar: carregarBanco },
   consultas: { titulo: "Consultas SQL", render: renderConsultas, carregar: carregarConsultas },
-  agentes: { titulo: "Agentes e habilidades", render: renderAgentes, carregar: carregarAgentes },
+  agentes: { titulo: "Equipe e contratações", render: renderAgentes, carregar: carregarAgentes },
   atividade: { titulo: "Atividade", render: renderAtividade },
+  canal: { titulo: "Canal da equipe", render: renderCanal, carregar: carregarCanal },
+  ti: { titulo: "TI e segurança", render: renderTI, carregar: carregarTI },
   configuracoes: { titulo: "Configurações", render: renderConfig, carregar: carregarConfig },
 };
 
@@ -175,6 +182,7 @@ function desenhar() {
   if (E.geral.erro_config && E.pagina !== "atividade") { alvo.innerHTML = renderBoasVindas(); return; }
   alvo.innerHTML = `<div class="pagina">${PAGINAS[E.pagina].render()}</div>`;
   if (E.pagina === "atividade") rolarLog();
+  if (E.pagina === "canal") { const m = $("#mensagens"); if (m) m.scrollTop = m.scrollHeight; }
 }
 
 const cabecalho = (titulo, subtitulo, acoes = "") =>
@@ -573,7 +581,55 @@ function renderBanco() {
 const POSICAO_TEXTO = { limpeza: "Depois da Limpeza", validacao: "Depois da Auditoria", modelagem: "Antes da Modelagem" };
 
 async function carregarAgentes() {
-  try { E.equipe = await api("/api/agentes"); } catch (e) { avisar(e.message, "erro"); }
+  try {
+    const [equipe, escritorio] = await Promise.all([api("/api/agentes"), api("/api/escritorio")]);
+    E.equipe = equipe; E.organograma = escritorio.equipe || [];
+  } catch (e) { avisar(e.message, "erro"); }
+}
+
+const NOME_ANDAR_PAINEL = { 1: "1º andar · Engenharia de dados", 2: "2º andar · Análise e qualidade", 3: "3º andar · Sala Excel",
+  4: "4º andar · Diretoria, governança e canal", 5: "5º andar · TI, DevOps e segurança" };
+const ORDEM_NIVEL = ["Gerente", "Coordenador(a)", "Especialista", "Sênior", "Pleno", "Júnior", "Estagiário"];
+
+function renderOrganograma() {
+  const gente = E.organograma || [];
+  if (!gente.length) return "";
+  const andares = [...new Set(gente.map((a) => Number(a.andar) || 1))].sort((a, b) => a - b);
+  return `<section class="organograma"><div class="secao-titulo">Quadro de pessoal · ${gente.length} pessoas em ${andares.length} andares</div>
+    ${andares.map((n) => {
+      const membros = gente.filter((a) => (Number(a.andar) || 1) === n);
+      const porNivel = ORDEM_NIVEL.map((nv) => [nv, membros.filter((a) => (a.ficha?.nivel || "Pleno") === nv)]).filter(([, l]) => l.length);
+      return `<details class="cartao andar-org" ${n === 1 ? "open" : ""}><summary><strong>${esc(NOME_ANDAR_PAINEL[n] || `${n}º andar`)}</strong>
+        <span class="muted">${membros.length} pessoas · ${porNivel.map(([nv, l]) => `${l.length} ${nv.toLowerCase()}`).join(" · ")}</span></summary>
+        <div class="niveis-org">${porNivel.map(([nv, l]) => `<div class="nivel-org"><div class="nivel-nome">${esc(nv)}</div>
+          ${l.map((a) => `<button class="pessoa-org" data-acao="ver-pessoa" data-id="${esc(a.id)}">${avatar(a)}<span><strong>${esc(a.nome)}</strong>
+            <small>${esc(a.ficha?.cargo || a.papel)}</small>${a.ficha?.gestor ? `<small class="muted">responde a ${esc(a.ficha.gestor.split(" (")[0])}</small>` : ""}</span>
+            ${a.ficha?.provas ? `<span class="etiqueta ${a.ficha.provas.aprovado ? "sucesso" : "perigo"}">${a.ficha.provas.acertos}/${a.ficha.provas.total}</span>` : ""}</button>`).join("")}
+        </div>`).join("")}</div></details>`;
+    }).join("")}</section>`;
+}
+
+async function abrirPessoa(id) {
+  const a = (E.organograma || []).find((x) => x.id === id); if (!a) return;
+  let manual = "";
+  try { manual = (await api(`/api/agentes/manual?id=${encodeURIComponent(id)}`)).texto; } catch { /* sem manual */ }
+  const f = a.ficha || {};
+  const lista = (t, itens) => itens?.length ? `<div><div class="secao-titulo">${t}</div><ul class="lista-ficha">${itens.map((x) => `<li>${esc(x)}</li>`).join("")}</ul></div>` : "";
+  abrirGaveta(`<div class="gaveta-cab">${avatar(a)}<div style="flex:1"><div class="muted">${esc(NOME_ANDAR_PAINEL[a.andar] || "")}</div>
+      <h2>${esc(a.nome)} · ${esc(f.cargo || a.papel)}</h2></div><button class="btn fantasma" data-acao="fechar-gaveta" aria-label="Fechar">${icone("x")}</button></div>
+    <div class="gaveta-corpo">
+      <div class="chips-colunas">${f.nivel ? `<span class="etiqueta info">${esc(f.nivel)}</span>` : ""}${f.area ? `<span class="etiqueta">${esc(f.area)}</span>` : ""}
+        ${f.gestor ? `<span class="etiqueta">Responde a ${esc(f.gestor)}</span>` : ""}
+        ${f.provas ? `<span class="etiqueta ${f.provas.aprovado ? "sucesso" : "perigo"}">Provas técnicas ${f.provas.acertos}/${f.provas.total}</span>` : ""}</div>
+      <p>${esc(a.descricao || "")}</p>
+      ${lista("Responsabilidades (escopo)", f.responsabilidades)}${lista("Critérios de qualidade", f.criterios)}
+      ${lista("Metodologias", f.metodologias)}${lista("Limites do cargo", f.limites)}
+      <div><div class="secao-titulo">Manual de procedimentos (.md)</div>
+        <p class="muted" style="margin:0 0 8px">Escreva em Markdown como esta pessoa deve trabalhar. Fica em agentes/${esc(id)}.md e o canal usa para responder.</p>
+        <textarea id="manual-md" class="mono" rows="14" placeholder="# Manual de ${esc(a.nome)}\n\n## Como confiro\n...">${esc(manual)}</textarea></div>
+      <div class="acoes" style="justify-content:flex-end"><button class="btn primario" data-acao="salvar-manual" data-id="${esc(id)}">${icone("ok")}Salvar manual</button></div>
+    </div>`);
+  $("#gaveta").classList.add("larga");
 }
 
 const avatar = (a, classe = "avatar") => `<span class="${classe}" style="background:${esc(a.cor)}">${esc((a.nome || "?").slice(0, 1).toUpperCase())}</span>`;
@@ -581,13 +637,15 @@ const avatar = (a, classe = "avatar") => `<span class="${classe}" style="backgro
 function renderAgentes() {
   const acoes = `<button class="btn" data-acao="abrir" data-alvo="habilidades">${icone("pasta")}Habilidades em Python</button>
     <a class="btn" href="escritorio.html">${icone("cubo")}Ver no escritório 3D</a>
-    <button class="btn primario" data-acao="novo-agente">${icone("mais")}Novo agente</button>`;
-  if (!E.equipe) return cabecalho("Agentes e habilidades", "", acoes) + `<div class="carregando">Carregando…</div>`;
+    <button class="btn primario" data-acao="novo-agente">${icone("mais")}Contratar</button>`;
+  if (!E.equipe) return cabecalho("Equipe e contratações", "", acoes) + `<div class="carregando">Carregando…</div>`;
   const erros = E.equipe.erros_habilidades || [];
-  return cabecalho("Agentes e habilidades", "Cada agente é uma etapa do robô. Monte sua equipe e dê a cada um as habilidades (habilidades) da tarefa dele.", acoes) +
+  return cabecalho("Equipe e contratações", "Todo o prédio, andar por andar, do gerente ao estagiário. Clique numa pessoa para ver a ficha e escrever o manual (.md). Para contratar, use “Novo agente”.", acoes) +
     (erros.length ? `<div class="ocorrencia erro"><div class="principal"><strong>Habilidades personalizadas com problema</strong><div class="exemplos">${erros.map((x) => `<span>${esc(x)}</span>`).join("")}</div></div></div>` : "") +
     `<div class="dica">${icone("info")}<p>A ordem abaixo é a ordem real de trabalho. Agentes nativos fazem o essencial; os seus agentes e as habilidades extras
       entram depois da <b>Limpeza</b>, depois da <b>Auditoria</b> ou antes da <b>Modelagem</b>. Qualquer habilidade que encontrar erro <b>reprova o arquivo</b> — nada sai pela metade.</p></div>
+    ${renderOrganograma()}
+    <div class="secao-titulo" style="margin-top:8px">Linha de produção · ordem real de trabalho</div>
     <section class="equipe">${E.equipe.agentes.map((a, i) => `<article class="cartao agente ${a.ativo ? "" : "inativo"}" data-acao="editar-agente" data-id="${esc(a.id)}">
       <span class="ordem-agente">${i + 1}º</span>
       <div class="agente-topo">${avatar(a)}<div><strong>${esc(a.nome)}</strong><small>${esc(a.papel || "")}</small></div></div>
@@ -596,7 +654,11 @@ function renderAgentes() {
         ${a.nativo ? `<span class="etiqueta">nativo</span>` : `<span class="etiqueta info">${esc(POSICAO_TEXTO[a.posicao] || a.posicao)}</span>`}
         ${a.aceita_habilidades ? `<span class="etiqueta ${a.habilidades.length ? "sucesso" : ""}">${a.habilidades.length} habilidade(s)</span>` : ""}
         ${!a.nativo && (a.aplicar_em || []).join(",") !== "*" ? `<span class="etiqueta">${esc(a.aplicar_em.join(", "))}</span>` : ""}
-        ${a.ativo ? "" : `<span class="etiqueta alerta">desligado</span>`}
+        ${a.ficha?.nivel ? `<span class="etiqueta info">${esc(a.ficha.nivel)}</span>` : ""}
+        ${!a.nativo && a.andar ? `<span class="etiqueta">${esc(a.andar)}º andar</span>` : ""}
+        ${a.fim_experiencia && a.nivel === "estagiario" ? `<span class="etiqueta alerta">experiência até ${esc(dataBr(a.fim_experiencia))}</span>` : ""}
+        ${a.contratado_por === "automatico" ? `<span class="etiqueta">contratado pela liderança</span>` : ""}
+        ${a.ativo ? "" : `<span class="etiqueta alerta">em treinamento</span>`}
         ${(a.problemas || []).length ? `<span class="etiqueta perigo">${icone("alerta")}configuração inválida</span>` : ""}
       </div></article>`).join("")}</section>`;
 }
@@ -652,6 +714,13 @@ function editorAgente() {
       <label>Ordem (menor trabalha antes)<input type="number" id="ag-ordem" value="${esc(a.ordem ?? 50)}"></label>
       <label>Arquivos que ele trata<input type="text" id="ag-aplicar" value="${esc((a.aplicar_em || ["*"]).join(", "))}"><small>* = todos · nps_* = só os que começam com nps_</small></label>
       <label>Cor no escritório<input type="color" id="ag-cor" value="${esc(a.cor || "#64748b")}"></label>
+      <label>Nível<select id="ag-nivel">${(E.equipe.rh?.niveis || []).map((n) => `<option value="${n.id}" ${(a.nivel || "pleno") === n.id ? "selected" : ""}>${esc(n.nome)} (risco até ${esc(n.risco_maximo)})</option>`).join("")}</select>
+        <small>Estagiário só observa (não altera dados) e tem 3 meses de experiência.</small></label>
+      <label>Andar<input type="number" id="ag-andar" min="1" max="9" value="${esc(a.andar || 1)}"><small>Um andar novo aparece no prédio sozinho.</small></label>
+      <label>Cargo<input type="text" id="ag-cargo" value="${esc(a.cargo || "")}" placeholder="Ex.: Analista de Dados Júnior — Contatos"></label>
+      <label>Área<select id="ag-area">${(E.equipe.rh?.areas || []).map((x) => `<option ${a.area === x ? "selected" : ""}>${esc(x)}</option>`).join("")}</select></label>
+      <label>Mentor (quem revisa o trabalho)<select id="ag-mentor"><option value="">—</option>${(E.organograma || []).filter((x) => ["Sênior", "Especialista", "Coordenador(a)"].includes(x.ficha?.nivel)).map((x) => `<option value="${esc(x.id)}" ${a.mentor === x.id ? "selected" : ""}>${esc(x.nome)} · ${esc(x.ficha?.cargo || x.papel)}</option>`).join("")}</select></label>
+      <label class="inteiro">Manual de procedimentos (.md)<textarea id="ag-manual" class="mono" rows="6" placeholder="# Como trabalho\n...">${esc(a.manual || "")}</textarea></label>
     </div>
     <div class="opcao"><div><strong>Agente ligado</strong><small>Desligado, ele não trabalha (mas a configuração fica guardada).</small></div>${chave(a.ativo !== false, "alternar-local", 'id="ag-ativo"')}</div>`;
 
@@ -684,6 +753,9 @@ function coletarEditor() {
     a.posicao = ler("ag-posicao").value; a.ordem = Number(ler("ag-ordem").value) || 50; a.cor = ler("ag-cor").value;
     a.aplicar_em = ler("ag-aplicar").value.split(",").map((x) => x.trim()).filter(Boolean);
     a.ativo = ler("ag-ativo").getAttribute("aria-checked") === "true";
+    a.nivel = ler("ag-nivel")?.value || "pleno"; a.andar = Number(ler("ag-andar")?.value) || 1;
+    a.cargo = ler("ag-cargo")?.value.trim() || ""; a.area = ler("ag-area")?.value || ""; a.mentor = ler("ag-mentor")?.value || "";
+    a.manual = ler("ag-manual")?.value ?? a.manual;
   }
   (a.habilidades || []).forEach((s, i) => {
     const liga = $(`[data-habilidade-ativa="${i}"]`);
@@ -924,6 +996,78 @@ function dadosBanco() {
 }
 
 // ------------------------------------------------------------------ ações (cliques)
+// ------------------------------------------------------------------ canal da equipe (offline)
+async function carregarCanal() {
+  const q = new URLSearchParams({ canal: E.canalAtual === "geral" ? "" : E.canalAtual, autor: E.canalAutor, tipo: E.canalTipo,
+                                  dias: E.canalDias || "", busca: E.canalBusca, limite: 300 });
+  try { E.canal = await api(`/api/canal?${q}`); } catch (e) { avisar(e.message, "erro"); }
+}
+
+const TIPO_MSG = { pergunta: "você perguntou", resposta: "resposta", acontecimento: "aconteceu", sprint: "sprint", alerta: "alerta",
+  boletim: "boletim", contratacao: "RH", mensagem: "mensagem" };
+const SUGESTOES = ["Como está hoje?", "Quais erros tivemos?", "Sprint", "Ideias para melhorar", "Como faço um PROCX?",
+  "Amostra para margem de 5% numa base de 2000", "Quem é a equipe?", "Como ligo o PostgreSQL?"];
+
+function renderCanal() {
+  const c = E.canal;
+  const acoes = `<button class="btn" data-acao="canal-sprint">${icone("historico")}Rodar sprint agora</button>`;
+  if (!c) return cabecalho("Canal da equipe", "", acoes) + `<div class="carregando">Carregando…</div>`;
+  const sp = c.sprint;
+  const lista = c.mensagens.map((m) => `<div class="msg ${m.autor === "dono" ? "minha" : ""} tipo-${esc(m.tipo)}">
+      <div class="msg-cab"><strong>${esc(m.nome)}</strong><small>${esc(m.papel)}</small><span class="etiqueta">${esc(TIPO_MSG[m.tipo] || m.tipo)}</span>
+        ${E.canalAtual === "geral" && m.canal !== "geral" ? `<span class="etiqueta info">#${esc(m.canal)}</span>` : ""}<time>${esc(dataCurta(m.data_hora))}</time></div>
+      <div class="msg-texto">${esc(m.texto)}</div></div>`).join("");
+  return cabecalho("Canal da equipe", `Converse com todo o prédio — 100% no seu computador, sem internet e sem API. Sprint ${sp.numero}: ${esc(dataBr(sp.inicio))} a ${esc(dataBr(sp.fim))} (faltam ${sp.dias_restantes} dia(s)).`, acoes) +
+    `<div class="canal-layout">
+      <nav class="canais">${Object.entries(c.canais).map(([id, nome]) => `<button data-acao="canal-ir" data-canal="${id}" class="${E.canalAtual === id ? "ativo" : ""}"><b>#${esc(id)}</b><small>${esc(nome)}</small></button>`).join("")}</nav>
+      <section class="conversa cartao">
+        <div class="filtros-canal">
+          <select id="canal-autor"><option value="">Todas as pessoas</option>${c.autores.map((a) => `<option value="${esc(a.id)}" ${E.canalAutor === a.id ? "selected" : ""}>${esc(a.nome)} · ${esc(a.papel)}</option>`).join("")}</select>
+          <select id="canal-tipo"><option value="">Todos os tipos</option>${Object.entries(TIPO_MSG).map(([k, v]) => `<option value="${k}" ${E.canalTipo === k ? "selected" : ""}>${esc(v)}</option>`).join("")}</select>
+          <select id="canal-dias">${[[0, "Todo o período"], [1, "Últimas 24h"], [7, "Últimos 7 dias"], [15, "Últimos 15 dias"], [30, "Últimos 30 dias"]].map(([d, t]) => `<option value="${d}" ${Number(E.canalDias) === d ? "selected" : ""}>${t}</option>`).join("")}</select>
+          <label class="campo-busca">${icone("busca")}<input type="text" id="canal-busca" placeholder="Buscar nas mensagens…" value="${esc(E.canalBusca)}"></label>
+        </div>
+        <div class="mensagens" id="mensagens">${lista || `<p class="muted" style="padding:20px">Nada por aqui ainda. Pergunte algo abaixo — a equipe responde na hora.</p>`}</div>
+        <div class="sugestoes">${SUGESTOES.map((t) => `<button class="btn pequeno" data-acao="canal-sugestao" data-texto="${esc(t)}">${esc(t)}</button>`).join("")}</div>
+        <div class="caixa-texto"><textarea id="canal-texto" rows="2" placeholder="Escreva para a equipe (#${esc(E.canalAtual)}). Chame alguém pelo nome: “Ricardo, como faço…”. Enter envia, Shift+Enter quebra linha.">${esc(E.canalRascunho)}</textarea>
+          <button class="btn primario" data-acao="canal-enviar">${icone("enviar")}Enviar</button></div>
+      </section></div>`;
+}
+
+async function enviarCanal() {
+  const caixa = $("#canal-texto");
+  const texto = (E.canalRascunho && !caixa?.value ? E.canalRascunho : caixa?.value || "").trim();
+  if (!texto) return;
+  E.canalRascunho = "";
+  try { await api("/api/canal/enviar", { corpo: { texto, canal: E.canalAtual } }); } catch (e) { avisar(e.message, "erro"); return; }
+  await carregarCanal(); desenhar();
+  const lista = $("#mensagens"); if (lista) lista.scrollTop = lista.scrollHeight;
+  $("#canal-texto")?.focus();
+}
+
+// ------------------------------------------------------------------ TI e segurança (5º andar)
+async function carregarTI() {
+  try { E.ti = await api("/api/ti"); } catch (e) { avisar(e.message, "erro"); }
+}
+
+function renderTI() {
+  const acoes = `<button class="btn primario" data-acao="ti-ronda">${icone("atividade")}Rodar ronda agora</button>`;
+  const r = E.ti?.ronda;
+  if (!r) return cabecalho("TI e segurança", "O 5º andar cuida da máquina e do programa.", acoes) + `<div class="vazio cartao"><p>Nenhuma ronda ainda. Clique em “Rodar ronda agora”.</p></div>`;
+  return cabecalho("TI e segurança", `Última ronda: ${esc(dataCurta(r.data_hora))} · automática a cada ${E.ti.intervalo_minutos ?? 30} minutos. Assinada por Fernanda (DevOps/SRE).`, acoes) +
+    `<div class="cartao ${r.saudavel ? "ok-cartao" : "alerta-cartao"}" style="padding:16px 20px;display:flex;gap:12px;align-items:center">
+      ${icone(r.saudavel ? "ok" : "alerta")}<strong>${r.saudavel ? "Sistema saudável: todas as verificações passaram." : "Há alertas — veja abaixo o que fazer."}</strong></div>
+    <div class="cartao"><table class="tabela"><thead><tr><th>Quem</th><th>O que verifica</th><th>Resultado</th></tr></thead><tbody>
+      ${r.itens.map((i) => `<tr><td><strong>${esc(i.nome)}</strong><br><small class="muted">${esc(i.cargo)}</small></td>
+        <td><small>${esc(({ sec_senior: "Painel só na sua máquina, senha fora do arquivo, código novo vigiado", cloud_aws: "Prontidão do PostgreSQL para o Amazon RDS (consultivo, nada vai para a nuvem)",
+          dev_pleno: "Python e bibliotecas nas versões exigidas", infra_pleno: "Espaço em disco e permissão de escrita nas pastas",
+          dev_junior: "Erros de programa no log das últimas 24h", devops_estagiario: "Tamanho dos logs (observação)" })[i.id] || "")}</small></td>
+        <td>${i.ok ? `<span class="etiqueta sucesso">${icone("ok")}OK</span>` : i.achados.map((a) => `<div class="etiqueta ${i.nivel === "estagiario" ? "" : "alerta"}" style="white-space:normal;margin:2px 0">${esc(a)}</div>`).join("")}</td></tr>`).join("")}
+    </tbody></table></div>`;
+}
+
+function dataBr(iso) { const [a, m, d] = String(iso || "").slice(0, 10).split("-"); return d ? `${d}/${m}/${a}` : ""; }
+
 const ACOES = {
   ir: (el) => { location.hash = `#${el.dataset.pagina}`; },
   ligar: (el) => comCarregando(el, async () => { await api("/api/robo/ligar", { corpo: {} }); await atualizarEstado(); desenhar(); }),
@@ -989,7 +1133,22 @@ const ACOES = {
     await carregarBanco(); desenhar();
   }),
   "novo-agente": () => abrirEditor({ id: "", nome: "", papel: "", descricao: "", cor: "#f97316", posicao: "limpeza", ordem: 50,
-    ativo: true, aplicar_em: ["*"], habilidades: [], nativo: false, aceita_habilidades: true }),
+    ativo: true, aplicar_em: ["*"], habilidades: [], nativo: false, aceita_habilidades: true, nivel: "estagiario", andar: 1,
+    area: "Qualidade de Dados", manual: "" }),
+  "ver-pessoa": (el) => abrirPessoa(el.dataset.id),
+  "salvar-manual": (el) => comCarregando(el, async () => {
+    await api("/api/agentes/manual/salvar", { corpo: { id: el.dataset.id, texto: $("#manual-md").value } });
+    avisar("Manual salvo. O canal já usa este conteúdo para responder.", "sucesso");
+  }),
+  "canal-ir": async (el) => { E.canalAtual = el.dataset.canal; await carregarCanal(); desenhar(); },
+  "canal-enviar": () => enviarCanal(),
+  "canal-sprint": (el) => comCarregando(el, async () => {
+    await api("/api/canal/sprint", { corpo: {} });
+    avisar("Sprint publicada: cada pessoa contou o que fez, o que foi bom, o que travou e o backlog.", "sucesso");
+    await carregarCanal(); desenhar();
+  }),
+  "canal-sugestao": (el) => { E.canalRascunho = el.dataset.texto; enviarCanal(); },
+  "ti-ronda": (el) => comCarregando(el, async () => { E.ti = await api("/api/ti/ronda", { corpo: {} }); desenhar(); avisar("Ronda de TI concluída."); }),
   "editar-agente": (el) => { const a = E.equipe.agentes.find((x) => x.id === el.dataset.id); if (a) abrirEditor(a); },
   "abrir-catalogo": () => { coletarEditor(); E.catalogoAberto = true; redesenharEditor(); $("#busca-habilidade")?.focus(); },
   "adicionar-habilidade": (el) => {
@@ -1009,7 +1168,10 @@ const ACOES = {
     const a = E.editando;
     if (!a.nativo && !a.id) a.id = (a.nome || "agente").normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase().replace(/[^a-z0-9]+/g, "_").replace(/^_|_$/g, "").replace(/^(\d)/, "a_$1").slice(0, 40) || "agente";
     const corpo = { id: a.id, habilidades: a.habilidades };
-    if (!a.nativo) Object.assign(corpo, { nome: a.nome, papel: a.papel, descricao: a.descricao, cor: a.cor, posicao: a.posicao, ordem: a.ordem, ativo: a.ativo, aplicar_em: a.aplicar_em });
+    if (!a.nativo) Object.assign(corpo, { nome: a.nome, papel: a.papel, descricao: a.descricao, cor: a.cor, posicao: a.posicao, ordem: a.ordem,
+      ativo: a.ativo, aplicar_em: a.aplicar_em, nivel: a.nivel, andar: a.andar, cargo: a.cargo, area: a.area, mentor: a.mentor,
+      manual: a.manual ?? "", contratado_por: a.contratado_por, contratante: a.contratante, contratado_em: a.contratado_em,
+      fim_experiencia: a.fim_experiencia });
     await api("/api/agentes/salvar", { corpo: { agente: corpo } });
     avisar(`${a.nome} salvo! Já vale para as próximas planilhas.`, "sucesso");
     fecharGaveta(); await carregarAgentes(); desenhar();
@@ -1068,7 +1230,32 @@ document.addEventListener("input", (e) => {
   }
   if (e.target.id === "busca-consulta") { E.buscaConsulta = e.target.value; $("#lista-consultas").innerHTML = listaConsultas(); }
   if (e.target.id === "busca-historico") { E.busca = e.target.value; $("#corpo-historico").innerHTML = linhasHistorico(); }
+  if (e.target.id === "canal-texto") E.canalRascunho = e.target.value;
+  if (e.target.id === "canal-busca") {
+    E.canalBusca = e.target.value;
+    clearTimeout(E._buscaCanal);
+    E._buscaCanal = setTimeout(async () => { await carregarCanal(); atualizarMensagens(); }, 300);
+  }
 });
+document.addEventListener("change", async (e) => {
+  const mapa = { "canal-autor": "canalAutor", "canal-tipo": "canalTipo", "canal-dias": "canalDias" };
+  if (mapa[e.target.id]) { E[mapa[e.target.id]] = e.target.value; await carregarCanal(); desenhar(); }
+});
+document.addEventListener("keydown", (e) => {
+  if (e.target.id === "canal-texto" && e.key === "Enter" && !e.shiftKey) { e.preventDefault(); enviarCanal(); }
+});
+
+// atualiza só a lista de mensagens (não atrapalha quem está digitando)
+function atualizarMensagens() {
+  const alvo = $("#mensagens"); if (!alvo || !E.canal) return;
+  const tmp = document.createElement("div"); tmp.innerHTML = renderCanal();
+  const novo = $("#mensagens", tmp);
+  if (novo && novo.innerHTML !== alvo.innerHTML) {
+    const noFim = alvo.scrollTop + alvo.clientHeight >= alvo.scrollHeight - 30;
+    alvo.innerHTML = novo.innerHTML;
+    if (noFim) alvo.scrollTop = alvo.scrollHeight;
+  }
+}
 
 // ------------------------------------------------------------------ arquivos: escolher e arrastar
 function escolherArquivo(modo) {
@@ -1105,6 +1292,7 @@ window.addEventListener("hashchange", () => irPara(location.hash.slice(1)));
   if (E.geral && !E.geral.erro_config) carregarConfig();
   irPara(location.hash.slice(1) || "inicio");
   setInterval(atualizarEstado, 2000);
+  setInterval(async () => { if (E.pagina === "canal") { await carregarCanal(); atualizarMensagens(); } }, 4000);
   setInterval(atualizarLog, 2000);
   atualizarLog();
 })();

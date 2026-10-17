@@ -244,7 +244,8 @@ class Api:
                 **{k: {"valor": excel_hoje["entregas"], "rotulo": "entregas Excel hoje"}
                    for k in ("excel_pesquisa", "excel_formulas", "excel_trade", "excel_dinamicas")},
                 **conferencias_hoje,
-                **{i: {"valor": len(x["achados"]), "rotulo": "alerta(s) na última ronda" if x["achados"] else "tudo OK na última ronda"}
+                **{i: {"valor": len(x["achados"]) if x["achados"] else "OK",
+                       "rotulo": "alerta(s) na última ronda" if x["achados"] else "na última ronda de TI"}
                    for i, x in status_ti.items()},
             },
             "analise_hoje": self._analise_hoje(hoje),
