@@ -157,3 +157,38 @@ def teste_conversa_tarefa_aprovacao_e_memoria_pela_api(painel, tmp_path):
     status, m = chamar(base, "/api/memoria")
     assert status == 200 and "desempenho" in m
     assert chamar(base, "/api/reuniao/gerar", {})[0] == 200
+
+
+def teste_senha_do_painel(painel):
+    base, _ = painel
+    assert chamar(base, "/api/acesso")[1] == {"senha": False, "logado": True}
+    status, r = chamar(base, "/api/senha", {"nova": "curta", "confirmacao": "curta"})
+    assert status == 400 and "8 caracteres" in r["erro"]
+    assert chamar(base, "/api/senha", {"nova": "segredo-forte-1", "confirmacao": "segredo-forte-1"})[0] == 200
+    # agora tudo pede senha; o hash nunca sai do servidor
+    assert chamar(base, "/api/estado")[0] == 401 and chamar(base, "/api/config")[0] == 401
+    assert chamar(base, "/api/robo/pausar", {})[0] == 401
+    assert chamar(base, "/api/conversa/anexar", dados=b"x", cabecalhos={"X-Nome-Arquivo": "a.csv"})[0] == 401
+    assert chamar(base, "/api/login", {"senha": "errada"})[0] == 403
+    req = urllib.request.Request(base + "/api/login", data=json.dumps({"senha": "segredo-forte-1"}).encode(),
+                                 headers={"X-Robo-Painel": "1", "Content-Type": "application/json"}, method="POST")
+    with urllib.request.urlopen(req) as r:
+        cookie = r.headers["Set-Cookie"]
+    assert "HttpOnly" in cookie and "SameSite=Strict" in cookie
+    sessao = {"Cookie": cookie.split(";")[0]}
+    status, cfg = chamar(base, "/api/config", cabecalhos=sessao)
+    assert status == 200 and cfg["senha_definida"] and "senha_hash" not in json.dumps(cfg)
+    # trocar exige a senha atual; força bruta trava
+    assert chamar(base, "/api/senha", {"atual": "x", "nova": "outra-senha-2", "confirmacao": "outra-senha-2"},
+                  cabecalhos=sessao)[0] == 403
+    for _ in range(5):
+        chamar(base, "/api/login", {"senha": "errada"})
+    status, r = chamar(base, "/api/login", {"senha": "segredo-forte-1"})
+    assert status == 403 and "Muitas tentativas" in r["erro"]
+
+
+def teste_hash_da_senha():
+    from robo.painel.acesso import conferir_hash, gerar_hash
+    h = gerar_hash("minha-senha-123")
+    assert h.startswith("pbkdf2_sha256$200000$") and "minha-senha" not in h
+    assert conferir_hash("minha-senha-123", h) and not conferir_hash("minha-senha-124", h)

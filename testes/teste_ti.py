@@ -5,11 +5,16 @@ from robo.canal import Canal
 
 
 def teste_ronda_em_ambiente_saudavel(cfg_factory):
-    cfg = cfg_factory()
+    cfg = cfg_factory(painel={"senha_hash": "pbkdf2_sha256$1$00$00"})  # saudável inclui painel com senha
     ti.ronda(cfg)  # 1ª ronda registra o código conhecido
     r = ti.ronda(cfg)
     assert r["saudavel"], r["itens"]
     assert {i["id"] for i in r["itens"]} == {p["id"] for p in ti.EQUIPE_TI if p["funcao"]}
+
+
+def teste_painel_sem_senha_e_alerta_de_seguranca(cfg_factory):
+    cfg = cfg_factory()
+    assert any("painel está sem senha" in a for a in ti.chk_seguranca(cfg))
 
 
 def teste_alerta_vai_para_o_canal_uma_vez(cfg_factory):

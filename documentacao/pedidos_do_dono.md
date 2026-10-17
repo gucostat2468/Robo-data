@@ -32,7 +32,7 @@ Legenda: ✅ feito e testado · 🟡 feito em parte · ⏳ pendente
 | 25 | Equipe preparada para qualquer cálculo, cabeçalho, variável, segmentação, erro | ✅ | centro de treinamento (17 casos difíceis), calculadora |
 | 26 | Explicação de tudo, linha por linha | ✅ | `documentacao/guia/` |
 | 27 | Texto único descrevendo o projeto (para outra IA) | ✅ | enviado na conversa |
-| 28 | Senha no painel | ⏳ | oferecido; ainda não feito |
+| 28 | Senha no painel | ✅ | Configurações → Senha do painel, ou `python -m robo senha` (PBKDF2, sessão HttpOnly, trava contra força bruta) |
 | 29 | Backup automático do banco | ✅ | `robo/backup.py` |
 | 30 | Teste de volume | 🟡 | 100 mil linhas em 154 s (ok); 300 mil interrompido por reinício da máquina de testes |
 | 31 | Rodar no Windows do dono | ⏳ | depende de você: `instalar.bat` |
@@ -42,4 +42,15 @@ Legenda: ✅ feito e testado · 🟡 feito em parte · ⏳ pendente
 | 35 | Todo erro vira handover para a área | ✅ | `robo/memoria.py`; `robo.memoria_handovers` |
 | 36 | Reunião semanal da liderança (certo, errado, plano de ação) | ✅ | página Memória e reuniões; `robo/reuniao.py` |
 | 37 | Desligar quem não tem desempenho | 🟡 | contratados: PDI → proposta → sua aprovação; cargos fixos viram correção de código (demitir o código pararia o robô) |
+| 39 | NPS sem casas decimais, com a conta aberta | ✅ | calculadora, resumo do 2º andar e Excel |
+| 40 | Fazer à mão quando eu precisar | ✅ | todo cálculo traz fórmula do Excel e SQL equivalente |
+| 41 | Confiabilidade de SQL e cálculos | ✅ | dupla checagem no PostgreSQL (conferido / divergente / não aplicável) |
+| 42 | Qualquer consulta SQL | ✅ | Dora roda SELECT livre em transação somente leitura |
+| 43 | PDCA contínuo e boas práticas | ✅ | `robo/memoria.py` (checagem automática) |
+| 44 | Estudo de todos 2x por semana | ✅ | `robo/desenvolvimento.py` |
+| 45 | Reunião com cada coordenador, também ao vivo | ✅ | Memória e reuniões; "como está o andar?" no chat |
+| 46 | Chat com todos, com filtros | ✅ | página Chat da empresa |
+| 47 | Alguém pensando no futuro com a memória | ✅ | Iara (`robo/ideias.py`) |
+| 48 | RH bem definido, novos andares | ✅ | `documentacao/rh_e_desenvolvimento.md` |
+| 49 | Qualquer tipo de banco de dados | 🟡 | PostgreSQL e SQLite hoje; SQL Server/MySQL exigem driver (ver resposta) |
 | 38 | IA opcional sem fingir | 🟡 | `robo/ia.py`: só modelo local, desligado; ainda não usado nas respostas |

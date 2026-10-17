@@ -26,6 +26,8 @@ import pandas as pd
 from robo import __version__, historico
 from robo.config import RAIZ_PROJETO
 from robo.leitura import EXTENSOES_SUPORTADAS
+from robo.painel.acesso import NOME_COOKIE, ROTAS_LIVRES, VALIDADE_SESSAO, token_do_cookie
+from robo.painel.acesso import conferir_hash as conferir
 from robo.manutencao import executar_manutencao
 from robo.monitor import TravaInstancia, eh_candidato
 from robo.painel import configuracao, sistema
@@ -113,6 +115,32 @@ class Api:
         self.c = controle
         self.porta = porta
         self.encerrar = threading.Event()
+        from robo.painel.acesso import Acesso
+        self.acesso = Acesso()
+
+    @property
+    def senha_hash(self) -> str | None:
+        return (self.c.cfg.painel.get("senha_hash") if self.c.cfg else None) or None
+
+    def acesso_estado(self, q, token=None) -> dict:
+        return {"senha": bool(self.senha_hash), "logado": not self.senha_hash or self.acesso.valida(token)}
+
+    def definir_senha(self, b, token=None) -> dict:
+        from robo.painel.acesso import gerar_hash
+        if self.senha_hash and not conferir(str(b.get("atual") or ""), self.senha_hash):
+            raise ErroApi("A senha atual não confere.", 403)
+        nova = str(b.get("nova") or "")
+        if nova != str(b.get("confirmacao") or ""):
+            raise ErroApi("A confirmação não é igual à nova senha.")
+        try:
+            h = gerar_hash(nova)
+        except ValueError as e:
+            raise ErroApi(str(e))
+        configuracao.definir_senha(configuracao.garantir_arquivo(self.c.caminho_config), h)
+        self.c.cfg.painel["senha_hash"] = h
+        self.acesso.sair_de_todas()  # senha nova derruba as sessões antigas
+        log.info("Senha do painel definida/alterada.")
+        return {"ok": True}
 
     @property
     def cfg(self):
@@ -405,7 +433,8 @@ class Api:
             "saida": {"formato": cfg.saida.get("formato"), "versionar": bool(cfg.saida.get("versionar"))},
             "monitoramento": cfg.monitoramento,
             "banco": b,
-            "painel": cfg.painel,
+            "painel": {k: v for k, v in cfg.painel.items() if k != "senha_hash"},  # a impressão da senha não sai do servidor
+            "senha_definida": bool(cfg.painel.get("senha_hash")),
             "regras": regras,
             "modelos_sql": self._modelos_sql(),
             "manutencao": cfg.manutencao,
@@ -1001,9 +1030,11 @@ def criar_manipulador(api: Api):
         def log_message(self, *args):  # silencia o log padrão de cada requisição
             pass
 
-        def _json(self, dados, status=200):
+        def _json(self, dados, status=200, cabecalhos=None):
             corpo = json.dumps(dados, ensure_ascii=False, default=str).encode("utf-8")
             self.send_response(status)
+            for k, v in (cabecalhos or {}).items():
+                self.send_header(k, v)
             self.send_header("Content-Type", "application/json; charset=utf-8")
             self.send_header("Cache-Control", "no-store")
             for k, v in CABECALHOS_SEGURANCA.items():
@@ -1015,10 +1046,23 @@ def criar_manipulador(api: Api):
         def _host_ok(self) -> bool:
             return self.headers.get("Host", "") in hosts_validos
 
+        def _token(self):
+            return token_do_cookie(self.headers.get("Cookie"))
+
+        def _bloqueado(self, caminho: str) -> bool:
+            """Com senha definida, toda rota /api (menos login e ping) exige sessão válida."""
+            if not caminho.startswith("/api/") or caminho in ROTAS_LIVRES or not api.senha_hash:
+                return False
+            return not api.acesso.valida(self._token())
+
         def do_GET(self):
             if not self._host_ok():
                 return self._json({"erro": "host inválido"}, 403)
             url = urllib.parse.urlparse(self.path)
+            if self._bloqueado(url.path):
+                return self._json({"erro": "Entre com a senha do painel.", "login": True}, 401)
+            if url.path == "/api/acesso":
+                return self._json(api.acesso_estado({}, self._token()))
             if url.path in ROTAS_GET:
                 return self._executar(lambda: ROTAS_GET[url.path](api, urllib.parse.parse_qs(url.query)))
             return self._estatico(url.path)
@@ -1037,6 +1081,11 @@ def criar_manipulador(api: Api):
             if tamanho < 0:
                 self.close_connection = True
                 return self._json({"erro": "tamanho da requisição inválido"}, 400)
+            if self._bloqueado(caminho):
+                self.close_connection = True
+                return self._json({"erro": "Entre com a senha do painel.", "login": True}, 401)
+            if caminho in ("/api/login", "/api/logout", "/api/senha"):
+                return self._acesso(caminho, tamanho)
             if caminho in ROTAS_UPLOAD:
                 return self._upload(caminho, tamanho)
             if caminho not in ROTAS_POST:
@@ -1069,6 +1118,31 @@ def criar_manipulador(api: Api):
                 return self._executar(lambda: ROTAS_UPLOAD[caminho](api, temp, nome))
             finally:
                 temp.unlink(missing_ok=True)
+
+        def _acesso(self, caminho, tamanho):
+            if tamanho > 10_000:
+                self.close_connection = True
+                return self._json({"erro": "requisição grande demais"}, 413)
+            try:
+                b = json.loads(self.rfile.read(tamanho) or b"{}")
+            except ValueError:
+                return self._json({"erro": "JSON inválido"}, 400)
+            if caminho == "/api/logout":
+                api.acesso.sair(self._token())
+                return self._json({"ok": True}, cabecalhos={"Set-Cookie": f"{NOME_COOKIE}=; Path=/; Max-Age=0; HttpOnly; SameSite=Strict"})
+            if caminho == "/api/senha":
+                if api.senha_hash and not api.acesso.valida(self._token()):
+                    return self._json({"erro": "Entre com a senha do painel.", "login": True}, 401)
+                return self._executar(lambda: api.definir_senha(b))
+            if not api.senha_hash:
+                return self._json({"ok": True, "sem_senha": True})
+            try:
+                token = api.acesso.entrar(str(b.get("senha") or ""), api.senha_hash)
+            except ValueError as e:
+                log.warning("Login recusado no painel: %s", e)
+                return self._json({"erro": str(e)}, 403)
+            return self._json({"ok": True}, cabecalhos={
+                "Set-Cookie": f"{NOME_COOKIE}={token}; Path=/; Max-Age={VALIDADE_SESSAO}; HttpOnly; SameSite=Strict"})
 
         def _executar(self, funcao):
             try:

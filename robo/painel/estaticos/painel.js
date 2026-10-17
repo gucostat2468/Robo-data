@@ -98,8 +98,30 @@ async function api(caminho, { corpo, arquivo, metodo } = {}) {
     throw new Error("Sem conexão com o robô. Ele foi encerrado? Abra pelo atalho “Robô de Planilhas”.");
   }
   const dados = await resposta.json().catch(() => ({}));
+  if (resposta.status === 401 && dados.login) { mostrarLogin(); throw new Error(dados.erro); }
   if (!resposta.ok) throw new Error(dados.erro || `Erro ${resposta.status}`);
   return dados;
+}
+
+function mostrarLogin() {
+  if ($("#tela-login")) return;
+  const el = document.createElement("div");
+  el.id = "tela-login";
+  el.style.cssText = "position:fixed;inset:0;z-index:999;display:grid;place-items:center;background:var(--fundo)";
+  el.innerHTML = `<form class="cartao" style="width:min(380px,92vw)"><div class="cartao-corpo">
+      <h1 style="margin:0 0 6px">Robô de Planilhas</h1><p class="muted" style="margin:0 0 14px">Este painel tem senha. Digite para entrar.</p>
+      <input type="password" id="login-senha" autocomplete="current-password" placeholder="Senha" style="width:100%;margin-bottom:10px">
+      <p id="login-erro" class="muted" style="color:var(--perigo);min-height:1.2em;margin:0 0 8px"></p>
+      <button class="btn primario" type="submit" style="width:100%">Entrar</button></div></form>`;
+  el.querySelector("form").addEventListener("submit", async (ev) => {
+    ev.preventDefault();
+    const r = await fetch("/api/login", { method: "POST", headers: { "X-Robo-Painel": "1", "Content-Type": "application/json" },
+      body: JSON.stringify({ senha: $("#login-senha").value }) });
+    const d = await r.json().catch(() => ({}));
+    if (r.ok) location.reload(); else $("#login-erro").textContent = d.erro || "Não foi possível entrar.";
+  });
+  document.body.appendChild(el);
+  $("#login-senha").focus();
 }
 
 function avisar(mensagem, tipo = "") {
@@ -905,7 +927,13 @@ function renderConfig() {
     `<button class="btn" data-acao="abrir" data-alvo="config">${icone("editar")}Editar config.yaml</button>
      <button class="btn" data-acao="recarregar-config">${icone("recarregar")}Recarregar</button>`) +
 
-  `<section class="cartao"><div class="cartao-cab"><h2>Geral</h2></div><div class="cartao-corpo">
+  `<section class="cartao"><div class="cartao-cab"><h2>Senha do painel</h2></div><div class="cartao-corpo">
+    <p class="muted" style="margin-top:0">${c.senha_definida ? "O painel pede senha para abrir. Para trocar, digite a atual e a nova." : "<b>O painel está sem senha</b>: qualquer pessoa logada neste Windows vê os dados. Defina uma com pelo menos 8 caracteres."}</p>
+    <div class="caixa-texto" style="flex-wrap:wrap">${c.senha_definida ? `<input type="password" id="senha-atual" placeholder="Senha atual" autocomplete="current-password">` : ""}
+      <input type="password" id="senha-nova" placeholder="Nova senha" autocomplete="new-password"><input type="password" id="senha-conf" placeholder="Repita a nova senha" autocomplete="new-password">
+      <button class="btn primario" data-acao="definir-senha">${icone("escudo")}${c.senha_definida ? "Trocar senha" : "Definir senha"}</button>
+      ${c.senha_definida ? `<button class="btn" data-acao="sair-sessao">Sair (encerrar sessão)</button>` : ""}</div></div></section>
+  <section class="cartao"><div class="cartao-cab"><h2>Geral</h2></div><div class="cartao-corpo">
     <div class="opcao"><div><strong>Ligar o robô ao abrir o aplicativo</strong><small>Se desligado, o robô começa pausado.</small></div>
       ${chave(p.ligar_robo_ao_abrir, "cfg-chave", 'data-secao="painel" data-chave="ligar_robo_ao_abrir"')}</div>
     <div class="opcao"><div><strong>Notificações do Windows</strong><small>Avisa quando uma planilha é tratada ou reprovada, mesmo com o painel fechado.</small></div>
@@ -1270,6 +1298,14 @@ function renderTI() {
 function dataBr(iso) { const [a, m, d] = String(iso || "").slice(0, 10).split("-"); return d ? `${d}/${m}/${a}` : ""; }
 
 const ACOES = {
+  "definir-senha": (el) => comCarregando(el, async () => {
+    const r = await fetch("/api/senha", { method: "POST", headers: { "X-Robo-Painel": "1", "Content-Type": "application/json" },
+      body: JSON.stringify({ atual: $("#senha-atual")?.value || "", nova: $("#senha-nova").value, confirmacao: $("#senha-conf").value }) });
+    const d = await r.json().catch(() => ({}));
+    if (!r.ok) throw new Error(d.erro || `Erro ${r.status}`);
+    avisar("Senha definida. Entre de novo com a senha nova.", "sucesso"); setTimeout(() => location.reload(), 900);
+  }),
+  "sair-sessao": async () => { await fetch("/api/logout", { method: "POST", headers: { "X-Robo-Painel": "1" }, body: "{}" }); location.reload(); },
   ir: (el) => { location.hash = `#${el.dataset.pagina}`; },
   ligar: (el) => comCarregando(el, async () => { await api("/api/robo/ligar", { corpo: {} }); await atualizarEstado(); desenhar(); }),
   pausar: (el) => comCarregando(el, async () => { await api("/api/robo/pausar", { corpo: {} }); await atualizarEstado(); desenhar(); }),

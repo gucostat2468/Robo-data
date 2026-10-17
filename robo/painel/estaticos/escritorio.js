@@ -19,6 +19,7 @@ async function api(caminho, corpo, arquivo) {
   else if (corpo) { op.body = JSON.stringify(corpo); op.headers["Content-Type"] = "application/json"; }
   const r = await fetch(caminho, op);
   const d = await r.json().catch(() => ({}));
+  if (r.status === 401 && d.login) { location.href = "inicio.html"; throw new Error(d.erro); } // painel com senha: entra lá
   if (!r.ok) throw new Error(d.erro || `Erro ${r.status}`);
   return d;
 }

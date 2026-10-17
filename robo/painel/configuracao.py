@@ -40,6 +40,16 @@ def _escalar(valor) -> str:
 def definir(caminho: Path, secao: str, chave: str, valor) -> None:
     if chave not in EDITAVEIS.get(secao, set()):
         raise ValueError(f"Configuração '{secao}.{chave}' não pode ser alterada pelo painel.")
+    _gravar(caminho, secao, chave, valor)
+
+
+def definir_senha(caminho: Path, senha_hash: str) -> None:
+    """Só pela rota própria de senha (que exige a senha atual) ou pelo comando 'robo senha' — nunca pelo
+    formulário genérico de configurações."""
+    _gravar(caminho, "painel", "senha_hash", senha_hash)
+
+
+def _gravar(caminho: Path, secao: str, chave: str, valor) -> None:
     linhas = caminho.read_text(encoding="utf-8").splitlines()
     novo = f"  {chave}: {_escalar(valor)}"
     inicio = next((i for i, l in enumerate(linhas) if re.match(rf"^{re.escape(secao)}:\s*(#.*)?$", l)), None)

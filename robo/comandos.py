@@ -113,6 +113,7 @@ def principal(argv: list[str] | None = None) -> int:
     sd.add_argument("arquivo")
     sub.add_parser("status", help="mostra pastas, fila e histórico")
     sub.add_parser("manutencao", help="remove arquivos antigos conforme a retenção")
+    sub.add_parser("senha", help="define ou troca a senha do painel (pede a senha duas vezes, sem mostrar)")
     sub.add_parser("atalhos", help="cria o atalho 'Robô de Planilhas' na Área de Trabalho e no Menu Iniciar (Windows)")
     si = sub.add_parser("inicializacao", help="liga/desliga o robô junto com o Windows")
     si.add_argument("acao", choices=["ligar", "desligar", "status"])
@@ -173,6 +174,23 @@ def principal(argv: list[str] | None = None) -> int:
         return _comando_banco(cfg, args.acao)
     if args.comando == "manutencao":
         print(executar_manutencao(cfg))
+        return 0
+    if args.comando == "senha":
+        import getpass
+
+        from robo.painel import configuracao
+        from robo.painel.acesso import gerar_hash
+        nova = getpass.getpass("Nova senha do painel (mínimo 8 caracteres): ")
+        if nova != getpass.getpass("Repita a senha: "):
+            print("As duas senhas não são iguais. Nada foi alterado.", file=sys.stderr)
+            return 1
+        try:
+            h = gerar_hash(nova)
+        except ValueError as e:
+            print(e, file=sys.stderr)
+            return 1
+        configuracao.definir_senha(configuracao.garantir_arquivo(args.config), h)
+        print("Senha definida. Reabra o painel: ele vai pedir a senha.")
         return 0
 
     cfg.criar_pastas()

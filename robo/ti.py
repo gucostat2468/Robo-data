@@ -118,6 +118,9 @@ def chk_seguranca(cfg) -> list[str]:
         problemas.append("o painel não está preso a 127.0.0.1 (ficaria visível na rede)")
     if cfg.banco.get("senha"):
         problemas.append("senha do PostgreSQL gravada no config.yaml — prefira a variável de ambiente ROBO_PG_SENHA")
+    if not (cfg.painel or {}).get("senha_hash"):
+        problemas.append("o painel está sem senha: qualquer pessoa logada neste Windows abre os dados "
+                         "(Configurações → Senha do painel, ou 'python -m robo senha')")
     # integridade: todo .py novo ou alterado em habilidades_personalizadas é código que roda no robô
     estado = _ler_estado(cfg)
     anteriores = estado.get("hashes_habilidades") or {}
@@ -288,6 +291,7 @@ def provas_ti() -> dict:
         cfg = _Cfg()
         cfg.logs, cfg.habilidades, cfg.base = base / "logs", base / "habilidades", base
         cfg.dados, cfg.banco = {"ti": {"disco_minimo_gb": 0.0001, "disco_critico_gb": 0.00001}}, {"habilitado": False}
+        cfg.painel = {"senha_hash": "pbkdf2_sha256$1$00$00"}  # sistema limpo = painel com senha
         cfg.entrada = base / "entrada"
         cfg.pastas = lambda: {"Bases-Limpeza (entrada)": base / "entrada", "Logs": base / "logs"}
         seg_ok = chk_seguranca(cfg)
@@ -296,6 +300,9 @@ def provas_ti() -> dict:
         cfg.banco = {"habilitado": False, "senha": "123"}
         seg_senha = chk_seguranca(cfg)
         cfg.banco = {"habilitado": False}
+        cfg.painel = {}
+        seg_painel = chk_seguranca(cfg)
+        cfg.painel = {"senha_hash": "pbkdf2_sha256$1$00$00"}
         disco_ok = chk_disco_e_pastas(cfg)
         cfg.dados = {"ti": {"disco_minimo_gb": 10 ** 9, "disco_critico_gb": 10 ** 8}}
         disco_cheio = chk_disco_e_pastas(cfg)
@@ -314,7 +321,8 @@ def provas_ti() -> dict:
         r3 = ronda(cfg, anunciar=False)
     return {
         "sec_senior": [("Sistema limpo não gera alerta", not seg_ok), ("Pega código novo de habilidade", bool(seg_novo)),
-                       ("Pega senha gravada no arquivo", any("senha" in x for x in seg_senha))],
+                       ("Pega senha gravada no arquivo", any("PostgreSQL" in x for x in seg_senha)),
+                       ("Pega painel sem senha", any("painel está sem senha" in x for x in seg_painel))],
         "infra_pleno": [("Disco com espaço não alerta", not disco_ok), ("Disco cheio vira CRÍTICO", any("CRÍTICO" in x for x in disco_cheio))],
         "dev_junior": [("Log limpo não alerta", not log_ok), ("6 erros em 24h geram alerta", bool(log_ruim))],
         "dev_pleno": [("Ambiente atual com dependências corretas", not chk_dependencias(cfg)),
