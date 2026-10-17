@@ -2,7 +2,7 @@ import pandas as pd
 import pytest
 from openpyxl import Workbook
 
-from robo import skills
+from robo import habilidades
 from robo.agentes import Equipe, ErroAgente
 from robo.pipeline import REPROVADO, SUCESSO, processar_arquivo
 from robo.relatorio import Relatorio
@@ -12,23 +12,23 @@ def rodar(nome, df, **parametros):
     rel = Relatorio("t.xlsx")
     df = df.copy()
     df.index = range(2, len(df) + 2)
-    saida = skills.executar_skill(df, {"skill": nome, "parametros": parametros}, rel, "dados", "t.xlsx", "Teste")
+    saida = habilidades.executar_habilidade(df, {"habilidade": nome, "parametros": parametros}, rel, "dados", "t.xlsx", "Teste")
     return saida, rel
 
 
-def test_catalogo_completo_e_documentado():
-    cat = skills.catalogo()
+def teste_catalogo_completo_e_documentado():
+    cat = habilidades.catalogo()
     assert len(cat) >= 24
     for s in cat:
         assert s["nome"] and s["descricao"] and s["conhecimento"], s["id"]
 
 
-def test_padronizar_texto_titulo_portugues():
+def teste_padronizar_texto_titulo_portugues():
     out, _ = rodar("padronizar_texto", pd.DataFrame({"nome": ["MARIA DA SILVA", "joão dos santos"]}), colunas="nome", modo="titulo")
     assert out["nome"].tolist() == ["Maria da Silva", "João dos Santos"]
 
 
-def test_de_para_ignora_acento_e_caixa_e_acusa_nao_mapeados():
+def teste_de_para_ignora_acento_e_caixa_e_acusa_nao_mapeados():
     df = pd.DataFrame({"modalidade": ["A Distância", "online", "presencial", "Híbrido"]})
     out, rel = rodar("mapear_valores", df, coluna="modalidade", mapa="a distancia=EAD\nonline=EAD\npresencial=Presencial",
                      nao_mapeados="erro")
@@ -36,7 +36,7 @@ def test_de_para_ignora_acento_e_caixa_e_acusa_nao_mapeados():
     assert rel.tem_erros and "Híbrido" in rel.erros[0].exemplos[0]
 
 
-def test_cpf_cnpj_com_digito_e_zero_perdido():
+def teste_cpf_cnpj_com_digito_e_zero_perdido():
     # 2º: o Excel transformou o CPF 012.345.678-90 em número e perdeu o zero; 3º: dígitos repetidos (inválido)
     df = pd.DataFrame({"cpf": ["529.982.247-25", 1234567890.0, "111.111.111-11", None]})
     out, rel = rodar("normalizar_documento", df, colunas="cpf", formato="formatado", invalidos="aviso")
@@ -46,7 +46,7 @@ def test_cpf_cnpj_com_digito_e_zero_perdido():
     assert out["doc"].iloc[0] == "11222333000181" and not rel.tem_erros
 
 
-def test_email_telefone_cep():
+def teste_email_telefone_cep():
     out, rel = rodar("validar_email", pd.DataFrame({"email": [" Ana@Empresa.COM ", "sem-arroba"]}), colunas="email", invalidos="vazio")
     assert out["email"].iloc[0] == "ana@empresa.com" and pd.isna(out["email"].iloc[1])
     out, rel = rodar("normalizar_telefone", pd.DataFrame({"tel": ["+55 (11) 98765-4321", "3456-7890", "123"]}),
@@ -56,7 +56,7 @@ def test_email_telefone_cep():
     assert out["cep"].tolist() == ["01310-100", "04567-000"]
 
 
-def test_classificar_nps_e_csat():
+def teste_classificar_nps_e_csat():
     out, rel = rodar("classificar_nps", pd.DataFrame({"nota": [10, 9, 8, 7, 6, 0]}), coluna="nota")
     assert out["grupo_nps"].tolist() == ["Promotor", "Promotor", "Neutro", "Neutro", "Detrator", "Detrator"]
     assert any("NPS desta base: 0.0" in o.mensagem for o in rel.ocorrencias)
@@ -66,14 +66,14 @@ def test_classificar_nps_e_csat():
     assert out["satisfeito"].tolist() == ["Sim", "Sim", "Não"]
 
 
-def test_codificacao_de_verbatins():
+def teste_codificacao_de_verbatins():
     df = pd.DataFrame({"comentario": ["Mensalidade muito cara", "Atendente demorou demais", "Adorei", None]})
     out, rel = rodar("categorizar_texto", df, coluna="comentario",
                      temas={"Preço": "caro, mensalidade, valor", "Atendimento": "atend, demor"})
     assert out["tema"].tolist()[:3] == ["Preço", "Atendimento", "Outros"] and pd.isna(out["tema"].iloc[3])
 
 
-def test_faixas_outliers_calculada_filtro():
+def teste_faixas_outliers_calculada_filtro():
     out, _ = rodar("classificar_faixas", pd.DataFrame({"idade": [17, 18, 30, 50]}), coluna="idade", nova_coluna="faixa",
                    limites="18, 25, 45", rotulos="<18, 18-24, 25-44, 45+")
     assert out["faixa"].tolist() == ["<18", "18-24", "25-44", "45+"]
@@ -87,7 +87,7 @@ def test_faixas_outliers_calculada_filtro():
     assert len(out) == 2
 
 
-def test_duplicidade_manter_ultimo_e_anonimizar():
+def teste_duplicidade_manter_ultimo_e_anonimizar():
     df = pd.DataFrame({"id": ["1", "1", "2"], "nota": [5, 9, 7]})
     out, rel = rodar("checar_duplicados", df, colunas="id", acao="manter_ultimo")
     assert out["nota"].tolist() == [9, 7]
@@ -98,12 +98,12 @@ def test_duplicidade_manter_ultimo_e_anonimizar():
     assert out["email"].iloc[0] == "a***@x.com"
 
 
-def test_parametros_e_colunas_inexistentes_viram_erro_claro():
+def teste_parametros_e_colunas_inexistentes_viram_erro_claro():
     _, rel = rodar("padronizar_texto", pd.DataFrame({"a": ["x"]}), colunas="nao_existe")
     assert rel.tem_erros and "nao_existe" in rel.erros[0].mensagem
     _, rel = rodar("mapear_valores", pd.DataFrame({"a": ["x"]}), coluna="a")
     assert rel.tem_erros and "obrigatório" in rel.erros[0].mensagem
-    _, rel = rodar("skill_que_nao_existe", pd.DataFrame({"a": [1]}))
+    _, rel = rodar("habilidade_que_nao_existe", pd.DataFrame({"a": [1]}))
     assert rel.tem_erros
 
 
@@ -119,16 +119,16 @@ def _planilha(pastas, nome):
     return caminho
 
 
-def test_agente_personalizado_trabalha_no_pipeline(pastas, cfg_factory, tmp_path):
+def teste_agente_personalizado_trabalha_no_pipeline(pastas, cfg_factory, tmp_path):
     cfg = cfg_factory()
-    equipe = Equipe(cfg.agentes, cfg.skills)
+    equipe = Equipe(cfg.agentes, cfg.habilidades)
     equipe.salvar({"id": "tina", "nome": "Tina", "papel": "Contatos", "cor": "#F97316", "posicao": "limpeza",
-                   "aplicar_em": ["nps_*"], "skills": [
-                       {"skill": "normalizar_telefone", "parametros": {"colunas": ["telefone"]}},
-                       {"skill": "classificar_nps", "parametros": {"coluna": "nota"}}]})
-    equipe.salvar({"id": "modelagem", "skills": [
-        {"skill": "categorizar_texto", "parametros": {"coluna": "comentario", "temas": {"Preço": "caro", "Atendimento": "atend"}}}]})
-    nomes = [a["id"] for a in Equipe(cfg.agentes, cfg.skills).lista()]
+                   "aplicar_em": ["nps_*"], "habilidades": [
+                       {"habilidade": "normalizar_telefone", "parametros": {"colunas": ["telefone"]}},
+                       {"habilidade": "classificar_nps", "parametros": {"coluna": "nota"}}]})
+    equipe.salvar({"id": "modelagem", "habilidades": [
+        {"habilidade": "categorizar_texto", "parametros": {"coluna": "comentario", "temas": {"Preço": "caro", "Atendimento": "atend"}}}]})
+    nomes = [a["id"] for a in Equipe(cfg.agentes, cfg.habilidades).lista()]
     assert nomes.index("tina") == nomes.index("limpeza") + 1
 
     etapas = []
@@ -145,22 +145,22 @@ def test_agente_personalizado_trabalha_no_pipeline(pastas, cfg_factory, tmp_path
     assert "grupo_nps" not in r2.tabelas["dados"].columns
 
 
-def test_agente_invalido_reprova_em_vez_de_publicar_errado(pastas, cfg_factory):
+def teste_agente_invalido_reprova_em_vez_de_publicar_errado(pastas, cfg_factory):
     cfg = cfg_factory()
     (cfg.agentes).mkdir(parents=True, exist_ok=True)
-    (cfg.agentes / "quebrado.yaml").write_text("id: quebrado\nnome: Q\nposicao: limpeza\nskills:\n  - skill: nao_existe\n",
+    (cfg.agentes / "quebrado.yaml").write_text("id: quebrado\nnome: Q\nposicao: limpeza\nhabilidades:\n  - habilidade: nao_existe\n",
                                                encoding="utf-8")
     r = processar_arquivo(_planilha(pastas, "x.xlsx"), cfg)
     assert r.status == REPROVADO and "configuração inválida" in r.relatorio.texto()
 
 
-def test_salvar_recusa_configuracao_invalida_e_nativos(cfg_factory):
+def teste_salvar_recusa_configuracao_invalida_e_nativos(cfg_factory):
     cfg = cfg_factory()
-    equipe = Equipe(cfg.agentes, cfg.skills)
+    equipe = Equipe(cfg.agentes, cfg.habilidades)
     with pytest.raises(ErroAgente):
         equipe.salvar({"id": "Nome Com Espaço", "nome": "x"})
     with pytest.raises(ErroAgente):
-        equipe.salvar({"id": "x1", "nome": "X", "skills": [{"skill": "mapear_valores", "parametros": {}}]})
+        equipe.salvar({"id": "x1", "nome": "X", "habilidades": [{"habilidade": "mapear_valores", "parametros": {}}]})
     with pytest.raises(ErroAgente):
         equipe.excluir("limpeza")
     equipe.salvar({"id": "x1", "nome": "X"})
@@ -168,21 +168,21 @@ def test_salvar_recusa_configuracao_invalida_e_nativos(cfg_factory):
     assert "x1" not in [a["id"] for a in equipe.lista()]
 
 
-def test_skill_personalizada_em_python(pastas, cfg_factory):
+def teste_habilidade_personalizada_em_python(pastas, cfg_factory):
     cfg = cfg_factory()
-    cfg.skills.mkdir(parents=True, exist_ok=True)
-    (cfg.skills / "vip.py").write_text('''
-from robo.skills import Param, skill
+    cfg.habilidades.mkdir(parents=True, exist_ok=True)
+    (cfg.habilidades / "vip.py").write_text('''
+from robo.habilidades import Param, habilidade
 
-@skill(id="marcar_vip", nome="Marcar VIP", categoria="Minhas skills", descricao="VIP acima do limite",
+@habilidade(id="marcar_vip", nome="Marcar VIP", categoria="Minhas habilidades", descricao="VIP acima do limite",
        parametros=[Param("coluna", "coluna", "Valor"), Param("limite", "numero", "Limite", padrao=5)])
 def marcar_vip(df, p, ctx):
     df["vip"] = (df[p["coluna"]] >= p["limite"]).map({True: "Sim", False: "Não"})
     return df
 ''', encoding="utf-8")
-    equipe = Equipe(cfg.agentes, cfg.skills)
-    assert skills.REGISTRO["marcar_vip"].origem == "personalizada"
+    equipe = Equipe(cfg.agentes, cfg.habilidades)
+    assert habilidades.REGISTRO["marcar_vip"].origem == "personalizada"
     equipe.salvar({"id": "vip", "nome": "Vic", "posicao": "modelagem",
-                   "skills": [{"skill": "marcar_vip", "parametros": {"coluna": "nota"}}]})
+                   "habilidades": [{"habilidade": "marcar_vip", "parametros": {"coluna": "nota"}}]})
     r = processar_arquivo(_planilha(pastas, "a.xlsx"), cfg)
     assert r.tabelas["dados"]["vip"].tolist() == ["Sim", "Não"]

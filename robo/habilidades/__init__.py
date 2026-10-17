@@ -1,14 +1,14 @@
-"""Skills: habilidades de tratamento de dados que os agentes executam.
+"""Habilidades: habilidades de tratamento de dados que os agentes executam.
 
-Uma skill é uma função  f(df, parametros, contexto) -> df  registrada com metadados:
+Uma habilidade é uma função  f(df, parametros, contexto) -> df  registrada com metadados:
 nome, categoria, descrição, CONHECIMENTO (quando usar / cuidados) e PARÂMETROS tipados.
 O painel usa os metadados para montar o formulário de configuração automaticamente.
 
-Criar a sua (arquivo .py dentro da pasta skills_personalizadas/ do projeto):
+Criar a sua (arquivo .py dentro da pasta habilidades_personalizadas/ do projeto):
 
-    from robo.skills import Param, skill
+    from robo.habilidades import Param, habilidade
 
-    @skill(id="marcar_vip", nome="Marcar clientes VIP", categoria="Minhas skills",
+    @habilidade(id="marcar_vip", nome="Marcar clientes VIP", categoria="Minhas habilidades",
            descricao="Cria a coluna vip = Sim quando o valor passa do limite.",
            parametros=[Param("coluna", "coluna", "Coluna de valor"),
                        Param("limite", "numero", "Valor mínimo para ser VIP", padrao=1000)])
@@ -33,12 +33,12 @@ log = logging.getLogger("robo")
 TIPOS_PARAMETRO = {"coluna", "colunas", "texto", "numero", "inteiro", "booleano", "escolha", "lista", "mapa", "expressao"}
 
 
-class ErroSkill(Exception):
-    """Configuração inválida de uma skill (parâmetro faltando, coluna inexistente...)."""
+class ErroHabilidade(Exception):
+    """Configuração inválida de uma habilidade (parâmetro faltando, coluna inexistente...)."""
 
 
-class ErroColunaAusente(ErroSkill):
-    """A planilha não tem a coluna que a skill usa (pode ser pulada se a skill estiver marcada como opcional)."""
+class ErroColunaAusente(ErroHabilidade):
+    """A planilha não tem a coluna que a habilidade usa (pode ser pulada se a habilidade estiver marcada como opcional)."""
 
 
 @dataclass
@@ -60,7 +60,7 @@ class Param:
 
 
 @dataclass
-class Skill:
+class Habilidade:
     id: str
     nome: str
     categoria: str
@@ -76,28 +76,28 @@ class Skill:
                 "parametros": [asdict(p) for p in self.parametros]}
 
 
-REGISTRO: dict[str, Skill] = {}
+REGISTRO: dict[str, Habilidade] = {}
 ERROS_CARGA: list[str] = []
 
 
-def skill(id: str, nome: str, categoria: str, descricao: str, parametros: list[Param] | None = None,
+def habilidade(id: str, nome: str, categoria: str, descricao: str, parametros: list[Param] | None = None,
           conhecimento: str = ""):
     def decorar(funcao):
         origem = "personalizada" if not funcao.__module__.startswith("robo.") else "nativa"
-        REGISTRO[id] = Skill(id, nome, categoria, descricao, funcao, parametros or [], conhecimento.strip(), origem)
+        REGISTRO[id] = Habilidade(id, nome, categoria, descricao, funcao, parametros or [], conhecimento.strip(), origem)
         return funcao
     return decorar
 
 
 # ---------------------------------------------------------------------------- contexto
 class Contexto:
-    """O que a skill enxerga além dos dados: onde registrar ocorrências e de quem é a tarefa."""
+    """O que a habilidade enxerga além dos dados: onde registrar ocorrências e de quem é a tarefa."""
 
-    def __init__(self, rel, tabela: str, arquivo: str, agente: str, skill_nome: str):
-        self.rel, self.tabela, self.arquivo, self.agente, self.skill_nome = rel, tabela, arquivo, agente, skill_nome
+    def __init__(self, rel, tabela: str, arquivo: str, agente: str, habilidade_nome: str):
+        self.rel, self.tabela, self.arquivo, self.agente, self.habilidade_nome = rel, tabela, arquivo, agente, habilidade_nome
 
     def _msg(self, mensagem: str) -> str:
-        return f"{mensagem} — {self.agente} · {self.skill_nome}"
+        return f"{mensagem} — {self.agente} · {self.habilidade_nome}"
 
     def erro(self, mensagem, coluna="", quantidade=None, exemplos=()):
         self.rel.erro(self._msg(mensagem), tabela=self.tabela, coluna=coluna, quantidade=quantidade, exemplos=exemplos)
@@ -158,8 +158,8 @@ def _como_mapa(valor) -> dict:
     return mapa
 
 
-def preparar_parametros(sk: Skill, brutos: dict, colunas_df=None) -> dict:
-    """Converte e valida os parâmetros. Levanta ErroSkill com mensagem clara."""
+def preparar_parametros(sk: Habilidade, brutos: dict, colunas_df=None) -> dict:
+    """Converte e valida os parâmetros. Levanta ErroHabilidade com mensagem clara."""
     from robo.limpeza import normalizar_nome_coluna
     p = {}
     brutos = brutos or {}
@@ -168,7 +168,7 @@ def preparar_parametros(sk: Skill, brutos: dict, colunas_df=None) -> dict:
         vazio = valor is None or valor == "" or valor == [] or valor == {}
         if vazio:
             if par.obrigatorio:
-                raise ErroSkill(f"parâmetro obrigatório '{par.rotulo}' não preenchido")
+                raise ErroHabilidade(f"parâmetro obrigatório '{par.rotulo}' não preenchido")
             p[par.nome] = par.padrao
             continue
         try:
@@ -189,11 +189,11 @@ def preparar_parametros(sk: Skill, brutos: dict, colunas_df=None) -> dict:
             elif par.tipo == "escolha":
                 valor = str(valor)
                 if par.opcoes and valor not in par.opcoes:
-                    raise ErroSkill(f"'{par.rotulo}' aceita: {', '.join(par.opcoes)}")
+                    raise ErroHabilidade(f"'{par.rotulo}' aceita: {', '.join(par.opcoes)}")
             else:
                 valor = str(valor)
         except (TypeError, ValueError) as e:
-            raise ErroSkill(f"valor inválido em '{par.rotulo}': {valor!r}") from e
+            raise ErroHabilidade(f"valor inválido em '{par.rotulo}': {valor!r}") from e
         p[par.nome] = valor
     if colunas_df is not None:
         faltando = []
@@ -210,34 +210,34 @@ def preparar_parametros(sk: Skill, brutos: dict, colunas_df=None) -> dict:
 
 
 # ---------------------------------------------------------------------------- execução / carga
-def executar_skill(df: pd.DataFrame, config: dict, rel, tabela: str, arquivo: str, agente: str) -> pd.DataFrame:
-    sk = REGISTRO.get(config.get("skill", ""))
+def executar_habilidade(df: pd.DataFrame, config: dict, rel, tabela: str, arquivo: str, agente: str) -> pd.DataFrame:
+    sk = REGISTRO.get(config.get("habilidade", ""))
     nome_agente = agente
     if sk is None:
-        rel.erro(f"Skill '{config.get('skill')}' não existe no catálogo — {nome_agente}", tabela=tabela)
+        rel.erro(f"Habilidade '{config.get('habilidade')}' não existe no catálogo — {nome_agente}", tabela=tabela)
         return df
     ctx = Contexto(rel, tabela, arquivo, nome_agente, sk.nome)
     try:
         p = preparar_parametros(sk, config.get("parametros") or {}, set(df.columns))
         resultado = sk.funcao(df.copy(), p, ctx)
         if not isinstance(resultado, pd.DataFrame):
-            raise ErroSkill("a skill não devolveu uma tabela")
+            raise ErroHabilidade("a habilidade não devolveu uma tabela")
         return resultado
     except ErroColunaAusente as e:
         if config.get("opcional"):
-            ctx.info(f"Skill pulada nesta planilha ({e}) — marcada como opcional")
+            ctx.info(f"Habilidade pulada nesta planilha ({e}) — marcada como opcional")
         else:
             ctx.erro(f"Configuração inválida: {e}")
-    except ErroSkill as e:
+    except ErroHabilidade as e:
         ctx.erro(f"Configuração inválida: {e}")
     except Exception as e:
-        log.exception("Falha na skill %s", sk.id)
+        log.exception("Falha na habilidade %s", sk.id)
         ctx.erro(f"Falha ao executar: {type(e).__name__}: {e}")
     return df
 
 
 def carregar_personalizadas(pasta: Path) -> list[str]:
-    """Importa os .py de skills_personalizadas/. Erros não derrubam o robô: ficam listados no painel."""
+    """Importa os .py de habilidades_personalizadas/. Erros não derrubam o robô: ficam listados no painel."""
     ERROS_CARGA.clear()
     for sk_id in [k for k, v in REGISTRO.items() if v.origem == "personalizada"]:
         REGISTRO.pop(sk_id, None)
@@ -248,13 +248,13 @@ def carregar_personalizadas(pasta: Path) -> list[str]:
         if arq.name.startswith("_"):
             continue
         try:
-            spec = importlib.util.spec_from_file_location(f"skills_personalizadas.{arq.stem}", arq)
+            spec = importlib.util.spec_from_file_location(f"habilidades_personalizadas.{arq.stem}", arq)
             modulo = importlib.util.module_from_spec(spec)
             spec.loader.exec_module(modulo)
             carregadas.append(arq.name)
         except Exception as e:
             ERROS_CARGA.append(f"{arq.name}: {type(e).__name__}: {e}")
-            log.error("Skill personalizada %s não carregou: %s", arq.name, e)
+            log.error("Habilidade personalizada %s não carregou: %s", arq.name, e)
     return carregadas
 
 
@@ -262,4 +262,4 @@ def catalogo() -> list[dict]:
     return sorted((s.metadados() for s in REGISTRO.values()), key=lambda m: (m["origem"] != "nativa", m["categoria"], m["nome"]))
 
 
-from robo.skills import nativas  # noqa: E402,F401  (registra o catálogo nativo)
+from robo.habilidades import nativas  # noqa: E402,F401  (registra o catálogo nativo)

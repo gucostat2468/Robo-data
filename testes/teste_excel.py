@@ -25,7 +25,7 @@ def _recalcular(caminho, pasta):
     return load_workbook(pasta / caminho.name, data_only=True)
 
 
-def test_criterio_escapa_curingas():
+def teste_criterio_escapa_curingas():
     assert _criterio("Pós*Graduação ?") == '"Pós~*Graduação ~?"'
     assert _criterio(">10") == '"=>10"'
     assert _criterio('Diz "oi"') == '"Diz ""oi"""'
@@ -33,7 +33,7 @@ def test_criterio_escapa_curingas():
 
 @pytest.mark.skipif(not SOFFICE, reason="LibreOffice não instalado")
 @pytest.mark.parametrize("cenario", ["pesquisa", "trade"])
-def test_formulas_recalculadas_batem_com_a_conferencia(tmp_path, cenario):
+def teste_formulas_recalculadas_batem_com_a_conferencia(tmp_path, cenario):
     rng = np.random.default_rng(4)
     if cenario == "pesquisa":
         df = pd.DataFrame({"curso": rng.choice(["Direito", "Medicina", "Pós*Graduação ?", "=Especial"], 250),
@@ -58,10 +58,10 @@ def test_formulas_recalculadas_batem_com_a_conferencia(tmp_path, cenario):
         assert {"Plano tabular", "Indicadores"} <= set(wb.sheetnames)
 
 
-def test_pipeline_entrega_excel(pastas, cfg_factory):
+def teste_pipeline_entrega_excel(pastas, cfg_factory):
     import sys, os
     sys.path.insert(0, os.path.dirname(__file__))
-    from test_analise import _salvar_xlsx, base_nps
+    from teste_analise import _salvar_xlsx, base_nps
     cfg = cfg_factory()
     arq = pastas / "Bases-Limpeza" / "nps_set.xlsx"
     _salvar_xlsx(base_nps(n=120), arq)

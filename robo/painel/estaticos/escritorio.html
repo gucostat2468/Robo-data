@@ -5,15 +5,15 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Escritório dos Robôs</title>
 <link rel="icon" href="robo.svg" type="image/svg+xml">
-<link rel="stylesheet" href="app.css">
+<link rel="stylesheet" href="painel.css">
 <link rel="stylesheet" href="escritorio.css">
-<script type="importmap">{ "imports": { "three": "./vendor/three.module.min.js" } }</script>
+<script type="importmap">{ "imports": { "three": "./terceiros/three.module.min.js" } }</script>
 </head>
 <body class="escritorio">
 <div id="cena" aria-label="Escritório 3D com os agentes do robô"></div>
 
 <header class="hud-topo">
-  <a class="btn" href="index.html#inicio" title="Voltar ao painel"><svg class="icone" viewBox="0 0 24 24"><path d="M19 12H5"/><path d="m11 6-6 6 6 6"/></svg>Painel</a>
+  <a class="btn" href="inicio.html#inicio" title="Voltar ao painel"><svg class="icone" viewBox="0 0 24 24"><path d="M19 12H5"/><path d="m11 6-6 6 6 6"/></svg>Painel</a>
   <div class="hud-titulo">
     <img src="robo.svg" width="28" height="28" alt="">
     <div><strong>Escritório dos Robôs</strong><span id="hud-status"><i class="ponto"></i>Conectando…</span></div>
@@ -44,7 +44,7 @@
   <div class="cartao"><div class="cartao-corpo">
     <h2>Seu computador não conseguiu desenhar o 3D</h2>
     <p class="muted">A placa de vídeo ou o navegador não liberou o WebGL. O robô continua funcionando normalmente.</p>
-    <a class="btn primario" href="index.html#inicio">Voltar ao painel</a>
+    <a class="btn primario" href="inicio.html#inicio">Voltar ao painel</a>
   </div></div>
 </div>
 <div class="avisos" id="avisos"></div>

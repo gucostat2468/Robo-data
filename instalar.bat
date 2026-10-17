@@ -57,7 +57,7 @@ if not exist ".venv\Scripts\python.exe" (
 echo [3/5] Instalando bibliotecas (pandas, openpyxl, xlrd, PyYAML, psycopg)...
 ".venv\Scripts\python.exe" -m pip install --upgrade pip --quiet
 REM --only-binary: usa apenas pacotes prontos (nunca tenta compilar)
-".venv\Scripts\python.exe" -m pip install -r requirements.txt --only-binary=:all: --quiet
+".venv\Scripts\python.exe" -m pip install -r requisitos.txt --only-binary=:all: --quiet
 if errorlevel 1 (
   echo [ERRO] Falha ao instalar as bibliotecas. Copie a mensagem acima e envie para analise.
   pause

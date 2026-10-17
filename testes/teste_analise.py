@@ -33,7 +33,7 @@ def nova_analise(df, **cfg):
     return Analise(df, "dados", "nps_setembro.xlsx", "nps", cfg, ["id", "id_*", "*_id"])
 
 
-def test_papeis_e_deteccao_de_indicador():
+def teste_papeis_e_deteccao_de_indicador():
     a = nova_analise(base_nps())
     assert a.papeis["id_resposta"] == "id" and a.papeis["data_resposta"] == "data"
     assert a.papeis["curso"] == "categoria" and a.papeis["comentario"] == "texto_livre"
@@ -41,7 +41,7 @@ def test_papeis_e_deteccao_de_indicador():
     assert set(a.segmentos) == {"curso", "uf"}
 
 
-def test_nps_e_margem_de_erro_conferem_com_a_formula():
+def teste_nps_e_margem_de_erro_conferem_com_a_formula():
     r = calcular_indicador("nps", pd.Series([10, 10, 9, 8, 7, 6, 0, 10]), 1.96)
     p, d = 4 / 8, 2 / 8
     assert r["valor"] == pytest.approx(25.0)
@@ -50,7 +50,7 @@ def test_nps_e_margem_de_erro_conferem_com_a_formula():
     assert csat["valor"] == pytest.approx(60.0)
 
 
-def test_estatistica_acha_o_efeito_real_e_nao_inventa_diferencas():
+def teste_estatistica_acha_o_efeito_real_e_nao_inventa_diferencas():
     a = nova_analise(base_nps())
     a.fazer_indicadores(); a.fazer_estatistica()
     sig = a.destaques[a.destaques["significativo"]]
@@ -65,18 +65,18 @@ def test_estatistica_acha_o_efeito_real_e_nao_inventa_diferencas():
     assert ((a.relacoes["variavel_a"] == "nota_nps") | (a.relacoes["variavel_b"] == "nota_nps")).any()
 
 
-def test_sem_efeito_nenhum_destaque_falso():
+def teste_sem_efeito_nenhum_destaque_falso():
     a = nova_analise(base_nps(medicina_ruim=False, semente=11))
     a.fazer_indicadores(); a.fazer_estatistica()
     assert not a.destaques["significativo"].any()
 
 
-def test_holm():
+def teste_holm():
     assert holm([0.001, 0.04, 0.03], 0.05) == [True, False, False]
     assert holm([0.01, 0.02, 0.03], 0.05) == [True, True, True]
 
 
-def test_monitoramento_compara_com_cargas_anteriores():
+def teste_monitoramento_compara_com_cargas_anteriores():
     ant = nova_analise(base_nps(semente=1))
     foto = ant.tirar_foto()
     nova = base_nps(n=250, semente=2).drop(columns=["nota_atendimento"])
@@ -88,7 +88,7 @@ def test_monitoramento_compara_com_cargas_anteriores():
     assert any("Medicna" in m for m in a.alertas["mensagem"])
 
 
-def test_chave_base_agrupa_ondas():
+def teste_chave_base_agrupa_ondas():
     assert chave_base("nps_outubro.xlsx", {}) == chave_base("NPS Setembro 2026.xlsx", {}) == "nps"
     assert chave_base("vendas_2026_09.csv", {}) == "vendas"
     assert chave_base("qualquer.xlsx", {"padrao": "pesquisa_csat_*"}) == "pesquisa_csat"
@@ -103,7 +103,7 @@ def _salvar_xlsx(df, caminho):
     wb.save(caminho)
 
 
-def test_pipeline_gera_analise_e_nunca_reprova(pastas, cfg_factory, monkeypatch):
+def teste_pipeline_gera_analise_e_nunca_reprova(pastas, cfg_factory, monkeypatch):
     cfg = cfg_factory()
     arq = pastas / "Bases-Limpeza" / "nps_setembro.xlsx"
     _salvar_xlsx(base_nps(), arq)
@@ -131,7 +131,7 @@ def test_pipeline_gera_analise_e_nunca_reprova(pastas, cfg_factory, monkeypatch)
     assert (alertas["tipo"] == "indicador").any()
 
 
-def test_analise_pode_ser_desligada(pastas, cfg_factory):
+def teste_analise_pode_ser_desligada(pastas, cfg_factory):
     cfg = cfg_factory(analise={"habilitado": False})
     arq = pastas / "Bases-Limpeza" / "nps_x.xlsx"
     _salvar_xlsx(base_nps(n=50), arq)

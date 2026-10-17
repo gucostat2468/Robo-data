@@ -119,7 +119,7 @@ def criar_atalhos() -> list[str]:
     if not EH_WINDOWS:
         raise RuntimeError("Atalhos só podem ser criados no Windows.")
     lancador = RAIZ_PROJETO / "Abrir Robo de Planilhas.vbs"
-    icone = RAIZ_PROJETO / "robo" / "painel" / "static" / "robo.ico"
+    icone = RAIZ_PROJETO / "robo" / "painel" / "estaticos" / "robo.ico"
     script = f"""
 $sh = New-Object -ComObject WScript.Shell
 $destinos = @([Environment]::GetFolderPath('Desktop'), [Environment]::GetFolderPath('Programs'))

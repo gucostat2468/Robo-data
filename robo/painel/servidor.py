@@ -34,7 +34,7 @@ from robo.pipeline import processar_arquivo
 
 log = logging.getLogger("robo")
 
-ESTATICOS = Path(__file__).parent / "static"
+ESTATICOS = Path(__file__).parent / "estaticos"
 LIMITE_UPLOAD = 300 * 1024 * 1024
 CABECALHO_ACAO = "X-Robo-Painel"
 RE_CARIMBO = re.compile(r"^\d{8}_\d{6}_")
@@ -181,8 +181,8 @@ class Api:
         from robo.analise import ANALISTAS, PADRAO_ANALISE
         equipe = [{"id": a["id"], "nome": a["nome"], "papel": a.get("papel", ""), "cor": a.get("cor", "#64748B"),
                    "descricao": a.get("descricao", ""), "nativo": a.get("nativo", False), "ativo": a.get("ativo", True),
-                   "skills": [s.get("skill") for s in a.get("skills", []) if s.get("ativo", True)],
-                   "aceita_skills": a.get("aceita_skills", True), "andar": 1, "ficha": _ficha_curta(a.get("ficha"))}
+                   "habilidades": [s.get("habilidade") for s in a.get("habilidades", []) if s.get("ativo", True)],
+                   "aceita_habilidades": a.get("aceita_habilidades", True), "andar": 1, "ficha": _ficha_curta(a.get("ficha"))}
                   for a in obter_equipe(cfg).lista()]
         cfg_analise = {**PADRAO_ANALISE, **(cfg.dados.get("analise") or {})}
         desligados = set(cfg_analise.get("analistas_desligados") or [])
@@ -190,18 +190,18 @@ class Api:
         from robo.producao import SUPERVISORES
         from robo.excel import EQUIPE_EXCEL
         # ninguém dorme: quem não tem trabalho no momento fica "de prontidão" (estudando, revisando), nunca desligado
-        equipe += [{**a, "nativo": True, "aceita_skills": False, "skills": [], "ativo": True,
+        equipe += [{**a, "nativo": True, "aceita_habilidades": False, "habilidades": [], "ativo": True,
                     "prontidao": "revisando os modelos SQL (banco ainda não configurado)" if a["id"] == "dba" and not cfg.banco.get("habilitado") else "",
-                    "ficha": _ficha_curta(rh.ficha({"id": a["id"], "skills": []}))} for a in SUPERVISORES]
-        equipe += [{**a, "id": f"analise_{a['id']}", "nativo": True, "aceita_skills": False, "skills": [], "andar": 2, "ativo": True,
+                    "ficha": _ficha_curta(rh.ficha({"id": a["id"], "habilidades": []}))} for a in SUPERVISORES]
+        equipe += [{**a, "id": f"analise_{a['id']}", "nativo": True, "aceita_habilidades": False, "habilidades": [], "andar": 2, "ativo": True,
                     "prontidao": "" if cfg_analise.get("habilitado", True) and a["id"] not in desligados
                     else "estudando (análise pausada nas Configurações)",
-                    "ficha": _ficha_curta(rh.ficha({"id": f"analise_{a['id']}", "skills": []}))} for a in ANALISTAS]
+                    "ficha": _ficha_curta(rh.ficha({"id": f"analise_{a['id']}", "habilidades": []}))} for a in ANALISTAS]
         cfg_excel = cfg.dados.get("excel") or {}
-        equipe += [{**a, "nativo": True, "aceita_skills": False, "skills": [], "andar": 3, "ativo": True,
+        equipe += [{**a, "nativo": True, "aceita_habilidades": False, "habilidades": [], "andar": 3, "ativo": True,
                     "ronda": a["id"] == "excel_supervisor",
                     "prontidao": "" if cfg_excel.get("habilitado", True) else "estudando (Sala Excel pausada nas Configurações)",
-                    "ficha": _ficha_curta(rh.ficha({"id": a["id"], "skills": []}))} for a in EQUIPE_EXCEL]
+                    "ficha": _ficha_curta(rh.ficha({"id": a["id"], "habilidades": []}))} for a in EQUIPE_EXCEL]
         for a in equipe:
             if not a.get("ativo", True):  # agente personalizado pausado pelo dono: segue estudando, não dorme
                 a["ativo"], a["prontidao"] = True, "em treinamento (pausado por você na tela Agentes)"
@@ -356,24 +356,24 @@ class Api:
         return [{"nome": p.name, "ativo": not p.name.startswith("_")} for p in sorted(pasta.glob("*.sql"))]
 
     def agentes(self, _q) -> dict:
-        from robo import skills
+        from robo import habilidades
         from robo.agentes import POSICOES
         from robo.pipeline import obter_equipe
         equipe = obter_equipe(self.cfg)
         from robo import rh
         from robo.analise import ANALISTAS
-        catalogo = [{**s, "risco": rh.RISCO_BASE.get(s["id"], "medio"), "provas": len(rh.provas_da_skill(s["id"]))}
-                    for s in skills.catalogo()]
+        catalogo = [{**s, "risco": rh.RISCO_BASE.get(s["id"], "medio"), "provas": len(rh.provas_da_habilidade(s["id"]))}
+                    for s in habilidades.catalogo()]
         from robo.producao import SUPERVISORES
-        analistas = [{**a, "id": f"analise_{a['id']}", "nativo": True, "aceita_skills": False, "skills": [], "andar": 2,
-                      "ativo": True, "ficha": rh.ficha({"id": f"analise_{a['id']}", "skills": []})} for a in ANALISTAS]
-        lideranca = [{**a, "nativo": True, "aceita_skills": False, "skills": [], "ativo": True,
-                      "ficha": rh.ficha({"id": a["id"], "skills": []})} for a in SUPERVISORES]
+        analistas = [{**a, "id": f"analise_{a['id']}", "nativo": True, "aceita_habilidades": False, "habilidades": [], "andar": 2,
+                      "ativo": True, "ficha": rh.ficha({"id": f"analise_{a['id']}", "habilidades": []})} for a in ANALISTAS]
+        lideranca = [{**a, "nativo": True, "aceita_habilidades": False, "habilidades": [], "ativo": True,
+                      "ficha": rh.ficha({"id": a["id"], "habilidades": []})} for a in SUPERVISORES]
         from robo.excel import EQUIPE_EXCEL
-        sala_excel = [{**a, "nativo": True, "aceita_skills": False, "skills": [], "ativo": True, "andar": 3,
-                       "ficha": rh.ficha({"id": a["id"], "skills": []})} for a in EQUIPE_EXCEL]
+        sala_excel = [{**a, "nativo": True, "aceita_habilidades": False, "habilidades": [], "ativo": True, "andar": 3,
+                       "ficha": rh.ficha({"id": a["id"], "habilidades": []})} for a in EQUIPE_EXCEL]
         return {"agentes": equipe.lista(), "analistas": analistas, "lideranca": lideranca, "sala_excel": sala_excel, "catalogo": catalogo,
-                "erros_skills": list(skills.ERROS_CARGA), "posicoes": POSICOES,
+                "erros_habilidades": list(habilidades.ERROS_CARGA), "posicoes": POSICOES,
                 "rh": {"niveis": [{"id": n, "nome": rh.NOME_NIVEL[n], "risco_maximo": rh.RISCO_MAXIMO[n]} for n in rh.NIVEIS],
                        "areas": rh.AREAS}}
 
@@ -460,7 +460,7 @@ class Api:
         pastas = {"entrada": cfg.entrada, "tratadas": cfg.tratadas, "erros": cfg.erros, "originais": cfg.originais,
                   "relatorios": cfg.relatorios, "logs": cfg.logs,
                   "modelos": self._pasta_modelos(), "projeto": RAIZ_PROJETO,
-                  "consultas": RAIZ_PROJETO / "consultas_sql", "agentes": cfg.agentes, "skills": cfg.skills}
+                  "consultas": RAIZ_PROJETO / "consultas_sql", "agentes": cfg.agentes, "habilidades": cfg.habilidades}
         if alvo in pastas:
             caminho = pastas[alvo]
             caminho.mkdir(parents=True, exist_ok=True)
@@ -718,7 +718,7 @@ def criar_manipulador(api: Api):
                 return self._json({"erro": f"{type(e).__name__}: {e}"}, 500)
 
         def _estatico(self, caminho):
-            nome = "index.html" if caminho in ("", "/") else caminho.lstrip("/")
+            nome = "inicio.html" if caminho in ("", "/") else caminho.lstrip("/")
             arquivo = (ESTATICOS / nome).resolve()
             if ESTATICOS.resolve() not in arquivo.parents or not arquivo.is_file():
                 return self._json({"erro": "não encontrado"}, 404)

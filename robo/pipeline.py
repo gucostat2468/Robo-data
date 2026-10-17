@@ -107,7 +107,7 @@ _CACHE_EQUIPE: dict = {}
 
 
 def obter_equipe(cfg: Config):
-    """Equipe de agentes, recarregada sozinha quando algum arquivo de agentes/ ou skills_personalizadas/ muda."""
+    """Equipe de agentes, recarregada sozinha quando algum arquivo de agentes/ ou habilidades_personalizadas/ muda."""
     from robo.agentes import Equipe
 
     def assinatura(pasta: Path):
@@ -115,12 +115,12 @@ def obter_equipe(cfg: Config):
             return ()
         return tuple(sorted((p.name, p.stat().st_mtime_ns) for p in pasta.iterdir() if p.is_file()))
 
-    chave = (str(cfg.agentes), str(cfg.skills))
-    marca = (assinatura(cfg.agentes), assinatura(cfg.skills))
+    chave = (str(cfg.agentes), str(cfg.habilidades))
+    marca = (assinatura(cfg.agentes), assinatura(cfg.habilidades))
     guardado = _CACHE_EQUIPE.get(chave)
     if guardado and guardado[0] == marca:
         return guardado[1]
-    equipe = Equipe(cfg.agentes, cfg.skills)
+    equipe = Equipe(cfg.agentes, cfg.habilidades)
     _CACHE_EQUIPE[chave] = (marca, equipe)
     return equipe
 

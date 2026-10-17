@@ -1,9 +1,9 @@
-"""MODELO de skill personalizada (arquivos que começam com "_" são ignorados).
+"""MODELO de habilidade personalizada (arquivos que começam com "_" são ignorados).
 
 Para criar a sua:
   1. Copie este arquivo com outro nome, por exemplo: marcar_vip.py
   2. Ajuste id, nome, parâmetros e a lógica.
-  3. Salve. No painel (Agentes e skills) ela aparece no catálogo, pronta para adicionar a um agente.
+  3. Salve. No painel (Agentes e habilidades) ela aparece no catálogo, pronta para adicionar a um agente.
 
 Regras de ouro:
   - receba df (tabela), p (parâmetros já validados) e ctx (onde registrar ocorrências);
@@ -11,13 +11,13 @@ Regras de ouro:
   - use ctx.erro(...) para reprovar o arquivo, ctx.aviso(...) para alertar e ctx.info(...) para documentar.
 """
 
-from robo.skills import Param, skill
+from robo.habilidades import Param, habilidade
 
 
-@skill(
+@habilidade(
     id="marcar_vip",
     nome="Marcar clientes VIP",
-    categoria="Minhas skills",
+    categoria="Minhas habilidades",
     descricao="Cria a coluna vip (Sim/Não) para valores acima de um limite.",
     parametros=[
         Param("coluna", "coluna", "Coluna de valor"),

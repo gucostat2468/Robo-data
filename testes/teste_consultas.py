@@ -75,7 +75,7 @@ def _todas():
     return [c["id"] for c in consultas.listar()]
 
 
-def test_biblioteca_tem_cabecalhos_completos():
+def teste_biblioteca_tem_cabecalhos_completos():
     itens = consultas.listar()
     assert len(itens) >= 25
     for c in itens:
@@ -83,13 +83,13 @@ def test_biblioteca_tem_cabecalhos_completos():
 
 
 @pytest.mark.parametrize("id_consulta", _todas())
-def test_consulta_executa(banco, id_consulta):
+def teste_consulta_executa(banco, id_consulta):
     r = consultas.executar(banco, id_consulta)
     assert r["colunas"], id_consulta
     assert r["linhas"], f"{id_consulta} não retornou linhas com os dados de exemplo"
 
 
-def test_numeros_do_nps_conferem(banco):
+def teste_numeros_do_nps_conferem(banco):
     r = consultas.executar(banco, "03 NPS/02_nps_mensal_com_variacao.sql")
     por_mes = {str(l[0]): float(l[2]) for l in r["linhas"]}
     assert por_mes["2026-09-01"] == 0.0
@@ -102,13 +102,13 @@ def test_numeros_do_nps_conferem(banco):
     assert outl["linhas"][0][4] == 99999.0
 
 
-def test_execucao_e_somente_leitura(banco, tmp_path):
+def teste_execucao_e_somente_leitura(banco, tmp_path):
     (tmp_path / "x.sql").write_text("CREATE TABLE tratado.invasora (a int);", encoding="utf-8")
     with pytest.raises(Exception) as erro:
         consultas.executar(banco, "x.sql", pasta=tmp_path)
     assert "read-only" in str(erro.value).lower() or "somente leitura" in str(erro.value).lower()
 
 
-def test_nao_sai_da_pasta(tmp_path):
+def teste_nao_sai_da_pasta(tmp_path):
     with pytest.raises(ValueError):
         consultas.caminho_seguro("../config.yaml")

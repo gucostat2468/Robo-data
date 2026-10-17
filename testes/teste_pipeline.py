@@ -9,7 +9,7 @@ from robo.monitor import Monitor
 from robo.pipeline import REPROVADO, SUCESSO, processar_arquivo
 
 
-def test_fluxo_completo_sucesso(planilha_baguncada, cfg_factory):
+def teste_fluxo_completo_sucesso(planilha_baguncada, cfg_factory):
     cfg = cfg_factory([REGRA_NPS])
     r = processar_arquivo(planilha_baguncada, cfg)
     assert r.status == SUCESSO, r.relatorio.texto()
@@ -34,7 +34,7 @@ def test_fluxo_completo_sucesso(planilha_baguncada, cfg_factory):
     assert pd.api.types.is_datetime64_any_dtype(df["data_resposta"])
 
 
-def test_reprovado_vai_para_erros_com_relatorio(pastas, cfg_factory):
+def teste_reprovado_vai_para_erros_com_relatorio(pastas, cfg_factory):
     wb = Workbook()
     ws = wb.active
     ws.append(["ID Resposta", "Nota NPS", "UF"])
@@ -59,7 +59,7 @@ def test_reprovado_vai_para_erros_com_relatorio(pastas, cfg_factory):
     assert {"Chave única repetida (id_resposta)", "Valores fora da lista permitida"} <= set(resumo["mensagem"])
 
 
-def test_modelo_estrela_e_calendario(planilha_baguncada, cfg_factory):
+def teste_modelo_estrela_e_calendario(planilha_baguncada, cfg_factory):
     regra = dict(REGRA_NPS, modelo={
         "fato": "fato_nps",
         "dimensoes": {"dim_curso": {"colunas": ["curso", "modalidade"], "chave": "id_curso"}},
@@ -79,7 +79,7 @@ def test_modelo_estrela_e_calendario(planilha_baguncada, cfg_factory):
     assert len(abas["dim_calendario"]) == 365
 
 
-def test_diagnostico_nao_mexe_em_nada(planilha_baguncada, cfg_factory):
+def teste_diagnostico_nao_mexe_em_nada(planilha_baguncada, cfg_factory):
     cfg = cfg_factory([REGRA_NPS])
     r = processar_arquivo(planilha_baguncada, cfg, gravar=False)
     assert planilha_baguncada.exists()
@@ -87,14 +87,14 @@ def test_diagnostico_nao_mexe_em_nada(planilha_baguncada, cfg_factory):
     assert r.tabelas["dados"].shape[0] == 4
 
 
-def test_formato_nao_suportado(pastas, cfg_factory):
+def teste_formato_nao_suportado(pastas, cfg_factory):
     caminho = pastas / "Bases-Limpeza" / "apresentacao.pdf"
     caminho.write_bytes(b"%PDF-1.4")
     r = processar_arquivo(caminho, cfg_factory())
     assert r.status == REPROVADO
 
 
-def test_monitor_espera_estabilidade(planilha_baguncada, cfg_factory):
+def teste_monitor_espera_estabilidade(planilha_baguncada, cfg_factory):
     cfg = cfg_factory([REGRA_NPS])
     m = Monitor(cfg)
     assert m.ciclo(agora=100.0) == []                 # 1ª vez: só registra
@@ -104,7 +104,7 @@ def test_monitor_espera_estabilidade(planilha_baguncada, cfg_factory):
     assert (cfg.tratadas / "nps_outubro.xlsx").exists()
 
 
-def test_monitor_ignora_temporarios(pastas, cfg_factory):
+def teste_monitor_ignora_temporarios(pastas, cfg_factory):
     (pastas / "Bases-Limpeza" / "~$nps.xlsx").write_bytes(b"lock")
     (pastas / "Bases-Limpeza" / "desktop.ini").write_text("x")
     m = Monitor(cfg_factory())
@@ -112,7 +112,7 @@ def test_monitor_ignora_temporarios(pastas, cfg_factory):
     assert m.ciclo(agora=100.0) == []
 
 
-def test_csv_saida(planilha_baguncada, cfg_factory):
+def teste_csv_saida(planilha_baguncada, cfg_factory):
     cfg = cfg_factory([REGRA_NPS], saida={"formato": "csv"})
     r = processar_arquivo(planilha_baguncada, cfg)
     assert r.status == SUCESSO
@@ -120,7 +120,7 @@ def test_csv_saida(planilha_baguncada, cfg_factory):
     assert df["valor_mensalidade"].iloc[0] == 1234.56
 
 
-def test_etapas_emitidas_em_ordem(planilha_baguncada, cfg_factory):
+def teste_etapas_emitidas_em_ordem(planilha_baguncada, cfg_factory):
     etapas = []
     r = processar_arquivo(planilha_baguncada, cfg_factory([REGRA_NPS]), ao_etapa=lambda e, a, **k: etapas.append((e, k)))
     assert r.status == SUCESSO
@@ -132,7 +132,7 @@ def test_etapas_emitidas_em_ordem(planilha_baguncada, cfg_factory):
     assert etapas[-1][1]["status"] == SUCESSO and etapas[-1][1]["linhas"] == 4
 
 
-def test_texto_com_igual_nao_vira_formula_ativa(pastas, cfg_factory):
+def teste_texto_com_igual_nao_vira_formula_ativa(pastas, cfg_factory):
     """Segurança: célula de origem '=HYPERLINK(...)' precisa sair como texto, nunca como fórmula."""
     from openpyxl import load_workbook
     wb = Workbook()

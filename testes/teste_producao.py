@@ -13,7 +13,7 @@ from robo.agentes import Equipe
 from robo.pipeline import REPROVADO, SUCESSO, processar_arquivo
 
 
-def test_aprovado_tem_checklist_assinado(planilha_baguncada, cfg_factory):
+def teste_aprovado_tem_checklist_assinado(planilha_baguncada, cfg_factory):
     cfg = cfg_factory([REGRA_NPS])
     r = processar_arquivo(planilha_baguncada, cfg)
     assert r.status == SUCESSO and r.checklist["liberado"]
@@ -23,23 +23,23 @@ def test_aprovado_tem_checklist_assinado(planilha_baguncada, cfg_factory):
     assert (aba["status"] == "OK").all()
 
 
-def test_supervisor_barra_linhas_que_somem_sem_explicacao(pastas, cfg_factory):
+def teste_supervisor_barra_linhas_que_somem_sem_explicacao(pastas, cfg_factory):
     cfg = cfg_factory()
-    cfg.skills.mkdir(parents=True, exist_ok=True)
-    (cfg.skills / "some.py").write_text('''
+    cfg.habilidades.mkdir(parents=True, exist_ok=True)
+    (cfg.habilidades / "some.py").write_text('''
 import pandas as pd
-from robo.skills import Param, skill
+from robo.habilidades import Param, habilidade
 
 def _df():
     return pd.DataFrame({"a": [1, 2]})
 
-@skill(id="tira_primeira", nome="Tira a primeira", categoria="Teste", descricao="bug: some com uma linha sem avisar")
+@habilidade(id="tira_primeira", nome="Tira a primeira", categoria="Teste", descricao="bug: some com uma linha sem avisar")
 def tira_primeira(df, p, ctx):
     return df.iloc[1:]
 
 tira_primeira.provas = [("Devolve tabela", _df(), {}, lambda d, r: isinstance(d, pd.DataFrame))]
 ''', encoding="utf-8")
-    Equipe(cfg.agentes, cfg.skills).salvar({"id": "bugado", "nome": "Bugado", "nivel": "senior", "skills": [{"skill": "tira_primeira"}]})
+    Equipe(cfg.agentes, cfg.habilidades).salvar({"id": "bugado", "nome": "Bugado", "nivel": "senior", "habilidades": [{"habilidade": "tira_primeira"}]})
     wb = Workbook(); ws = wb.active
     ws.append(["id", "v"]); ws.append(["1", 10]); ws.append(["2", 20])
     caminho = pastas / "Bases-Limpeza" / "base.xlsx"; wb.save(caminho)
@@ -53,7 +53,7 @@ DSN = os.environ.get("ROBO_TESTE_PG")
 
 
 @pytest.mark.skipif(not DSN, reason="defina ROBO_TESTE_PG para testar com PostgreSQL")
-def test_dba_desfaz_carga_que_nao_bate(planilha_baguncada, cfg_factory, monkeypatch):
+def teste_dba_desfaz_carga_que_nao_bate(planilha_baguncada, cfg_factory, monkeypatch):
     import psycopg
 
     from robo import banco as mod
@@ -81,10 +81,10 @@ def test_dba_desfaz_carga_que_nao_bate(planilha_baguncada, cfg_factory, monkeypa
             c.execute(f'DROP DATABASE IF EXISTS "{nome}" WITH (FORCE)')
 
 
-def test_coordenador_de_analise_revisa(pastas, cfg_factory):
+def teste_coordenador_de_analise_revisa(pastas, cfg_factory):
     import sys
     sys.path.insert(0, os.path.dirname(__file__))
-    from test_analise import _salvar_xlsx, base_nps
+    from teste_analise import _salvar_xlsx, base_nps
     cfg = cfg_factory()
     arq = pastas / "Bases-Limpeza" / "nps_set.xlsx"
     _salvar_xlsx(base_nps(), arq)

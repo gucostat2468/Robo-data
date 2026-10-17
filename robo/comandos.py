@@ -97,7 +97,7 @@ def _comando_banco(cfg, acao: str) -> int:
         return 1
 
 
-def main(argv: list[str] | None = None) -> int:
+def principal(argv: list[str] | None = None) -> int:
     p = argparse.ArgumentParser(prog="robo", description="Robô de Planilhas — ETL automático Bases-Limpeza -> Bases-Tratadas")
     p.add_argument("--config", help="caminho do config.yaml (padrão: config.yaml na pasta do projeto)")
     p.add_argument("-v", "--verboso", action="store_true")

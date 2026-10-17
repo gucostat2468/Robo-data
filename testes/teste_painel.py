@@ -20,7 +20,7 @@ def painel(tmp_path):
     entrada.mkdir(parents=True)
     cfg = tmp_path / "config.yaml"
     cfg.write_text(yaml.safe_dump({"pastas": {"entrada": str(entrada), "logs": str(tmp_path / "logs"),
-                                              "agentes": str(tmp_path / "agentes"), "skills": str(tmp_path / "skills")},
+                                              "agentes": str(tmp_path / "agentes"), "habilidades": str(tmp_path / "habilidades")},
                                    "painel": {"notificacoes": False}}), encoding="utf-8")
     controle = ControleRobo(cfg)
     servidor = ThreadingHTTPServer(("127.0.0.1", 0), None)
@@ -56,7 +56,7 @@ def _xlsx(tmp_path):
     return caminho.read_bytes()
 
 
-def test_estado_e_paginas(painel):
+def teste_estado_e_paginas(painel):
     base, _ = painel
     status, d = chamar(base, "/api/estado")
     assert status == 200 and d["erro_config"] is None and "kpis" in d
@@ -71,7 +71,7 @@ def test_estado_e_paginas(painel):
         assert r.headers["Content-Type"].startswith("text/javascript")
 
 
-def test_seguranca_das_acoes(painel):
+def teste_seguranca_das_acoes(painel):
     base, _ = painel
     req = urllib.request.Request(base + "/api/robo/pausar", data=b"{}", method="POST")
     with pytest.raises(urllib.error.HTTPError) as e:
@@ -81,7 +81,7 @@ def test_seguranca_das_acoes(painel):
     assert chamar(base, "/api/abrir", {"alvo": "arquivo", "caminho": "C:/Windows/system32/calc.exe"})[0] == 404
 
 
-def test_testar_enviar_e_agentes(painel, tmp_path):
+def teste_testar_enviar_e_agentes(painel, tmp_path):
     base, entrada = painel
     conteudo = _xlsx(tmp_path)
     status, r = chamar(base, "/api/testar", dados=conteudo, cabecalhos={"X-Nome-Arquivo": "base.xlsx"})
@@ -92,10 +92,10 @@ def test_testar_enviar_e_agentes(painel, tmp_path):
     assert status == 200 and (entrada / "base.xlsx").exists()
 
     novo = {"id": "tina", "nome": "Tina", "papel": "Contatos", "cor": "#F97316", "posicao": "limpeza",
-            "skills": [{"skill": "padronizar_texto", "parametros": {"colunas": ["id"], "modo": "maiusculo"}}]}
+            "habilidades": [{"habilidade": "padronizar_texto", "parametros": {"colunas": ["id"], "modo": "maiusculo"}}]}
     assert chamar(base, "/api/agentes/salvar", {"agente": novo})[0] == 200
     _, ag = chamar(base, "/api/agentes")
     assert "tina" in [a["id"] for a in ag["agentes"]]
-    status, r = chamar(base, "/api/agentes/salvar", {"agente": {**novo, "skills": [{"skill": "nao_existe"}]}})
+    status, r = chamar(base, "/api/agentes/salvar", {"agente": {**novo, "habilidades": [{"habilidade": "nao_existe"}]}})
     assert status == 400 and "não existe" in r["erro"]
     assert chamar(base, "/api/agentes/excluir", {"id": "limpeza"})[0] == 400

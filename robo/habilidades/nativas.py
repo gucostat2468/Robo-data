@@ -1,4 +1,4 @@
-"""Catálogo nativo de skills. Cada uma documenta QUANDO usar e os CUIDADOS (campo conhecimento)."""
+"""Catálogo nativo de habilidades. Cada uma documenta QUANDO usar e os CUIDADOS (campo conhecimento)."""
 
 from __future__ import annotations
 
@@ -10,7 +10,7 @@ import numpy as np
 import pandas as pd
 
 from robo.limpeza import _converter, _detectar_decimal, normalizar_nome_coluna, sem_acento
-from robo.skills import ACAO_INVALIDOS, ErroSkill, Param, skill
+from robo.habilidades import ACAO_INVALIDOS, ErroHabilidade, Param, habilidade
 
 PADRONIZACAO = "Padronização"
 DOCUMENTOS = "Documentos e contato"
@@ -37,12 +37,12 @@ def _digitos(v) -> str:
 
 def _numerica(df, coluna):
     if not pd.api.types.is_numeric_dtype(df[coluna]):
-        raise ErroSkill(f"a coluna '{coluna}' precisa ser numérica (hoje é texto). Use a skill Converter tipo antes.")
+        raise ErroHabilidade(f"a coluna '{coluna}' precisa ser numérica (hoje é texto). Use a habilidade Converter tipo antes.")
     return df[coluna].astype("float64")
 
 
 # =============================================================================== padronização
-@skill("padronizar_texto", "Padronizar textos", PADRONIZACAO,
+@habilidade("padronizar_texto", "Padronizar textos", PADRONIZACAO,
        "Deixa textos no mesmo formato: maiúsculas, minúsculas, título ou frase, com ou sem acentos.",
        [Param("colunas", "colunas", "Colunas de texto"),
         Param("modo", "escolha", "Formato", padrao="titulo", opcoes=["maiusculo", "minusculo", "titulo", "frase", "nenhum"],
@@ -70,7 +70,7 @@ def padronizar_texto(df, p, ctx):
     return df
 
 
-@skill("mapear_valores", "De-para de valores", PADRONIZACAO,
+@habilidade("mapear_valores", "De-para de valores", PADRONIZACAO,
        "Troca valores por uma versão oficial (ex.: 'a distância', 'EaD', 'online' → 'EAD').",
        [Param("coluna", "coluna", "Coluna"),
         Param("mapa", "mapa", "De-para (uma linha por valor: original=oficial)",
@@ -78,7 +78,7 @@ def padronizar_texto(df, p, ctx):
         Param("nao_mapeados", "escolha", "Valores fora do de-para", padrao="manter",
               opcoes=["manter", "aviso", "erro", "vazio"])],
        conhecimento="""
-QUANDO USAR: categorias com grafias diferentes vindas de sistemas ou pessoas diferentes. É a skill mais usada em
+QUANDO USAR: categorias com grafias diferentes vindas de sistemas ou pessoas diferentes. É a habilidade mais usada em
 pesquisa de mercado para consolidar respostas abertas curtas (ex.: canal, região, curso).
 COMO FUNCIONA: a comparação ignora maiúsculas, acentos e espaços nas pontas.
 CUIDADOS: use "erro" em 'valores fora do de-para' quando a lista oficial é fechada (ex.: UF) — assim um valor novo
@@ -109,7 +109,7 @@ def mapear_valores(df, p, ctx):
     return df
 
 
-@skill("converter_tipo", "Converter tipo", PADRONIZACAO,
+@habilidade("converter_tipo", "Converter tipo", PADRONIZACAO,
        "Força colunas para texto, inteiro, decimal, data ou data e hora.",
        [Param("colunas", "colunas", "Colunas"),
         Param("tipo", "escolha", "Tipo", opcoes=["texto", "inteiro", "decimal", "data", "datahora"]),
@@ -130,7 +130,7 @@ def converter_tipo(df, p, ctx):
     return df
 
 
-@skill("arredondar", "Arredondar números", PADRONIZACAO,
+@habilidade("arredondar", "Arredondar números", PADRONIZACAO,
        "Arredonda colunas numéricas para N casas decimais.",
        [Param("colunas", "colunas", "Colunas numéricas"), Param("casas", "inteiro", "Casas decimais", padrao=2)],
        conhecimento="""
@@ -163,7 +163,7 @@ def _cnpj_valido(d: str) -> bool:
     return True
 
 
-@skill("normalizar_documento", "CPF / CNPJ", DOCUMENTOS,
+@habilidade("normalizar_documento", "CPF / CNPJ", DOCUMENTOS,
        "Padroniza e valida CPF e CNPJ pelos dígitos verificadores.",
        [Param("colunas", "colunas", "Colunas com CPF/CNPJ"),
         Param("tipo", "escolha", "Documento", padrao="auto", opcoes=["auto", "cpf", "cnpj"]),
@@ -174,7 +174,7 @@ def _cnpj_valido(d: str) -> bool:
 QUANDO USAR: antes de cruzar bases por CPF/CNPJ (ex.: pesquisa × CRM). Pontuação diferente faz o cruzamento falhar.
 COMO FUNCIONA: recupera zeros à esquerda perdidos pelo Excel e confere os dígitos verificadores (o mesmo cálculo da
 Receita Federal). Documento com dígito errado quase sempre é erro de digitação.
-CUIDADOS: CPF é dado pessoal (LGPD). Se a base vai circular, combine com a skill Anonimizar.""")
+CUIDADOS: CPF é dado pessoal (LGPD). Se a base vai circular, combine com a habilidade Anonimizar.""")
 def normalizar_documento(df, p, ctx):
     for col in p["colunas"]:
         original = df[col]
@@ -200,7 +200,7 @@ def normalizar_documento(df, p, ctx):
     return df
 
 
-@skill("validar_email", "E-mail", DOCUMENTOS,
+@habilidade("validar_email", "E-mail", DOCUMENTOS,
        "Coloca e-mails em minúsculas, tira espaços e valida o formato.",
        [Param("colunas", "colunas", "Colunas de e-mail"), ACAO_INVALIDOS],
        conhecimento="""
@@ -217,7 +217,7 @@ def validar_email(df, p, ctx):
     return df
 
 
-@skill("normalizar_telefone", "Telefone (Brasil)", DOCUMENTOS,
+@habilidade("normalizar_telefone", "Telefone (Brasil)", DOCUMENTOS,
        "Padroniza telefones brasileiros com DDD e valida a quantidade de dígitos.",
        [Param("colunas", "colunas", "Colunas de telefone"),
         Param("formato", "escolha", "Formato de saída", padrao="formatado", opcoes=["digitos", "formatado"],
@@ -253,7 +253,7 @@ def normalizar_telefone(df, p, ctx):
     return df
 
 
-@skill("normalizar_cep", "CEP", DOCUMENTOS,
+@habilidade("normalizar_cep", "CEP", DOCUMENTOS,
        "Padroniza CEP no formato 00000-000 e recupera o zero à esquerda perdido pelo Excel.",
        [Param("colunas", "colunas", "Colunas de CEP"), ACAO_INVALIDOS],
        conhecimento="""
@@ -280,7 +280,7 @@ def normalizar_cep(df, p, ctx):
 
 
 # =============================================================================== qualidade e validação
-@skill("validar_regex", "Validar formato (expressão regular)", QUALIDADE,
+@habilidade("validar_regex", "Validar formato (expressão regular)", QUALIDADE,
        "Confere se os valores seguem um padrão (ex.: matrícula com 2 letras e 6 números).",
        [Param("coluna", "coluna", "Coluna"),
         Param("padrao", "texto", "Expressão regular", ajuda="ex.: ^[A-Z]{2}\\d{6}$"),
@@ -293,13 +293,13 @@ def validar_regex(df, p, ctx):
     try:
         padrao = re.compile(p["padrao"])
     except re.error as e:
-        raise ErroSkill(f"expressão regular inválida: {e}") from e
+        raise ErroHabilidade(f"expressão regular inválida: {e}") from e
     col = p["coluna"]
     invalidos = df[col].notna() & ~df[col].map(lambda v: bool(padrao.search(str(v))))
     return ctx.tratar_invalidos(df, col, invalidos, p["invalidos"], p["mensagem"])
 
 
-@skill("validar_datas", "Validar datas", QUALIDADE,
+@habilidade("validar_datas", "Validar datas", QUALIDADE,
        "Barra datas futuras ou fora de um período.",
        [Param("coluna", "coluna", "Coluna de data"),
         Param("nao_futuras", "booleano", "Recusar datas no futuro", padrao=True),
@@ -312,7 +312,7 @@ ou de conversão (dia e mês trocados) e distorcem séries mensais no Power BI."
 def validar_datas(df, p, ctx):
     col = p["coluna"]
     if not pd.api.types.is_datetime64_any_dtype(df[col]):
-        raise ErroSkill(f"a coluna '{col}' não é data. Use a skill Converter tipo antes.")
+        raise ErroHabilidade(f"a coluna '{col}' não é data. Use a habilidade Converter tipo antes.")
     serie = df[col]
     fora = pd.Series(False, index=df.index)
     if p["nao_futuras"]:
@@ -322,12 +322,12 @@ def validar_datas(df, p, ctx):
             try:
                 limite = pd.Timestamp(datetime.strptime(p[chave].strip(), "%d/%m/%Y"))
             except ValueError as e:
-                raise ErroSkill(f"data {chave} inválida: use dd/mm/aaaa") from e
+                raise ErroHabilidade(f"data {chave} inválida: use dd/mm/aaaa") from e
             fora |= (serie < limite) if op == "lt" else (serie > limite)
     return ctx.tratar_invalidos(df, col, fora & serie.notna(), p["invalidos"], "Data fora do período permitido")
 
 
-@skill("checar_duplicados", "Duplicidade por chave", QUALIDADE,
+@habilidade("checar_duplicados", "Duplicidade por chave", QUALIDADE,
        "Encontra linhas com a mesma chave (ex.: mesmo cliente respondendo duas vezes).",
        [Param("colunas", "colunas", "Colunas que formam a chave"),
         Param("acao", "escolha", "O que fazer", padrao="erro", opcoes=["erro", "aviso", "manter_primeiro", "manter_ultimo"])],
@@ -351,7 +351,7 @@ def checar_duplicados(df, p, ctx):
     return df[~remover]
 
 
-@skill("completude_minima", "Completude mínima", QUALIDADE,
+@habilidade("completude_minima", "Completude mínima", QUALIDADE,
        "Exige um percentual mínimo de preenchimento nas colunas indicadas.",
        [Param("colunas", "colunas", "Colunas"),
         Param("minimo_pct", "numero", "Preenchimento mínimo (%)", padrao=95),
@@ -370,7 +370,7 @@ def completude_minima(df, p, ctx):
     return df
 
 
-@skill("outliers", "Valores atípicos (outliers)", QUALIDADE,
+@habilidade("outliers", "Valores atípicos (outliers)", QUALIDADE,
        "Detecta valores muito fora do padrão pelo método IQR ou desvio-padrão.",
        [Param("coluna", "coluna", "Coluna numérica"),
         Param("metodo", "escolha", "Método", padrao="iqr", opcoes=["iqr", "zscore"],
@@ -402,7 +402,7 @@ def outliers(df, p, ctx):
     return ctx.tratar_invalidos(df, col, fora, p["acao"], f"Valor atípico ({p['metodo'].upper()})")
 
 
-@skill("filtrar_linhas", "Filtrar linhas", QUALIDADE,
+@habilidade("filtrar_linhas", "Filtrar linhas", QUALIDADE,
        "Mantém só as linhas que atendem a uma condição (ex.: status == 'Concluída').",
        [Param("condicao", "expressao", "Manter linhas onde…", ajuda="ex.: nota_nps >= 0 and status == 'Concluída'"),
         Param("acao", "escolha", "Linhas fora da condição", padrao="remover", opcoes=["remover", "aviso", "erro"])],
@@ -414,7 +414,7 @@ def filtrar_linhas(df, p, ctx):
     try:
         manter = df.astype({c: "float64" for c in df.columns if str(df[c].dtype) == "Int64"}).eval(p["condicao"], engine="python")
     except Exception as e:
-        raise ErroSkill(f"condição inválida: {e}") from e
+        raise ErroHabilidade(f"condição inválida: {e}") from e
     if not isinstance(manter, pd.Series) or manter.dtype != bool:
         manter = pd.Series(manter, index=df.index).fillna(False).astype(bool)
     fora = ~manter
@@ -430,7 +430,7 @@ def filtrar_linhas(df, p, ctx):
 
 
 # =============================================================================== enriquecimento
-@skill("preencher_vazios", "Preencher vazios", ENRIQUECIMENTO,
+@habilidade("preencher_vazios", "Preencher vazios", ENRIQUECIMENTO,
        "Completa células vazias com um valor fixo, o valor anterior, a média, a mediana ou a moda.",
        [Param("colunas", "colunas", "Colunas"),
         Param("metodo", "escolha", "Preencher com", opcoes=["valor", "anterior", "media", "mediana", "moda"]),
@@ -448,13 +448,13 @@ def preencher_vazios(df, p, ctx):
         m = p["metodo"]
         if m == "valor":
             if p.get("valor") in (None, ""):
-                raise ErroSkill("informe o valor fixo")
+                raise ErroHabilidade("informe o valor fixo")
             valor = p["valor"]
             if pd.api.types.is_numeric_dtype(df[col]):
                 try:
                     valor = float(str(valor).replace(",", "."))
                 except ValueError as e:
-                    raise ErroSkill(f"a coluna '{col}' é numérica; o valor precisa ser número") from e
+                    raise ErroHabilidade(f"a coluna '{col}' é numérica; o valor precisa ser número") from e
             df[col] = df[col].fillna(valor)
         elif m == "anterior":
             df[col] = df[col].ffill()
@@ -469,7 +469,7 @@ def preencher_vazios(df, p, ctx):
     return df
 
 
-@skill("coluna_calculada", "Coluna calculada", ENRIQUECIMENTO,
+@habilidade("coluna_calculada", "Coluna calculada", ENRIQUECIMENTO,
        "Cria uma coluna a partir de uma conta (ex.: valor_total = quantidade * preco).",
        [Param("nova_coluna", "coluna", "Nome da nova coluna", existente=False),
         Param("expressao", "expressao", "Fórmula", ajuda="ex.: quantidade * preco_unitario  ·  (receita - custo) / receita")],
@@ -483,12 +483,12 @@ def coluna_calculada(df, p, ctx):
         base = df.astype({c: "float64" for c in df.columns if str(df[c].dtype) == "Int64"})
         df[p["nova_coluna"]] = base.eval(p["expressao"], engine="python")
     except Exception as e:
-        raise ErroSkill(f"fórmula inválida: {e}") from e
+        raise ErroHabilidade(f"fórmula inválida: {e}") from e
     ctx.info(f"Coluna {p['nova_coluna']} = {p['expressao']}")
     return df
 
 
-@skill("classificar_faixas", "Faixas (idade, valor, tempo…)", ENRIQUECIMENTO,
+@habilidade("classificar_faixas", "Faixas (idade, valor, tempo…)", ENRIQUECIMENTO,
        "Agrupa números em faixas nomeadas (ex.: idade → 18-24, 25-34…).",
        [Param("coluna", "coluna", "Coluna numérica"),
         Param("nova_coluna", "coluna", "Nome da nova coluna", existente=False),
@@ -504,18 +504,18 @@ def classificar_faixas(df, p, ctx):
     try:
         limites = [float(str(v).replace(",", ".")) for v in p["limites"]]
     except ValueError as e:
-        raise ErroSkill("os limites precisam ser números") from e
+        raise ErroHabilidade("os limites precisam ser números") from e
     if limites != sorted(limites):
-        raise ErroSkill("os limites precisam estar em ordem crescente")
+        raise ErroHabilidade("os limites precisam estar em ordem crescente")
     if len(p["rotulos"]) != len(limites) + 1:
-        raise ErroSkill(f"informe {len(limites) + 1} nomes de faixa para {len(limites)} limites")
+        raise ErroHabilidade(f"informe {len(limites) + 1} nomes de faixa para {len(limites)} limites")
     x = _numerica(df, p["coluna"])
     faixas = pd.cut(x, [-np.inf, *limites, np.inf], labels=p["rotulos"], right=False)
     df[p["nova_coluna"]] = faixas.astype(object).where(faixas.notna(), pd.NA)
     return df
 
 
-@skill("extrair_data", "Partes da data", ENRIQUECIMENTO,
+@habilidade("extrair_data", "Partes da data", ENRIQUECIMENTO,
        "Cria colunas de ano, mês, trimestre, dia da semana… a partir de uma data.",
        [Param("coluna", "coluna", "Coluna de data"),
         Param("partes", "lista", "Partes", padrao=["ano", "mes", "ano_mes"],
@@ -527,7 +527,7 @@ boa prática e permite inteligência de tempo no DAX.""")
 def extrair_data(df, p, ctx):
     col = p["coluna"]
     if not pd.api.types.is_datetime64_any_dtype(df[col]):
-        raise ErroSkill(f"a coluna '{col}' não é data")
+        raise ErroHabilidade(f"a coluna '{col}' não é data")
     meses = ["Janeiro", "Fevereiro", "Março", "Abril", "Maio", "Junho", "Julho", "Agosto", "Setembro", "Outubro",
              "Novembro", "Dezembro"]
     dias = ["Segunda", "Terça", "Quarta", "Quinta", "Sexta", "Sábado", "Domingo"]
@@ -542,12 +542,12 @@ def extrair_data(df, p, ctx):
     }
     for parte in p["partes"]:
         if parte not in geradores:
-            raise ErroSkill(f"parte '{parte}' desconhecida (use: {', '.join(geradores)})")
+            raise ErroHabilidade(f"parte '{parte}' desconhecida (use: {', '.join(geradores)})")
         df[f"{col}_{parte}"] = geradores[parte]()
     return df
 
 
-@skill("dividir_coluna", "Dividir coluna", ENRIQUECIMENTO,
+@habilidade("dividir_coluna", "Dividir coluna", ENRIQUECIMENTO,
        "Separa uma coluna em várias (ex.: 'São Paulo - SP' → cidade e uf).",
        [Param("coluna", "coluna", "Coluna"), Param("separador", "texto", "Separador", ajuda="ex.:  -  ou  /  ou  ;"),
         Param("novas_colunas", "colunas", "Nomes das novas colunas", existente=False)],
@@ -562,7 +562,7 @@ def dividir_coluna(df, p, ctx):
     return df
 
 
-@skill("juntar_colunas", "Juntar colunas", ENRIQUECIMENTO,
+@habilidade("juntar_colunas", "Juntar colunas", ENRIQUECIMENTO,
        "Concatena colunas em uma (ex.: cidade + ' / ' + uf).",
        [Param("colunas", "colunas", "Colunas, na ordem"), Param("separador", "texto", "Separador", padrao=" "),
         Param("nova_coluna", "coluna", "Nome da nova coluna", existente=False)],
@@ -576,7 +576,7 @@ def juntar_colunas(df, p, ctx):
 
 
 # =============================================================================== pesquisa e customer insights
-@skill("classificar_nps", "Classificar NPS", PESQUISA,
+@habilidade("classificar_nps", "Classificar NPS", PESQUISA,
        "Cria a coluna Promotor / Neutro / Detrator a partir da nota de 0 a 10.",
        [Param("coluna", "coluna", "Coluna da nota (0 a 10)"),
         Param("nova_coluna", "coluna", "Nome da nova coluna", padrao="grupo_nps", existente=False),
@@ -603,7 +603,7 @@ def classificar_nps(df, p, ctx):
     return df
 
 
-@skill("classificar_csat", "Classificar CSAT (top-2-box)", PESQUISA,
+@habilidade("classificar_csat", "Classificar CSAT (top-2-box)", PESQUISA,
        "Marca quem está satisfeito pelas duas notas mais altas da escala.",
        [Param("coluna", "coluna", "Coluna da nota"),
         Param("escala", "escolha", "Escala", padrao="5", opcoes=["5", "7", "10"]),
@@ -623,7 +623,7 @@ def classificar_csat(df, p, ctx):
     return df
 
 
-@skill("categorizar_texto", "Codificar verbatins por tema", PESQUISA,
+@habilidade("categorizar_texto", "Codificar verbatins por tema", PESQUISA,
        "Classifica respostas abertas em temas por palavras-chave (codificação temática).",
        [Param("coluna", "coluna", "Coluna de texto (comentário)"),
         Param("temas", "mapa", "Temas e palavras-chave (tema=palavra1, palavra2)",
@@ -644,7 +644,7 @@ def categorizar_texto(df, p, ctx):
         if termos:
             regras.append((tema, re.compile(r"\b(" + "|".join(re.escape(t) for t in termos) + r")")))
     if not regras:
-        raise ErroSkill("informe pelo menos um tema com palavras-chave")
+        raise ErroHabilidade("informe pelo menos um tema com palavras-chave")
     saida = []
     for v in df[p["coluna"]]:
         if v is None or (not isinstance(v, str) and pd.isna(v)) or not str(v).strip():
@@ -667,7 +667,7 @@ def categorizar_texto(df, p, ctx):
 
 
 # =============================================================================== estrutura
-@skill("selecionar_colunas", "Selecionar colunas", ESTRUTURA,
+@habilidade("selecionar_colunas", "Selecionar colunas", ESTRUTURA,
        "Mantém só as colunas necessárias ou exclui as que não devem ser publicadas.",
        [Param("modo", "escolha", "Modo", padrao="excluir", opcoes=["manter", "excluir"]),
         Param("colunas", "colunas", "Colunas")],
@@ -681,7 +681,7 @@ def selecionar_colunas(df, p, ctx):
     return df.drop(columns=p["colunas"])
 
 
-@skill("renomear_colunas", "Renomear colunas", ESTRUTURA,
+@habilidade("renomear_colunas", "Renomear colunas", ESTRUTURA,
        "Troca nomes de colunas (ex.: vlr_tot → valor_total).",
        [Param("mapa", "mapa", "Nomes (atual=novo)", ajuda="ex.:\nvlr_tot=valor_total\ndt_resp=data_resposta")],
        conhecimento="""
@@ -691,12 +691,12 @@ def renomear_colunas(df, p, ctx):
     mapa = {normalizar_nome_coluna(k): normalizar_nome_coluna(v) for k, v in p["mapa"].items()}
     faltando = [k for k in mapa if k not in df.columns]
     if faltando:
-        raise ErroSkill(f"coluna(s) inexistente(s): {', '.join(faltando)}")
+        raise ErroHabilidade(f"coluna(s) inexistente(s): {', '.join(faltando)}")
     return df.rename(columns=mapa)
 
 
 # =============================================================================== privacidade
-@skill("anonimizar", "Anonimizar dados pessoais", PRIVACIDADE,
+@habilidade("anonimizar", "Anonimizar dados pessoais", PRIVACIDADE,
        "Protege CPF, e-mail, telefone e nomes: troca por código (hash), mascara ou remove.",
        [Param("colunas", "colunas", "Colunas com dados pessoais"),
         Param("metodo", "escolha", "Método", padrao="hash", opcoes=["hash", "mascarar", "remover"],

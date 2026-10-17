@@ -51,7 +51,7 @@ def _planilha(pasta, nome, linhas, cabecalho=("ID Resposta", "Data Resposta", "N
     return caminho
 
 
-def test_elt_completo_bruto_tratado_analitico(planilha_baguncada, cfg_factory, banco_cfg, tmp_path):
+def teste_elt_completo_bruto_tratado_analitico(planilha_baguncada, cfg_factory, banco_cfg, tmp_path):
     modelos = tmp_path / "modelos"
     modelos.mkdir()
     (modelos / "01_nps_por_curso.sql").write_text("""
@@ -92,7 +92,7 @@ def test_elt_completo_bruto_tratado_analitico(planilha_baguncada, cfg_factory, b
     assert _q(banco_cfg, "SELECT DISTINCT lote_id FROM analise.perfil") == [(r.id,)]
 
 
-def test_reprocessar_mesmo_arquivo_nao_duplica(pastas, cfg_factory, banco_cfg):
+def teste_reprocessar_mesmo_arquivo_nao_duplica(pastas, cfg_factory, banco_cfg):
     cfg = cfg_factory([], banco=banco_cfg)
     for _ in range(2):
         c = _planilha(pastas, "vendas.xlsx", [(1, "01/10/2026", 9, "Direito", "EAD", "SP")])
@@ -102,7 +102,7 @@ def test_reprocessar_mesmo_arquivo_nao_duplica(pastas, cfg_factory, banco_cfg):
     assert _q(banco_cfg, "SELECT count(*) FROM robo.lotes")[0][0] == 2
 
 
-def test_dimensao_mantem_chaves_entre_arquivos(pastas, cfg_factory, banco_cfg):
+def teste_dimensao_mantem_chaves_entre_arquivos(pastas, cfg_factory, banco_cfg):
     regra = {"padrao": "nps_*", "destino": {"tabela": "nps"},
              "modelo": {"fato": "fato_nps", "dimensoes": {"dim_curso": {"colunas": ["curso"], "chave": "id_curso"}}}}
     cfg = cfg_factory([regra], banco=banco_cfg)
@@ -119,7 +119,7 @@ def test_dimensao_mantem_chaves_entre_arquivos(pastas, cfg_factory, banco_cfg):
     assert [c for _, c in juntos] == ["Medicina", "Direito", "Direito", "Psicologia"]
 
 
-def test_mesclar_por_chave(pastas, cfg_factory, banco_cfg):
+def teste_mesclar_por_chave(pastas, cfg_factory, banco_cfg):
     regra = {"padrao": "clientes*", "destino": {"tabela": "clientes", "modo": "mesclar", "chave": ["id_cliente"]}}
     cfg = cfg_factory([regra], banco=banco_cfg)
     cab = ("ID Cliente", "Nome", "Plano")
@@ -128,7 +128,7 @@ def test_mesclar_por_chave(pastas, cfg_factory, banco_cfg):
     assert _q(banco_cfg, "SELECT id_cliente, plano FROM tratado.clientes ORDER BY 1") == [("1", "A"), ("2", "C"), ("3", "A")]
 
 
-def test_conflito_de_tipo_reprova_e_nao_publica(pastas, cfg_factory, banco_cfg):
+def teste_conflito_de_tipo_reprova_e_nao_publica(pastas, cfg_factory, banco_cfg):
     cfg = cfg_factory([{"padrao": "metas*", "destino": {"tabela": "metas"}}], banco=banco_cfg)
     cab = ("Mes", "Meta")
     assert processar_arquivo(_planilha(pastas, "metas_1.xlsx", [("jan", 10), ("fev", 20)], cab), cfg).status == SUCESSO
@@ -144,7 +144,7 @@ def test_conflito_de_tipo_reprova_e_nao_publica(pastas, cfg_factory, banco_cfg):
     assert erros and erros[0][0] == "metas_2.xlsx" and "Conflito de tipo" in erros[0][2]
 
 
-def test_alargamento_de_tipo_e_coluna_nova(pastas, cfg_factory, banco_cfg):
+def teste_alargamento_de_tipo_e_coluna_nova(pastas, cfg_factory, banco_cfg):
     cfg = cfg_factory([{"padrao": "m*", "destino": {"tabela": "m"}}], banco=banco_cfg)
     assert processar_arquivo(_planilha(pastas, "m1.xlsx", [("a", 10)], ("Item", "Valor")), cfg).status == SUCESSO
     assert processar_arquivo(_planilha(pastas, "m2.xlsx", [("b", 2.5, "x")], ("Item", "Valor", "Extra")), cfg).status == SUCESSO
@@ -153,7 +153,7 @@ def test_alargamento_de_tipo_e_coluna_nova(pastas, cfg_factory, banco_cfg):
     assert tipos["valor"] == "double precision" and tipos["extra"] == "text"
 
 
-def test_modelo_sql_com_erro_reprova(planilha_baguncada, cfg_factory, banco_cfg, tmp_path):
+def teste_modelo_sql_com_erro_reprova(planilha_baguncada, cfg_factory, banco_cfg, tmp_path):
     (tmp_path / "ruim.sql").write_text("SELECT * FROM tabela_que_nao_existe;", encoding="utf-8")
     cfg = cfg_factory([REGRA_NPS], banco={**banco_cfg, "pasta_modelos": str(tmp_path)})
     r = processar_arquivo(planilha_baguncada, cfg)
@@ -161,7 +161,7 @@ def test_modelo_sql_com_erro_reprova(planilha_baguncada, cfg_factory, banco_cfg,
     assert "ruim.sql" in r.relatorio.texto()
 
 
-def test_banco_fora_do_ar_adia_sem_mexer_no_arquivo(planilha_baguncada, cfg_factory, banco_cfg):
+def teste_banco_fora_do_ar_adia_sem_mexer_no_arquivo(planilha_baguncada, cfg_factory, banco_cfg):
     cfg = cfg_factory([REGRA_NPS], banco={**banco_cfg, "porta": 1, "tempo_limite_conexao": 2})
     r = processar_arquivo(planilha_baguncada, cfg)
     assert r.status == ADIADO

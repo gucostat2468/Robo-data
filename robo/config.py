@@ -25,9 +25,9 @@ PADROES: dict = {
         "originais": "auto",
         "relatorios": "auto",
         "logs": "logs",
-        # definições dos agentes (YAML) e skills em Python escritas por você
+        # definições dos agentes (YAML) e habilidades em Python escritas por você
         "agentes": "agentes",
-        "skills": "skills_personalizadas",
+        "habilidades": "habilidades_personalizadas",
     },
     "monitoramento": {
         "intervalo_segundos": 5,
@@ -230,7 +230,7 @@ class Config:
             setattr(self, ATRIBUTO_PASTA[nome], padrao if str(valor).lower() == "auto" else _expandir(valor, self.base))
         self.logs = _expandir(p.get("logs") or "logs", self.base)
         self.agentes = _expandir(p.get("agentes") or "agentes", RAIZ_PROJETO)
-        self.skills = _expandir(p.get("skills") or "skills_personalizadas", RAIZ_PROJETO)
+        self.habilidades = _expandir(p.get("habilidades") or p.get("skills") or "habilidades_personalizadas", RAIZ_PROJETO)
 
     def criar_pastas(self):
         for pasta in self.pastas().values():

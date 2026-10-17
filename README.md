@@ -45,7 +45,7 @@ Dois cliques no atalho **Robô de Planilhas**. Abre uma janela com o painel e o 
 |---|---|
 | **Visão geral** | Status do robô, números do dia, fila e últimos processamentos. Arraste planilhas para a janela para enviar ou só testar. |
 | **Escritório 3D** | A equipe de agentes trabalhando ao vivo: o documento anda de mesa em mesa conforme as etapas reais. Clique num agente para ver o que ele faz. |
-| **Agentes e skills** | Crie agentes e dê a cada um as skills (habilidades) da tarefa dele. |
+| **Agentes e habilidades** | Crie agentes e dê a cada um as habilidades (habilidades) da tarefa dele. |
 | **Reprovados** | O que corrigir, em qual linha, com os botões *Abrir planilha* → *Já corrigi — reprocessar*. |
 | **Histórico** | Todos os processamentos, com filtro, busca e detalhe completo. |
 | **Testar planilha** | Mostra o que o robô faria com um arquivo **sem gravar nada**: veredito, erros e prévia dos dados. |
@@ -60,7 +60,7 @@ Dois cliques no atalho **Robô de Planilhas**. Abre uma janela com o painel e o 
 
 Cada agente é uma etapa **real** do processamento:
 
-| Agente | Etapa | Aceita skills? |
+| Agente | Etapa | Aceita habilidades? |
 |---|---|---|
 | Rita — Recepção | Espera o OneDrive terminar de sincronizar e o Excel fechar o arquivo | — |
 | Leo — Leitura | Lê xlsx/xls/csv, acha o cabeçalho, detecta `#REF!`, `#N/D`… | — |
@@ -72,15 +72,15 @@ Cada agente é uma etapa **real** do processamento:
 | Duda — Publicação | Grava em Bases-Tratadas e arquiva o original | — |
 
 ### Criar um agente (pelo painel)
-1. **Agentes e skills** → **Novo agente**.
+1. **Agentes e habilidades** → **Novo agente**.
 2. Dê nome, função, cor, **quando trabalha** e **para quais arquivos** (`*` = todos; `nps_*` = só os que começam com nps_).
-3. **Adicionar skill** → escolha no catálogo → preencha os campos marcados com `*`.
-4. Abra **Conhecimento: quando usar e cuidados** em cada skill: é um guia de boas práticas.
+3. **Adicionar habilidade** → escolha no catálogo → preencha os campos marcados com `*`.
+4. Abra **Conhecimento: quando usar e cuidados** em cada habilidade: é um guia de boas práticas.
 5. **Salvar agente.** Já vale para a próxima planilha e ele ganha uma mesa no escritório 3D.
 
-> Teste sempre em **Testar planilha** antes: você vê exatamente o que cada skill fez.
+> Teste sempre em **Testar planilha** antes: você vê exatamente o que cada habilidade fez.
 
-### Catálogo de skills (26 nativas)
+### Catálogo de habilidades (26 nativas)
 - **Padronização:** padronizar textos, de-para de valores, converter tipo, arredondar.
 - **Documentos e contato:** CPF/CNPJ (com dígito verificador), e-mail, telefone, CEP.
 - **Qualidade e validação:** formato (regex), datas, duplicidade por chave, completude mínima, outliers (IQR / z-score), filtrar linhas.
@@ -89,8 +89,8 @@ Cada agente é uma etapa **real** do processamento:
 - **Estrutura:** selecionar e renomear colunas.
 - **Privacidade (LGPD):** anonimizar (hash com chave secreta, mascarar ou remover).
 
-### Skills em Python (para regras muito específicas)
-Copie `skills_personalizadas/_exemplo_skill.py` com outro nome (sem `_` no início), ajuste e salve: ela aparece no catálogo. Se tiver erro, o painel mostra a mensagem e o robô continua funcionando.
+### Habilidades em Python (para regras muito específicas)
+Copie `habilidades_personalizadas/_exemplo_habilidade.py` com outro nome (sem `_` no início), ajuste e salve: ela aparece no catálogo. Se tiver erro, o painel mostra a mensagem e o robô continua funcionando.
 
 Os agentes ficam em `agentes/*.yaml` (legíveis, dá para editar à mão e versionar). Há um exemplo desligado: `agentes/tina_contatos.yaml`.
 
@@ -156,7 +156,7 @@ VAR Prom = CALCULATE ( [Respostas], fato_nps[nota_nps] >= 9 )
 VAR Det  = CALCULATE ( [Respostas], fato_nps[nota_nps] <= 6 )
 RETURN DIVIDE ( Prom - Det, [Respostas] ) * 100
 ```
-Com a skill **Classificar NPS**, você também ganha a coluna `grupo_nps` (Promotor/Neutro/Detrator) para gráficos de barras empilhadas.
+Com a habilidade **Classificar NPS**, você também ganha a coluna `grupo_nps` (Promotor/Neutro/Detrator) para gráficos de barras empilhadas.
 
 ## 7. Logs e resumo de erros
 
@@ -190,7 +190,7 @@ Execute pelo painel (modo **somente leitura**: nenhuma consulta altera dados) ou
 | Status **Adiado** | Arquivo de saída aberto no Excel/Power BI ou PostgreSQL desligado: o robô tenta de novo sozinho |
 | "Já existe um robô rodando" | Já está aberto: use o atalho (ele só mostra a janela) |
 | Escritório 3D não aparece | Placa de vídeo sem WebGL: o restante do painel funciona normalmente |
-| Coluna numérica virou texto | Menos de 95% dos valores eram números: use a skill **Converter tipo** |
+| Coluna numérica virou texto | Menos de 95% dos valores eram números: use a habilidade **Converter tipo** |
 | Python 3.15 / erro "Visual C++" | O `instalar.bat` já resolve: usa o 3.13 ao lado |
 
 Ferramentas avançadas em `ferramentas/`: modo texto sem painel, status, processar uma vez, diagnosticar arrastando um arquivo, parar o robô.
@@ -200,14 +200,14 @@ Ferramentas avançadas em `ferramentas/`: modo texto sem painel, status, process
 ```
 robo/
 ├── leitura.py, limpeza.py, validacao.py, modelagem.py, escrita.py   ← ETL
-├── skills/          catálogo de skills (__init__: motor · nativas.py: 26 skills)
+├── habilidades/          catálogo de habilidades (__init__: motor · nativas.py: 26 habilidades)
 ├── agentes.py       equipe: nativos + personalizados (agentes/*.yaml)
 ├── banco.py         PostgreSQL em camadas (psycopg 3 + COPY)
 ├── consultas.py     biblioteca consultas_sql/ (execução somente leitura)
 ├── pipeline.py      orquestra um arquivo e emite os eventos de cada etapa
 ├── monitor.py       vigia a pasta (polling, robusto com OneDrive)
 ├── historico.py     histórico, detalhes JSON e resumo de ocorrências
-└── painel/          servidor local + interface (static/) + escritório 3D (Three.js embutido)
+└── painel/          servidor local + interface (estaticos/) + escritório 3D (Three.js embutido)
 ```
 
-Testes: `.venv\Scripts\python -m pip install -r requirements-dev.txt` e `.venv\Scripts\python -m pytest`. Para incluir os testes de PostgreSQL: `set ROBO_TESTE_PG=host=localhost port=5432 user=postgres password=SUA_SENHA`.
+Testes: `.venv\Scripts\python -m pip install -r requisitos-dev.txt` e `.venv\Scripts\python -m pytest`. Para incluir os testes de PostgreSQL: `set ROBO_TESTE_PG=host=localhost port=5432 user=postgres password=SUA_SENHA`.

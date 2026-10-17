@@ -133,7 +133,7 @@ const E = {
   reprovados: null, assinaturaRep: "",
   teste: null, arquivoTeste: null, abaTeste: 0,
   config: null, banco: null,
-  equipe: null, editando: null, catalogoAberto: false, buscaSkill: "",
+  equipe: null, editando: null, catalogoAberto: false, buscaHabilidade: "",
   consultas: null, consultaAtual: null, resultadoConsulta: null, buscaConsulta: "",
   log: [], logSeq: 0, logFiltro: "todos", autoRolar: true,
 };
@@ -153,7 +153,7 @@ const PAGINAS = {
   testar: { titulo: "Testar planilha", render: renderTestar },
   banco: { titulo: "Banco de dados", render: renderBanco, carregar: carregarBanco },
   consultas: { titulo: "Consultas SQL", render: renderConsultas, carregar: carregarConsultas },
-  agentes: { titulo: "Agentes e skills", render: renderAgentes, carregar: carregarAgentes },
+  agentes: { titulo: "Agentes e habilidades", render: renderAgentes, carregar: carregarAgentes },
   atividade: { titulo: "Atividade", render: renderAtividade },
   configuracoes: { titulo: "Configurações", render: renderConfig, carregar: carregarConfig },
 };
@@ -569,7 +569,7 @@ function renderBanco() {
       Use as tabelas de <b>tratado</b> e as visões de <b>analitico</b>.</p></div>`;
 }
 
-// ------------------------------------------------------------------ agentes e skills
+// ------------------------------------------------------------------ agentes e habilidades
 const POSICAO_TEXTO = { limpeza: "Depois da Limpeza", validacao: "Depois da Auditoria", modelagem: "Antes da Modelagem" };
 
 async function carregarAgentes() {
@@ -579,22 +579,22 @@ async function carregarAgentes() {
 const avatar = (a, classe = "avatar") => `<span class="${classe}" style="background:${esc(a.cor)}">${esc((a.nome || "?").slice(0, 1).toUpperCase())}</span>`;
 
 function renderAgentes() {
-  const acoes = `<button class="btn" data-acao="abrir" data-alvo="skills">${icone("pasta")}Skills em Python</button>
+  const acoes = `<button class="btn" data-acao="abrir" data-alvo="habilidades">${icone("pasta")}Habilidades em Python</button>
     <a class="btn" href="escritorio.html">${icone("cubo")}Ver no escritório 3D</a>
     <button class="btn primario" data-acao="novo-agente">${icone("mais")}Novo agente</button>`;
-  if (!E.equipe) return cabecalho("Agentes e skills", "", acoes) + `<div class="carregando">Carregando…</div>`;
-  const erros = E.equipe.erros_skills || [];
-  return cabecalho("Agentes e skills", "Cada agente é uma etapa do robô. Monte sua equipe e dê a cada um as skills (habilidades) da tarefa dele.", acoes) +
-    (erros.length ? `<div class="ocorrencia erro"><div class="principal"><strong>Skills personalizadas com problema</strong><div class="exemplos">${erros.map((x) => `<span>${esc(x)}</span>`).join("")}</div></div></div>` : "") +
-    `<div class="dica">${icone("info")}<p>A ordem abaixo é a ordem real de trabalho. Agentes nativos fazem o essencial; os seus agentes e as skills extras
-      entram depois da <b>Limpeza</b>, depois da <b>Auditoria</b> ou antes da <b>Modelagem</b>. Qualquer skill que encontrar erro <b>reprova o arquivo</b> — nada sai pela metade.</p></div>
+  if (!E.equipe) return cabecalho("Agentes e habilidades", "", acoes) + `<div class="carregando">Carregando…</div>`;
+  const erros = E.equipe.erros_habilidades || [];
+  return cabecalho("Agentes e habilidades", "Cada agente é uma etapa do robô. Monte sua equipe e dê a cada um as habilidades (habilidades) da tarefa dele.", acoes) +
+    (erros.length ? `<div class="ocorrencia erro"><div class="principal"><strong>Habilidades personalizadas com problema</strong><div class="exemplos">${erros.map((x) => `<span>${esc(x)}</span>`).join("")}</div></div></div>` : "") +
+    `<div class="dica">${icone("info")}<p>A ordem abaixo é a ordem real de trabalho. Agentes nativos fazem o essencial; os seus agentes e as habilidades extras
+      entram depois da <b>Limpeza</b>, depois da <b>Auditoria</b> ou antes da <b>Modelagem</b>. Qualquer habilidade que encontrar erro <b>reprova o arquivo</b> — nada sai pela metade.</p></div>
     <section class="equipe">${E.equipe.agentes.map((a, i) => `<article class="cartao agente ${a.ativo ? "" : "inativo"}" data-acao="editar-agente" data-id="${esc(a.id)}">
       <span class="ordem-agente">${i + 1}º</span>
       <div class="agente-topo">${avatar(a)}<div><strong>${esc(a.nome)}</strong><small>${esc(a.papel || "")}</small></div></div>
       <p>${esc(a.descricao || "Sem descrição.")}</p>
       <div class="chips-colunas">
         ${a.nativo ? `<span class="etiqueta">nativo</span>` : `<span class="etiqueta info">${esc(POSICAO_TEXTO[a.posicao] || a.posicao)}</span>`}
-        ${a.aceita_skills ? `<span class="etiqueta ${a.skills.length ? "sucesso" : ""}">${a.skills.length} skill(s)</span>` : ""}
+        ${a.aceita_habilidades ? `<span class="etiqueta ${a.habilidades.length ? "sucesso" : ""}">${a.habilidades.length} habilidade(s)</span>` : ""}
         ${!a.nativo && (a.aplicar_em || []).join(",") !== "*" ? `<span class="etiqueta">${esc(a.aplicar_em.join(", "))}</span>` : ""}
         ${a.ativo ? "" : `<span class="etiqueta alerta">desligado</span>`}
         ${(a.problemas || []).length ? `<span class="etiqueta perigo">${icone("alerta")}configuração inválida</span>` : ""}
@@ -608,7 +608,7 @@ function editorAgente() {
     const id = `p-${i}-${par.nome}`, nome = `${esc(par.rotulo)}${par.obrigatorio ? " *" : ""}`;
     const ajuda = par.ajuda ? `<small>${esc(par.ajuda).replace(/\n/g, "<br>")}</small>` : "";
     const v = valor ?? par.padrao ?? "";
-    const attrs = `id="${id}" data-skill="${i}" data-param="${esc(par.nome)}" data-tipo="${par.tipo}"`;
+    const attrs = `id="${id}" data-habilidade="${i}" data-param="${esc(par.nome)}" data-tipo="${par.tipo}"`;
     if (par.tipo === "booleano") return `<label>${nome}${ajuda}<span>${chave(Boolean(v), "alternar-local", attrs)}</span></label>`;
     if (par.tipo === "escolha") return `<label>${nome}${ajuda}<select ${attrs}>${par.opcoes.map((o) => `<option ${String(v) === String(o) ? "selected" : ""}>${esc(o)}</option>`).join("")}</select></label>`;
     if (par.tipo === "mapa") {
@@ -619,28 +619,28 @@ function editorAgente() {
     const tipo = par.tipo === "numero" || par.tipo === "inteiro" ? "number" : "text";
     return `<label class="${par.tipo === "expressao" ? "inteiro" : ""}">${nome}${ajuda}<input type="${tipo}" step="any" ${attrs} value="${esc(texto)}" ${par.tipo === "expressao" ? 'class="mono"' : ""}></label>`;
   };
-  const skillsHtml = (a.skills || []).map((cfgSk, i) => {
-    const sk = porId[cfgSk.skill];
-    if (!sk) return `<div class="ocorrencia erro"><div class="principal"><strong>Skill “${esc(cfgSk.skill)}” não existe no catálogo</strong></div>
-      <button class="btn pequeno perigo" data-acao="remover-skill" data-i="${i}">${icone("lixeira")}</button></div>`;
-    return `<div class="skill-cartao ${cfgSk.ativo === false ? "desligada" : ""}">
-      <div class="skill-cab"><b class="contador">${i + 1}</b><div class="principal"><strong>${esc(sk.nome)}</strong><small>${esc(sk.categoria)} · ${esc(sk.descricao)}</small></div>
-        ${chave(cfgSk.ativo !== false, "alternar-local", `data-skill-ativa="${i}" title="Ligar/desligar"`)}
-        <button class="btn fantasma pequeno" data-acao="mover-skill" data-i="${i}" data-d="-1" title="Subir" ${i === 0 ? "disabled" : ""}>${icone("cima")}</button>
-        <button class="btn fantasma pequeno" data-acao="mover-skill" data-i="${i}" data-d="1" title="Descer" ${i === a.skills.length - 1 ? "disabled" : ""}>${icone("baixo")}</button>
-        <button class="btn fantasma pequeno" data-acao="remover-skill" data-i="${i}" title="Remover">${icone("lixeira")}</button></div>
-      <div class="skill-corpo">
+  const habilidadesHtml = (a.habilidades || []).map((cfgSk, i) => {
+    const sk = porId[cfgSk.habilidade];
+    if (!sk) return `<div class="ocorrencia erro"><div class="principal"><strong>Habilidade “${esc(cfgSk.habilidade)}” não existe no catálogo</strong></div>
+      <button class="btn pequeno perigo" data-acao="remover-habilidade" data-i="${i}">${icone("lixeira")}</button></div>`;
+    return `<div class="habilidade-cartao ${cfgSk.ativo === false ? "desligada" : ""}">
+      <div class="habilidade-cab"><b class="contador">${i + 1}</b><div class="principal"><strong>${esc(sk.nome)}</strong><small>${esc(sk.categoria)} · ${esc(sk.descricao)}</small></div>
+        ${chave(cfgSk.ativo !== false, "alternar-local", `data-habilidade-ativa="${i}" title="Ligar/desligar"`)}
+        <button class="btn fantasma pequeno" data-acao="mover-habilidade" data-i="${i}" data-d="-1" title="Subir" ${i === 0 ? "disabled" : ""}>${icone("cima")}</button>
+        <button class="btn fantasma pequeno" data-acao="mover-habilidade" data-i="${i}" data-d="1" title="Descer" ${i === a.habilidades.length - 1 ? "disabled" : ""}>${icone("baixo")}</button>
+        <button class="btn fantasma pequeno" data-acao="remover-habilidade" data-i="${i}" title="Remover">${icone("lixeira")}</button></div>
+      <div class="habilidade-corpo">
         ${sk.parametros.length ? `<div class="form">${sk.parametros.map((par) => campoParam(sk, i, par, (cfgSk.parametros || {})[par.nome])).join("")}</div>` : `<p class="muted">Sem parâmetros.</p>`}
         ${sk.conhecimento ? `<details class="conhecimento"><summary>Conhecimento: quando usar e cuidados</summary><pre>${esc(sk.conhecimento)}</pre></details>` : ""}
       </div></div>`;
   }).join("");
 
-  const busca = E.buscaSkill.trim().toLowerCase();
+  const busca = E.buscaHabilidade.trim().toLowerCase();
   let grupo = "";
   const catalogoHtml = cat.filter((s) => !busca || `${s.nome} ${s.descricao} ${s.categoria}`.toLowerCase().includes(busca)).map((s) => {
     let h = "";
     if (s.categoria !== grupo) { grupo = s.categoria; h += `<div class="grupo">${esc(grupo)}</div>`; }
-    return h + `<button data-acao="adicionar-skill" data-skill="${esc(s.id)}"><strong>${esc(s.nome)}</strong><small>${esc(s.descricao)}</small></button>`;
+    return h + `<button data-acao="adicionar-habilidade" data-habilidade="${esc(s.id)}"><strong>${esc(s.nome)}</strong><small>${esc(s.descricao)}</small></button>`;
   }).join("");
 
   const nativoInfo = a.nativo ? `<p class="muted" style="margin:0">${esc(a.descricao)}</p>` : `
@@ -661,17 +661,17 @@ function editorAgente() {
     <div class="gaveta-corpo">
       ${(a.problemas || []).length ? `<div class="ocorrencia erro"><div class="principal"><strong>Configuração inválida</strong><div class="exemplos">${a.problemas.map((x) => `<span>${esc(x)}</span>`).join("")}</div></div></div>` : ""}
       ${nativoInfo}
-      ${a.aceita_skills === false ? `<div class="dica">${icone("info")}<p>Este agente faz uma tarefa de infraestrutura (ler, carregar ou arquivar) e não usa skills de dados.</p></div>` : `
-      <div><div class="secao-titulo">Skills — executadas de cima para baixo</div>
-        <div style="display:flex;flex-direction:column;gap:10px">${skillsHtml || `<p class="muted">Nenhuma skill ainda. Adicione do catálogo abaixo.</p>`}</div></div>
-      <div><div class="secao-titulo">Catálogo de skills (${cat.length})</div>
-        ${E.catalogoAberto ? `<label class="campo-busca" style="max-width:none;margin-bottom:10px">${icone("busca")}<input type="text" id="busca-skill" placeholder="Buscar skill…" value="${esc(E.buscaSkill)}"></label>
-          <div class="catalogo" id="catalogo-skills">${catalogoHtml}</div>`
-        : `<button class="btn" data-acao="abrir-catalogo">${icone("mais")}Adicionar skill</button>`}</div>`}
+      ${a.aceita_habilidades === false ? `<div class="dica">${icone("info")}<p>Este agente faz uma tarefa de infraestrutura (ler, carregar ou arquivar) e não usa habilidades de dados.</p></div>` : `
+      <div><div class="secao-titulo">Habilidades — executadas de cima para baixo</div>
+        <div style="display:flex;flex-direction:column;gap:10px">${habilidadesHtml || `<p class="muted">Nenhuma habilidade ainda. Adicione do catálogo abaixo.</p>`}</div></div>
+      <div><div class="secao-titulo">Catálogo de habilidades (${cat.length})</div>
+        ${E.catalogoAberto ? `<label class="campo-busca" style="max-width:none;margin-bottom:10px">${icone("busca")}<input type="text" id="busca-habilidade" placeholder="Buscar habilidade…" value="${esc(E.buscaHabilidade)}"></label>
+          <div class="catalogo" id="catalogo-habilidades">${catalogoHtml}</div>`
+        : `<button class="btn" data-acao="abrir-catalogo">${icone("mais")}Adicionar habilidade</button>`}</div>`}
       <div class="acoes" style="justify-content:space-between;border-top:1px solid var(--borda);padding-top:16px">
         <div>${!a.nativo && a.id && E.equipe.agentes.some((x) => x.id === a.id) ? `<button class="btn perigo" data-acao="excluir-agente">${icone("lixeira")}Excluir agente</button>` : ""}</div>
         <div class="acoes"><button class="btn" data-acao="fechar-gaveta">Cancelar</button>
-        ${a.aceita_skills === false ? "" : `<button class="btn primario" data-acao="salvar-agente">${icone("ok")}Salvar agente</button>`}</div>
+        ${a.aceita_habilidades === false ? "" : `<button class="btn primario" data-acao="salvar-agente">${icone("ok")}Salvar agente</button>`}</div>
       </div>
     </div>`;
 }
@@ -685,11 +685,11 @@ function coletarEditor() {
     a.aplicar_em = ler("ag-aplicar").value.split(",").map((x) => x.trim()).filter(Boolean);
     a.ativo = ler("ag-ativo").getAttribute("aria-checked") === "true";
   }
-  (a.skills || []).forEach((s, i) => {
-    const liga = $(`[data-skill-ativa="${i}"]`);
+  (a.habilidades || []).forEach((s, i) => {
+    const liga = $(`[data-habilidade-ativa="${i}"]`);
     if (liga) s.ativo = liga.getAttribute("aria-checked") === "true";
     s.parametros = s.parametros || {};
-    document.querySelectorAll(`[data-skill="${i}"][data-param]`).forEach((el) => {
+    document.querySelectorAll(`[data-habilidade="${i}"][data-param]`).forEach((el) => {
       const tipo = el.dataset.tipo;
       let v = tipo === "booleano" ? el.getAttribute("aria-checked") === "true" : el.value;
       if (tipo === "colunas" || tipo === "lista") v = String(v).split(",").map((x) => x.trim()).filter(Boolean);
@@ -705,7 +705,7 @@ function coletarEditor() {
 }
 
 function abrirEditor(agente) {
-  E.editando = JSON.parse(JSON.stringify(agente)); E.catalogoAberto = false; E.buscaSkill = "";
+  E.editando = JSON.parse(JSON.stringify(agente)); E.catalogoAberto = false; E.buscaHabilidade = "";
   abrirGaveta(editorAgente());
   $("#gaveta").classList.add("larga");
 }
@@ -989,26 +989,26 @@ const ACOES = {
     await carregarBanco(); desenhar();
   }),
   "novo-agente": () => abrirEditor({ id: "", nome: "", papel: "", descricao: "", cor: "#f97316", posicao: "limpeza", ordem: 50,
-    ativo: true, aplicar_em: ["*"], skills: [], nativo: false, aceita_skills: true }),
+    ativo: true, aplicar_em: ["*"], habilidades: [], nativo: false, aceita_habilidades: true }),
   "editar-agente": (el) => { const a = E.equipe.agentes.find((x) => x.id === el.dataset.id); if (a) abrirEditor(a); },
-  "abrir-catalogo": () => { coletarEditor(); E.catalogoAberto = true; redesenharEditor(); $("#busca-skill")?.focus(); },
-  "adicionar-skill": (el) => {
+  "abrir-catalogo": () => { coletarEditor(); E.catalogoAberto = true; redesenharEditor(); $("#busca-habilidade")?.focus(); },
+  "adicionar-habilidade": (el) => {
     coletarEditor();
-    E.editando.skills.push({ skill: el.dataset.skill, ativo: true, parametros: {} });
-    E.catalogoAberto = false; E.buscaSkill = ""; redesenharEditor();
-    avisar("Skill adicionada. Preencha os campos com * e salve.");
+    E.editando.habilidades.push({ habilidade: el.dataset.habilidade, ativo: true, parametros: {} });
+    E.catalogoAberto = false; E.buscaHabilidade = ""; redesenharEditor();
+    avisar("Habilidade adicionada. Preencha os campos com * e salve.");
   },
-  "remover-skill": (el) => { coletarEditor(); E.editando.skills.splice(Number(el.dataset.i), 1); redesenharEditor(); },
-  "mover-skill": (el) => {
+  "remover-habilidade": (el) => { coletarEditor(); E.editando.habilidades.splice(Number(el.dataset.i), 1); redesenharEditor(); },
+  "mover-habilidade": (el) => {
     coletarEditor();
-    const i = Number(el.dataset.i), j = i + Number(el.dataset.d), l = E.editando.skills;
+    const i = Number(el.dataset.i), j = i + Number(el.dataset.d), l = E.editando.habilidades;
     [l[i], l[j]] = [l[j], l[i]]; redesenharEditor();
   },
   "salvar-agente": (el) => comCarregando(el, async () => {
     coletarEditor();
     const a = E.editando;
     if (!a.nativo && !a.id) a.id = (a.nome || "agente").normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase().replace(/[^a-z0-9]+/g, "_").replace(/^_|_$/g, "").replace(/^(\d)/, "a_$1").slice(0, 40) || "agente";
-    const corpo = { id: a.id, skills: a.skills };
+    const corpo = { id: a.id, habilidades: a.habilidades };
     if (!a.nativo) Object.assign(corpo, { nome: a.nome, papel: a.papel, descricao: a.descricao, cor: a.cor, posicao: a.posicao, ordem: a.ordem, ativo: a.ativo, aplicar_em: a.aplicar_em });
     await api("/api/agentes/salvar", { corpo: { agente: corpo } });
     avisar(`${a.nome} salvo! Já vale para as próximas planilhas.`, "sucesso");
@@ -1061,10 +1061,10 @@ document.addEventListener("click", (ev) => {
 $("#gaveta-fundo").addEventListener("click", fecharGaveta);
 document.addEventListener("keydown", (e) => { if (e.key === "Escape") fecharGaveta(); });
 document.addEventListener("input", (e) => {
-  if (e.target.id === "busca-skill") {
-    E.buscaSkill = e.target.value;
+  if (e.target.id === "busca-habilidade") {
+    E.buscaHabilidade = e.target.value;
     const tmp = document.createElement("div"); tmp.innerHTML = editorAgente();
-    $("#catalogo-skills").innerHTML = $("#catalogo-skills", tmp).innerHTML;
+    $("#catalogo-habilidades").innerHTML = $("#catalogo-habilidades", tmp).innerHTML;
   }
   if (e.target.id === "busca-consulta") { E.buscaConsulta = e.target.value; $("#lista-consultas").innerHTML = listaConsultas(); }
   if (e.target.id === "busca-historico") { E.busca = e.target.value; $("#corpo-historico").innerHTML = linhasHistorico(); }

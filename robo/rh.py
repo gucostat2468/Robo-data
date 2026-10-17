@@ -1,14 +1,14 @@
 """RH do Robô de Planilhas: cargos, níveis, permissões e PROCESSO SELETIVO TÉCNICO.
 
 Ninguém trabalha sem passar nas provas:
-- cada skill tem casos de prova com resposta conhecida (executam o código de verdade);
+- cada habilidade tem casos de prova com resposta conhecida (executam o código de verdade);
 - cada agente nativo tem provas da sua função;
-- um agente só é "contratado" (trabalha) se TODAS as provas das suas skills passarem
-  e se o nível dele permitir o risco de cada skill.
+- um agente só é "contratado" (trabalha) se TODAS as provas das suas habilidades passarem
+  e se o nível dele permitir o risco de cada habilidade.
 
 Níveis (do menor para o maior) e o que cada um pode fazer:
-  estagiário   trabalha em MODO OBSERVAÇÃO: roda as skills numa cópia e só relata o que faria
-  júnior       só skills de risco BAIXO (validar, padronizar formato)
+  estagiário   trabalha em MODO OBSERVAÇÃO: roda as habilidades numa cópia e só relata o que faria
+  júnior       só habilidades de risco BAIXO (validar, padronizar formato)
   pleno        risco BAIXO e MÉDIO (de-para, conversões, colunas calculadas…)
   sênior       todos os riscos, inclusive ALTO (remover linhas/colunas, anonimizar)
   especialista todos os riscos; referência técnica da área
@@ -34,7 +34,7 @@ NOME_RISCO = {"baixo": "baixo", "medio": "médio", "alto": "alto"}
 AREAS = ["Engenharia de Dados", "Qualidade de Dados", "Governança e Privacidade", "Análise de Dados",
          "Estatística", "Customer Insights e Pesquisa", "Storytelling e Negócio"]
 
-# ----------------------------------------------------------------------------- risco das skills
+# ----------------------------------------------------------------------------- risco das habilidades
 RISCO_BASE = {
     "padronizar_texto": "baixo", "normalizar_documento": "baixo", "validar_email": "baixo", "normalizar_telefone": "baixo",
     "normalizar_cep": "baixo", "validar_regex": "baixo", "validar_datas": "baixo", "completude_minima": "baixo",
@@ -47,17 +47,17 @@ RISCO_BASE = {
 }
 
 
-def risco_de(skill_id: str, parametros: dict | None = None) -> str:
-    """Risco da skill COM os parâmetros escolhidos (apagar linha é sempre alto)."""
+def risco_de(habilidade_id: str, parametros: dict | None = None) -> str:
+    """Risco da habilidade COM os parâmetros escolhidos (apagar linha é sempre alto)."""
     p = parametros or {}
-    risco = RISCO_BASE.get(skill_id, "medio")
+    risco = RISCO_BASE.get(habilidade_id, "medio")
     if p.get("invalidos") == "remover" or p.get("acao") in ("remover", "manter_primeiro", "manter_ultimo"):
         risco = "alto"
     elif p.get("invalidos") == "vazio" and risco == "baixo":
         risco = "medio"
-    if skill_id == "preencher_vazios" and p.get("metodo") in ("media", "mediana", "moda"):
+    if habilidade_id == "preencher_vazios" and p.get("metodo") in ("media", "mediana", "moda"):
         risco = "alto"  # imputação estatística altera o resultado de indicadores
-    if skill_id == "filtrar_linhas" and p.get("acao") in ("aviso", "erro"):
+    if habilidade_id == "filtrar_linhas" and p.get("acao") in ("aviso", "erro"):
         risco = "baixo"
     return risco
 
@@ -66,14 +66,14 @@ def nivel_permite(nivel: str, risco: str) -> bool:
     return ORDEM_RISCO[risco] <= ORDEM_RISCO[RISCO_MAXIMO.get(nivel, "medio")]
 
 
-# ----------------------------------------------------------------------------- provas das skills
+# ----------------------------------------------------------------------------- provas das habilidades
 def _df(**colunas):
     df = pd.DataFrame(colunas)
     df.index = range(2, len(df) + 2)
     return df
 
 
-PROVAS_SKILLS: dict[str, list] = {
+PROVAS_HABILIDADES: dict[str, list] = {
     "padronizar_texto": [
         ("Nome próprio em título, com preposição minúscula", _df(n=["MARIA DA SILVA"]), {"colunas": "n", "modo": "titulo"},
          lambda d, r: d["n"].iloc[0] == "Maria da Silva"),
@@ -144,12 +144,12 @@ PROVAS_SKILLS: dict[str, list] = {
 }
 
 
-def _rodar_caso(skill_id, descricao, df, parametros, verificar) -> dict:
-    from robo import skills
+def _rodar_caso(habilidade_id, descricao, df, parametros, verificar) -> dict:
+    from robo import habilidades
     from robo.relatorio import Relatorio
     rel = Relatorio("prova.xlsx")
     try:
-        saida = skills.executar_skill(df.copy(), {"skill": skill_id, "parametros": parametros}, rel, "prova", "prova.xlsx", "Prova")
+        saida = habilidades.executar_habilidade(df.copy(), {"habilidade": habilidade_id, "parametros": parametros}, rel, "prova", "prova.xlsx", "Prova")
         ok = bool(verificar(saida, rel))
         motivo = "" if ok else "; ".join(o.mensagem for o in rel.erros) or "resultado diferente do esperado"
     except Exception as e:
@@ -158,19 +158,19 @@ def _rodar_caso(skill_id, descricao, df, parametros, verificar) -> dict:
 
 
 @lru_cache(maxsize=None)
-def _provas_skill_cache(skill_id: str) -> tuple:
-    casos = PROVAS_SKILLS.get(skill_id, [])
-    return tuple(tuple(_rodar_caso(skill_id, *c).items()) for c in casos)
+def _provas_habilidade_cache(habilidade_id: str) -> tuple:
+    casos = PROVAS_HABILIDADES.get(habilidade_id, [])
+    return tuple(tuple(_rodar_caso(habilidade_id, *c).items()) for c in casos)
 
 
-def provas_da_skill(skill_id: str) -> list[dict]:
-    """Executa (uma vez por sessão) os casos de prova da skill."""
-    from robo import skills
-    sk = skills.REGISTRO.get(skill_id)
+def provas_da_habilidade(habilidade_id: str) -> list[dict]:
+    """Executa (uma vez por sessão) os casos de prova da habilidade."""
+    from robo import habilidades
+    sk = habilidades.REGISTRO.get(habilidade_id)
     if sk is not None and sk.origem == "personalizada":
         provas = getattr(sk.funcao, "provas", None) or []
-        return [_rodar_caso(skill_id, *c) for c in provas]
-    return [dict(item) for item in _provas_skill_cache(skill_id)]
+        return [_rodar_caso(habilidade_id, *c) for c in provas]
+    return [dict(item) for item in _provas_habilidade_cache(habilidade_id)]
 
 
 # ----------------------------------------------------------------------------- provas dos agentes nativos e analistas
@@ -438,14 +438,14 @@ def processo_seletivo(agente: dict) -> dict:
     provas = list(_provas_nativas_cache().get(agente["id"], []))
     pendencias = []
     nivel = agente.get("nivel") or "pleno"
-    for cfg in agente.get("skills") or []:
+    for cfg in agente.get("habilidades") or []:
         if cfg.get("ativo", True) is False:
             continue
-        sid = cfg.get("skill", "")
-        casos = provas_da_skill(sid)
+        sid = cfg.get("habilidade", "")
+        casos = provas_da_habilidade(sid)
         provas += [{**c, "prova": f"[{sid}] {c['prova']}"} for c in casos]
         if not casos:
-            pendencias.append(f"skill '{sid}' não tem prova técnica cadastrada")
+            pendencias.append(f"habilidade '{sid}' não tem prova técnica cadastrada")
         risco = risco_de(sid, cfg.get("parametros"))
         if not nivel_permite(nivel, risco):
             pendencias.append(f"nível {NOME_NIVEL.get(nivel, nivel)} não pode usar '{sid}' (risco {NOME_RISCO[risco]}); "
@@ -479,7 +479,7 @@ FICHAS = {
                 "responsabilidades": ["Padronizar colunas e textos", "Converter tipos com limiar de confiança de 95%",
                                       "Remover linhas vazias, de total e duplicatas exatas"],
                 "criterios": ["Toda alteração fica registrada no relatório", "Nenhuma conversão abaixo do limiar de confiança"],
-                "limites": ["Não inventa valores: imputação só com skill explícita e nível adequado"]},
+                "limites": ["Não inventa valores: imputação só com habilidade explícita e nível adequado"]},
     "validacao": {"cargo": "Auditor Sênior de Dados", "nivel": "senior", "area": "Governança e Privacidade",
                   "metodologias": ["Contratos de dados: colunas obrigatórias, chaves únicas, domínios e faixas",
                                    "Princípio tudo-ou-nada (fail fast)", "Rastreabilidade linha a linha"],
@@ -582,13 +582,13 @@ def ficha(agente: dict) -> dict:
     """Ficha profissional + resultado do processo seletivo."""
     base = dict(FICHAS.get(agente["id"], {}))
     if not base:
-        from robo import skills
-        cats = sorted({skills.REGISTRO[s["skill"]].categoria for s in agente.get("skills") or [] if s.get("skill") in skills.REGISTRO})
+        from robo import habilidades
+        cats = sorted({habilidades.REGISTRO[s["habilidade"]].categoria for s in agente.get("habilidades") or [] if s.get("habilidade") in habilidades.REGISTRO})
         base = {"cargo": agente.get("cargo") or agente.get("papel") or "Agente", "nivel": agente.get("nivel") or "pleno",
                 "area": agente.get("area") or "Qualidade de Dados",
-                "metodologias": [f"Conhecimento de {c} (ver 'Conhecimento' de cada skill)" for c in cats],
+                "metodologias": [f"Conhecimento de {c} (ver 'Conhecimento' de cada habilidade)" for c in cats],
                 "responsabilidades": [agente.get("descricao")] if agente.get("descricao") else [],
-                "criterios": ["Todas as provas técnicas das suas skills aprovadas"],
+                "criterios": ["Todas as provas técnicas das suas habilidades aprovadas"],
                 "limites": [f"Nível {NOME_NIVEL.get(agente.get('nivel') or 'pleno')}: risco máximo "
                             f"{NOME_RISCO[RISCO_MAXIMO.get(agente.get('nivel') or 'pleno', 'medio')]}"]
                 + (["Estagiário: trabalha em observação, não altera os dados publicados"] if agente.get("nivel") == "estagiario" else []),

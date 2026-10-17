@@ -1,4 +1,4 @@
-from robo.cli import main
+from robo.comandos import principal
 
 if __name__ == "__main__":
-    raise SystemExit(main())
+    raise SystemExit(principal())

@@ -431,7 +431,7 @@ pre.sql { margin: 0; padding: 14px 16px; background: var(--superficie-2); border
 .campos-consulta dd { margin: 0; }
 @media (max-width: 1000px) { .consultas { grid-template-columns: 1fr; } .consultas-lista { position: static; max-height: 320px; } }
 
-/* ---------------------------------------------------------------- agentes e skills */
+/* ---------------------------------------------------------------- agentes e habilidades */
 .nav a.destaque-3d { color: var(--primaria); }
 .equipe { display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 14px; }
 .agente { padding: 16px; display: flex; flex-direction: column; gap: 10px; cursor: pointer; transition: border-color .12s, transform .12s; position: relative; }
@@ -445,15 +445,15 @@ pre.sql { margin: 0; padding: 14px 16px; background: var(--superficie-2); border
 .agente .chips-colunas { margin-top: auto; }
 .ordem-agente { position: absolute; top: 12px; right: 14px; font-size: 12px; font-weight: 700; color: var(--texto-3); }
 .gaveta.larga { width: min(820px, 96vw); }
-.skill-cartao { border: 1px solid var(--borda); border-radius: var(--raio-p); background: var(--superficie); }
-.skill-cartao.desligada { opacity: .6; }
-.skill-cab { display: flex; align-items: center; gap: 10px; padding: 12px 14px; border-bottom: 1px solid var(--borda); background: var(--superficie-2); border-radius: var(--raio-p) var(--raio-p) 0 0; }
-.skill-cab .principal { flex: 1; min-width: 0; }
-.skill-cab strong { display: block; }
-.skill-cab small { color: var(--texto-3); }
-.skill-corpo { padding: 14px; display: flex; flex-direction: column; gap: 12px; }
-.skill-corpo textarea { width: 100%; min-height: 84px; padding: 8px 11px; border-radius: var(--raio-p); border: 1px solid var(--borda-forte); background: var(--superficie); font-family: var(--mono); font-size: 12.5px; resize: vertical; }
-.skill-corpo .form label small { font-weight: 400; }
+.habilidade-cartao { border: 1px solid var(--borda); border-radius: var(--raio-p); background: var(--superficie); }
+.habilidade-cartao.desligada { opacity: .6; }
+.habilidade-cab { display: flex; align-items: center; gap: 10px; padding: 12px 14px; border-bottom: 1px solid var(--borda); background: var(--superficie-2); border-radius: var(--raio-p) var(--raio-p) 0 0; }
+.habilidade-cab .principal { flex: 1; min-width: 0; }
+.habilidade-cab strong { display: block; }
+.habilidade-cab small { color: var(--texto-3); }
+.habilidade-corpo { padding: 14px; display: flex; flex-direction: column; gap: 12px; }
+.habilidade-corpo textarea { width: 100%; min-height: 84px; padding: 8px 11px; border-radius: var(--raio-p); border: 1px solid var(--borda-forte); background: var(--superficie); font-family: var(--mono); font-size: 12.5px; resize: vertical; }
+.habilidade-corpo .form label small { font-weight: 400; }
 details.conhecimento { background: var(--info-suave); border-radius: var(--raio-p); padding: 8px 12px; }
 details.conhecimento summary { cursor: pointer; font-weight: 600; color: var(--info); }
 details.conhecimento pre { white-space: pre-wrap; font-family: var(--fonte); margin: 8px 0 2px; color: var(--texto); font-size: 13px; }

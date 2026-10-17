@@ -20,7 +20,7 @@ def pastas(tmp_path: Path):
 def cfg_factory(pastas, tmp_path):
     def _fazer(regras=None, **extra):
         sobrescrever = {"pastas": {"entrada": str(pastas / "Bases-Limpeza"), "logs": str(tmp_path / "logs"),
-                                   "agentes": str(tmp_path / "agentes"), "skills": str(tmp_path / "skills")},
+                                   "agentes": str(tmp_path / "agentes"), "habilidades": str(tmp_path / "habilidades")},
                         "regras": regras or [], **extra}
         return carregar_config(tmp_path / "nao_existe.yaml", sobrescrever=sobrescrever)
     return _fazer
@@ -59,9 +59,9 @@ REGRA_NPS = {
 
 
 @pytest.fixture(autouse=True)
-def _limpar_skills_personalizadas():
-    """Cada teste começa só com o catálogo nativo (skills personalizadas não vazam entre testes)."""
+def _limpar_habilidades_personalizadas():
+    """Cada teste começa só com o catálogo nativo (habilidades personalizadas não vazam entre testes)."""
     yield
-    from robo import skills
-    for sid in [k for k, v in skills.REGISTRO.items() if v.origem == "personalizada"]:
-        skills.REGISTRO.pop(sid, None)
+    from robo import habilidades
+    for sid in [k for k, v in habilidades.REGISTRO.items() if v.origem == "personalizada"]:
+        habilidades.REGISTRO.pop(sid, None)

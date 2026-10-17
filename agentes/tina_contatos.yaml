@@ -1,4 +1,4 @@
-# Agente de exemplo, ATIVO. Skills marcadas como opcionais: se a planilha não tiver a coluna, ela pula sem reprovar.
+# Agente de exemplo, ATIVO. Habilidades marcadas como opcionais: se a planilha não tiver a coluna, ela pula sem reprovar.
 # Padroniza contatos e classifica o NPS das bases de pesquisa (arquivos que começam com nps_).
 id: tina_contatos
 nome: Tina
@@ -13,21 +13,21 @@ area: Qualidade de Dados
 cargo: Analista Pleno de Dados de Contato
 aplicar_em:
 - nps_*
-skills:
-- skill: validar_email
+habilidades:
+- habilidade: validar_email
   ativo: true
   opcional: true
   parametros:
     colunas: [email]
     invalidos: vazio
-- skill: normalizar_telefone
+- habilidade: normalizar_telefone
   ativo: true
   opcional: true
   parametros:
     colunas: [telefone]
     formato: formatado
     invalidos: aviso
-- skill: classificar_nps
+- habilidade: classificar_nps
   ativo: true
   opcional: true
   parametros:

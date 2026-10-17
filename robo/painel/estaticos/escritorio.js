@@ -5,7 +5,7 @@
    Three.js está embutido em ./vendor (funciona sem internet).
    ===================================================================== */
 import * as THREE from "three";
-import { OrbitControls } from "./vendor/OrbitControls.js";
+import { OrbitControls } from "./terceiros/OrbitControls.js";
 
 const $ = (s) => document.querySelector(s);
 const esc = (v) => String(v ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
@@ -794,7 +794,7 @@ function desenharEquipe() {
     for (const a of membros) {
       const e = estado.estacoes.get(a.id); const sit = e?.situacao === "parado" && e.prontidao ? "prontidao" : e?.situacao || "parado";
       const n = estado.agentesNumeros[a.id];
-      const detalhe = a.prontidao ? a.prontidao : n ? `${num(n.valor)} ${n.rotulo}` : a.skills.length ? `${a.skills.length} skill(s)` : a.papel;
+      const detalhe = a.prontidao ? a.prontidao : n ? `${num(n.valor)} ${n.rotulo}` : a.habilidades.length ? `${a.habilidades.length} habilidade(s)` : a.papel;
       const nivel = a.ficha?.nivel ? `<em class="nivel">${esc(a.ficha.nivel)}</em>` : "";
       html.push(`<button class="membro ${estado.selecionado === a.id ? "selecionado" : ""}" data-agente="${esc(a.id)}">
         <span class="avatar" style="background:${esc(a.cor)}">${esc(a.nome.slice(0, 1))}</span>
@@ -802,7 +802,7 @@ function desenharEquipe() {
         <span class="estado ${CLASSE_SITUACAO[sit] || ""}">${NOME_SITUACAO[sit]}</span></button>`);
     }
   }
-  html.push(`<div style="padding:10px 14px"><a class="btn pequeno" style="width:100%" href="index.html#agentes">Equipe, contratações e skills</a></div>`);
+  html.push(`<div style="padding:10px 14px"><a class="btn pequeno" style="width:100%" href="inicio.html#agentes">Equipe, contratações e habilidades</a></div>`);
   $("#hud-equipe").innerHTML = html.join("");
 }
 
@@ -826,8 +826,8 @@ function mostrarFicha(id) {
     ${lista("Responsabilidades", f.responsabilidades)}
     ${lista("Critérios de qualidade", f.criterios)}
     ${lista("O que não faz (limites)", f.limites)}
-    ${a.aceita_skills ? `<div><div class="secao-titulo">Skills</div>${a.skills.length ? `<div class="chips-colunas">${a.skills.map((s) => `<span class="chip-coluna">${esc(s)}</span>`).join("")}</div>` : `<p class="muted">Nenhuma skill extra.</p>`}</div>` : ""}
-    <a class="btn" href="index.html#agentes">Ver ficha completa no painel</a>`;
+    ${a.aceita_habilidades ? `<div><div class="secao-titulo">Habilidades</div>${a.habilidades.length ? `<div class="chips-colunas">${a.habilidades.map((s) => `<span class="chip-coluna">${esc(s)}</span>`).join("")}</div>` : `<p class="muted">Nenhuma habilidade extra.</p>`}</div>` : ""}
+    <a class="btn" href="inicio.html#agentes">Ver ficha completa no painel</a>`;
   ficha.hidden = false;
   const est = estado.estacoes.get(id);
   if (est && est.andar !== estado.andarVisivel && estado.andarVisivel !== "predio") definirAndarVisivel(est.andar);
@@ -892,7 +892,7 @@ async function atualizar() {
     const d = await api(`/api/escritorio?desde=${estado.ultimoSeq}`);
     estado.ligado = d.ligado; estado.fila = d.fila || []; estado.agentesNumeros = d.agentes || {};
     estado.bancoHabilitado = Boolean(d.banco_habilitado); estado.analiseHoje = d.analise_hoje || null; estado.excelHoje = d.excel_hoje || null;
-    const chave = JSON.stringify((d.equipe || []).map((a) => [a.id, a.nome, a.papel, a.cor, a.prontidao, a.andar, a.ronda, a.skills.length, a.ficha?.nivel])) + estado.bancoHabilitado;
+    const chave = JSON.stringify((d.equipe || []).map((a) => [a.id, a.nome, a.papel, a.cor, a.prontidao, a.andar, a.ronda, a.habilidades.length, a.ficha?.nivel])) + estado.bancoHabilitado;
     if (chave !== estado.chaveEquipe) {
       estado.chaveEquipe = chave; estado.equipe = d.equipe || [];
       estado.documentos.forEach((doc) => raiz.remove(doc.g)); estado.documentos.clear();
