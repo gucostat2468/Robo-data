@@ -5,11 +5,16 @@ Para criar a sua:
   2. Ajuste id, nome, parâmetros e a lógica.
   3. Salve. No painel (Agentes e habilidades) ela aparece no catálogo, pronta para adicionar a um agente.
 
+Prova técnica (OBRIGATÓRIA): sem ela o RH não aprova nenhum agente que use a habilidade.
+  Cada prova é (descrição, tabela de exemplo, parâmetros, conferência(resultado, relatorio) -> True/False).
+
 Regras de ouro:
   - receba df (tabela), p (parâmetros já validados) e ctx (onde registrar ocorrências);
   - devolva SEMPRE a tabela (df);
   - use ctx.erro(...) para reprovar o arquivo, ctx.aviso(...) para alertar e ctx.info(...) para documentar.
 """
+
+import pandas as pd
 
 from robo.habilidades import Param, habilidade
 
@@ -30,3 +35,10 @@ def marcar_vip(df, p, ctx):
     df["vip"] = (valores >= p["limite"]).map({True: "Sim", False: "Não"})
     ctx.info(f"{int((df['vip'] == 'Sim').sum())} cliente(s) VIP", coluna=p["coluna"])
     return df
+
+
+# prova técnica: um caso com resposta conhecida (500 não é VIP, 1500 é)
+marcar_vip.provas = [
+    ("Marca VIP só acima do limite", pd.DataFrame({"valor": [500.0, 1500.0]}), {"coluna": "valor", "limite": 1000},
+     lambda resultado, relatorio: resultado["vip"].tolist() == ["Não", "Sim"]),
+]

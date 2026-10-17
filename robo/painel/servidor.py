@@ -266,12 +266,17 @@ class Api:
     def _execucao_resumida(self, cfg, i: str) -> dict:
         """Partes do JSON da execução usadas no escritório (lidas uma vez só e guardadas em memória)."""
         cache = self.__dict__.setdefault("_cache_execucoes", {})
-        if i not in cache:
-            exe = historico.ler_execucao(cfg.logs, i) or {}
-            cache[i] = {"excel": exe.get("excel"),
-                        "quadro": [{"id": q["id"], "ok": q["ok"], "achados": len(q.get("achados") or [])}
-                                   for q in exe.get("quadro") or []]}
-        return cache[i]
+        if i in cache:
+            return cache[i]
+        exe = historico.ler_execucao(cfg.logs, i) or {}
+        resumo = {"excel": exe.get("excel"),
+                  "quadro": [{"id": q["id"], "ok": q["ok"], "achados": len(q.get("achados") or [])}
+                             for q in exe.get("quadro") or []]}
+        if exe:  # só guarda quando o detalhe já existe (senão tenta de novo na próxima atualização)
+            if len(cache) > 5000:
+                cache.clear()
+            cache[i] = resumo
+        return resumo
 
     def _quadro_hoje(self, cfg, execucoes: list[dict]) -> dict:
         from robo.quadro import QUADRO
@@ -306,7 +311,7 @@ class Api:
                 entregas.append(ex)
         ultimo = Path(entregas[0]["arquivo"]).name if entregas else None
         return {"entregas": len(entregas), "conferencias": sum(int(e.get("conferencias") or 0) for e in entregas),
-                "ultimo": ultimo}
+                "divergencias": sum(1 for e in entregas if e.get("revisao_ok") is False), "ultimo": ultimo}
 
     def _analises_do_dia(self, hoje: str) -> list[dict]:
         pasta = self.cfg.logs / "analises"
@@ -654,9 +659,13 @@ class Api:
         elif alvo == "config":
             caminho = configuracao.garantir_arquivo(self.c.caminho_config)
         elif alvo == "arquivo":
+            # só arquivos de DADOS e relatórios, das pastas de dados (nunca .bat/.vbs/.py da pasta do projeto)
             caminho = Path(str(b.get("caminho", "")))
-            if not _dentro(caminho, list(pastas.values())) or not caminho.exists():
-                raise ErroApi("Arquivo não encontrado ou fora das pastas do robô", 404)
+            pastas_dados = [cfg.entrada, cfg.tratadas, cfg.erros, cfg.originais, cfg.relatorios, cfg.logs]
+            seguros = {".xlsx", ".xlsm", ".xls", ".csv", ".txt", ".json", ".md", ".log"}
+            if (not _dentro(caminho, pastas_dados) or not caminho.exists()
+                    or caminho.suffix.lower() not in seguros):
+                raise ErroApi("Arquivo não encontrado, fora das pastas de dados ou de um tipo que o painel não abre", 404)
         elif alvo == "reprovado":
             caminho = cfg.erros / Path(str(b.get("nome", ""))).name
             if not caminho.exists():
@@ -874,7 +883,13 @@ def criar_manipulador(api: Api):
             if origem and origem not in origens_validas:
                 return self._json({"erro": "origem recusada"}, 403)
             caminho = urllib.parse.urlparse(self.path).path
-            tamanho = int(self.headers.get("Content-Length") or 0)
+            try:
+                tamanho = int(self.headers.get("Content-Length") or 0)
+            except ValueError:
+                tamanho = -1
+            if tamanho < 0:
+                self.close_connection = True
+                return self._json({"erro": "tamanho da requisição inválido"}, 400)
             if caminho in ROTAS_UPLOAD:
                 return self._upload(caminho, tamanho)
             if caminho not in ROTAS_POST:
@@ -902,6 +917,8 @@ def criar_manipulador(api: Api):
                             break
                         f.write(bloco)
                         restante -= len(bloco)
+                if restante > 0:  # a conexão caiu no meio: arquivo incompleto não é processado
+                    return self._json({"erro": "O envio foi interrompido antes do fim. Tente de novo."}, 400)
                 return self._executar(lambda: ROTAS_UPLOAD[caminho](api, temp, nome))
             finally:
                 temp.unlink(missing_ok=True)
@@ -911,6 +928,8 @@ def criar_manipulador(api: Api):
                 return self._json(funcao())
             except ErroApi as e:
                 return self._json({"erro": str(e)}, e.status)
+            except (ValueError, TypeError) as e:  # parâmetro inválido (ex.: dias=abc) é erro de quem pediu
+                return self._json({"erro": f"Parâmetro inválido: {e}"}, 400)
             except Exception as e:
                 log.exception("Erro na API do painel")
                 return self._json({"erro": f"{type(e).__name__}: {e}"}, 500)

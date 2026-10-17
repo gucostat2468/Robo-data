@@ -593,6 +593,7 @@ def classificar_nps(df, p, ctx):
     invalidos = x.notna() & ((x < 0) | (x > 10) | (x != x.round()))
     df = ctx.tratar_invalidos(df, col, invalidos, p["invalidos"], "Nota NPS fora de 0 a 10")
     x = _numerica(df, col)
+    x = x.where(~(x.notna() & ((x < 0) | (x > 10) | (x != x.round()))))  # nota inválida mantida não é classificada
     grupo = np.select([x >= 9, x >= 7, x >= 0], ["Promotor", "Neutro", "Detrator"], default="")
     df[p["nova_coluna"]] = pd.Series(grupo, index=df.index).replace("", pd.NA)
     contagem = df[p["nova_coluna"]].value_counts()
@@ -619,6 +620,7 @@ def classificar_csat(df, p, ctx):
     invalidos = x.notna() & ((x < 1) | (x > escala))
     df = ctx.tratar_invalidos(df, col, invalidos, p["invalidos"], f"Nota fora da escala 1 a {escala}")
     x = _numerica(df, col)
+    x = x.where(~(x.notna() & ((x < 1) | (x > escala))))  # nota fora da escala mantida não é classificada
     df[p["nova_coluna"]] = x.map(lambda v: pd.NA if pd.isna(v) else ("Sim" if v >= escala - 1 else "Não"))
     return df
 

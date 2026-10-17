@@ -30,7 +30,7 @@ from robo import historico
 
 STATUS = ["a_fazer", "fazendo", "travado", "feito"]
 NOME_STATUS = {"a_fazer": "A fazer", "fazendo": "Fazendo", "travado": "Travado", "feito": "Feito"}
-LIDER_ANDAR = {1: "coord_engenharia", 2: "coord_analise", 3: "coord_excel", 4: "canal_helena", 5: "coord_devops"}
+from robo.contratacao import LIDER_DO_ANDAR as LIDER_ANDAR  # um só lugar define o líder de cada andar
 GERENTE_ANDAR = {1: "ger_engenharia", 2: "ger_analise", 3: "excel_supervisor", 4: "ger_operacoes", 5: "ger_ti"}
 _trava = threading.Lock()
 
@@ -258,6 +258,7 @@ def avaliar_todos(cfg) -> dict:
     from robo.quadro import QUADRO
     from robo.ti import EQUIPE_TI
     rh._provas_nativas_cache.cache_clear()
+    rh._provas_habilidade_cache.cache_clear()  # "do zero" de verdade: provas das habilidades também refeitas
     pessoas = [(a["id"], a["nome"], 1) for a in NATIVOS] + [(a["id"], a["nome"], a["andar"]) for a in SUPERVISORES]
     pessoas += [(f"analise_{a['id']}", a["nome"], 2) for a in ANALISTAS] + [(a["id"], a["nome"], 3) for a in EQUIPE_EXCEL]
     pessoas += [(p["id"], p["nome"], p["andar"]) for p in QUADRO] + [(a["id"], a["nome"], a["andar"]) for a in EQUIPE_CANAL]

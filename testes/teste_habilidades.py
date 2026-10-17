@@ -179,6 +179,10 @@ from robo.habilidades import Param, habilidade
 def marcar_vip(df, p, ctx):
     df["vip"] = (df[p["coluna"]] >= p["limite"]).map({True: "Sim", False: "Não"})
     return df
+
+import pandas as pd
+marcar_vip.provas = [("VIP acima do limite", pd.DataFrame({"v": [1, 9]}), {"coluna": "v"},
+                      lambda r, rel: r["vip"].tolist() == ["Não", "Sim"])]
 ''', encoding="utf-8")
     equipe = Equipe(cfg.agentes, cfg.habilidades)
     assert habilidades.REGISTRO["marcar_vip"].origem == "personalizada"
@@ -186,3 +190,45 @@ def marcar_vip(df, p, ctx):
                    "habilidades": [{"habilidade": "marcar_vip", "parametros": {"coluna": "nota"}}]})
     r = processar_arquivo(_planilha(pastas, "a.xlsx"), cfg)
     assert r.tabelas["dados"]["vip"].tolist() == ["Sim", "Não"]
+
+
+def teste_habilidade_sem_prova_nao_e_contratada(cfg_factory):
+    import pytest
+    from robo.agentes import ErroAgente
+    cfg = cfg_factory()
+    cfg.habilidades.mkdir(parents=True, exist_ok=True)
+    (cfg.habilidades / "sem_prova.py").write_text('''
+from robo.habilidades import habilidade
+
+@habilidade(id="sem_prova", nome="Sem prova", categoria="Teste", descricao="não tem prova técnica")
+def sem_prova(df, p, ctx):
+    return df
+''', encoding="utf-8")
+    with pytest.raises(ErroAgente, match="não tem prova técnica"):
+        Equipe(cfg.agentes, cfg.habilidades).salvar({"id": "zeca", "nome": "Zeca", "posicao": "limpeza",
+                                                     "habilidades": [{"habilidade": "sem_prova"}]})
+
+
+def teste_personalizada_nao_substitui_nativa(cfg_factory):
+    cfg = cfg_factory()
+    cfg.habilidades.mkdir(parents=True, exist_ok=True)
+    (cfg.habilidades / "falsa.py").write_text('''
+from robo.habilidades import habilidade
+
+@habilidade(id="validar_email", nome="E-mail falso", categoria="Teste", descricao="tenta trocar a nativa")
+def falsa(df, p, ctx):
+    return df
+''', encoding="utf-8")
+    Equipe(cfg.agentes, cfg.habilidades)
+    assert habilidades.REGISTRO["validar_email"].origem == "nativa"
+    assert any("já é de uma habilidade nativa" in e for e in habilidades.ERROS_CARGA)
+
+
+def teste_nps_nao_classifica_nota_invalida_mantida():
+    import pandas as pd
+    from robo.habilidades import executar_habilidade
+    from robo.relatorio import Relatorio
+    df = pd.DataFrame({"nota": [10, 11, 3]})
+    r = executar_habilidade(df, {"habilidade": "classificar_nps", "parametros": {"coluna": "nota", "invalidos": "aviso"}},
+                            Relatorio("x"), "t", "x", "teste")
+    assert r["grupo_nps"].tolist()[0] == "Promotor" and pd.isna(r["grupo_nps"].tolist()[1])

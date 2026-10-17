@@ -620,7 +620,7 @@ function desenharTV(andar) {
     blocos = [["Mensagens hoje", c.mensagens ?? 0, "#fdba74"], [`Sprint ${c.sprint ?? 1}`, c.dias_restantes ?? 0, "#7fe0b4"], ["Pessoas", estado.equipe.length, "#a9c1ff"]];
   } else if (andar === 3) {
     const x = estado.excelHoje || {};
-    blocos = [["Entregas", x.entregas ?? 0, "#86efac"], ["Conferências", x.conferencias ?? 0, "#7fe0b4"], ["Divergências", 0, "#ffd27a"]];
+    blocos = [["Entregas", x.entregas ?? 0, "#86efac"], ["Conferências", x.conferencias ?? 0, "#7fe0b4"], ["Divergências", x.divergencias ?? 0, "#ffd27a"]];
   } else {
     const h = estado.analiseHoje || {};
     blocos = [["Bases", h.bases ?? 0, "#f0abfc"], ["Diferenças reais", h.destaques ?? 0, "#7fe0b4"], ["Alertas", h.alertas ?? 0, "#ffd27a"]];

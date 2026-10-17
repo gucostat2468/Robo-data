@@ -470,10 +470,10 @@ def processo_seletivo(agente: dict) -> dict:
                               f"promova o agente ou passe a tarefa a um sênior")
     acertos = sum(p["aprovado"] for p in provas)
     reprovadas = [p for p in provas if not p["aprovado"]]
-    bloqueios = [f"reprovado na prova: {p['prova']} ({p['motivo']})" for p in reprovadas] + \
-                [x for x in pendencias if "não pode usar" in x]
+    # sem prova não há como comprovar competência: bloqueia (regra da casa: ninguém trabalha sem passar nas provas)
+    bloqueios = [f"reprovado na prova: {p['prova']} ({p['motivo']})" for p in reprovadas] + pendencias
     return {"total": len(provas), "acertos": acertos, "aprovado": not bloqueios, "bloqueios": bloqueios,
-            "ressalvas": [x for x in pendencias if "não pode usar" not in x], "provas": provas}
+            "ressalvas": [], "provas": provas}
 
 
 # ----------------------------------------------------------------------------- fichas profissionais

@@ -20,6 +20,7 @@ dias_experiencia (padrão 90).
 
 from __future__ import annotations
 
+import hashlib
 import json
 import logging
 import re
@@ -34,7 +35,7 @@ log = logging.getLogger("robo")
 
 PADRAO = {"habilitada": True, "maximo": 12, "observacoes_minimas": 5, "dias_experiencia": 90}
 # líder que contrata em cada andar (coordenador; no 5º andar, o gerente de TI)
-LIDER_DO_ANDAR = {1: "coord_engenharia", 2: "coord_analise", 3: "coord_excel", 4: "canal_helena", 5: "ger_ti"}
+LIDER_DO_ANDAR = {1: "coord_engenharia", 2: "coord_analise", 3: "coord_excel", 4: "canal_helena", 5: "coord_devops"}
 
 # o que reconhecer → que habilidade resolve → que cargo contratar
 DEMANDAS = [
@@ -167,7 +168,9 @@ def avaliar(cfg, arquivo: str, regra: dict | None, tabelas: dict) -> list[dict]:
             lider = LIDER_DO_ANDAR[1]
             ocupados = {a["nome"] for a in equipe.personalizados}
             nome = next((n for n in NOMES if n not in ocupados), f"Estagiário {len(ocupados) + 1}")
-            agente_id = re.sub(r"[^a-z0-9_]", "_", f"auto_{d['tipo']}_{base}_{col}".lower())[:40].rstrip("_")
+            completo = re.sub(r"[^a-z0-9_]", "_", f"auto_{d['tipo']}_{base}_{col}".lower())
+            # nomes longos são cortados; o final com 6 caracteres do resumo evita que dois cortes fiquem iguais
+            agente_id = completo if len(completo) <= 40 else f"{completo[:33].rstrip('_')}_{hashlib.sha1(completo.encode()).hexdigest()[:6]}"
             dados = {"id": agente_id, "nome": nome, "papel": d["cargo"].split(" — ")[-1], "cargo": d["cargo"],
                      "nivel": "estagiario", "area": "Qualidade de Dados", "mentor": "limpeza", "andar": 1,
                      "contratado_por": "automatico", "contratante": lider, "contratado_em": date.today().isoformat(),

@@ -16,6 +16,10 @@ Criar a sua (arquivo .py dentro da pasta habilidades_personalizadas/ do projeto)
         df["vip"] = (df[p["coluna"]] >= p["limite"]).map({True: "Sim", False: "Não"})
         ctx.info(f"{(df['vip'] == 'Sim').sum()} clientes VIP")
         return df
+
+    # prova técnica obrigatória: (descrição, tabela de exemplo, parâmetros, conferência)
+    marcar_vip.provas = [("Marca VIP só acima do limite", pd.DataFrame({"valor": [500.0, 1500.0]}),
+                          {"coluna": "valor", "limite": 1000}, lambda r, rel: r["vip"].tolist() == ["Não", "Sim"])]
 """
 
 from __future__ import annotations
@@ -84,6 +88,8 @@ def habilidade(id: str, nome: str, categoria: str, descricao: str, parametros: l
           conhecimento: str = ""):
     def decorar(funcao):
         origem = "personalizada" if not funcao.__module__.startswith("robo.") else "nativa"
+        if origem == "personalizada" and id in REGISTRO and REGISTRO[id].origem == "nativa":
+            raise ErroHabilidade(f"o id '{id}' já é de uma habilidade nativa: escolha outro nome")
         REGISTRO[id] = Habilidade(id, nome, categoria, descricao, funcao, parametros or [], conhecimento.strip(), origem)
         return funcao
     return decorar
