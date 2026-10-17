@@ -35,7 +35,7 @@ body.escritorio { overflow: hidden; background: #dfe6ef; }
 .membro .estado.trabalhando { background: var(--info-suave); color: var(--info); }
 .membro .estado.ok { background: var(--sucesso-suave); color: var(--sucesso); }
 .membro .estado.erro { background: var(--perigo-suave); color: var(--perigo); }
-.membro .estado.desligado { opacity: .6; }
+.membro .estado.prontidao { background: var(--info-suave); color: var(--info); opacity: .85; }
 
 .hud-ficha {
   position: fixed; left: 16px; top: 80px; z-index: 6; width: 340px;

@@ -188,11 +188,27 @@ class Api:
         desligados = set(cfg_analise.get("analistas_desligados") or [])
         from robo import rh
         from robo.producao import SUPERVISORES
-        equipe += [{**a, "nativo": True, "aceita_skills": False, "skills": [], "ativo": a["id"] != "dba" or bool(cfg.banco.get("habilitado")),
+        from robo.excel import EQUIPE_EXCEL
+        # ninguém dorme: quem não tem trabalho no momento fica "de prontidão" (estudando, revisando), nunca desligado
+        equipe += [{**a, "nativo": True, "aceita_skills": False, "skills": [], "ativo": True,
+                    "prontidao": "revisando os modelos SQL (banco ainda não configurado)" if a["id"] == "dba" and not cfg.banco.get("habilitado") else "",
                     "ficha": _ficha_curta(rh.ficha({"id": a["id"], "skills": []}))} for a in SUPERVISORES]
-        equipe += [{**a, "id": f"analise_{a['id']}", "nativo": True, "aceita_skills": False, "skills": [], "andar": 2,
-                    "ativo": bool(cfg_analise.get("habilitado", True)) and a["id"] not in desligados,
+        equipe += [{**a, "id": f"analise_{a['id']}", "nativo": True, "aceita_skills": False, "skills": [], "andar": 2, "ativo": True,
+                    "prontidao": "" if cfg_analise.get("habilitado", True) and a["id"] not in desligados
+                    else "estudando (análise pausada nas Configurações)",
                     "ficha": _ficha_curta(rh.ficha({"id": f"analise_{a['id']}", "skills": []}))} for a in ANALISTAS]
+        cfg_excel = cfg.dados.get("excel") or {}
+        equipe += [{**a, "nativo": True, "aceita_skills": False, "skills": [], "andar": 3, "ativo": True,
+                    "ronda": a["id"] == "excel_supervisor",
+                    "prontidao": "" if cfg_excel.get("habilitado", True) else "estudando (Sala Excel pausada nas Configurações)",
+                    "ficha": _ficha_curta(rh.ficha({"id": a["id"], "skills": []}))} for a in EQUIPE_EXCEL]
+        for a in equipe:
+            if not a.get("ativo", True):  # agente personalizado pausado pelo dono: segue estudando, não dorme
+                a["ativo"], a["prontidao"] = True, "em treinamento (pausado por você na tela Agentes)"
+            elif a["id"] == "banco" and not cfg.banco.get("habilitado"):
+                a["prontidao"] = "preparando as tabelas (PostgreSQL ainda não configurado)"
+            a.setdefault("prontidao", "")
+        excel_hoje = self._excel_hoje(cfg, ok)
         dados.update({
             "equipe": equipe,
             "fila": c.monitor.estado_fila() if c.monitor else [],
@@ -207,10 +223,28 @@ class Api:
                           "inativo": not cfg.banco.get("habilitado")},
                 "publicacao": {"valor": len(ok), "rotulo": "planilhas publicadas hoje"},
                 **self._numeros_analise(hoje),
+                "excel_supervisor": {"valor": excel_hoje["conferencias"], "rotulo": "conferências de fórmula assinadas hoje"},
+                **{k: {"valor": excel_hoje["entregas"], "rotulo": "entregas Excel hoje"}
+                   for k in ("excel_pesquisa", "excel_formulas", "excel_trade", "excel_dinamicas")},
             },
             "analise_hoje": self._analise_hoje(hoje),
+            "excel_hoje": excel_hoje,
         })
         return dados
+
+    def _excel_hoje(self, cfg, aprovados: list[dict]) -> dict:
+        """Entregas da Sala Excel de hoje (lê o JSON de cada execução uma vez só e guarda em memória)."""
+        cache = self.__dict__.setdefault("_cache_excel", {})
+        entregas = []
+        for x in aprovados[:300]:
+            i = x.get("id") or ""
+            if i not in cache:
+                cache[i] = (historico.ler_execucao(cfg.logs, i) or {}).get("excel")
+            if cache[i]:
+                entregas.append(cache[i])
+        ultimo = Path(entregas[0]["arquivo"]).name if entregas else None
+        return {"entregas": len(entregas), "conferencias": sum(int(e.get("conferencias") or 0) for e in entregas),
+                "ultimo": ultimo}
 
     def _analises_do_dia(self, hoje: str) -> list[dict]:
         pasta = self.cfg.logs / "analises"
@@ -335,7 +369,10 @@ class Api:
                       "ativo": True, "ficha": rh.ficha({"id": f"analise_{a['id']}", "skills": []})} for a in ANALISTAS]
         lideranca = [{**a, "nativo": True, "aceita_skills": False, "skills": [], "ativo": True,
                       "ficha": rh.ficha({"id": a["id"], "skills": []})} for a in SUPERVISORES]
-        return {"agentes": equipe.lista(), "analistas": analistas, "lideranca": lideranca, "catalogo": catalogo,
+        from robo.excel import EQUIPE_EXCEL
+        sala_excel = [{**a, "nativo": True, "aceita_skills": False, "skills": [], "ativo": True, "andar": 3,
+                       "ficha": rh.ficha({"id": a["id"], "skills": []})} for a in EQUIPE_EXCEL]
+        return {"agentes": equipe.lista(), "analistas": analistas, "lideranca": lideranca, "sala_excel": sala_excel, "catalogo": catalogo,
                 "erros_skills": list(skills.ERROS_CARGA), "posicoes": POSICOES,
                 "rh": {"niveis": [{"id": n, "nome": rh.NOME_NIVEL[n], "risco_maximo": rh.RISCO_MAXIMO[n]} for n in rh.NIVEIS],
                        "areas": rh.AREAS}}

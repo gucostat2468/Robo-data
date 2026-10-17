@@ -64,6 +64,9 @@ def test_estado_e_paginas(painel):
         assert chamar(base, rota)[0] == 200, rota
     _, esc = chamar(base, "/api/escritorio")
     assert [a["id"] for a in esc["equipe"]][:3] == ["recepcao", "leitura", "limpeza"]
+    assert {a["andar"] for a in esc["equipe"] if a["id"].startswith("excel_")} == {3}
+    assert all(a["ativo"] for a in esc["equipe"]), "ninguém dorme: quem está sem trabalho fica de prontidão"
+    assert "excel_hoje" in esc
     with urllib.request.urlopen(base + "/escritorio.js") as r:
         assert r.headers["Content-Type"].startswith("text/javascript")
 

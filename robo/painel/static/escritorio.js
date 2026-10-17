@@ -223,8 +223,14 @@ function criarPlanta(x, z, escala = 1) {
 
 // ------------------------------------------------------------------ estado da cena
 // ------------------------------------------------------------------ estado da cena (prédio de 2 andares)
-const ALTURA = 4.4; // pé-direito: o 2º andar fica 4,4 m acima do 1º
-const NOME_ANDAR = { 1: "1º andar · Engenharia de dados", 2: "2º andar · Análise e Qualidade" };
+const ALTURA = 4.4; // pé-direito: cada andar fica 4,4 m acima do anterior
+const NOME_ANDAR = { 1: "1º andar · Engenharia de dados", 2: "2º andar · Análise e Qualidade", 3: "3º andar · Sala Excel (Trade e Pesquisa)" };
+const PLACA_ANDAR = { 1: ["1º ANDAR · ENGENHARIA DE DADOS", "#1d3fb0"], 2: ["2º ANDAR · ANÁLISE E QUALIDADE", "#7c3aed"], 3: ["3º ANDAR · SALA EXCEL", "#107c41"] };
+const COR_TV = { 1: ["#0f1b3d", "#1d3fb0"], 2: ["#1e1038", "#6d28d9"], 3: ["#062b18", "#107c41"] };
+const yAndar = (andar) => (andar - 1) * ALTURA;
+const andarDe = (a) => Number(a.andar) || 1;
+// "prédio" conta como acima de todos os andares (mostra todos)
+const nivelVista = (v) => (v === "predio" ? 99 : v);
 const estado = {
   equipe: [], estacoes: new Map(), ultimoSeq: 0, iniciado: false, chaveEquipe: "",
   fila: [], filaEventos: [], tocando: null, documentos: new Map(), selecionado: null,
@@ -232,29 +238,37 @@ const estado = {
   andarVisivel: 1, seguir: true, ultimoManual: 0,
 };
 let raiz = new THREE.Group(); cena.add(raiz);
-const andares = { 1: null, 2: null };
+const andares = {};
+let listaAndares = [1, 2, 3];
 let geo = null, elevador = null;
-let caixaEntrada, caixaTratadas, caixaErros, prateleira, pilhaEntrada = [], pilhaTratadas = [], pilhaErros = [], pilhaRelatorios = [], leds = [];
+let caixaEntrada, caixaTratadas, caixaErros, pilhaEntrada = [], pilhaTratadas = [], pilhaErros = [], leds = [];
+const prateleiras = {}, pilhasRelatorios = {};
 const tvs = {};
 const clicaveis = [];
 const ETAPA_NATIVA = new Set(["recepcao", "leitura", "limpeza", "validacao", "modelagem", "banco", "publicacao",
-  "supervisor", "dba", "coord_engenharia", "coord_analise"]);
+  "supervisor", "dba", "coord_engenharia", "coord_analise",
+  "excel_supervisor", "excel_pesquisa", "excel_formulas", "excel_trade", "excel_dinamicas"]);
 
 function montarPredio(equipe) {
   cena.remove(raiz); raiz = new THREE.Group(); cena.add(raiz);
   estado.estacoes.clear(); clicaveis.length = 0; leds = [];
-  pilhaEntrada = []; pilhaTratadas = []; pilhaErros = []; pilhaRelatorios = [];
-  const eq1 = equipe.filter((a) => a.andar !== 2), eq2 = equipe.filter((a) => a.andar === 2);
-  const porFileira = Math.max(3, Math.ceil(eq1.length / 2), Math.ceil(eq2.length / 2)), espaco = 3.9;
+  pilhaEntrada = []; pilhaTratadas = []; pilhaErros = [];
+  for (const k of Object.keys(andares)) delete andares[k];
+  for (const k of Object.keys(prateleiras)) { delete prateleiras[k]; delete pilhasRelatorios[k]; }
+  listaAndares = [...new Set([1, 2, 3, ...equipe.map(andarDe)])].sort((a, b) => a - b);
+  const porAndar = Object.fromEntries(listaAndares.map((n) => [n, equipe.filter((a) => andarDe(a) === n)]));
+  const sentados = (lista) => lista.filter((a) => !a.ronda).length;
+  const porFileira = Math.max(3, ...listaAndares.map((n) => Math.ceil(sentados(porAndar[n]) / 2))), espaco = 3.9;
   const colX = (c) => (c - (porFileira - 1) / 2) * espaco;
   const minX = colX(0) - 6.2, maxX = colX(porFileira - 1) + 4.2;
   geo = { colX, porFileira, minX, maxX, largura: maxX - minX, zFundo: -1.5, zFrente: 3.3, zParede: -4.6, profundidade: 11.5,
           xElevador: minX + 1.3, zElevador: -4.6 + 1.25 };
-  for (const andar of [1, 2]) {
-    const g = new THREE.Group(); g.position.y = andar === 1 ? 0 : ALTURA; raiz.add(g);
+  for (const andar of listaAndares) {
+    const g = new THREE.Group(); g.position.y = yAndar(andar); raiz.add(g);
     andares[andar] = g;
-    construirAndar(g, andar, andar === 1 ? eq1 : eq2);
+    construirAndar(g, andar, porAndar[andar]);
   }
+  if (!listaAndares.includes(estado.andarVisivel) && estado.andarVisivel !== "predio") estado.andarVisivel = 1;
   construirElevador();
   enquadrarCameras();
   definirAndarVisivel(estado.andarVisivel);
@@ -275,15 +289,16 @@ function criarAndarilho(g, andar, ag, i) {
   etiqueta.position.set(0, 2.55, 0); etiqueta.scale.set(2.6, 0.81, 1); grupo.add(etiqueta);
   const anel = new THREE.Mesh(new THREE.TorusGeometry(0.3, 0.035, 8, 40), new THREE.MeshStandardMaterial({ color: ag.cor, emissive: ag.cor, emissiveIntensity: 0.8 }));
   anel.rotation.x = Math.PI / 2; anel.position.y = 2.15; anel.visible = false; grupo.add(anel);
-  const ok = selo("✓", "#16a34a"), erro = selo("!", "#dc2626"), zz = selo("z", "#94a3b8");
-  for (const s of [ok, erro, zz]) { s.position.set(0.42, 2.15, 0.1); grupo.add(s); }
+  const ok = selo("✓", "#16a34a"), erro = selo("!", "#dc2626"), estudo = selo("✎", "#2563eb");
+  for (const s of [ok, erro, estudo]) { s.position.set(0.42, 2.15, 0.1); grupo.add(s); }
+  estudo.visible = Boolean(ag.prontidao);
   p.grupo.traverse((o) => { if (o.isMesh) { o.userData.agente = ag.id; clicaveis.push(o); } });
-  const yBase = andar === 1 ? 0 : ALTURA;
+  const yBase = yAndar(andar);
   estado.estacoes.set(ag.id, {
-    agente: ag, andar, grupo, p, anel, etiqueta, selos: { ok, erro, zz }, inativo: !ag.ativo, semente, movel: true, yBase,
+    agente: ag, andar, grupo, p, anel, etiqueta, selos: { ok, erro, estudo }, prontidao: Boolean(ag.prontidao), semente, movel: true, yBase,
     ronda, alvoRonda: (i + 1) % ronda.length, caminho: [], mesa: { logo: { material: { emissiveIntensity: 0 } }, tampa: {} },
     get mesaPos() { const v = new THREE.Vector3(); grupo.getWorldPosition(v); return v.add(new THREE.Vector3(0, 0.9, 0)); },
-    situacao: ag.ativo ? "parado" : "desligado", ate: 0,
+    situacao: "parado", ate: 0,
   });
 }
 
@@ -303,7 +318,7 @@ function caminhoAte(e, destino) {
 
 function construirAndar(g, andar, equipe) {
   const { colX, minX, maxX, largura, zFundo, zFrente, zParede, profundidade, xElevador, zElevador } = geo;
-  const yBase = andar === 1 ? 0 : ALTURA;
+  const yBase = yAndar(andar);
   const cx = (minX + maxX) / 2, cz = zParede + profundidade / 2;
 
   // piso (no 2º andar é uma laje com o vão do elevador)
@@ -317,14 +332,14 @@ function construirAndar(g, andar, equipe) {
     g.add(caixa(xVao - minX, 0.3, zParede + profundidade - zVao, carpete, (minX + xVao) / 2, -0.15, (zVao + zParede + profundidade) / 2, false));
     for (let i = 1; i < Math.floor(profundidade / 1.5); i++) g.add(caixa(largura - 2, 0.004, 0.02, mat(ESCURO ? "#363e50" : "#cfd6e2"), cx + 1, 0.003, zParede + i * 1.5, false));
     g.add(caixa(largura, 0.1, 0.08, mat(ESCURO ? "#3d4558" : "#c7ced9"), cx, 0.55, zParede + profundidade, false)); // guarda-corpo baixo
-    // borda da laje (fachada): esconde o andar de baixo quando você está no 2º andar
+    // borda da laje (fachada): esconde o andar de baixo quando você está num andar de cima
     g.add(caixa(largura, 1.3, 0.3, mat(ESCURO ? "#30384a" : "#e4e8ef"), cx, -0.8, zParede + profundidade - 0.05, false));
   }
   g.add(caixa(largura - 3, 0.01, 0.9, mat(ESCURO ? "#2b3550" : "#cdd8ea"), cx + 0.6, 0.01, zFundo + 1.55, false));
   g.add(caixa(largura - 3, 0.01, 0.9, mat(ESCURO ? "#2b3550" : "#cdd8ea"), cx + 0.6, 0.01, zFrente + 1.55, false));
 
   // paredes, rodapé e janelas
-  const corParede = mat(andar === 1 ? (ESCURO ? "#262c39" : "#f3efe8") : (ESCURO ? "#232a38" : "#eef2f7"));
+  const corParede = mat(andar === 1 ? (ESCURO ? "#262c39" : "#f3efe8") : andar === 3 ? (ESCURO ? "#1f2d27" : "#edf5ef") : (ESCURO ? "#232a38" : "#eef2f7"));
   const altParede = andar === 1 ? ALTURA : 3.6;
   g.add(caixa(largura, altParede, 0.2, corParede, cx, altParede / 2, zParede, false));
   g.add(caixa(0.2, altParede, profundidade, corParede, minX, altParede / 2, cz, false));
@@ -335,7 +350,8 @@ function construirAndar(g, andar, equipe) {
     g.add(caixa(3.4, 0.08, 0.1, mat("#ffffff"), x, 1.06, zParede + 0.14, false));
     g.add(caixa(0.06, 1.8, 0.08, mat("#ffffff"), x, 2.0, zParede + 0.14, false));
   }
-  const placaAndar = placa(andar === 1 ? "1º ANDAR · ENGENHARIA DE DADOS" : "2º ANDAR · ANÁLISE E QUALIDADE", andar === 1 ? "#1d3fb0" : "#7c3aed");
+  const [textoPlaca, corPlaca] = PLACA_ANDAR[andar] || [`${andar}º ANDAR`, "#475569"];
+  const placaAndar = placa(textoPlaca, corPlaca);
   placaAndar.scale.set(4.2, 0.98, 1); placaAndar.position.set(cx, 3.35, zParede + 0.3); g.add(placaAndar);
 
   // TV do andar
@@ -369,7 +385,7 @@ function construirAndar(g, andar, equipe) {
     sofa.add(caixa(2.2, 0.42, 0.85, mat("#5b6b8c"), 0, 0.3, 0)); sofa.add(caixa(2.2, 0.6, 0.22, mat("#56658a"), 0, 0.62, -0.32));
     g.add(sofa);
   } else {
-    // estante de relatórios (Bases-Relatorios) e sala de reunião
+    // estante de entregas (Bases-Relatorios) e sala de reunião
     const estante = new THREE.Group(); estante.position.set(xLateral, 0, zFrente + 0.8);
     estante.add(caixa(1.6, 1.7, 0.5, mat(ESCURO ? "#4a3b2f" : "#a47c55"), 0, 0.85, 0));
     const cores = ["#ef4444", "#3b82f6", "#22c55e", "#f59e0b", "#8b5cf6", "#0ea5e9"];
@@ -377,14 +393,25 @@ function construirAndar(g, andar, equipe) {
       estante.add(caixa(0.16, 0.42, 0.34, mat(cores[(i + prat) % 6]), -0.6 + i * 0.22, 0.3 + prat * 0.52, 0.06));
     }
     g.add(estante);
-    const p = placa("Bases-Relatorios", "#7c3aed"); p.position.set(xLateral, 2.15, zFrente + 0.8); g.add(p);
-    prateleira = { local: new THREE.Vector3(xLateral, 1.72, zFrente + 0.8), mundo: new THREE.Vector3(xLateral, ALTURA + 1.72, zFrente + 0.8) };
+    const p = placa(andar === 3 ? "Entregas Excel" : "Bases-Relatorios", corPlaca); p.position.set(xLateral, 2.15, zFrente + 0.8); g.add(p);
+    prateleiras[andar] = { local: new THREE.Vector3(xLateral, 1.72, zFrente + 0.8), mundo: new THREE.Vector3(xLateral, yBase + 1.72, zFrente + 0.8) };
+    pilhasRelatorios[andar] = [];
     const mesa = new THREE.Group(); mesa.position.set(maxX - 2.2, 0, zFrente + 0.6);
     mesa.add(cilindro(1.0, 1.0, 0.06, mat("#f7f4ef"), 0, 0.76, 0, 32)); mesa.add(cilindro(0.08, 0.12, 0.74, mat("#8b6b4a"), 0, 0.37, 0));
     for (let i = 0; i < 5; i++) { const c = criarCadeira(); const a = (i / 5) * Math.PI * 2; c.position.set(Math.cos(a) * 1.35, 0, Math.sin(a) * 1.35); c.rotation.y = -a - Math.PI / 2; mesa.add(c); }
     g.add(mesa);
-    // quadro com gráfico na parede lateral
-    const quadro = texturaTexto((ctx, l, a) => {
+    // quadro na parede lateral: gráfico de NPS (análise) ou planilha com fórmulas (Sala Excel)
+    const quadro = andar === 3 ? texturaTexto((ctx, l, a) => {
+      ctx.fillStyle = "#ffffff"; ctx.fillRect(0, 0, l, a);
+      ctx.fillStyle = "#107c41"; ctx.fillRect(0, 0, l, 44);
+      ctx.fillStyle = "#ffffff"; ctx.font = "700 26px Segoe UI, system-ui"; ctx.fillText("fx  =CONT.SES(Dados!C:C;A5)", 16, 31);
+      ctx.strokeStyle = "#d1d5db"; ctx.lineWidth = 1;
+      for (let r = 0; r < 9; r++) { ctx.beginPath(); ctx.moveTo(0, 60 + r * 30); ctx.lineTo(l, 60 + r * 30); ctx.stroke(); }
+      for (let c = 0; c < 5; c++) { ctx.beginPath(); ctx.moveTo(c * 110, 44); ctx.lineTo(c * 110, a); ctx.stroke(); }
+      ctx.fillStyle = "#334155"; ctx.font = "500 20px Segoe UI, system-ui";
+      [["Segmento", "Base", "%", "Conf."], ["Sul", "312", "31%", "OK"], ["Sudeste", "455", "45%", "OK"], ["Nordeste", "233", "23%", "OK"]]
+        .forEach((linha, r) => linha.forEach((v, c) => { ctx.fillStyle = v === "OK" ? "#16a34a" : "#334155"; ctx.fillText(v, 8 + c * 110, 82 + r * 30); }));
+    }, 512, 320) : texturaTexto((ctx, l, a) => {
       ctx.fillStyle = "#ffffff"; ctx.fillRect(0, 0, l, a);
       ctx.fillStyle = "#334155"; ctx.font = "700 40px Segoe UI, system-ui"; ctx.fillText("Evolução do NPS", 30, 60);
       [42, 47, 39, 51, 55, 58].forEach((v, i) => { ctx.fillStyle = i === 5 ? "#7c3aed" : "#a5b4fc"; ctx.fillRect(40 + i * 75, 300 - v * 4, 50, v * 4); });
@@ -413,12 +440,12 @@ function construirAndar(g, andar, equipe) {
     const cadeira = criarCadeira(); cadeira.position.z = -0.12; grupo.add(cadeira);
     const p = criarPersonagem(ag.cor, semente); grupo.add(p.grupo);
     const nivel = ag.ficha?.nivel ? ` · ${ag.ficha.nivel}` : "";
-    const sub = !ag.ativo ? "desligado" : ag.id === "banco" && !estado.bancoHabilitado ? "banco desligado" : `${ag.papel}${nivel}`;
+    const sub = `${ag.papel}${nivel}`;
     const etiqueta = rotulo(ag.nome, sub, ag.cor); etiqueta.position.set(0, 2.45, 0); etiqueta.scale.set(2.6, 0.81, 1); grupo.add(etiqueta);
     const anel = new THREE.Mesh(new THREE.TorusGeometry(0.3, 0.035, 8, 40), new THREE.MeshStandardMaterial({ color: ag.cor, emissive: ag.cor, emissiveIntensity: 0.8 }));
     anel.rotation.x = Math.PI / 2; anel.position.y = 1.98; anel.visible = false; grupo.add(anel);
-    const ok = selo("✓", "#16a34a"), erro = selo("!", "#dc2626"), zz = selo("z", "#94a3b8");
-    for (const s of [ok, erro, zz]) { s.position.set(0.42, 2.0, 0.1); grupo.add(s); }
+    const ok = selo("✓", "#16a34a"), erro = selo("!", "#dc2626"), estudo = selo("✎", "#2563eb");
+    for (const s of [ok, erro, estudo]) { s.position.set(0.42, 2.0, 0.1); grupo.add(s); }
     if (ag.id === "banco") {
       const rack = new THREE.Group(); rack.position.set(1.25, 0, -0.9);
       rack.add(caixa(0.7, 1.9, 0.6, mat("#1f2430"), 0, 0.95, 0));
@@ -430,11 +457,12 @@ function construirAndar(g, andar, equipe) {
     }
     if (i % 3 === 1) grupo.add(criarPlanta(-1.1, -0.7, 0.55));
     for (const parte of [p.grupo, mesa.grupo]) parte.traverse((o) => { if (o.isMesh) { o.userData.agente = ag.id; clicaveis.push(o); } });
-    const inativo = !ag.ativo || (ag.id === "banco" && !estado.bancoHabilitado);
-    if (inativo) { mesa.tampa.rotation.x = 1.45; zz.visible = true; }
+    // ninguém dorme: quem está sem trabalho fica de prontidão (estudando e revisando), com o notebook aberto
+    const prontidao = Boolean(ag.prontidao);
+    estudo.visible = prontidao;
     estado.estacoes.set(ag.id, {
-      agente: ag, andar, grupo, p, mesa, anel, etiqueta, selos: { ok, erro, zz }, inativo, semente,
-      mesaPos: new THREE.Vector3(x + 0.52, yBase + 0.86, z + 0.77), situacao: inativo ? "desligado" : "parado", ate: 0,
+      agente: ag, andar, grupo, p, mesa, anel, etiqueta, selos: { ok, erro, estudo }, prontidao, semente,
+      mesaPos: new THREE.Vector3(x + 0.52, yBase + 0.86, z + 0.77), situacao: "parado", ate: 0,
     });
   });
 }
@@ -442,7 +470,7 @@ function construirAndar(g, andar, equipe) {
 function construirElevador() {
   const { xElevador: x, zElevador: z } = geo;
   const vidro = new THREE.MeshStandardMaterial({ color: "#9ec5ff", transparent: true, opacity: 0.18, depthWrite: false, roughness: 0.1 });
-  const altura = ALTURA + 3.6, poco = new THREE.Group();
+  const altura = yAndar(listaAndares.at(-1)) + 3.6, poco = new THREE.Group();
   poco.add(caixa(1.7, altura, 0.04, vidro, x, altura / 2, z + 0.85, false));
   poco.add(caixa(0.04, altura, 1.7, vidro, x + 0.85, altura / 2, z, false));
   for (const [dx, dz] of [[-0.85, -0.85], [0.85, -0.85], [-0.85, 0.85], [0.85, 0.85]]) poco.add(caixa(0.07, altura, 0.07, mat("#64748b"), x + dx, altura / 2, z + dz));
@@ -454,14 +482,13 @@ function construirElevador() {
   const luz = new THREE.Mesh(new THREE.BoxGeometry(0.8, 0.03, 0.3), new THREE.MeshStandardMaterial({ color: "#fff7d6", emissive: "#fff7d6", emissiveIntensity: 1.2 }));
   luz.position.y = 2.24; cabine.add(luz);
   cabine.position.set(x, 0, z); raiz.add(cabine);
-  for (const andar of [1, 2]) {
+  for (const andar of listaAndares) {
     const p = placa(`Elevador · ${andar}º`, "#475569"); p.scale.set(1.9, 0.44, 1);
-    p.position.set(x + 0.2, (andar === 1 ? 0 : ALTURA) + 2.75, z + 1.0); (andar === 1 ? raiz : andares[2]).add(p);
-    if (andar === 2) p.position.y = 2.75;
+    p.position.set(x + 0.2, 2.75, z + 1.0); andares[andar].add(p);
   }
   elevador = { cabine, x, z };
 }
-const pontoElevador = (andar) => new THREE.Vector3(geo.xElevador, (andar === 1 ? 0 : ALTURA) + 1.0, geo.zElevador);
+const pontoElevador = (andar) => new THREE.Vector3(geo.xElevador, yAndar(andar) + 1.0, geo.zElevador);
 
 // ------------------------------------------------------------------ câmera, andares e caminhada
 let enquadramentos = {};
@@ -471,27 +498,34 @@ function enquadrarCameras() {
   const cx = (minX + maxX) / 2 + (temPainel ? largura * 300 / innerWidth * 0.32 : 0);
   const aspecto = innerWidth / innerHeight;
   const dist = Math.max(17, largura * (aspecto < 1.6 ? 1.18 : 1.04)) * (temPainel ? 1.08 : 1.3);
-  for (const andar of [1, 2]) {
-    const y = andar === 1 ? 0 : ALTURA;
+  for (const andar of listaAndares) {
+    const y = yAndar(andar);
     enquadramentos[andar] = { pos: new THREE.Vector3(cx + 1.2, y + dist * 0.6, zParede + 4.8 + dist * 0.8), alvo: new THREE.Vector3(cx + 0.8, y + 0.4, zParede + 5.6) };
   }
-  enquadramentos.predio = { pos: new THREE.Vector3(cx + 2, ALTURA * 1.3 + dist * 0.18, zParede + 6 + dist * 1.15), alvo: new THREE.Vector3(cx + 0.8, ALTURA * 0.8, zParede + 5) };
+  const topo = yAndar(listaAndares.at(-1));
+  enquadramentos.predio = { pos: new THREE.Vector3(cx + 2, topo * 0.65 + ALTURA * 0.6 + dist * 0.18, zParede + 6 + dist * 1.15 + topo * 0.7),
+                            alvo: new THREE.Vector3(cx + 0.8, topo * 0.5 + ALTURA * 0.3, zParede + 5) };
   if (!estado.iniciado) { const e = enquadramentos[estado.andarVisivel]; camera.position.copy(e.pos); controles.target.copy(e.alvo); controles.update(); }
 }
 
 function definirAndarVisivel(andar) {
   estado.andarVisivel = andar;
-  if (andares[2]) andares[2].visible = andar !== 1;
-  // no 2º andar, as placas e etiquetas do 1º não aparecem "flutuando" por baixo
-  andares[1]?.traverse((o) => { if (o.isSprite && !o.userData.selo) o.visible = andar !== 2; });
+  const vista = nivelVista(andar);
+  for (const n of listaAndares) {
+    if (!andares[n]) continue;
+    andares[n].visible = n <= vista;
+    // num andar de cima, as placas e etiquetas dos de baixo não aparecem "flutuando" por baixo da laje
+    const escondeEtiquetas = andar !== "predio" && n < vista;
+    andares[n].traverse((o) => { if (o.isSprite && !o.userData.selo) o.visible = !escondeEtiquetas; });
+  }
   document.querySelectorAll("#andares [data-andar]").forEach((b) => b.classList.toggle("ativo", b.dataset.andar === String(andar)));
 }
 
 function irParaAndar(andar, manual = false) {
   if (manual) estado.ultimoManual = performance.now();
   const destino = enquadramentos[andar]; if (!destino) return;
-  const subindo = andar !== 1;
-  if (subindo) definirAndarVisivel(andar); // mostra o 2º andar antes de a câmera subir
+  const subindo = nivelVista(andar) >= nivelVista(estado.andarVisivel);
+  if (subindo) definirAndarVisivel(andar); // mostra o andar de cima antes de a câmera subir
   voo = { t0: performance.now(), dur: 1100, dePos: camera.position.clone(), deAlvo: controles.target.clone(),
           paraPos: destino.pos.clone(), paraAlvo: destino.alvo.clone(), aoTerminar: subindo ? null : () => definirAndarVisivel(andar) };
   if (!subindo) estado.andarVisivel = andar;
@@ -504,7 +538,8 @@ addEventListener("keydown", (e) => {
   if (["INPUT", "TEXTAREA", "SELECT"].includes(document.activeElement?.tagName)) return;
   if (e.code === "Digit1") return irParaAndar(1, true);
   if (e.code === "Digit2") return irParaAndar(2, true);
-  if (e.code === "Digit3") return irParaAndar("predio", true);
+  if (e.code === "Digit3" && listaAndares.includes(3)) return irParaAndar(3, true);
+  if (e.code === "Digit4" || e.code === "KeyP") return irParaAndar("predio", true);
   if (e.code === "KeyF") return alternarSeguir();
   if (e.key === "Escape") return irParaAndar(estado.andarVisivel, true);
   if (["KeyW", "KeyA", "KeyS", "KeyD", "KeyQ", "KeyE", "ArrowUp", "ArrowDown", "ArrowLeft", "ArrowRight", "ShiftLeft", "ShiftRight"].includes(e.code)) {
@@ -554,10 +589,11 @@ function desenharTV(andar) {
   const tv = tvs[andar]; if (!tv) return;
   const ctx = tv.canvas.getContext("2d"), l = 1024, a = 512;
   const grad = ctx.createLinearGradient(0, 0, l, a);
-  grad.addColorStop(0, andar === 1 ? "#0f1b3d" : "#1e1038"); grad.addColorStop(1, andar === 1 ? "#1d3fb0" : "#6d28d9");
+  const [c0, c1] = COR_TV[andar] || COR_TV[2];
+  grad.addColorStop(0, c0); grad.addColorStop(1, c1);
   ctx.fillStyle = grad; ctx.fillRect(0, 0, l, a);
   ctx.fillStyle = "rgba(255,255,255,.85)"; ctx.font = "600 34px Segoe UI, system-ui, sans-serif"; ctx.textAlign = "left";
-  ctx.fillText(andar === 1 ? "HOJE NA ENGENHARIA" : "HOJE NA ANÁLISE", 48, 70);
+  ctx.fillText(andar === 1 ? "HOJE NA ENGENHARIA" : andar === 3 ? "HOJE NA SALA EXCEL" : "HOJE NA ANÁLISE", 48, 70);
   ctx.textAlign = "right"; ctx.fillStyle = estado.ligado ? "#7fe0b4" : "#f5b445";
   ctx.fillText(estado.ligado ? "● Monitorando" : "● Pausado", l - 48, 70); ctx.textAlign = "left";
   let blocos;
@@ -565,6 +601,9 @@ function desenharTV(andar) {
     const k = estado.kpis || {};
     blocos = [["Aprovados", k.hoje_sucesso ?? 0, "#7fe0b4"], ["Reprovados", k.hoje_reprovado ?? 0, "#ff9a85"],
       ["Na fila", estado.fila.length, "#ffd27a"], ["Linhas", k.hoje_linhas ?? 0, "#a9c1ff"]];
+  } else if (andar === 3) {
+    const x = estado.excelHoje || {};
+    blocos = [["Entregas", x.entregas ?? 0, "#86efac"], ["Conferências", x.conferencias ?? 0, "#7fe0b4"], ["Divergências", 0, "#ffd27a"]];
   } else {
     const h = estado.analiseHoje || {};
     blocos = [["Bases", h.bases ?? 0, "#f0abfc"], ["Diferenças reais", h.destaques ?? 0, "#7fe0b4"], ["Alertas", h.alertas ?? 0, "#ffd27a"]];
@@ -581,6 +620,13 @@ function desenharTV(andar) {
     ctx.fillText(linhas.length ? `Último resumo · ${estado.analiseHoje.ultimo_arquivo}` : "Nenhuma análise hoje ainda", 48, 330, l - 96);
     ctx.font = "400 23px Segoe UI, system-ui, sans-serif"; ctx.fillStyle = "rgba(255,255,255,.8)";
     linhas.forEach((t, i) => ctx.fillText(String(t).trim(), 48, 370 + i * 34, l - 96));
+  } else if (andar === 3) {
+    const x = estado.excelHoje || {};
+    ctx.fillStyle = "rgba(255,255,255,.92)"; ctx.font = "600 26px Segoe UI, system-ui, sans-serif";
+    ctx.fillText(x.ultimo ? `Última entrega · ${x.ultimo}` : "Nenhuma entrega Excel hoje ainda", 48, 330, l - 96);
+    ctx.font = "400 23px Segoe UI, system-ui, sans-serif"; ctx.fillStyle = "rgba(255,255,255,.8)";
+    ["Toda fórmula é recalculada e comparada com o Python na aba Conferência.",
+     "Ricardo só assina quando 100% das conferências fecham."].forEach((t, i) => ctx.fillText(t, 48, 370 + i * 34, l - 96));
   } else {
     ctx.fillStyle = "rgba(255,255,255,.55)"; ctx.font = "400 26px Segoe UI, system-ui, sans-serif";
     ctx.fillText(`Atualizado ${new Date().toLocaleTimeString("pt-BR")}`, 48, 475);
@@ -633,8 +679,11 @@ const FRASE = {
   analise_relator: "está escrevendo o resumo executivo de",
   supervisor: "está conferindo (conciliação de linhas e integridade) antes de publicar", dba: "está conferindo no PostgreSQL, antes do commit,",
   coord_engenharia: "está passando o checklist de produção de", coord_analise: "está revisando as análises de",
+  excel_pesquisa: "está montando o plano tabular (CONT.SES) de", excel_formulas: "está escrevendo as fórmulas de NPS, CSAT e margem de",
+  excel_trade: "está montando o SOMASES de trade (loja, canal, SKU) de", excel_dinamicas: "está organizando o resumo e o guia de uso de",
+  excel_supervisor: "está conferindo célula a célula, contra o Python, a entrega de",
 };
-const DURACAO_EXTRA = { supervisor: 2.4, dba: 1.6, coord_engenharia: 2.0, coord_analise: 2.0 };
+const DURACAO_EXTRA = { supervisor: 2.4, dba: 1.6, coord_engenharia: 2.0, coord_analise: 2.0, excel_supervisor: 2.2 };
 
 function idAgente(etapa) {
   if (etapa.startsWith("agente:")) return etapa.slice(7);
@@ -647,7 +696,7 @@ function definirSituacao(id, situacao, segundos = 0) {
   e.situacao = situacao; e.ate = segundos ? performance.now() + segundos * 1000 : 0;
   e.anel.visible = situacao === "trabalhando";
   e.selos.ok.visible = situacao === "ok"; e.selos.erro.visible = situacao === "erro";
-  e.selos.zz.visible = situacao === "desligado";
+  e.selos.estudo.visible = situacao === "parado" && e.prontidao;
   e.mesa.logo.material.emissiveIntensity = situacao === "trabalhando" ? 1.6 : 0.15;
   desenharEquipe();
 }
@@ -671,11 +720,11 @@ function iniciarEvento(ev) {
       definirSituacao("publicacao", "parado"); narrar(`⏳ ${curto} adiado — o robô tenta de novo em instantes`);
     } else if (ev.status === "sucesso") {
       doc.faixa.material.color.set("#16a34a");
-      if (doc.andar === 2) {
-        total = moverDocumento(doc, prateleira.mundo, dur * 1000, 2); final = "relatorios";
+      if (doc.andar >= 2 && prateleiras[doc.andar]) {
+        total = moverDocumento(doc, prateleiras[doc.andar].mundo, dur * 1000, doc.andar); final = "relatorios";
         empilhar(pilhaTratadas, caixaTratadas, "#dcfce7");
-        definirSituacao("analise_relator", "ok", 2.2);
-        narrar(`✅ ${curto} aprovado — ${num(ev.linhas)} linhas em Bases-Tratadas${ev.banco ? " e no PostgreSQL" : ""}; análise em Bases-Relatorios`);
+        definirSituacao(doc.andar === 3 ? "excel_supervisor" : "analise_relator", "ok", 2.2);
+        narrar(`✅ ${curto} aprovado — ${num(ev.linhas)} linhas em Bases-Tratadas${ev.banco ? " e no PostgreSQL" : ""}; análise e entrega Excel em Bases-Relatorios`);
       } else {
         total = moverDocumento(doc, caixaTratadas.clone().add(new THREE.Vector3(0, 0.3, 0)), dur * 1000, 1); final = "tratadas";
         definirSituacao("publicacao", "ok", 2.2);
@@ -687,7 +736,7 @@ function iniciarEvento(ev) {
       narrar(`⛔ ${curto} reprovado — ${num(ev.erros)} erro(s). Veja em Reprovados no painel`);
     }
     seguirPara(doc.andar);
-    estado.tocando = { ev, fim: performance.now() + Math.max(dur * 1000, total + 200), doc, final };
+    estado.tocando = { ev, fim: performance.now() + Math.max(dur * 1000, total + 200), doc, final, andarFinal: doc.andar };
     return;
   }
 
@@ -701,7 +750,7 @@ function iniciarEvento(ev) {
     est.caminho = caminhoAte(est, local);
     const distancia = est.caminho.reduce((d, p, i) => d + (i ? p.distanceTo(est.caminho[i - 1]) : p.distanceTo(est.grupo.position)), 0);
     seguirPara(est.andar);
-    estado.equipe.forEach((a) => { const e = estado.estacoes.get(a.id); if (e && e.situacao === "trabalhando") definirSituacao(a.id, e.inativo ? "desligado" : "parado"); });
+    estado.equipe.forEach((a) => { const e = estado.estacoes.get(a.id); if (e && e.situacao === "trabalhando") definirSituacao(a.id, "parado"); });
     definirSituacao(id, "trabalhando");
     narrar(`${est.agente.nome} (${est.agente.papel}) ${FRASE[id] || "está conferindo"} ${curto}`);
     estado.tocando = { ev, fim: performance.now() + (Math.min(3.5, distancia / 2.6) + (DURACAO_EXTRA[id] || 1.8) * velocidade) * 1000, id };
@@ -711,10 +760,10 @@ function iniciarEvento(ev) {
   const trocaAndar = est.andar !== doc.andar;
   const deslocamento = moverDocumento(doc, est.mesaPos, Math.min(900, dur * 450), est.andar);
   seguirPara(est.andar);
-  estado.equipe.forEach((a) => { const e = estado.estacoes.get(a.id); if (e && e.situacao === "trabalhando") definirSituacao(a.id, e.inativo ? "desligado" : "parado"); });
+  estado.equipe.forEach((a) => { const e = estado.estacoes.get(a.id); if (e && e.situacao === "trabalhando") definirSituacao(a.id, "parado"); });
   definirSituacao(id, "trabalhando");
   const frase = FRASE[id] || FRASE[ev.etapa] || "está trabalhando em";
-  narrar(`${trocaAndar ? "⬆ Subiu para a análise · " : ""}${est.agente.nome} (${est.agente.papel || "agente"}) ${frase} ${curto}`);
+  narrar(`${trocaAndar ? `⬆ Subiu para o ${est.andar}º andar · ` : ""}${est.agente.nome} (${est.agente.papel || "agente"}) ${frase} ${curto}`);
   estado.tocando = { ev, fim: performance.now() + dur * 1000 + (trocaAndar ? deslocamento : 0), id };
 }
 
@@ -726,26 +775,26 @@ function finalizarEvento() {
     raiz.remove(t.doc.g); estado.documentos.delete(t.doc.arquivo);
     if (t.final === "tratadas") empilhar(pilhaTratadas, caixaTratadas, "#dcfce7");
     else if (t.final === "erros") empilhar(pilhaErros, caixaErros, "#fee2e2");
-    else if (t.final === "relatorios") empilhar(pilhaRelatorios, prateleira.local, "#ede9fe", andares[2]);
+    else if (t.final === "relatorios") empilhar(pilhasRelatorios[t.andarFinal], prateleiras[t.andarFinal].local, t.andarFinal === 3 ? "#dcfce7" : "#ede9fe", andares[t.andarFinal]);
   }
 }
 
 function narrar(texto) { $("#hud-agora").textContent = texto; }
 
 // ------------------------------------------------------------------ interface lateral (equipe e ficha profissional)
-const NOME_SITUACAO = { parado: "livre", trabalhando: "trabalhando", ok: "concluiu", erro: "barrou", desligado: "desligado" };
-const CLASSE_SITUACAO = { trabalhando: "trabalhando", ok: "ok", erro: "erro", desligado: "desligado" };
+const NOME_SITUACAO = { parado: "de plantão", trabalhando: "trabalhando", ok: "concluiu", erro: "barrou", prontidao: "de prontidão" };
+const CLASSE_SITUACAO = { trabalhando: "trabalhando", ok: "ok", erro: "erro", prontidao: "prontidao" };
 
 function desenharEquipe() {
   const html = [];
-  for (const andar of [2, 1]) {
-    const membros = estado.equipe.filter((a) => (a.andar === 2 ? 2 : 1) === andar);
+  for (const andar of [...listaAndares].reverse()) {
+    const membros = estado.equipe.filter((a) => andarDe(a) === andar);
     if (!membros.length) continue;
     html.push(`<h3><button class="link-andar" data-ir-andar="${andar}">${NOME_ANDAR[andar]} (${membros.length})</button></h3>`);
     for (const a of membros) {
-      const e = estado.estacoes.get(a.id); const sit = e?.situacao || "parado";
+      const e = estado.estacoes.get(a.id); const sit = e?.situacao === "parado" && e.prontidao ? "prontidao" : e?.situacao || "parado";
       const n = estado.agentesNumeros[a.id];
-      const detalhe = n ? `${num(n.valor)} ${n.rotulo}` : a.skills.length ? `${a.skills.length} skill(s)` : a.papel;
+      const detalhe = a.prontidao ? a.prontidao : n ? `${num(n.valor)} ${n.rotulo}` : a.skills.length ? `${a.skills.length} skill(s)` : a.papel;
       const nivel = a.ficha?.nivel ? `<em class="nivel">${esc(a.ficha.nivel)}</em>` : "";
       html.push(`<button class="membro ${estado.selecionado === a.id ? "selecionado" : ""}" data-agente="${esc(a.id)}">
         <span class="avatar" style="background:${esc(a.cor)}">${esc(a.nome.slice(0, 1))}</span>
@@ -769,8 +818,9 @@ function mostrarFicha(id) {
       <button class="btn fantasma pequeno fechar" data-fechar aria-label="Fechar">✕</button></header>
     <div class="chips-colunas">${f.nivel ? `<span class="etiqueta info">${esc(f.nivel)}</span>` : ""}${f.area ? `<span class="etiqueta">${esc(f.area)}</span>` : ""}
       ${f.provas ? `<span class="etiqueta ${f.provas.aprovado ? "sucesso" : "perigo"}">Provas técnicas ${f.provas.acertos}/${f.provas.total}</span>` : ""}
-      <span class="etiqueta">${NOME_ANDAR[a.andar === 2 ? 2 : 1].split(" · ")[0]}</span></div>
+      <span class="etiqueta">${(NOME_ANDAR[andarDe(a)] || `${andarDe(a)}º andar`).split(" · ")[0]}</span></div>
     <p>${esc(a.descricao)}</p>
+    ${a.prontidao ? `<p class="muted">Agora: ${esc(a.prontidao)}. Ninguém aqui dorme — sem arquivo, a pessoa estuda e revisa o próprio método.</p>` : ""}
     ${n ? `<div><div class="numero">${num(n.valor)}</div><span class="muted">${esc(n.rotulo)}</span></div>` : ""}
     ${lista("Metodologias e referências", f.metodologias)}
     ${lista("Responsabilidades", f.responsabilidades)}
@@ -841,8 +891,8 @@ async function atualizar() {
   try {
     const d = await api(`/api/escritorio?desde=${estado.ultimoSeq}`);
     estado.ligado = d.ligado; estado.fila = d.fila || []; estado.agentesNumeros = d.agentes || {};
-    estado.bancoHabilitado = Boolean(d.banco_habilitado); estado.analiseHoje = d.analise_hoje || null;
-    const chave = JSON.stringify((d.equipe || []).map((a) => [a.id, a.nome, a.papel, a.cor, a.ativo, a.andar, a.skills.length, a.ficha?.nivel])) + estado.bancoHabilitado;
+    estado.bancoHabilitado = Boolean(d.banco_habilitado); estado.analiseHoje = d.analise_hoje || null; estado.excelHoje = d.excel_hoje || null;
+    const chave = JSON.stringify((d.equipe || []).map((a) => [a.id, a.nome, a.papel, a.cor, a.prontidao, a.andar, a.ronda, a.skills.length, a.ficha?.nivel])) + estado.bancoHabilitado;
     if (chave !== estado.chaveEquipe) {
       estado.chaveEquipe = chave; estado.equipe = d.equipe || [];
       estado.documentos.forEach((doc) => raiz.remove(doc.g)); estado.documentos.clear();
@@ -860,7 +910,7 @@ async function atualizar() {
     if (!estado.tocando && !estado.filaEventos.length && !estado.documentos.size) {
       narrar(estado.fila.length ? `${estado.fila.length} arquivo(s) aguardando sincronização na recepção` : "Aguardando planilhas em Bases-Limpeza…");
     }
-    atualizarPilhaEntrada(); desenharEquipe(); desenharTV(2);
+    atualizarPilhaEntrada(); desenharEquipe(); desenharTV(2); desenharTV(3);
   } catch {
     $("#hud-status").innerHTML = `<i class="ponto erro"></i>Sem conexão com o robô`;
   }
@@ -919,9 +969,9 @@ function animar() {
   if (estado.tocando && agora >= estado.tocando.fim) finalizarEvento();
 
   for (const [id, e] of estado.estacoes) {
-    if (e.ate && agora > e.ate) definirSituacao(id, e.inativo ? "desligado" : "parado");
-    if (e.movel && e.situacao !== "desligado") andarAgente(e, dt, t);
-    if (e.andar === 2 && !andares[2]?.visible) continue;
+    if (e.ate && agora > e.ate) definirSituacao(id, "parado");
+    if (e.movel) andarAgente(e, dt, t);
+    if (!andares[e.andar]?.visible) continue;
     if (e.movel) { e.anel.rotation.z += 0.06; continue; }
     const fase = e.semente % 100;
     const { tronco, cabeca, bracos } = e.p;
@@ -937,9 +987,11 @@ function animar() {
     } else if (e.situacao === "ok") {
       bracos[0].rotation.x = -2.6; bracos[1].rotation.x = -2.6;
       tronco.position.y = e.p.alturaTronco + Math.abs(Math.sin(t * 6)) * 0.05;
-    } else if (e.situacao === "desligado") {
-      cabeca.rotation.x = 0.45; bracos[0].rotation.x = -0.9; bracos[1].rotation.x = -0.9;
-      e.selos.zz.position.y = 2.0 + Math.sin(t * 1.5) * 0.08;
+    } else if (e.prontidao) { // estudando: lê no notebook e digita devagar, olhando a tela
+      bracos[0].rotation.x = -1.15 + Math.sin(t * 5 + fase) * 0.06;
+      bracos[1].rotation.x = -1.15 + Math.sin(t * 5 + fase + 2) * 0.06;
+      cabeca.rotation.x = 0.22 + Math.sin(t * 0.7 + fase) * 0.04; cabeca.rotation.y = Math.sin(t * 0.5 + fase) * 0.1;
+      e.selos.estudo.position.y = 2.0 + Math.sin(t * 1.5) * 0.06;
     } else {
       bracos[0].rotation.x += (-1.0 - bracos[0].rotation.x) * 0.1;
       bracos[1].rotation.x += (-1.0 - bracos[1].rotation.x) * 0.1;
@@ -959,7 +1011,7 @@ function animar() {
   });
 
   for (const doc of estado.documentos.values()) {
-    doc.g.visible = doc.andar === 1 || Boolean(andares[2]?.visible);
+    doc.g.visible = Boolean(andares[doc.andar]?.visible);
     const seg = doc.rota[0];
     if (!seg) continue;
     if (!seg.t0) { seg.t0 = agora; seg.de = doc.g.position.clone(); }
