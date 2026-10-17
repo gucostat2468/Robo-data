@@ -57,14 +57,14 @@ def fazer_backup(cfg) -> dict:
     """Faz o backup agora. Nunca levanta exceção: o resultado diz o que aconteceu."""
     if not cfg.banco.get("habilitado"):
         return {"ok": False, "motivo": "PostgreSQL desligado nas Configurações: não há o que copiar."}
-    from robo.banco import Banco
-    b = Banco(cfg.banco, cfg.base)
-    p = b._parametros()
     carimbo = datetime.now().strftime("%Y%m%d_%H%M%S")
     destino = pasta(cfg) / carimbo
-    destino.mkdir(parents=True, exist_ok=True)
     inicio = datetime.now()
     try:
+        from robo.banco import Banco
+        b = Banco(cfg.banco, cfg.base)
+        p = b._parametros()
+        destino.mkdir(parents=True, exist_ok=True)
         pg_dump = localizar_pg_dump()
         if pg_dump:
             arquivo = destino / f"{p['dbname']}.dump"
@@ -125,7 +125,7 @@ def rotina(cfg) -> dict | None:
     if not c.get("habilitado", True) or not cfg.banco.get("habilitado"):
         return None
     u = ultimo(cfg)
-    if u and u.get("ok") and datetime.now() - datetime.strptime(u["data_hora"], "%Y-%m-%d %H:%M:%S") < timedelta(hours=float(c["intervalo_horas"])):
+    if u and u.get("ok") and u.get("data_hora") and datetime.now() - datetime.strptime(u["data_hora"], "%Y-%m-%d %H:%M:%S") < timedelta(hours=float(c["intervalo_horas"])):
         return None
     r = fazer_backup(cfg)
     try:

@@ -265,14 +265,17 @@ class Banco:
             tabela = f"{base}_{normalizar_nome_coluna(aba)}" if varias else base
             nomes, vistos = [], set()
             for c in df.columns:
-                n = normalizar_nome_coluna(c)
-                while n in vistos or n.startswith("_"):
+                # colunas da planilha não podem colidir com as de controle (que começam com "_")
+                n = normalizar_nome_coluna(c).lstrip("_") or "coluna"
+                while n in vistos:
                     n = f"{n}_x"
                 vistos.add(n)
                 nomes.append(n)
             dados = pd.DataFrame({n: [None if pd.isna(v) else _texto_de(v) for v in df[c]] for n, c in zip(nomes, df.columns)})
-            dados.insert(0, "_linha_origem", list(df.index))
-            dados["_aba"] = aba
+            # abas empilhadas têm a linha no formato "Fev!12": vira aba "Fev" + linha 12
+            origem = [str(i).rsplit("!", 1) if "!" in str(i) else [aba, i] for i in df.index]
+            dados.insert(0, "_linha_origem", [int(linha) for _, linha in origem])
+            dados["_aba"] = [a for a, _ in origem]
             dados["_arquivo_origem"] = arquivo
             dados["_lote_id"] = lote_id
             dados["_carregado_em"] = pd.Timestamp(datetime.now())

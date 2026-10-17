@@ -74,6 +74,10 @@ def ler(id_consulta: str, pasta: Path = PASTA_PADRAO) -> dict:
 def executar(banco, id_consulta: str, pasta: Path = PASTA_PADRAO, limite: int = LIMITE_LINHAS) -> dict:
     """Roda a consulta em transação SOMENTE LEITURA com tempo limite de 60 s."""
     texto = caminho_seguro(id_consulta, pasta).read_text(encoding="utf-8-sig")
+    sem_comentarios = re.sub(r"--[^\n]*|/\*.*?\*/", " ", texto, flags=re.S)
+    if re.search(r"\b(commit|rollback|begin|start\s+transaction|savepoint|set\s+(session|transaction))\b",
+                 sem_comentarios, re.IGNORECASE):
+        raise ValueError("Consulta recusada: o painel só roda consultas de leitura (sem COMMIT/ROLLBACK/BEGIN).")
     inicio = time.perf_counter()
     with banco.conectar() as conn:
         with conn.transaction():

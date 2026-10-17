@@ -167,3 +167,22 @@ def teste_banco_fora_do_ar_adia_sem_mexer_no_arquivo(planilha_baguncada, cfg_fac
     assert r.status == ADIADO
     assert planilha_baguncada.exists()
     assert not (cfg.tratadas / "nps_outubro.xlsx").exists()
+
+
+def teste_abas_empilhadas_carregam_no_banco_com_aba_e_linha(pastas, cfg_factory, banco_cfg):
+    """Várias abas com o mesmo cabeçalho (uma por mês) + PostgreSQL: não pode travar, e cada linha guarda aba e linha."""
+    from openpyxl import Workbook
+    wb = Workbook()
+    for i, mes in enumerate(["Jan", "Fev"]):
+        ws = wb.active if i == 0 else wb.create_sheet()
+        ws.title = mes
+        ws.append(["ID", "_Interna", "Nota"])
+        for j in range(1, 4):
+            ws.append([i * 10 + j, "x", j])
+    caminho = pastas / "Bases-Limpeza" / "mensal.xlsx"
+    wb.save(caminho)
+    r = processar_arquivo(caminho, cfg_factory([], banco=banco_cfg))
+    assert r.status == SUCESSO, [o.mensagem for o in r.relatorio.erros]
+    linhas = _q(banco_cfg, "SELECT _aba, _linha_origem FROM bruto.mensal ORDER BY _aba, _linha_origem")
+    assert linhas == [("Fev", 2), ("Fev", 3), ("Fev", 4), ("Jan", 2), ("Jan", 3), ("Jan", 4)]
+    assert _q(banco_cfg, "SELECT count(*) FROM tratado.mensal")[0][0] == 6
