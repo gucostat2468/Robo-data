@@ -211,6 +211,13 @@ class Api:
         equipe += [{**a, "nativo": True, "aceita_habilidades": False, "habilidades": [], "ativo": True,
                     "ronda": a["id"] == "canal_helena", "prontidao": "",
                     "ficha": _ficha_curta(rh.ficha({"id": a["id"], "habilidades": []}))} for a in EQUIPE_CANAL]
+        from robo import ti
+        ronda_ti = ti.ultima_ronda(cfg) or {}
+        status_ti = {i["id"]: i for i in ronda_ti.get("itens") or []}
+        equipe += [{"id": p["id"], "nome": p["nome"], "papel": p["cargo"].split(" — ")[0], "cor": p["cor"], "andar": 5,
+                    "descricao": "; ".join(p["escopo"]), "nativo": True, "aceita_habilidades": False, "habilidades": [],
+                    "ativo": True, "ronda": p["nivel"] == "coordenador", "prontidao": "",
+                    "ficha": _ficha_curta(rh.ficha({"id": p["id"], "habilidades": []}))} for p in ti.EQUIPE_TI]
         for a in equipe:
             if not a.get("ativo", True):  # agente personalizado pausado pelo dono: segue estudando, não dorme
                 a["ativo"], a["prontidao"] = True, "em treinamento (pausado por você na tela Agentes)"
@@ -237,10 +244,14 @@ class Api:
                 **{k: {"valor": excel_hoje["entregas"], "rotulo": "entregas Excel hoje"}
                    for k in ("excel_pesquisa", "excel_formulas", "excel_trade", "excel_dinamicas")},
                 **conferencias_hoje,
+                **{i: {"valor": len(x["achados"]), "rotulo": "alerta(s) na última ronda" if x["achados"] else "tudo OK na última ronda"}
+                   for i, x in status_ti.items()},
             },
             "analise_hoje": self._analise_hoje(hoje),
             "excel_hoje": excel_hoje,
             "canal_hoje": self._canal_hoje(cfg),
+            "ti": {"saudavel": ronda_ti.get("saudavel"), "data_hora": ronda_ti.get("data_hora"),
+                   "alertas": [a for i in ronda_ti.get("itens") or [] for a in i["achados"]][:5]},
         })
         return dados
 
@@ -430,14 +441,71 @@ class Api:
                        "areas": rh.AREAS}}
 
     def agente_salvar(self, b) -> dict:
-        from robo.agentes import ErroAgente
+        from robo.agentes import IDS_NATIVOS, ErroAgente
         from robo.pipeline import obter_equipe
+        dados = b.get("agente") or {}
+        novo = not (self.cfg.agentes / f"{dados.get('id', '')}.yaml").exists()
         try:
-            a = obter_equipe(self.cfg).salvar(b.get("agente") or {})
+            if novo and dados.get("id") not in IDS_NATIVOS:
+                from robo.contratacao import contratar_manual
+                a = contratar_manual(self.cfg, dados)  # contratação: anuncia no canal e aplica experiência de estagiário
+            else:
+                a = obter_equipe(self.cfg).salvar(dados)
         except ErroAgente as e:
             raise ErroApi(str(e))
         log.info("Agente %s salvo pelo painel", a.get("nome") or a.get("id"))
         return {"ok": True, "id": a["id"]}
+
+    def agente_manual(self, b) -> dict:
+        from robo.agentes import ErroAgente
+        from robo.pipeline import obter_equipe
+        try:
+            obter_equipe(self.cfg).salvar_manual(str(b.get("id", "")), str(b.get("texto", "")))
+        except ErroAgente as e:
+            raise ErroApi(str(e))
+        return {"ok": True}
+
+    def agente_manual_ler(self, q) -> dict:
+        from robo.pipeline import obter_equipe
+        return {"texto": obter_equipe(self.cfg).manual(q.get("id", [""])[0])}
+
+    # ------------------------------------------------------------ canal da equipe (offline)
+    def canal(self, q) -> dict:
+        from robo.canal import CANAIS, Canal, pessoas
+        c = Canal(self.cfg)
+        p = lambda k: q.get(k, [""])[0]
+        msgs = c.listar(canal=p("canal"), autor=p("autor"), tipo=p("tipo"), busca=p("busca"),
+                        dias=int(p("dias") or 0), desde_id=int(p("desde") or 0), limite=int(p("limite") or 300))
+        numero, ini, fim = c.sprint_de(date.today())
+        gente = pessoas()
+        autores = sorted({m["autor"] for m in c.listar(limite=5000)})
+        return {"mensagens": msgs, "canais": CANAIS,
+                "autores": [{"id": a, "nome": gente.get(a, {}).get("nome", a), "papel": gente.get(a, {}).get("papel", "")}
+                            for a in autores],
+                "sprint": {"numero": numero, "inicio": ini.isoformat(), "fim": fim.isoformat(),
+                           "dias_restantes": (fim - date.today()).days}}
+
+    def canal_enviar(self, b) -> dict:
+        from robo.canal import Canal
+        texto = str(b.get("texto", "")).strip()
+        if not texto:
+            raise ErroApi("Escreva uma mensagem.")
+        return {"mensagens": Canal(self.cfg).perguntar(texto, str(b.get("canal") or "geral"))}
+
+    def canal_sprint(self, _b) -> dict:
+        from robo.canal import Canal
+        c = Canal(self.cfg)
+        c.sincronizar()
+        return {"mensagens": c.publicar_sprint()}
+
+    # ------------------------------------------------------------ TI (5º andar)
+    def ti(self, _q) -> dict:
+        from robo import ti
+        return {"ronda": ti.ultima_ronda(self.cfg), "intervalo_minutos": ti._c(self.cfg)["intervalo_minutos"]}
+
+    def ti_ronda(self, _b) -> dict:
+        from robo import ti
+        return {"ronda": ti.ronda(self.cfg)}
 
     def agente_excluir(self, b) -> dict:
         from robo.agentes import ErroAgente
@@ -680,7 +748,8 @@ ROTAS_GET = {
     "/api/ping": lambda api, q: {"app": "robo-planilhas", "versao": __version__},
     "/api/estado": Api.estado, "/api/escritorio": Api.escritorio, "/api/agentes": Api.agentes, "/api/historico": Api.historico, "/api/execucao": Api.execucao,
     "/api/reprovados": Api.reprovados, "/api/log": Api.log, "/api/config": Api.config,
-    "/api/banco/resumo": Api.banco_resumo, "/api/consultas": Api.consultas, "/api/consulta": Api.consulta,
+    "/api/banco/resumo": Api.banco_resumo, "/api/canal": Api.canal, "/api/ti": Api.ti,
+    "/api/agentes/manual": Api.agente_manual_ler, "/api/consultas": Api.consultas, "/api/consulta": Api.consulta,
 }
 ROTAS_POST = {
     "/api/robo/ligar": Api.ligar, "/api/robo/pausar": Api.pausar, "/api/robo/processar-agora": Api.processar_agora,
@@ -689,7 +758,8 @@ ROTAS_POST = {
     "/api/config/recarregar": Api.recarregar, "/api/banco/testar": Api.banco_testar,
     "/api/banco/modelos": Api.banco_modelos, "/api/manutencao": Api.manutencao,
     "/api/consultas/executar": Api.consulta_executar, "/api/agentes/salvar": Api.agente_salvar,
-    "/api/agentes/excluir": Api.agente_excluir, "/api/inicializacao": Api.inicializacao, "/api/atalhos": Api.atalhos, "/api/sair": Api.sair,
+    "/api/agentes/excluir": Api.agente_excluir, "/api/agentes/manual/salvar": Api.agente_manual,
+    "/api/canal/enviar": Api.canal_enviar, "/api/canal/sprint": Api.canal_sprint, "/api/ti/ronda": Api.ti_ronda, "/api/inicializacao": Api.inicializacao, "/api/atalhos": Api.atalhos, "/api/sair": Api.sair,
 }
 ROTAS_UPLOAD = {"/api/testar": Api.testar, "/api/enviar": Api.enviar}
 

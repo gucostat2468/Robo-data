@@ -111,7 +111,29 @@ class ControleRobo:
                 monitor.ciclo()
             except Exception:
                 log.exception("Erro no ciclo do monitor")
+            self._rotinas()
             parar.wait(monitor.intervalo)
+
+    def _rotinas(self):
+        """Rotinas da empresa que não dependem de arquivo novo: canal (a cada minuto) e ronda de TI (a cada 30 min)."""
+        if not self.cfg:
+            return
+        agora = time.time()
+        if agora - getattr(self, "_ultimo_canal", 0) >= 60:
+            self._ultimo_canal = agora
+            try:
+                from robo.canal import Canal
+                Canal(self.cfg).sincronizar()
+            except Exception:
+                log.exception("Falha ao sincronizar o canal da equipe")
+        from robo.ti import _c as cfg_ti
+        if agora - getattr(self, "_ultima_ronda_ti", 0) >= 60 * float(cfg_ti(self.cfg)["intervalo_minutos"]):
+            self._ultima_ronda_ti = agora
+            try:
+                from robo.ti import ronda
+                ronda(self.cfg)
+            except Exception:
+                log.exception("Falha na ronda de TI")
 
     def processar_agora(self) -> bool:
         if not self.monitor:

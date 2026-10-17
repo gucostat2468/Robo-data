@@ -436,7 +436,8 @@ def _provas_nativas_cache() -> dict:
             resultado[a] = [{"prova": "Execução das provas", "aprovado": False, "motivo": f"{type(e).__name__}: {e}"}]
     # quadro de pessoal (gerentes, plenos, juniores, estagiários) e equipe do canal
     from robo import canal, quadro
-    for grupo, ids in ((quadro.provas_quadro, [p["id"] for p in quadro.QUADRO]),
+    from robo import ti
+    for grupo, ids in ((quadro.provas_quadro, [p["id"] for p in quadro.QUADRO]), (ti.provas_ti, list(ti.POR_ID)),
                        (canal.provas_canal, ["canal_nina", "canal_iara", "canal_helena", "ger_operacoes"])):
         try:
             for agente, casos in grupo().items():
@@ -629,6 +630,9 @@ def _nome_pessoa(pid: str) -> str:
     try:
         from robo.canal import pessoas
         from robo.quadro import POR_ID
+        from robo.ti import POR_ID as TI
+        if pid in TI:
+            return f"{TI[pid]['nome']} ({TI[pid]['cargo'].split(' — ')[0]})"
         if pid in POR_ID:
             return f"{POR_ID[pid]['nome']} ({POR_ID[pid]['cargo'].split(' — ')[0]})"
         p = pessoas().get(pid)
@@ -640,7 +644,15 @@ def _nome_pessoa(pid: str) -> str:
 def ficha(agente: dict) -> dict:
     """Ficha profissional + resultado do processo seletivo."""
     base = dict(FICHAS.get(agente["id"], {}))
-    from robo import quadro
+    from robo import quadro, ti
+    if not base and agente["id"] in ti.POR_ID:
+        p = ti.POR_ID[agente["id"]]
+        esc = quadro.ESCOPO_NIVEL[p["nivel"]]
+        base = {"cargo": p["cargo"], "nivel": p["nivel"], "area": p["area"], "metodologias": p["metodologias"],
+                "responsabilidades": p["escopo"], "criterios": p["criterios"],
+                "limites": (p.get("nao_faz") or [quadro._frase(esc["nao_faz"])]) + [
+                    f"Decide: {esc['decide']}", "Não bloqueia planilhas: alerta no canal #ti e entra na sprint"],
+                "gestor": "Você (dono)" if ti.GESTORES[p["id"]] == "dono" else _nome_pessoa(ti.GESTORES[p["id"]])}
     if not base and agente["id"] in quadro.POR_ID:
         p = quadro.POR_ID[agente["id"]]
         esc = quadro.ESCOPO_NIVEL[p["nivel"]]

@@ -516,9 +516,12 @@ def lotacao() -> dict:
     pessoas = [(a["id"], 1) for a in NATIVOS] + [(a["id"], a["andar"]) for a in SUPERVISORES]
     pessoas += [(f"analise_{a['id']}", 2) for a in ANALISTAS] + [(a["id"], 3) for a in EQUIPE_EXCEL]
     pessoas += [(p["id"], p["andar"]) for p in QUADRO] + [(a["id"], a["andar"]) for a in EQUIPE_CANAL]
+    from robo.ti import EQUIPE_TI
+    pessoas += [(p["id"], 5) for p in EQUIPE_TI]
     andares: dict[int, dict[str, list[str]]] = {}
     for pid, andar in pessoas:
-        nivel = (rh.FICHAS.get(pid) or POR_ID.get(pid) or {}).get("nivel", "pleno")
+        from robo.ti import POR_ID as TI
+        nivel = (rh.FICHAS.get(pid) or POR_ID.get(pid) or TI.get(pid) or {}).get("nivel", "pleno")
         andares.setdefault(andar, {}).setdefault(nivel, []).append(pid)
     return andares
 

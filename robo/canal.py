@@ -31,6 +31,7 @@ CANAIS = {
     "banco": "PostgreSQL",
     "rh": "RH e contratações",
     "ideias": "Ideias e evolução da plataforma",
+    "ti": "TI, DevOps, infraestrutura e segurança (5º andar)",
 }
 
 EQUIPE_CANAL = [
@@ -82,6 +83,10 @@ def pessoas() -> dict:
     p.update({a["id"]: {"nome": a["nome"], "papel": a["papel"], "canal": "geral"} for a in EQUIPE_CANAL})
     p["canal_iara"]["canal"] = "ideias"
     p["canal_helena"]["canal"] = "rh"
+    from robo.quadro import QUADRO
+    from robo.ti import EQUIPE_TI
+    p.update({x["id"]: {"nome": x["nome"], "papel": x["cargo"].split(" — ")[0], "canal": "geral"} for x in QUADRO})
+    p.update({x["id"]: {"nome": x["nome"], "papel": x["cargo"].split(" — ")[0], "canal": "ti"} for x in EQUIPE_TI})
     p[DONO["id"]] = {"nome": DONO["nome"], "papel": "Dono da empresa", "canal": "geral"}
     return p
 
@@ -246,7 +251,10 @@ def _mensagens_execucao(h: dict, exe: dict) -> list[tuple[str, str, str]]:
             msgs.append(("limpeza", "engenharia",
                          f"Em {arq}, tirei {_num(removidas)} linha(s) — cada uma com o motivo registrado no relatório de qualidade."))
         analise = exe.get("analise") or {}
-        resumo = [r.get("resumo_executivo") for r in (analise.get("resumo") or []) if r.get("resumo_executivo")]
+        resumo = [r.get("resumo_executivo") if isinstance(r, dict) else r for r in (analise.get("resumo") or [])]
+        resumo = [str(x).strip() for x in resumo if x and str(x).strip()]
+        if analise.get("manchete"):
+            msgs.append(("ger_analise", "analise", f"Manchete de {arq}: {analise['manchete']}."))
         if resumo:
             msgs.append(("analise_relator", "analise", f"Resumo de {arq}: " + " ".join(str(x).strip() for x in resumo[:3])))
         ressalvas = (exe.get("checklist_analise") or {}).get("ressalvas") or []
@@ -527,6 +535,50 @@ INTENCOES = {
 }
 
 
+PALAVRAS_VAZIAS = set("""como para qual quais quem onde quando porque sobre esta este essa esse isso isto voce voces
+fazer faco pode podem tenho temos preciso quero queria seria muito mais menos entre pela pelo pelos pelas numa num
+uma umas dos das nos nas com sem que nao sim tem ter""".split())
+
+
+def _secoes_markdown(cfg) -> list[dict]:
+    """Seções (## título + texto) dos manuais dos agentes (agentes/*.md) e da pasta conhecimento/."""
+    from robo.config import RAIZ_PROJETO
+    fontes = []
+    pasta_agentes = Path(getattr(cfg, "agentes", "") or "")
+    if pasta_agentes.is_dir():
+        fontes += [(arq, arq.stem) for arq in sorted(pasta_agentes.glob("*.md"))]
+    pasta_conhecimento = Path(RAIZ_PROJETO) / "conhecimento"
+    if pasta_conhecimento.is_dir():
+        fontes += [(arq, "canal_nina") for arq in sorted(pasta_conhecimento.glob("*.md")) if not arq.name.startswith("_")]
+    secoes = []
+    for arq, autor in fontes[:300]:
+        try:
+            texto = arq.read_text(encoding="utf-8")[:200_000]
+        except OSError:
+            continue
+        partes = re.split(r"(?m)^#{1,3}\s+", texto)
+        for parte in partes:
+            if not parte.strip():
+                continue
+            titulo, _, corpo = parte.partition("\n")
+            secoes.append({"arquivo": arq.name, "autor": autor, "titulo": titulo.strip(), "corpo": corpo.strip()})
+    return secoes
+
+
+def _buscar_markdown(cfg, t: str) -> tuple[int, dict | None]:
+    termos = {w for w in t.split() if len(w) >= 4 and w not in PALAVRAS_VAZIAS}
+    if not termos:
+        return 0, None
+    melhor = (0, None)
+    for sec in _secoes_markdown(cfg):
+        titulo, corpo = normalizar(sec["titulo"]), normalizar(sec["corpo"])
+        achados = {w for w in termos if w in titulo or w in corpo}
+        pontos = sum(3 if w in titulo else 1 for w in achados)
+        if len(achados) >= 2 and pontos > melhor[0]:
+            melhor = (pontos, sec)
+    return melhor
+
+
 def _pontuar(texto: str, chaves: list[str]) -> int:
     pontos = 0
     palavras = set(texto.split())
@@ -560,6 +612,14 @@ def responder(texto: str, cfg) -> list[dict]:
     # cálculo amostral/margem com números na mensagem tem prioridade (resposta exata, não texto pronto)
     if (pont_int["amostra"] or "margem" in t) and _numeros(t):
         return [_calculo_amostral(t)]
+    # manuais e conhecimento em .md escritos por você/pela equipe têm prioridade quando batem melhor
+    pontos_md, secao = _buscar_markdown(cfg, t)
+    if secao and pontos_md >= 4 and pontos_md > max(melhor_kb[0], melhor_int[1]):
+        gente = pessoas()
+        autor = secao["autor"] if secao["autor"] in gente else "canal_nina"
+        corpo = secao["corpo"] if len(secao["corpo"]) <= 1200 else secao["corpo"][:1200].rsplit(" ", 1)[0] + "…"
+        return [{"autor": autor, "intencao": "manual",
+                 "texto": f"Do manual {secao['arquivo']} — {secao['titulo']}: {corpo}"}]
     # pergunta técnica ("como faço PROCX") vence intenção genérica; dados do robô vencem em empate
     if melhor_kb[0] > melhor_int[1] or (melhor_kb[0] >= 2 and melhor_int[0] in ("ajuda", "saudacao", "equipe")):
         v = CONHECIMENTO[melhor_kb[1]]
