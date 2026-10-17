@@ -67,6 +67,10 @@ CATEGORIAS = [
     (r"conferencia da equipe|coordenadora de engenharia", 1, "coord_engenharia",
      "Conferência do quadro barrou a produção", "Seguir o achado da conferência (tipos, espaços, auditoria, amostra)",
      "Checklist da coordenadora verde na próxima carga"),
+    (r"futurewarning|deprecationwarning|depreciac", 5, "head_python", "Uma biblioteca avisou que vai mudar de comportamento",
+     "O especialista da biblioteca troca o uso antigo pelo novo e cria teste com o caso", "A revisão da biblioteca volta sem aviso"),
+    (r"revisao (da|de) biblioteca|biblioteca .* mudou", 5, "head_python", "Atualização de biblioteca mudou um comportamento do qual o robô depende",
+     "Fixar a versão anterior em requisitos.txt até o código ser ajustado e testado", "Revisão da biblioteca toda verde"),
     (r"divergencia entre calculadora e postgresql", 1, "dba", "O mesmo cálculo deu números diferentes em dois caminhos",
      "Dora compara a consulta SQL com a calculadora linha a linha, acha a causa (tipo, nulo, linha duplicada, arquivo "
      "diferente) e cria um teste automatizado com o caso", "A mesma pergunta volta a dar 'Conferido no PostgreSQL'"),
@@ -313,13 +317,14 @@ MINIMO_EVENTOS = 5
 TAXA_MINIMA = 70.0
 
 
-def situacao(acertos: int, erros: int) -> str:
-    """Regra única de desempenho (política de RH): sem dados, ok, atenção ou insuficiente."""
+def situacao(acertos: int, erros: int, taxa_minima: float = TAXA_MINIMA) -> str:
+    """Regra única de desempenho (política de RH): sem dados, ok, atenção ou insuficiente.
+    taxa_minima é maior para quem é mais cobrado (guilda Python: 90%)."""
     n = acertos + erros
     if n < MINIMO_EVENTOS:
         return "sem_dados" if not n else ("atencao" if erros else "ok")
     taxa = 100 * acertos / n
-    return "insuficiente" if taxa < TAXA_MINIMA else "atencao" if taxa < 90 else "ok"
+    return "insuficiente" if taxa < taxa_minima else "atencao" if taxa < max(90, taxa_minima + 5) else "ok"
 
 
 def desempenho(cfg, dias: int = 7, ate: datetime | None = None) -> list[dict]:
@@ -338,13 +343,15 @@ def desempenho(cfg, dias: int = 7, ate: datetime | None = None) -> list[dict]:
                 d["ultimos_erros"].append(x["resumo"])
         elif x["tipo"] in ("aprendizado", "treinamento"):
             d["aprendizados"] += 1
+    from robo.lideranca import EXIGENCIA as exigencia
     saida = []
     for p in organizacao.lista(cfg):
         d = por.get(p["id"], {"acertos": 0, "erros": 0, "aprendizados": 0, "ultimos_erros": []})
         n = d["acertos"] + d["erros"]
         taxa = round(100 * d["acertos"] / n, 1) if n else None
         saida.append({"id": p["id"], "nome": p["nome"], "andar": p["andar"], "grupo": p["grupo"], **d, "eventos": n,
-                      "taxa": taxa, "situacao": situacao(d["acertos"], d["erros"]), "pode_ser_desligado": p["grupo"] == "contratado"})
+                      "taxa": taxa, "situacao": situacao(d["acertos"], d["erros"], exigencia.get(p["id"], TAXA_MINIMA)),
+                      "exigencia": exigencia.get(p["id"], TAXA_MINIMA), "pode_ser_desligado": p["grupo"] == "contratado"})
     return saida
 
 

@@ -61,4 +61,11 @@ Legenda: ✅ feito e testado · 🟡 feito em parte · ⏳ pendente
 | 55 | Como está a empresa agora / onde tudo é registrado | ✅ | página Raio-X da empresa |
 | 56 | Funcionar bem só com o notebook aberto | ✅ | rotinas registradas, recuperação do que atrasou e resumo de abertura |
 | 57 | Liderança que desenvolve pessoas (lifelong learning) | ✅ | Project Oxygen, SBI, 1:1, 70-20-10, PDI e promoção |
+| 58 | Reunião em tela, estilo Teams, telas abertas enquanto falo | ✅ | página Sala de reunião (`robo/sala.py`) |
+| 59 | Trabalhar sozinhos com Excel e PostgreSQL de várias áreas | ✅ | laboratório a cada 10 min (`robo/laboratorio.py`), schema `laboratorio` |
+| 60 | Funcionar com celular desligado ou sem créditos | ✅ | tudo local; só depende do notebook ligado |
+| 61 | TI Python estratégica | ✅ | Henrique e TI: velocidade por volume, projeção e dívida técnica |
+| 62 | Especialista para cada biblioteca, os mais cobrados | ✅ | guilda Python, exigência de 90% (`robo/bibliotecas.py`) |
+| 63 | Interação entre funcionários e balão no 3D | ✅ | `robo/interacoes.py`; balões no escritório 3D |
+| 64 | NPS numa fórmula só | ✅ | `=ARRED((CONT.SES(…>=9) − CONT.SES(…<=6)) / CONT.SES(…>=0) * 100; 0)` |
 | 38 | IA opcional sem fingir | 🟡 | `robo/ia.py`: só modelo local, desligado; ainda não usado nas respostas |

@@ -19,6 +19,8 @@ ONDE = {
     "Sessões (notebook aberto/fechado)": "logs/trabalho.db → sessoes",
     "Reuniões": "logs/trabalho.db → reunioes + logs/reunioes/<id>.md",
     "Auditorias dos heads": "logs/trabalho.db → auditorias",
+    "Laboratório (treino contínuo)": "logs/trabalho.db → laboratorio_exercicios e laboratorio_medidas; PostgreSQL: schema laboratorio",
+    "Conversas entre funcionários": "logs/trabalho.db → interacoes (e o canal da equipe)",
     "Canal da equipe": "logs/canal/mensagens.jsonl",
 }
 
@@ -47,6 +49,12 @@ def montar(cfg) -> dict:
         auds = []
     gente = organizacao.lista(cfg)
     estado_rotinas = rotinas.estado(cfg)
+    try:
+        from robo import interacoes, laboratorio
+        lab = laboratorio.resumo(cfg)
+        conversas_internas = interacoes.recentes(cfg, 20)
+    except Exception:
+        lab, conversas_internas = {"rodadas": 0, "por_pessoa": [], "por_area": {}, "ultimas": []}, []
     ses = rotinas.sessoes(cfg, 10)
     return {
         "agora": datetime.now().isoformat(timespec="seconds"),
@@ -62,6 +70,7 @@ def montar(cfg) -> dict:
         "conferencias_calculo": conferencias,
         "auditorias": auds,
         "rotinas": estado_rotinas,
+        "laboratorio": lab, "interacoes": conversas_internas,
         "sessoes": ses,
         "onde_fica": ONDE,
     }
@@ -89,5 +98,9 @@ def texto(r: dict) -> str:
     if r["auditorias"]:
         ok = sum(1 for a in r["auditorias"] if a["aprovada"])
         linhas.append(f"Auditorias dos heads: {ok} de {len(r['auditorias'])} recentes aprovadas.")
+    lab = r.get("laboratorio") or {}
+    if lab.get("rodadas"):
+        erros = sum(p["erros"] for p in lab["por_pessoa"])
+        linhas.append(f"Laboratório na semana: {lab['rodadas']} exercício(s) em {len(lab['por_area'])} área(s), {erros} etapa(s) com erro.")
     linhas.append("Rotinas atrasadas: " + ", ".join(atrasadas) + "." if atrasadas else "Todas as rotinas estão em dia.")
     return "\n".join(linhas)

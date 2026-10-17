@@ -529,6 +529,50 @@ def f_raio_x(cfg, **_) -> dict:
                      evidencia="todos os registros da empresa, lidos agora")
 
 
+def f_revisao_biblioteca(cfg, quem: str = "", biblioteca: str | None = None, **_) -> dict:
+    from robo import bibliotecas, memoria
+    alvo = biblioteca or next((n for n, (resp, _) in bibliotecas.BIBLIOTECAS.items() if resp == quem), None)
+    nomes = [alvo] if alvo else list(bibliotecas.BIBLIOTECAS)
+    linhas, problemas = [], []
+    for n in nomes:
+        r = bibliotecas.revisar(n)
+        linhas.append(f"{n} {r['versao']}: " + ("tudo como o robô espera" if r["ok"] and not r["depreciacoes"] else
+                      "; ".join(r["falhas"] + r["depreciacoes"])))
+        for f in r["falhas"]:
+            problemas.append(f)
+            memoria.handover(cfg, f"Revisão da biblioteca {n} {r['versao']}: {f}", n, r["especialista"])
+        for d in r["depreciacoes"]:
+            memoria.handover(cfg, f"{n}: {d}", n, r["especialista"])
+    resumo = ("Revisei " + (alvo or f"as {len(nomes)} bibliotecas") + ": " +
+              ("tudo se comporta como o robô espera." if not problemas else f"{len(problemas)} comportamento(s) mudaram."))
+    return resultado(True, "execucao", _secoes(resumo, [{"titulo": "Por biblioteca", "texto": "\n".join(linhas)}]),
+                     {"problemas": problemas}, evidencia="guardas de comportamento executados agora na versão instalada")
+
+
+def f_estrategia_python(cfg, **_) -> dict:
+    from robo import laboratorio
+    r = laboratorio.estrategia_ti(cfg)
+    return resultado(True, "calculo", r["texto"], r, evidencia="tempos medidos no laboratório (regressão linear simples)")
+
+
+def f_laboratorio(cfg, **_) -> dict:
+    from robo import laboratorio, organizacao
+    r = laboratorio.resumo(cfg)
+    gente = organizacao.por_id(cfg)
+    nome = lambda x: (gente.get(x) or {}).get("nome", x)  # noqa: E731
+    total = sum(p["acertos"] + p["erros"] for p in r["por_pessoa"])
+    erros = sum(p["erros"] for p in r["por_pessoa"])
+    resumo = (f"Na última semana o laboratório rodou {r['rodadas']} exercício(s) em {len(r['por_area'])} área(s): "
+              f"{total - erros} etapa(s) certas e {erros} com erro." if r["rodadas"] else
+              "O laboratório ainda não rodou nenhum exercício (ele roda sozinho a cada 10 minutos com o robô aberto).")
+    linhas = [f"{nome(p['responsavel'])}: {p['acertos']} certo(s), {p['erros']} erro(s)" for p in r["por_pessoa"]]
+    ultimos = [f"{'✅' if u['ok'] else '⛔'} {u['area']} · {nome(u['responsavel'])} · {u['etapa']}: {u['detalhe'][:100]}"
+               for u in r["ultimas"][:12]]
+    return resultado(True, "ferramenta", _secoes(resumo, [{"titulo": "Por pessoa", "texto": "\n".join(linhas) or "—"},
+                                                         {"titulo": "Últimas etapas", "texto": "\n".join(ultimos) or "—"}]),
+                     r, evidencia="laboratorio_exercicios (dados sintéticos com resposta conhecida)")
+
+
 def f_resumo_executivo(cfg, titulo: str = "Resumo executivo", partes: list | None = None, ref: str = "", **_) -> dict:
     """Escreve um .md com os resultados REAIS das etapas anteriores (não cria número novo)."""
     partes = [p for p in partes or [] if p.get("texto")]
@@ -583,6 +627,11 @@ REGISTRO: dict[str, Ferramenta] = {f.id: f for f in [
     Ferramenta("desenvolvimento", "Treinamento e desenvolvimento", "Rodada de estudo e planos 70-20-10", "baixo", False, f_desenvolvimento),
     Ferramenta("desempenho", "Desempenho", "Acertos, erros e situação de cada pessoa", "baixo", False, f_desempenho),
     Ferramenta("people_analytics", "People analytics", "Indicadores de pessoas", "baixo", False, f_people_analytics),
+    Ferramenta("revisao_biblioteca", "Revisão de biblioteca", "Guardas de comportamento de pandas, numpy, openpyxl…",
+               "baixo", False, f_revisao_biblioteca),
+    Ferramenta("estrategia_python", "Estratégia Python", "Desempenho por volume, projeção e dívida técnica", "baixo", False,
+               f_estrategia_python),
+    Ferramenta("laboratorio", "Laboratório", "O que a equipe treinou e errou no laboratório", "baixo", False, f_laboratorio),
     Ferramenta("raio_x", "Raio-X da empresa", "Como a empresa está agora, com números de todos os registros", "baixo", False, f_raio_x),
     Ferramenta("organizacao", "Organização", "Quem faz o quê, por andar e nível", "baixo", False, f_organizacao),
     Ferramenta("resumo_executivo", "Resumo executivo", "Arquivo .md com os resultados das etapas", "medio", False, f_resumo_executivo),

@@ -26,6 +26,7 @@ ROTINAS = {
     "estudo": ("canal_helena", "Rodada de estudo de todos os funcionários (2x por semana)", 84),
     "reuniao": ("ger_operacoes", "Reunião semanal da liderança, andar por andar", 24 * 7),
     "auditoria": ("dir_dados", "Auditoria por amostragem dos heads (confiança nos resultados)", 24 * 7),
+    "laboratorio": ("head_engenharia", "Laboratório: treino com planilhas sintéticas de várias áreas, no Excel e no PostgreSQL", 1 / 6),
     "canal": ("canal_nina", "Posta no canal o que aconteceu (aprovações, reprovações, entregas)", 1 / 60),
 }
 

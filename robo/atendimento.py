@@ -104,6 +104,12 @@ def _texto_contrato(c: dict) -> str:
 
 def _escolher_ferramenta(t: str, ctx: dict) -> str | None:
     """Ferramenta para uma pergunta (não tarefa). Ordem: mais específica primeiro."""
+    if re.search(r"laboratorio|treinaram|treino continuo|o que (voces|a equipe) (fez|fizeram|treinou)", t):
+        return "laboratorio"
+    if re.search(r"(versao|versoes) (das |de )?bibliotecas?|revis(e|ao) (a |da |das )?bibliotecas?|deprecia", t):
+        return "revisao_biblioteca"
+    if re.search(r"estrategi(a|co) (de |da )?(ti|python)|projecao de volume|300 mil linhas|aguenta (o |mais )?volume", t):
+        return "estrategia_python"
     if re.search(r"como (esta|anda|vai|funciona) (a |nossa )?empresa|raio.?x|panorama geral|visao geral da empresa", t):
         return "raio_x"
     if re.search(r"scorecard|indicadores da (area|diretoria)|farol|metas da area|como esta a (minha )?area", t):
@@ -156,7 +162,7 @@ def conversar(cfg, funcionario: str, texto: str, conversa_id: str | None = None,
         conv = tb.conversa(conversa_id)
         if not conv:
             raise ValueError("Conversa não encontrada.")
-        if conv["funcionario"] != funcionario:
+        if conv["funcionario"] != funcionario and funcionario not in (conv["contexto"].get("participantes") or []):
             raise ValueError("Esta conversa é com outra pessoa.")
     else:
         conversa_id = tb.criar_conversa(funcionario, (texto or f"Arquivo {arquivo}")[:80], origem)
@@ -166,9 +172,12 @@ def conversar(cfg, funcionario: str, texto: str, conversa_id: str | None = None,
         ctx = tb.atualizar_contexto(conversa_id, arquivo=str(arquivo))
     tb.mensagem(conversa_id, "dono", texto or f"(anexou {arquivo})", dados={"arquivo": str(arquivo)} if arquivo else None)
 
+    from robo import interacoes
+    interacoes.balao(funcionario, f"Pedido do dono: {texto[:100]}", rotulo="pedido do dono")
     respostas, sid = _responder(cfg, tb, conversa_id, contrato, texto, ctx, arquivo)
     for r in respostas:
         tb.mensagem(conversa_id, r["autor"], r["texto"], r["natureza"], r, sid)
+        interacoes.balao(r["autor"], r["texto"].split("\n")[0].replace("**", "")[:120], rotulo="resposta ao dono")
     return {"conversa_id": conversa_id, "respostas": respostas, "solicitacao_id": sid}
 
 

@@ -184,6 +184,17 @@ class ControleRobo:
                 finally:
                     self._estrategia_rodando = False
             threading.Thread(target=_rodar, name="robo-estrategia", daemon=True).start()
+        # laboratório: treino contínuo (a própria rotina decide se já passou o intervalo); em linha própria
+        if agora - getattr(self, "_ultimo_lab", 0) >= 60 and not getattr(self, "_lab_rodando", False):
+            self._ultimo_lab, self._lab_rodando = agora, True
+
+            def _lab():
+                from robo import laboratorio
+                try:
+                    rotinas.executar(cfg, "laboratorio", lambda: laboratorio.rotina(cfg))
+                finally:
+                    self._lab_rodando = False
+            threading.Thread(target=_lab, name="robo-laboratorio", daemon=True).start()
         from robo.ti import _c as cfg_ti
         if agora - getattr(self, "_ultima_ronda_ti", 0) >= 60 * float(cfg_ti(cfg)["intervalo_minutos"]):
             self._ultima_ronda_ti = agora

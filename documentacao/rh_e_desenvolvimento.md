@@ -31,6 +31,11 @@ Só você promove, muda permissão e decide desligamento (`organizacao.pode_alte
 | 4º Operações e Governança | Cláudia | Simone (Governança) | Renata, Vitor, Lara, canal |
 | 4º Pessoas (RH) | Marta (CHRO) | Juliana (Gente e Gestão) | Helena (coord.) → Priscila (R&S), Roberta (T&D), Mauro (desempenho), Tiago (people analytics), Bianca (estagiária) |
 | 5º TI | Alexandre (CTO) | André (Infra e Segurança) | Gustavo, Fernanda e equipe |
+| 5º Guilda Python | Alexandre (CTO) | Henrique (Engenharia Python) | Sofia (pandas), Nicolas (numpy), Olívia (openpyxl), Xavier (xlrd), Elisa (PyYAML), Pietro (psycopg), Silas (sqlite3) |
+
+**A guilda Python é a mais cobrada da empresa.** O acerto mínimo deles é de 90%; no resto da empresa é de 70%.
+Cada especialista responde pelos comportamentos da sua biblioteca dos quais o robô depende e pelos avisos de
+depreciação no código. Só existe especialista para biblioteca usada de verdade (`requisitos.txt` + sqlite3).
 
 O escopo de cada cargo foi baseado em fontes públicas confiáveis. A lista com os links está em
 `conhecimento/lideranca_e_gestao.md`, que a liderança consulta no chat.
@@ -81,6 +86,19 @@ não tiver competência para o risco do nível, a promoção é recusada com o m
    vira handover.
 4. **Scorecard da diretoria.** Mede o resultado com meta e farol, calculado dos registros.
 5. **Revisor independente.** Toda tarefa é revisada por alguém que não a executou.
+
+## 4d. Laboratório: treino contínuo
+
+Com o notebook ligado, a cada 10 minutos o laboratório gera uma planilha nova de uma área: educação/NPS, varejo,
+RH, financeiro, marketing ou logística. Ela já vem suja como na vida real: título, acento, R$ em texto, datas em
+texto, duplicata e linha de Total.
+- **Como confere:** o gerador conhece a resposta certa. Por isso cada etapa (engenharia, cálculo, ciência de dados,
+  PostgreSQL, biblioteca) é conferida contra a verdade.
+- **O que acontece com o resultado:** acerto e erro vão para a memória de cada um. Erro vira handover, e quem errou
+  pede ajuda a quem sabe (a conversa aparece no canal e como balão no 3D).
+- **Onde fica:** os dados são sintéticos e ficam separados, em `logs/laboratorio` e no schema `laboratorio`.
+  Nada vai para a produção.
+- **Do que depende:** de nada externo (celular, internet ou créditos). Só do notebook ligado com o robô aberto.
 
 ## 5. PDCA contínuo e boas práticas
 

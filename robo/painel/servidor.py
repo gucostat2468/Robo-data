@@ -981,6 +981,31 @@ class Api:
         res = rotinas.executar(self.cfg, "auditoria", lambda: auditoria.auditar_todos(self.cfg))
         return {"auditorias": res}
 
+    def sala_abrir(self, b) -> dict:
+        from robo import sala
+        andar = int(b.get("andar") or 1)
+        if andar not in (1, 2, 3, 4, 5):
+            raise ErroApi("Andar inválido.")
+        return sala.abrir(self.cfg, andar)
+
+    def sala_falar(self, b) -> dict:
+        from robo import sala
+        texto = str(b.get("texto") or "").strip()
+        if not texto:
+            raise ErroApi("Escreva o que quer dizer na reunião.")
+        return sala.falar(self.cfg, str(b.get("conversa_id") or ""), texto, b.get("para") or None)
+
+    def sala_ver(self, q) -> dict:
+        from robo import sala
+        d = sala.detalhes(self.cfg, q.get("id", [""])[0])
+        if not d:
+            raise ErroApi("Reunião não encontrada.", 404)
+        return d
+
+    def salas(self, q) -> dict:
+        from robo.trabalho import Trabalho
+        return {"salas": [c for c in Trabalho(self.cfg).conversas(limite=100) if (c["contexto"] or {}).get("sala")][:10]}
+
     def reuniao_ao_vivo(self, q) -> dict:
         from robo import reuniao
         andar = q.get("andar", [""])[0]
@@ -1017,6 +1042,7 @@ ROTAS_GET = {
     "/api/funcionarios": Api.funcionarios, "/api/funcionario": Api.funcionario, "/api/conversa": Api.conversa,
     "/api/solicitacoes": Api.solicitacoes, "/api/solicitacao": Api.solicitacao, "/api/memoria": Api.memoria_resumo,
     "/api/reuniao/ao-vivo": Api.reuniao_ao_vivo, "/api/raio-x": Api.raio_x,
+    "/api/reuniao/sala": Api.sala_ver, "/api/reuniao/salas": Api.salas,
 }
 ROTAS_POST = {
     "/api/robo/ligar": Api.ligar, "/api/robo/pausar": Api.pausar, "/api/robo/processar-agora": Api.processar_agora,
@@ -1034,6 +1060,7 @@ ROTAS_POST = {
     "/api/aprovacoes/decidir": Api.aprovacao_decidir, "/api/solicitacoes/cancelar": Api.solicitacao_cancelar,
     "/api/handovers/estado": Api.handover_estado, "/api/reuniao/gerar": Api.reuniao_gerar, "/api/estudo/rodar": Api.estudo_rodar,
     "/api/auditorias/rodar": Api.auditorias_rodar,
+    "/api/reuniao/sala/abrir": Api.sala_abrir, "/api/reuniao/sala/falar": Api.sala_falar,
     "/api/memoria/exportar": Api.memoria_exportar, "/api/memoria/sincronizar": Api.memoria_sincronizar,
 }
 ROTAS_UPLOAD = {"/api/testar": Api.testar, "/api/enviar": Api.enviar, "/api/conversa/anexar": Api.anexar}

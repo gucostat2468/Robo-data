@@ -42,7 +42,7 @@ PERMISSOES_NIVEL = {
 ORDEM_RISCO = {"baixo": 0, "medio": 1, "alto": 2}
 
 # Ferramentas que todo mundo pode usar (só leem)
-FERRAMENTAS_COMUNS = ["conhecimento", "historico"]
+FERRAMENTAS_COMUNS = ["conhecimento", "historico", "laboratorio"]
 # Ferramentas por andar
 FERRAMENTAS_ANDAR = {
     1: ["diagnosticar_planilha", "consulta_sql", "dados_pessoais"],
@@ -55,7 +55,7 @@ FERRAMENTAS_ANDAR = {
 LIDERES = ["ger_engenharia", "coord_engenharia", "ger_analise", "coord_analise", "excel_supervisor", "coord_excel",
            "ger_operacoes", "canal_helena", "ger_ti", "coord_devops",
            "dir_dados", "dir_analytics", "dir_operacoes", "dir_pessoas", "dir_tecnologia",
-           "head_engenharia", "head_ciencia", "head_bi", "head_governanca", "head_rh", "head_ti"]
+           "head_engenharia", "head_ciencia", "head_bi", "head_governanca", "head_rh", "head_ti", "head_python"]
 FERRAMENTAS_PESSOA = {
     "recepcao": ["publicar_planilha"], "coord_engenharia": ["publicar_planilha", "calcular"],
     "supervisor": ["calcular"], "dba": ["consulta_sql"], "banco": ["consulta_sql"],
@@ -73,6 +73,7 @@ ENCAMINHAR = {
     "scorecard": "dir_operacoes", "auditoria": "head_engenharia", "drivers": "cd_senior_drivers",
     "segmentacao": "cd_pleno_segmentos", "anomalias": "cd_junior_anomalias", "recrutamento": "rh_rs",
     "desenvolvimento": "rh_td", "desempenho": "rh_desempenho", "people_analytics": "rh_people", "raio_x": "dir_operacoes",
+    "revisao_biblioteca": "head_python", "estrategia_python": "head_python", "laboratorio": "head_engenharia",
     "conhecimento": "canal_nina", "historico": "canal_nina",
 }
 
@@ -209,7 +210,9 @@ def ferramentas_de(pid: str, andar: int) -> list[str]:
     fs = list(FERRAMENTAS_COMUNS) + FERRAMENTAS_ANDAR.get(int(andar or 1), []) + FERRAMENTAS_PESSOA.get(pid, [])
     fs += (lideranca.POR_ID.get(pid) or {}).get("ferramentas", [])
     if pid in LIDERES:
-        fs.append("reuniao_andar")  # gerentes e coordenadores respondem pela situação do andar a qualquer momento
+        fs.append("reuniao_andar")
+    if int(andar or 0) == 5 and pid in ("ger_ti", "coord_devops", "dev_pleno", "dir_tecnologia"):
+        fs.append("estrategia_python")  # a TI Python olha a operação de forma estratégica  # gerentes e coordenadores respondem pela situação do andar a qualquer momento
     return list(dict.fromkeys(fs))
 
 

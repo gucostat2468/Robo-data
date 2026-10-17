@@ -273,7 +273,7 @@ def _executar(cfg, sid: str) -> str:
             quem = outro
         tb.atualizar_etapa(e["id"], quem, estado="em_execucao", funcionario=quem, inicio=datetime.now().isoformat(timespec="seconds"),
                            tentativas=int(e["tentativas"] or 0) + 1)
-        _sinal(quem, rotulo, tarefa=sid)
+        _sinal(quem, rotulo, tarefa=sid, fala=f"Fazendo: {e['titulo'][:90]}")
         params = dict(e["parametros"])
         if e["ferramenta"] == "resumo_executivo":
             params.update(titulo=s["titulo"], ref=sid, partes=[
@@ -298,7 +298,7 @@ def _revisar(cfg, sid: str) -> str:
     if revisor in executores:  # salvaguarda: quem executou não revisa
         revisor = "dono"
     tb.mudar_estado(sid, "em_revisao", revisor, f"Revisão independente com {revisor}")
-    _sinal(revisor, f"{sid} · revisão", tarefa=sid)
+    _sinal(revisor, f"{sid} · revisão", tarefa=sid, fala=f"Revisando {sid} de forma independente")
     achados = []
     concluidas = [e for e in s["etapas"] if e["estado"] == "concluida"]
     for e in concluidas:

@@ -123,15 +123,15 @@ def montar_excel(op: str, col: str | None, por: list[str], filtros: list, exempl
                       f"coluna {c} com: =PROCX([@{chave}];{aba}[{chave}];{aba}[{c}])")
     if op == "nps":
         f = ";" + filtros_excel if filtros_excel else ""
-        passos += [f"2. Promotores: =CONT.SES(Tabela[{col}];\">=9\"{f})",
-                   f"3. Detratores: =CONT.SES(Tabela[{col}];\"<=6\"{f})",
-                   f"4. Respondentes: =CONT.SES(Tabela[{col}];\">=0\"{f})",
-                   "5. NPS: =ARRED((Promotores − Detratores) / Respondentes * 100; 0) — use as células dos passos 2 a 4."]
+        c = f"Tabela[{col}]"
+        passos += [f"2. NPS numa fórmula só (promotores − detratores, dividido por quem respondeu):\n"
+                   f"=ARRED((CONT.SES({c};\">=9\"{f}) - CONT.SES({c};\"<=6\"{f})) / CONT.SES({c};\">=0\"{f}) * 100; 0)",
+                   "Os neutros (7 e 8) não aparecem na fórmula, mas estão no total de respondentes (o último CONT.SES)."]
     elif op == "csat":
         f = ";" + filtros_excel if filtros_excel else ""
-        passos += [f"2. Satisfeitos: =CONT.SES(Tabela[{col}];\">={escala - 1}\"{f})",
-                   f"3. Respondentes: =CONT.SES(Tabela[{col}];\">=0\"{f})",
-                   "4. CSAT %: =Satisfeitos / Respondentes (formate como porcentagem)."]
+        c = f"Tabela[{col}]"
+        passos.append(f"2. CSAT numa fórmula só (satisfeitos ÷ respondentes):\n"
+                      f"=ARRED(CONT.SES({c};\">={escala - 1}\"{f}) / CONT.SES({c};\">=0\"{f}) * 100; 0)")
     elif op in EXCEL:
         nome, modelo = EXCEL[op]
         if op == "contagem" and not filtros_excel:

@@ -246,3 +246,15 @@ def teste_conferencia_com_modelo_estrela_junta_dimensao(pastas, cfg_factory, ban
     r = ferramentas.executar("calcular", cfg, pergunta="nps por modalidade")
     assert r["dados"]["conferencia"] == "conferido", r["texto"]
     assert "JOIN" in r["dados"]["sql"] and "PROCX([@id_curso];dim_curso[id_curso];dim_curso[modalidade])" in r["texto"]
+
+
+def teste_laboratorio_no_postgres_em_schema_separado(cfg_factory, banco_cfg):
+    from robo import laboratorio
+    cfg = cfg_factory([], banco=banco_cfg)
+    r = laboratorio.exercicio(cfg, "varejo", 5)
+    assert r["falhas"] == [] and r["etapas"] == 5, r  # cabeçalho, limpeza, cálculo, SQL e biblioteca
+    etapas = laboratorio.resumo(cfg)["ultimas"]
+    assert any(e["responsavel"] == "dba" and e["ok"] for e in etapas)
+    # a tabela de treino é apagada depois; nada vai para o schema de produção
+    assert _q(banco_cfg, "SELECT count(*) FROM information_schema.tables WHERE table_schema='laboratorio'")[0][0] == 0
+    assert _q(banco_cfg, "SELECT count(*) FROM information_schema.tables WHERE table_schema='tratado'")[0][0] == 0

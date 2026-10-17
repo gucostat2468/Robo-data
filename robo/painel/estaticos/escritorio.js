@@ -970,6 +970,7 @@ async function atualizar() {
     const agora = Date.now() / 1000;
     for (const ev of d.eventos || []) {
       if (!estado.iniciado && agora - ev.ts > 20) continue; // ao abrir, não repete o que já passou
+      if (ev.fala) { mostrarBalao(ev.etapa, ev.fala, ev.para); if (!ev.tarefa) continue; } // conversa: balão na hora
       estado.filaEventos.push(ev);
     }
     estado.ultimoSeq = Math.max(estado.ultimoSeq, d.ultimo_seq || 0);
@@ -1029,8 +1030,41 @@ function andarAgente(e, dt, t) {
 // ------------------------------------------------------------------ animação
 const relogio = new THREE.Clock();
 let ultimoQuadro = performance.now();
+// ------------------------------------------------------------------ balões de conversa em cima de cada pessoa
+const baloes = new Map(); // id → {el, ate}
+function mostrarBalao(id, texto, para) {
+  const est = estado.estacoes.get(id); if (!est) return;
+  let b = baloes.get(id);
+  if (!b) {
+    const el = document.createElement("div"); el.className = "balao-fala";
+    el.style.cssText = "position:fixed;z-index:20;max-width:240px;padding:8px 10px;border-radius:12px;background:#fff;color:#111827;" +
+      "font:12px/1.35 system-ui,sans-serif;box-shadow:0 6px 18px rgba(0,0,0,.18);pointer-events:none;transform:translate(-50%,-100%)";
+    document.body.appendChild(el); b = { el }; baloes.set(id, b);
+  }
+  const nomePara = para && estado.estacoes.get(para) ? `<b>→ ${esc(estado.estacoes.get(para).agente.nome)}</b> ` : "";
+  b.el.innerHTML = `<b>${esc(est.agente.nome)}</b>: ${nomePara}${esc(texto)}`;
+  b.ate = performance.now() + 8000;
+  if (baloes.size > 8) { const [velho] = [...baloes.entries()].sort((a, c) => a[1].ate - c[1].ate); velho[1].el.remove(); baloes.delete(velho[0]); }
+}
+const _vetorBalao = new THREE.Vector3();
+function posicionarBaloes(agora) {
+  for (const [id, b] of baloes) {
+    const est = estado.estacoes.get(id);
+    if (!est || agora > b.ate) { b.el.remove(); baloes.delete(id); continue; }
+    if (!andares[est.andar]?.visible) { b.el.style.display = "none"; continue; }
+    est.grupo.getWorldPosition(_vetorBalao); _vetorBalao.y += 2.3;
+    _vetorBalao.project(camera);
+    const fora = _vetorBalao.z > 1 || Math.abs(_vetorBalao.x) > 1.1 || Math.abs(_vetorBalao.y) > 1.1;
+    b.el.style.display = fora ? "none" : "block";
+    b.el.style.left = `${(_vetorBalao.x + 1) / 2 * innerWidth}px`;
+    b.el.style.top = `${(1 - _vetorBalao.y) / 2 * innerHeight}px`;
+    b.el.style.opacity = Math.min(1, (b.ate - agora) / 800).toFixed(2);
+  }
+}
+
 function animar() {
   requestAnimationFrame(animar);
+  posicionarBaloes(performance.now());
   const t = relogio.getElapsedTime(), agora = performance.now();
   const dt = Math.min(0.05, (agora - ultimoQuadro) / 1000); ultimoQuadro = agora;
 

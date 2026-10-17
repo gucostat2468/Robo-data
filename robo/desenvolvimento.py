@@ -60,6 +60,11 @@ def estudar(cfg, anunciar: bool = True) -> dict:
         resultado.append({"id": pid, "nome": p["nome"], "andar": andar, "prova_ok": prova["aprovado"],
                           "erros_revisados": len(meus_erros), "handovers_estudados": len(abertos),
                           "boas_praticas_novas": len(praticas)})
+    try:  # quem acertou ensina quem errou na mesma área (conversa registrada e no canal)
+        from robo import interacoes
+        trocas = interacoes.trocar_experiencias(cfg)
+    except Exception:
+        trocas = []
     aprovados = sum(r["prova_ok"] for r in resultado)
     tb.lembrar("estudo_rodada", datetime.now().strftime("%Y-%m-%d"),
                f"{len(resultado)} funcionário(s) estudaram; {aprovados} aprovados na prova", "desenvolvimento")
@@ -71,7 +76,7 @@ def estudar(cfg, anunciar: bool = True) -> dict:
                               "do andar. Tudo ficou na memória de cada um.", "rh", tipo="treinamento")
         except Exception:
             pass
-    return {"funcionarios": len(resultado), "aprovados": aprovados, "pessoas": resultado}
+    return {"funcionarios": len(resultado), "aprovados": aprovados, "trocas": len(trocas), "pessoas": resultado}
 
 
 def rotina(cfg) -> dict | None:

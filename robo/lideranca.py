@@ -132,11 +132,51 @@ EQUIPE = [
        ["Indicadores de pessoas: quadro por andar e nível, aprovação nas provas, desempenho médio, contratações e desligamentos"],
        ["Números batem com o registro de funcionários"], [FONTES["shrm"]], ["Não expõe dado fora da empresa"],
        ["people_analytics"]),
+    # ------------------------------------------------------------------ guilda Python (5º andar): a mais cobrada da empresa
+    _p("head_python", "Henrique", "Head de Engenharia Python", "head", 5, "Engenharia de Dados", "dir_tecnologia", "#1D4ED8",
+       ["Maior autoridade técnica em Python da empresa", "Lidera a guilda de bibliotecas e olha a operação de forma "
+        "estratégica: desempenho por volume, projeção de crescimento, dívida técnica e avisos de depreciação",
+        "Decide quando atualizar uma biblioteca (só com todas as revisões passando)"],
+       ["Revisões das bibliotecas todas verdes", "Projeção de volume atualizada", "Exigência: 90% de acerto"],
+       [FONTES["sre"]], ["Não atualiza biblioteca sem revisão verde"], ["revisao_biblioteca", "estrategia_python"]),
+    _p("esp_pandas", "Sofia", "Especialista em pandas", "especialista", 5, "Engenharia de Dados", "head_python", "#150458",
+       ["Garante que agrupamentos, tipos, leitura de planilhas e conversões do pandas se comportam como o robô espera",
+        "Pega avisos de depreciação antes de virarem erro na próxima versão"],
+       ["Revisão do pandas verde", "Exigência: 90% de acerto"], ["pandas: groupby, dtypes nulláveis, IO"],
+       ["Não aceita 'funciona na minha máquina'"], ["revisao_biblioteca", "calcular"]),
+    _p("esp_numpy", "Nicolas", "Especialista em numpy", "especialista", 5, "Estatística", "head_python", "#4DABCF",
+       ["Garante a matemática por trás de drivers, segmentação e correlação (mínimos quadrados, sementes, precisão)"],
+       ["Revisão do numpy verde", "Exigência: 90% de acerto"], ["numpy: álgebra linear, aleatoriedade reproduzível"],
+       ["Não troca método sem prova"], ["revisao_biblioteca"]),
+    _p("esp_openpyxl", "Olívia", "Especialista em openpyxl (Excel)", "especialista", 5, "Engenharia de Dados", "head_python",
+       "#107C41", ["Garante que fórmulas, formatos e células mescladas do Excel são lidos e gravados corretamente"],
+       ["Revisão do openpyxl verde", "Exigência: 90% de acerto"], ["openpyxl: fórmulas, data_only, estilos"],
+       ["Não grava número por cima de fórmula"], ["revisao_biblioteca"]),
+    _p("esp_xlrd", "Xavier", "Especialista em xlrd (.xls antigo)", "especialista", 5, "Engenharia de Dados", "head_python", "#217346",
+       ["Garante a leitura de planilhas .xls antigas e conhece os limites delas (sem macro, sem .xlsx)"],
+       ["Revisão do xlrd verde", "Exigência: 90% de acerto"], ["xlrd 2.x"], ["Não promete o que o .xls não guarda"],
+       ["revisao_biblioteca"]),
+    _p("esp_yaml", "Elisa", "Especialista em PyYAML (configuração)", "especialista", 5, "Governança e Privacidade", "head_python",
+       "#CB171E", ["Garante que o config.yaml é lido com segurança (safe_load) e sem perder acento"],
+       ["Revisão do PyYAML verde", "Exigência: 90% de acerto"], ["PyYAML safe_load/safe_dump"],
+       ["Não usa load inseguro"], ["revisao_biblioteca"]),
+    _p("esp_psycopg", "Pietro", "Especialista em psycopg (PostgreSQL)", "especialista", 5, "Engenharia de Dados", "head_python",
+       "#336791", ["Garante SQL composto com segurança, parâmetros separados do texto e transações corretas"],
+       ["Revisão do psycopg verde", "Exigência: 90% de acerto"], ["psycopg 3: sql.Composed, COPY, transações"],
+       ["Não cola valor dentro do SQL"], ["revisao_biblioteca", "consulta_sql"]),
+    _p("esp_sqlite", "Silas", "Especialista em sqlite3 (memória da empresa)", "especialista", 5, "Engenharia de Dados",
+       "head_python", "#003B57", ["Garante que a memória da empresa (trabalho.db) grava tudo ou nada e aguenta reinício"],
+       ["Revisão do sqlite3 verde", "Exigência: 90% de acerto"], ["sqlite3: transações, WAL"],
+       ["Não grava fora de transação"], ["revisao_biblioteca"]),
     _p("rh_estagiaria", "Bianca", "Estagiária de RH", "estagiario", 4, "Pessoas e Cultura", "rh_desempenho", "#F9A8D4",
        ["Acompanha os indicadores de desempenho em modo observação"], ["Relato correto"], [FONTES["oxygen"]],
        ["Não altera nem decide nada"], ["desempenho"]),
 ]
 POR_ID = {p["id"]: p for p in EQUIPE}
+
+GUILDA_PYTHON = ["head_python", "esp_pandas", "esp_numpy", "esp_openpyxl", "esp_xlrd", "esp_yaml", "esp_psycopg", "esp_sqlite"]
+# os mais cobrados da empresa: acerto mínimo de 90% (o resto da empresa: 70%)
+EXIGENCIA = {pid: 90.0 for pid in GUILDA_PYTHON}
 
 # quem passa a responder a quem (os gerentes existentes ganham head ou diretor acima)
 NOVOS_GESTORES = {"ger_engenharia": "head_engenharia", "ger_analise": "dir_analytics", "excel_supervisor": "head_bi",
@@ -311,6 +351,8 @@ def provas() -> dict:
     from robo import auditoria
     r.update(auditoria.provas())
     r.update(ciencia.provas())
+    from robo import bibliotecas
+    r.update(bibliotecas.provas())
     emails = pd.Series(["a@b.com", "c@d.com.br", "x@y.org"] * 5)
     r["rh_rs"] = [("Reconhece demanda de e-mail para contratar", (contratacao.reconhecer(emails, "contato") or {}).get("habilidade") is not None),
                   ("Não contrata para coluna de nota", contratacao.reconhecer(pd.Series([1, 2, 3] * 5), "nota") is None)]

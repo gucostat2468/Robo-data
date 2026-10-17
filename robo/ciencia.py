@@ -23,6 +23,7 @@ def _numericas(df: pd.DataFrame, excluir: list[str] | None = None) -> list[str]:
     excluir = set(excluir or [])
     return [c for c in df.columns if c not in excluir and pd.api.types.is_numeric_dtype(df[c])
             and not pd.api.types.is_bool_dtype(df[c]) and not str(c).lower().startswith(IGNORAR_PREFIXOS)
+            and str(c).lower() != "id" and not str(c).lower().endswith("_id")
             and df[c].nunique(dropna=True) > 2]
 
 
@@ -38,8 +39,9 @@ def drivers(df: pd.DataFrame, alvo: str, atributos: list[str] | None = None) -> 
     atributos = [a for a in atributos if a in d.columns]
     if alvo not in d.columns or not atributos:
         return {"ok": False, "motivo": "o indicador ou os atributos não variam (todos iguais)"}
+    d = d.astype(float)  # colunas do pipeline são nulláveis (Int64/Float64): o numpy precisa de float puro
     z = (d - d.mean()) / d.std()
-    X, y = z[atributos].to_numpy(), z[alvo].to_numpy()
+    X, y = z[atributos].to_numpy(dtype=float), z[alvo].to_numpy(dtype=float)
     betas, *_ = np.linalg.lstsq(X, y, rcond=None)
     pred = X @ betas
     r2 = float(1 - ((y - pred) ** 2).sum() / ((y - y.mean()) ** 2).sum())
@@ -95,12 +97,12 @@ def segmentar(df: pd.DataFrame, colunas: list[str] | None = None, k_max: int = 5
     colunas = colunas or _numericas(df)
     if len(colunas) < 1:
         return {"ok": False, "motivo": "não há colunas numéricas para segmentar"}
-    d = df[colunas].apply(pd.to_numeric, errors="coerce").dropna()
+    d = df[colunas].apply(pd.to_numeric, errors="coerce").dropna().astype(float)
     d = d.loc[:, d.std() > 0]
     if len(d) < 30 or d.shape[1] == 0:
         return {"ok": False, "motivo": f"só {len(d)} linha(s) completas; segmentação precisa de pelo menos 30"}
     media, desvio = d.mean(), d.std()
-    Z = ((d - media) / desvio).to_numpy()
+    Z = ((d - media) / desvio).to_numpy(dtype=float)
     rng = np.random.default_rng(SEMENTE)
     amostra = Z[rng.choice(len(Z), min(len(Z), 1500), replace=False)]
     melhor = None
@@ -205,6 +207,8 @@ def provas() -> dict:
     x1, x2, x3 = rng.normal(size=n), rng.normal(size=n), rng.normal(size=n)
     df = pd.DataFrame({"nps": 3 * x1 + 0.3 * x2 + rng.normal(scale=0.5, size=n), "atendimento": x1, "preco": x2, "app": x3})
     r = drivers(df, "nps")
+    nulavel = df.assign(atendimento=df["atendimento"].astype("Float64"), nps=df["nps"].astype("Float64"))
+    r_nulavel = drivers(nulavel, "nps")
     blobs = pd.DataFrame({"a": np.r_[rng.normal(0, .3, 100), rng.normal(5, .3, 80)],
                           "b": np.r_[rng.normal(0, .3, 100), rng.normal(5, .3, 80)]})
     s = segmentar(blobs)
@@ -213,8 +217,10 @@ def provas() -> dict:
     sujo.loc[7, "v"] = 500
     return {
         "cd_senior_drivers": [("Acha o driver plantado (atendimento) em 1º", r["ok"] and r["drivers"][0]["atributo"] == "atendimento"),
-                              ("Não inventa driver com poucos dados", not drivers(df.head(10), "nps")["ok"])],
+                              ("Não inventa driver com poucos dados", not drivers(df.head(10), "nps")["ok"]),
+                              ("Funciona com colunas nulláveis do pipeline (Float64)", r_nulavel["ok"])],
         "cd_pleno_segmentos": [("Separa dois grupos claros", s["ok"] and s["k"] == 2),
+                               ("Funciona com colunas nulláveis (Float64)", segmentar(blobs.astype("Float64"))["ok"]),
                                ("Tamanhos certos (100 e 80)", s["ok"] and sorted(g["tamanho"] for g in s["grupos"]) == [80, 100])],
         "cd_junior_anomalias": [("Não acusa dado normal", not anomalias(limpo)["achados"]),
                                 ("Pega o valor plantado", bool(anomalias(sujo)["achados"]))],
