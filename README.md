@@ -71,8 +71,46 @@ Cada agente é uma etapa **real** do processamento:
 | Beto — Banco | Carrega no PostgreSQL (bruto → tratado → analítico) | — |
 | Duda — Publicação | Grava em Bases-Tratadas e arquiva o original | — |
 
+### O prédio: 5 andares, do gerente ao estagiário
+
+Além da linha de produção acima, cada andar tem gerente, coordenador(a), sêniores/especialistas, plenos, juniores e
+estagiários — **cada cargo com uma conferência real**, executada em todo arquivo, e com prova técnica no RH
+(um caso correto que ele precisa aprovar e um erro plantado que ele precisa pegar). Veja tudo em **Equipe e contratações**.
+
+| Andar | O que faz | Quem pode barrar |
+|---|---|---|
+| 1º Engenharia de dados | Limpa, valida, modela, carrega no PostgreSQL e publica; plenos e juniores conferem tipos, espaços, origem e relêem o arquivo gravado | Coordenadora, supervisor, DBA, plenos e juniores (o arquivo vai para Bases-Erros) |
+| 2º Análise e qualidade | Perfil, NPS/CSAT/CES com margem, testes estatísticos, monitoramento; pleno recalcula o NPS por conta própria | Ninguém barra (o dado já foi publicado): achados viram ressalvas |
+| 3º Sala Excel | Entrega Excel com fórmulas vivas e aba Conferência; coordenadora confere integridade, pleno confere fórmulas, júnior confere formatos | Ressalva registrada na entrega |
+| 4º Diretoria e canal | Boletim diário, sprints de 15 dias, ideias, RH, LGPD (dados pessoais) e catálogo de dados | — |
+| 5º TI e segurança | Ronda a cada 30 min: dependências, disco e permissões, erros no log, segurança do painel, senha fora do arquivo, código novo vigiado, prontidão para nuvem (consultiva) | — (alerta no canal #ti) |
+
+Escopo por senioridade: **gerente** responde por metas e prazos e não executa tarefa operacional; **coordenador**
+libera ou barra a produção; **sênior/especialista** executa o crítico e revisa; **pleno** faz a segunda conferência
+independente; **júnior** checa critérios objetivos; **estagiário** trabalha em **observação** (nunca altera nem barra).
+
+### Contratações (manual e automática)
+- **Você contrata** em **Equipe e contratações → Contratar**: nível, andar (de 1 a 9 — um andar novo aparece no prédio
+  sozinho), cargo, área, mentor, habilidades e o **manual de procedimentos em Markdown (.md)**.
+- **A liderança contrata sozinha, só estagiários**: quando uma coluna publicada mostra uma necessidade comprovada
+  (e-mail, telefone, CPF/CNPJ ou CEP fora do padrão), a coordenadora do andar testa a habilidade numa cópia e,
+  havendo trabalho de verdade, contrata um estagiário em observação. Datas e números nunca são confundidos com contato,
+  e se mais da metade dos valores seria "inválida" a contratação não acontece (seria a coluna errada).
+- **Experiência de 3 meses**: no fim, o líder recomenda efetivar como Júnior (você decide) ou desliga quem não teve
+  trabalho/falhou. Como estagiário nunca altera dados, desligar não deixa rastro. Ajustes em `config.yaml`:
+  `contratacao_automatica: {habilitada: true, maximo: 12, observacoes_minimas: 5, dias_experiencia: 90}`.
+
+### Canal da equipe (sem internet, sem API)
+**Canal da equipe** no painel: canais por área (#geral, #engenharia, #analise, #excel, #lideranca, #banco, #rh, #ideias, #ti),
+filtros por pessoa, tipo, período e busca, e uma caixa de texto. Quem responde é um roteador de intenções em Python:
+status do dia, erros, sprint, ideias, banco, equipe, cálculo de amostra/margem de erro (exato) e dúvidas de Excel,
+Power BI/DAX, pesquisa e trade marketing. Chame alguém pelo nome ("Ricardo, como faço…"). Ele também procura nos
+manuais `agentes/<id>.md` e nos arquivos `.md` da pasta `conhecimento/` (coloque lá o glossário e as regras da empresa).
+Quando não tem certeza, diz que não entendeu — não inventa. A cada 15 dias cada pessoa publica a sprint:
+feito, bom, travou e backlog.
+
 ### Criar um agente (pelo painel)
-1. **Agentes e habilidades** → **Novo agente**.
+1. **Equipe e contratações** → **Contratar**.
 2. Dê nome, função, cor, **quando trabalha** e **para quais arquivos** (`*` = todos; `nps_*` = só os que começam com nps_).
 3. **Adicionar habilidade** → escolha no catálogo → preencha os campos marcados com `*`.
 4. Abra **Conhecimento: quando usar e cuidados** em cada habilidade: é um guia de boas práticas.
@@ -121,7 +159,13 @@ regras:
    - **Password:** crie uma senha e **anote** (é a do usuário `postgres`);
    - **Port:** deixe `5432`;
    - no final, desmarque o *Stack Builder*.
-3. No painel: **Configurações → Banco de dados PostgreSQL** → ligue a chave, informe a senha → **Testar conexão** → **Salvar**.
+3. No painel: **Configurações → Banco de dados PostgreSQL** → ligue a chave e preencha:
+   servidor `127.0.0.1`, porta `5432`, banco `robo_dados`, usuário `postgres` e a senha → **Testar conexão** → **Salvar**.
+4. Mais seguro (recomendado pelo time de segurança): em vez de gravar a senha no arquivo, crie a variável de ambiente
+   do Windows `ROBO_PG_SENHA` (Iniciar → digite "variáveis de ambiente" → **Editar as variáveis de ambiente para sua conta**
+   → **Novo** → nome `ROBO_PG_SENHA`, valor = sua senha → OK) e deixe o campo de senha vazio. Reinicie o robô.
+
+Onde isso fica gravado: seção `banco:` do `config.yaml` (`habilitado: true`, `host`, `porta`, `banco`, `usuario`).
 
 O banco `robo_dados` é criado sozinho. Camadas:
 
@@ -200,7 +244,14 @@ Ferramentas avançadas em `ferramentas/`: modo texto sem painel, status, process
 ```
 robo/
 ├── leitura.py, limpeza.py, validacao.py, modelagem.py, escrita.py   ← ETL
-├── habilidades/          catálogo de habilidades (__init__: motor · nativas.py: 26 habilidades)
+├── habilidades/     catálogo de habilidades (__init__: motor · nativas.py: 26 habilidades)
+├── rh.py            fichas, níveis, permissões por risco e processo seletivo técnico
+├── producao.py      portão de produção (supervisor, DBA, coordenadores)
+├── quadro.py        cargos de gerente a estagiário com conferências reais e provas
+├── contratacao.py   contratação automática pela liderança e experiência de 3 meses
+├── canal.py         canal offline, sprints, boletim e ideias
+├── ti.py            5º andar: ronda de TI e segurança
+├── analise.py       2º andar · excel.py: 3º andar (entrega Excel auto-conferida)
 ├── agentes.py       equipe: nativos + personalizados (agentes/*.yaml)
 ├── banco.py         PostgreSQL em camadas (psycopg 3 + COPY)
 ├── consultas.py     biblioteca consultas_sql/ (execução somente leitura)
