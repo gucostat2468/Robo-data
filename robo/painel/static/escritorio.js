@@ -117,7 +117,7 @@ function selo(simbolo, cor) {
     ctx.fillText(simbolo, l / 2, a / 2 + 4);
   }, 128, 128);
   const s = new THREE.Sprite(new THREE.SpriteMaterial({ map: tex, transparent: true, depthWrite: false }));
-  s.scale.set(0.55, 0.55, 1); s.visible = false;
+  s.scale.set(0.55, 0.55, 1); s.visible = false; s.userData.selo = true;
   return s;
 }
 function placa(texto, cor) {
@@ -136,17 +136,25 @@ const PELES = ["#f2c7a5", "#d9a37e", "#a86f4c", "#7c4f34", "#f5d3b8", "#c68a63"]
 const CABELOS = ["#2b1d14", "#5a3a22", "#141414", "#8a5a2b", "#c9a15c", "#3d3d3d"];
 function hashTexto(t) { let h = 0; for (const c of t) h = (h * 31 + c.charCodeAt(0)) >>> 0; return h; }
 
-function criarPersonagem(cor, semente) {
+function criarPersonagem(cor, semente, emPe = false) {
   const g = new THREE.Group();
   const pele = mat(PELES[semente % PELES.length]);
   const cabelo = mat(CABELOS[(semente >>> 3) % CABELOS.length]);
   const calca = mat(ESCURO ? "#3a4256" : "#33405a");
+  const pernas = [];
   for (const lado of [-1, 1]) {
-    g.add(caixa(0.17, 0.16, 0.5, calca, lado * 0.12, 0.62, 0.22));
-    g.add(caixa(0.15, 0.5, 0.15, calca, lado * 0.12, 0.34, 0.45));
-    g.add(caixa(0.17, 0.08, 0.26, mat("#222"), lado * 0.12, 0.05, 0.52));
+    if (emPe) {
+      const quadril = new THREE.Group(); quadril.position.set(lado * 0.12, 0.86, 0); g.add(quadril);
+      quadril.add(caixa(0.17, 0.82, 0.18, calca, 0, -0.41, 0));
+      quadril.add(caixa(0.17, 0.08, 0.28, mat("#222"), 0, -0.82, 0.05));
+      pernas.push(quadril);
+    } else {
+      g.add(caixa(0.17, 0.16, 0.5, calca, lado * 0.12, 0.62, 0.22));
+      g.add(caixa(0.15, 0.5, 0.15, calca, lado * 0.12, 0.34, 0.45));
+      g.add(caixa(0.17, 0.08, 0.26, mat("#222"), lado * 0.12, 0.05, 0.52));
+    }
   }
-  const tronco = new THREE.Group(); tronco.position.y = 0.66; g.add(tronco);
+  const tronco = new THREE.Group(); tronco.position.y = emPe ? 0.82 : 0.66; g.add(tronco);
   const camisa = new THREE.Mesh(new THREE.CapsuleGeometry(0.25, 0.42, 6, 14), mat(cor));
   camisa.position.y = 0.42; camisa.castShadow = true; tronco.add(camisa);
   const cabeca = new THREE.Group(); cabeca.position.y = 0.98; tronco.add(cabeca);
@@ -165,10 +173,14 @@ function criarPersonagem(cor, semente) {
     const braco = new THREE.Mesh(new THREE.CapsuleGeometry(0.075, 0.36, 4, 10), mat(cor));
     braco.position.y = -0.22; braco.castShadow = true; ombro.add(braco);
     const mao = new THREE.Mesh(new THREE.SphereGeometry(0.07, 10, 8), pele); mao.position.y = -0.46; ombro.add(mao);
-    ombro.rotation.x = -1.15; ombro.rotation.z = lado * -0.12;
+    ombro.rotation.x = emPe ? -0.15 : -1.15; ombro.rotation.z = lado * -0.12;
     bracos.push(ombro);
   }
-  return { grupo: g, tronco, cabeca, bracos };
+  if (emPe) { // prancheta de quem confere
+    const prancheta = caixa(0.26, 0.34, 0.03, mat("#a16207"), 0, -0.4, 0.06); prancheta.add(caixa(0.2, 0.24, 0.01, mat("#ffffff"), 0, -0.02, 0.02));
+    bracos[0].add(prancheta);
+  }
+  return { grupo: g, tronco, cabeca, bracos, pernas, alturaTronco: emPe ? 0.82 : 0.66 };
 }
 
 // ------------------------------------------------------------------ mobiliário
@@ -225,7 +237,8 @@ let geo = null, elevador = null;
 let caixaEntrada, caixaTratadas, caixaErros, prateleira, pilhaEntrada = [], pilhaTratadas = [], pilhaErros = [], pilhaRelatorios = [], leds = [];
 const tvs = {};
 const clicaveis = [];
-const ETAPA_NATIVA = new Set(["recepcao", "leitura", "limpeza", "validacao", "modelagem", "banco", "publicacao"]);
+const ETAPA_NATIVA = new Set(["recepcao", "leitura", "limpeza", "validacao", "modelagem", "banco", "publicacao",
+  "supervisor", "dba", "coord_engenharia", "coord_analise"]);
 
 function montarPredio(equipe) {
   cena.remove(raiz); raiz = new THREE.Group(); cena.add(raiz);
@@ -245,6 +258,47 @@ function montarPredio(equipe) {
   construirElevador();
   enquadrarCameras();
   definirAndarVisivel(estado.andarVisivel);
+}
+
+// corredores livres (entre as fileiras e na frente da fileira da frente) — por onde os supervisores andam
+const corredores = () => ({ fundo: geo.zFundo + 1.8, frente: geo.zFrente + 1.75, x1: geo.colX(0) - 1.6, x2: geo.colX(geo.porFileira - 1) + 1.6 });
+
+function criarAndarilho(g, andar, ag, i) {
+  const c = corredores();
+  const semente = hashTexto(ag.id);
+  const p = criarPersonagem(ag.cor, semente, true);
+  const grupo = new THREE.Group(); g.add(grupo); grupo.add(p.grupo);
+  const ronda = [[c.x1, c.fundo], [c.x2, c.fundo], [c.x2, c.frente], [c.x1, c.frente]];
+  if (i % 2) ronda.reverse();
+  const inicio = ronda[i % ronda.length]; grupo.position.set(inicio[0], 0, inicio[1]);
+  const etiqueta = rotulo(ag.nome, ag.papel + (ag.ficha?.nivel ? ` · ${ag.ficha.nivel}` : ""), ag.cor);
+  etiqueta.position.set(0, 2.55, 0); etiqueta.scale.set(2.6, 0.81, 1); grupo.add(etiqueta);
+  const anel = new THREE.Mesh(new THREE.TorusGeometry(0.3, 0.035, 8, 40), new THREE.MeshStandardMaterial({ color: ag.cor, emissive: ag.cor, emissiveIntensity: 0.8 }));
+  anel.rotation.x = Math.PI / 2; anel.position.y = 2.15; anel.visible = false; grupo.add(anel);
+  const ok = selo("✓", "#16a34a"), erro = selo("!", "#dc2626"), zz = selo("z", "#94a3b8");
+  for (const s of [ok, erro, zz]) { s.position.set(0.42, 2.15, 0.1); grupo.add(s); }
+  p.grupo.traverse((o) => { if (o.isMesh) { o.userData.agente = ag.id; clicaveis.push(o); } });
+  const yBase = andar === 1 ? 0 : ALTURA;
+  estado.estacoes.set(ag.id, {
+    agente: ag, andar, grupo, p, anel, etiqueta, selos: { ok, erro, zz }, inativo: !ag.ativo, semente, movel: true, yBase,
+    ronda, alvoRonda: (i + 1) % ronda.length, caminho: [], mesa: { logo: { material: { emissiveIntensity: 0 } }, tampa: {} },
+    get mesaPos() { const v = new THREE.Vector3(); grupo.getWorldPosition(v); return v.add(new THREE.Vector3(0, 0.9, 0)); },
+    situacao: ag.ativo ? "parado" : "desligado", ate: 0,
+  });
+}
+
+// caminho pelos corredores até ficar de frente para um ponto (local do andar)
+function caminhoAte(e, destino) {
+  const c = corredores(), atual = e.grupo.position;
+  const corredorDestino = destino.z < (geo.zFundo + geo.zFrente) / 2 + 0.6 ? c.fundo : c.frente;
+  const corredorAtual = Math.abs(atual.z - c.fundo) < Math.abs(atual.z - c.frente) ? c.fundo : c.frente;
+  const pts = [[atual.x, corredorAtual]];
+  if (corredorAtual !== corredorDestino) {
+    const lateral = Math.abs(atual.x - c.x1) < Math.abs(atual.x - c.x2) ? c.x1 : c.x2;
+    pts.push([lateral, corredorAtual], [lateral, corredorDestino]);
+  }
+  pts.push([destino.x, corredorDestino]);
+  return pts.map(([x, z]) => new THREE.Vector3(x, 0, z));
 }
 
 function construirAndar(g, andar, equipe) {
@@ -342,6 +396,11 @@ function construirAndar(g, andar, equipe) {
   g.add(criarPlanta(maxX - 0.8, zParede + 0.8, 1.1));
   g.add(criarPlanta(maxX - 0.8, zFrente + 2.6, 0.9));
 
+  // quem faz ronda (supervisor e coordenadores) anda pelos corredores
+  const rondantes = equipe.filter((a) => a.ronda);
+  equipe = equipe.filter((a) => !a.ronda);
+  rondantes.forEach((ag, i) => criarAndarilho(g, andar, ag, i));
+
   // estações dos agentes: fileira do fundo da esquerda para a direita; da frente, da direita para a esquerda
   const porFileira = Math.max(1, Math.ceil(equipe.length / 2));
   equipe.forEach((ag, i) => {
@@ -424,7 +483,7 @@ function definirAndarVisivel(andar) {
   estado.andarVisivel = andar;
   if (andares[2]) andares[2].visible = andar !== 1;
   // no 2º andar, as placas e etiquetas do 1º não aparecem "flutuando" por baixo
-  andares[1]?.traverse((o) => { if (o.isSprite) o.visible = andar !== 2; });
+  andares[1]?.traverse((o) => { if (o.isSprite && !o.userData.selo) o.visible = andar !== 2; });
   document.querySelectorAll("#andares [data-andar]").forEach((b) => b.classList.toggle("ativo", b.dataset.andar === String(andar)));
 }
 
@@ -572,7 +631,10 @@ const FRASE = {
   analise_perfil: "está traçando o perfil de", analise_indicadores: "está calculando os indicadores de",
   analise_estatistica: "está testando o que é diferença real em", analise_monitoramento: "está comparando com as cargas anteriores",
   analise_relator: "está escrevendo o resumo executivo de",
+  supervisor: "está conferindo (conciliação de linhas e integridade) antes de publicar", dba: "está conferindo no PostgreSQL, antes do commit,",
+  coord_engenharia: "está passando o checklist de produção de", coord_analise: "está revisando as análises de",
 };
+const DURACAO_EXTRA = { supervisor: 2.4, dba: 1.6, coord_engenharia: 2.0, coord_analise: 2.0 };
 
 function idAgente(etapa) {
   if (etapa.startsWith("agente:")) return etapa.slice(7);
@@ -621,7 +683,7 @@ function iniciarEvento(ev) {
       }
     } else {
       doc.faixa.material.color.set("#dc2626"); total = moverDocumento(doc, caixaErros.clone().add(new THREE.Vector3(0, 0.3, 0)), dur * 1000, 1); final = "erros";
-      definirSituacao("validacao", "erro", 3); definirSituacao("publicacao", "parado");
+      definirSituacao(String(ev.motivo || "").includes("Supervisor") ? "supervisor" : "validacao", "erro", 3); definirSituacao("publicacao", "parado");
       narrar(`⛔ ${curto} reprovado — ${num(ev.erros)} erro(s). Veja em Reprovados no painel`);
     }
     seguirPara(doc.andar);
@@ -633,6 +695,18 @@ function iniciarEvento(ev) {
   const est = id && estado.estacoes.get(id);
   if (!est) { estado.tocando = { ev, fim: performance.now() + 50 }; return; }
   doc = doc || novoDocumento(ev.arquivo);
+  if (est.movel) { // supervisor/coordenador vai até onde o documento está
+    if (doc.andar !== est.andar) { const ultimo = doc.rota.at(-1)?.para; if (ultimo) doc.g.position.copy(ultimo); }
+    const local = doc.g.position.clone(); local.y -= est.yBase;
+    est.caminho = caminhoAte(est, local);
+    const distancia = est.caminho.reduce((d, p, i) => d + (i ? p.distanceTo(est.caminho[i - 1]) : p.distanceTo(est.grupo.position)), 0);
+    seguirPara(est.andar);
+    estado.equipe.forEach((a) => { const e = estado.estacoes.get(a.id); if (e && e.situacao === "trabalhando") definirSituacao(a.id, e.inativo ? "desligado" : "parado"); });
+    definirSituacao(id, "trabalhando");
+    narrar(`${est.agente.nome} (${est.agente.papel}) ${FRASE[id] || "está conferindo"} ${curto}`);
+    estado.tocando = { ev, fim: performance.now() + (Math.min(3.5, distancia / 2.6) + (DURACAO_EXTRA[id] || 1.8) * velocidade) * 1000, id };
+    return;
+  }
   doc.faixa.material.color.set(est.agente.cor);
   const trocaAndar = est.andar !== doc.andar;
   const deslocamento = moverDocumento(doc, est.mesaPos, Math.min(900, dur * 450), est.andar);
@@ -795,6 +869,44 @@ async function atualizarTV() {
   try { estado.kpis = (await api("/api/estado")).kpis; desenharTV(1); } catch { /* tenta de novo */ }
 }
 
+// ------------------------------------------------------------------ andarilhos (ronda e ida até o documento)
+function andarAgente(e, dt, t) {
+  const g = e.grupo, p = e.p;
+  let alvo = null, velocidade = 0.9;
+  if (e.situacao === "trabalhando" && e.caminho.length) { alvo = e.caminho[0]; velocidade = 2.6; }
+  else if (e.situacao !== "trabalhando") {
+    if (e.caminho.length && e.situacao === "parado") e.caminho = [];
+    const r = e.ronda[e.alvoRonda]; alvo = new THREE.Vector3(r[0], 0, r[1]);
+  }
+  let andando = false;
+  if (alvo) {
+    const delta = alvo.clone().sub(g.position); delta.y = 0;
+    const dist = delta.length();
+    if (dist < 0.05) {
+      if (e.situacao === "trabalhando") e.caminho.shift(); else e.alvoRonda = (e.alvoRonda + 1) % e.ronda.length;
+    } else {
+      g.position.add(delta.multiplyScalar(Math.min(1, (velocidade * dt) / dist)));
+      const angulo = Math.atan2(alvo.x - g.position.x, alvo.z - g.position.z);
+      g.rotation.y += Math.atan2(Math.sin(angulo - g.rotation.y), Math.cos(angulo - g.rotation.y)) * Math.min(1, dt * 8);
+      andando = true;
+    }
+  }
+  if (e.situacao === "trabalhando" && !e.caminho.length) { // chegou: vira para a mesa e confere a prancheta
+    const deFrente = g.position.z < (geo.zFundo + geo.zFrente) / 2 + 0.6 ? Math.PI : 0;
+    g.rotation.y += Math.atan2(Math.sin(deFrente - g.rotation.y), Math.cos(deFrente - g.rotation.y)) * Math.min(1, dt * 6);
+    p.cabeca.rotation.x = 0.35; p.bracos[0].rotation.x = -1.3 + Math.sin(t * 3) * 0.05; p.bracos[1].rotation.x = -0.9;
+  } else {
+    p.cabeca.rotation.x = 0.05;
+    p.bracos[0].rotation.x = andando ? -0.9 : -0.9; p.bracos[1].rotation.x = andando ? Math.sin(t * 7) * 0.45 : -0.15;
+  }
+  const passo = andando ? Math.sin(t * (velocidade > 1 ? 11 : 7)) * 0.5 : 0;
+  if (p.pernas?.length) { p.pernas[0].rotation.x = passo; p.pernas[1].rotation.x = -passo; }
+  p.tronco.position.y = p.alturaTronco + (andando ? Math.abs(Math.sin(t * 7)) * 0.03 : 0);
+  if (e.selos.ok.visible || e.selos.erro.visible) for (const s of [e.selos.ok, e.selos.erro]) s.position.y = 2.15 + Math.sin(t * 4) * 0.05;
+  const pos = new THREE.Vector3(); g.getWorldPosition(pos);
+  e.etiqueta.material.opacity = e.agente.id === estado.selecionado ? 1 : Math.min(1, Math.max(0, (camera.position.distanceTo(pos) - 5) / 4));
+}
+
 // ------------------------------------------------------------------ animação
 const relogio = new THREE.Clock();
 let ultimoQuadro = performance.now();
@@ -808,7 +920,9 @@ function animar() {
 
   for (const [id, e] of estado.estacoes) {
     if (e.ate && agora > e.ate) definirSituacao(id, e.inativo ? "desligado" : "parado");
+    if (e.movel && e.situacao !== "desligado") andarAgente(e, dt, t);
     if (e.andar === 2 && !andares[2]?.visible) continue;
+    if (e.movel) { e.anel.rotation.z += 0.06; continue; }
     const fase = e.semente % 100;
     const { tronco, cabeca, bracos } = e.p;
     if (e.situacao === "trabalhando") {
@@ -817,12 +931,12 @@ function animar() {
       cabeca.rotation.x = 0.18 + Math.sin(t * 3) * 0.04;
       cabeca.rotation.y = Math.sin(t * 1.5 + fase) * 0.12;
       e.anel.rotation.z += 0.08;
-      tronco.position.y = 0.66 + Math.abs(Math.sin(t * 9)) * 0.012;
+      tronco.position.y = e.p.alturaTronco + Math.abs(Math.sin(t * 9)) * 0.012;
     } else if (e.situacao === "erro") {
       bracos[1].rotation.x = -2.9 + Math.sin(t * 8) * 0.15; bracos[0].rotation.x = -1.15; cabeca.rotation.x = -0.1;
     } else if (e.situacao === "ok") {
       bracos[0].rotation.x = -2.6; bracos[1].rotation.x = -2.6;
-      tronco.position.y = 0.66 + Math.abs(Math.sin(t * 6)) * 0.05;
+      tronco.position.y = e.p.alturaTronco + Math.abs(Math.sin(t * 6)) * 0.05;
     } else if (e.situacao === "desligado") {
       cabeca.rotation.x = 0.45; bracos[0].rotation.x = -0.9; bracos[1].rotation.x = -0.9;
       e.selos.zz.position.y = 2.0 + Math.sin(t * 1.5) * 0.08;
@@ -831,7 +945,7 @@ function animar() {
       bracos[1].rotation.x += (-1.0 - bracos[1].rotation.x) * 0.1;
       cabeca.rotation.x = Math.sin(t * 0.8 + fase) * 0.05;
       cabeca.rotation.y = Math.sin(t * 0.35 + fase) * 0.35;
-      tronco.position.y = 0.66 + Math.sin(t * 1.6 + fase) * 0.006;
+      tronco.position.y = e.p.alturaTronco + Math.sin(t * 1.6 + fase) * 0.006;
     }
     for (const s of [e.selos.ok, e.selos.erro]) if (s.visible) s.position.y = 2.0 + Math.sin(t * 4) * 0.05;
     const pos = new THREE.Vector3(); e.grupo.getWorldPosition(pos);
