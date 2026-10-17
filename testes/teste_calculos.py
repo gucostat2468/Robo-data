@@ -42,3 +42,18 @@ def teste_canal_usa_a_calculadora(planilha_baguncada, cfg_factory):
 def teste_sem_base_publicada_responde_com_honestidade(cfg_factory):
     r = calcular(cfg_factory(), "nps por região")
     assert "Ainda não há" in r["texto"]
+
+
+def teste_numeros_e_filtros_de_texto(planilha_baguncada, cfg_factory):
+    from robo.calculos import _valor
+    assert _valor("8.5") == 8.5 and _valor("1.234,5") == 1234.5 and _valor("85") == 85.0 and _valor("Sul") == "Sul"
+    cfg = _cfg(planilha_baguncada, cfg_factory)
+    assert "só dá para filtrar com =" in calcular(cfg, "contagem por curso onde curso > A")["texto"]
+
+
+def teste_canal_diferencia_erros_de_calculo(planilha_baguncada, cfg_factory):
+    cfg = _cfg(planilha_baguncada, cfg_factory)
+    assert responder("quantos erros tivemos hoje?", cfg)[0]["intencao"] == "erros"
+    assert "±2,5" in responder("amostra para margem de 2.5% numa base de 5000", cfg)[0]["texto"].replace(".", ",") or \
+        "2,5 pontos" in responder("amostra para margem de 2.5% numa base de 5000", cfg)[0]["texto"].replace(".", ",")
+    assert "5 andares" in responder("quem é a equipe?", cfg)[0]["texto"]

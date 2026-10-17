@@ -107,11 +107,13 @@ def _achar_coluna(trecho: str, colunas: list[str]) -> str | None:
 
 
 def _valor(texto: str):
+    """Número em formato brasileiro (1.234,5) ou com ponto decimal (8.5); o resto continua texto."""
     t = texto.strip().strip("'\"")
-    try:
-        return float(t.replace(".", "").replace(",", ".")) if re.fullmatch(r"-?[\d.]+(,\d+)?", t) else t
-    except ValueError:
-        return t
+    if re.fullmatch(r"-?\d{1,3}(\.\d{3})+(,\d+)?|-?\d+(,\d+)?", t):  # 1.234 / 1.234,5 / 85 / 8,5
+        return float(t.replace(".", "").replace(",", "."))
+    if re.fullmatch(r"-?\d+\.\d+", t):  # 8.5 (ponto decimal)
+        return float(t)
+    return t
 
 
 def interpretar(pergunta: str, bases: list[str]) -> dict | None:
@@ -242,6 +244,11 @@ def calcular(cfg, pergunta: str) -> dict | None:
             mask = {"=": serie == valor, "!=": serie != valor, ">": serie > valor, "<": serie < valor,
                     ">=": serie >= valor, "<=": serie <= valor}[sinal]
         else:
+            if sinal not in ("=", "!="):
+                return {"autor": "canal_nina", "texto": f"A coluna {c} é texto: para ela só dá para filtrar com = ou "
+                                                        f"!= (ex.: {c} = valor). Maior/menor só em colunas numéricas."}
+            if isinstance(valor, float):  # número digitado para coluna de texto (ex.: código 2025)
+                valor = str(int(valor)) if valor.is_integer() else str(valor)
             alvo = _norm(valor)
             iguais = serie.astype(str).map(_norm) == alvo
             mask = ~iguais if sinal == "!=" else iguais
@@ -301,7 +308,8 @@ def _executar(op: str, df: pd.DataFrame, metricas: list[str], por: list[str]) ->
             return "Correlação precisa de duas colunas (ex.: correlação entre nota_nps e idade)", ""
         a, b = (pd.to_numeric(df[m], errors="coerce") for m in metricas[:2])
         r = a.corr(b)
-        forca = "forte" if abs(r) >= 0.7 else "moderada" if abs(r) >= 0.4 else "fraca" if abs(r) >= 0.2 else "praticamente nenhuma"
+        # mesmos cortes da análise do 2º andar (robo/analise.py)
+        forca = "forte" if abs(r) >= 0.7 else "moderada" if abs(r) >= 0.5 else "fraca" if abs(r) >= 0.3 else "praticamente nenhuma"
         return (f"Correlação de Pearson entre {metricas[0]} e {metricas[1]}: {_fmt(r)} ({forca}; correlação não prova causa)",
                 f"n = {int((a.notna() & b.notna()).sum())}")
 

@@ -324,8 +324,11 @@ class Entrega:
         ultima = 4 + len(self.conferencias)
         ws["A1"] = f"Entrega Excel — {self.base}"; ws["A1"].font = Font(bold=True, size=16, color="1F3864")
         ws["A3"] = "Status da conferência"; ws["A3"].font = NEGRITO
-        ws["B3"] = (f"=IF(COUNTIF('Conferência'!E5:E{ultima},\"OK\")={len(self.conferencias)},"
-                    f"\"✔ Todas as {len(self.conferencias)} conferências OK\",\"✖ Há divergências — não use, avise o supervisor\")")
+        if not self.conferencias:
+            ws["B3"] = "Sem números para conferir nesta base (nenhum segmento, indicador ou valor de trade reconhecido)"
+        else:
+            ws["B3"] = (f"=IF(COUNTIF('Conferência'!E5:E{ultima},\"OK\")={len(self.conferencias)},"
+                        f"\"✔ Todas as {len(self.conferencias)} conferências OK\",\"✖ Há divergências — não use, avise o supervisor\")")
         ws["B3"].font = Font(bold=True, size=13, color="107C41")
         ws["B3"].fill = VERDE_CLARO
         linhas = [("Arquivo de origem", self.arquivo), ("Registros", self.n), ("Gerado em", datetime.now().strftime("%d/%m/%Y %H:%M")),

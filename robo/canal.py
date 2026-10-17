@@ -434,7 +434,7 @@ CONHECIMENTO = [
               "selecione a tabela → Transformar Dados. Lá você remove colunas, troca tipos e filtra, e cada passo fica gravado "
               "em 'Etapas Aplicadas' (à direita). No fim, Fechar e Carregar. Para apontar para as nossas bases, use a pasta "
               "Bases-Tratadas: ela só tem arquivos que passaram em todas as conferências."},
-    {"chaves": ["seerro", "iferror", "#n/d", "#div/0", "erro na formula", "#valor"], "autor": "excel_formulas",
+    {"chaves": ["seerro", "iferror", "n/d", "div/0", "erro na formula", "erro de formula"], "autor": "excel_formulas",
      "texto": "SEERRO (IFERROR) troca um erro por um valor: =SEERRO(sua_fórmula; 0). Use com moderação: ele esconde QUALQUER "
               "erro, inclusive os que você precisava ver. Prefira tratar a causa — #N/D é valor não encontrado, #DIV/0! é "
               "divisão por zero (use =SE(base=0; \"\"; a/base)), #VALOR! é texto onde deveria ter número."},
@@ -469,7 +469,7 @@ CONHECIMENTO = [
      "texto": "Atalhos que mais economizam tempo: Ctrl+T (vira Tabela), Ctrl+Shift+L (filtro), Ctrl+seta (vai ao fim dos dados), "
               "Ctrl+Shift+seta (seleciona até o fim), F4 (trava referência $A$1), Ctrl+; (data de hoje), Alt+= (AutoSoma), "
               "Ctrl+1 (formatar células)."},
-    {"chaves": ["referencia absoluta", "cifrao", "$a$1", "travar celula", "f4"], "autor": "excel_supervisor",
+    {"chaves": ["referencia absoluta", "cifrao", "referencia fixa", "travar celula", "f4"], "autor": "excel_supervisor",
      "texto": "O $ trava a referência ao arrastar a fórmula: $A$1 trava linha e coluna; A$1 só a linha; $A1 só a coluna. "
               "Atalho: clique na referência dentro da fórmula e aperte F4 para alternar."},
     {"chaves": ["dax", "medida", "calculate", "sumx", "power bi", "powerbi"], "autor": "excel_formulas",
@@ -615,13 +615,17 @@ def responder(texto: str, cfg) -> list[dict]:
     pont_int = {k: _pontuar(t, v) for k, v in INTENCOES.items()}
     pont_kb = [(_pontuar(t, v["chaves"]), i) for i, v in enumerate(CONHECIMENTO)]
     melhor_kb = max(pont_kb) if pont_kb else (0, -1)
-    melhor_int = max(pont_int.items(), key=lambda x: x[1])
+    # em empate, a intenção mais específica vence (erros antes de status; status é a mais genérica)
+    ordem = ["erros", "sprint", "banco", "ideias", "amostra", "equipe", "ajuda", "status", "saudacao"]
+    melhor_int = max(pont_int.items(), key=lambda x: (x[1], -ordem.index(x[0]) if x[0] in ordem else -99))
 
     # cálculo amostral/margem com números na mensagem tem prioridade (resposta exata, não texto pronto)
     if (pont_int["amostra"] or "margem" in t) and _numeros(t):
         return [_calculo_amostral(t)]
     # pedido de cálculo sobre as bases publicadas ("nps por região", "média de valor por loja onde canal = App")
-    if not re.match(r"^(como|o que|qual a diferenca|por que)\b", t):
+    # perguntas sobre o próprio robô ("quantos erros tivemos", "como está hoje") não são cálculo sobre bases
+    sobre_o_robo = pont_int["erros"] >= 2 or pont_int["status"] >= 2 or pont_int["sprint"] or pont_int["equipe"] >= 2
+    if not sobre_o_robo and not re.match(r"^(como|o que|qual a diferenca|por que)\b", t):
         try:
             from robo.calculos import calcular
             r = calcular(cfg, texto)
@@ -737,12 +741,14 @@ def _r_equipe(cfg, _t) -> dict:
     from robo.analise import ANALISTAS
     from robo.excel import EQUIPE_EXCEL
     from robo.producao import SUPERVISORES, agentes_reprovados_no_rh
-    total = len(NATIVOS) + len(ANALISTAS) + len(EQUIPE_EXCEL) + len(SUPERVISORES) + len(EQUIPE_CANAL)
+    from robo.quadro import lotacao
+    andares = lotacao()
+    total = sum(len(p) for niveis in andares.values() for p in niveis.values())
     reprovados = agentes_reprovados_no_rh()
     return {"autor": "canal_helena", "intencao": "equipe",
-            "texto": f"Somos {total} pessoas em 4 andares: 1º Engenharia de dados ({len(NATIVOS)} + supervisor, DBA e "
-                     f"coordenadora), 2º Análise ({len(ANALISTAS)} analistas + coordenador), 3º Sala Excel "
-                     f"({len(EQUIPE_EXCEL)} especialistas) e 4º Canal e ideias (Nina, Iara e eu). "
+            "texto": f"Somos {total} pessoas em {len(andares)} andares: 1º Engenharia de dados, 2º Análise e qualidade, "
+                     f"3º Sala Excel, 4º Diretoria e canal, 5º TI e segurança — todos com gerente, coordenação, "
+                     f"sêniores, plenos, juniores e estagiários. "
                      + ("Todos aprovados no processo seletivo técnico. " if not reprovados else
                         f"Reprovados nas provas: {', '.join(reprovados)}. ")
                      + "Para contratar (estagiário, júnior, pleno, sênior), vá em Agentes no painel: cada contratação "
@@ -769,7 +775,7 @@ def _r_amostra(cfg, t) -> dict:
 def _calculo_amostral(t: str) -> dict:
     nums = _numeros(t)
     # margem: número seguido de % ou "pontos"; população: o maior número restante
-    m = re.search(r"(\d+(?:,\d+)?)\s*(%|pontos|p\.p\.|pp)", t)
+    m = re.search(r"(\d+(?:[.,]\d+)?)\s*(%|pontos|p\.p\.|pp)", t)
     margem = float(m.group(1).replace(",", ".")) / 100 if m else None
     resto = [n for n in nums if not m or n != float(m.group(1).replace(",", "."))]
     if margem is None and ("respostas" in t or "entrevist" in t or "com " in t) and resto:
