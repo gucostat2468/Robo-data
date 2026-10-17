@@ -99,3 +99,25 @@ def teste_testar_enviar_e_agentes(painel, tmp_path):
     status, r = chamar(base, "/api/agentes/salvar", {"agente": {**novo, "habilidades": [{"habilidade": "nao_existe"}]}})
     assert status == 400 and "não existe" in r["erro"]
     assert chamar(base, "/api/agentes/excluir", {"id": "limpeza"})[0] == 400
+
+
+def teste_cabecalhos_de_seguranca_e_limite_de_corpo(painel):
+    base, _ = painel
+    with urllib.request.urlopen(base + "/") as r:
+        assert r.headers["X-Frame-Options"] == "DENY" and "frame-ancestors 'none'" in r.headers["Content-Security-Policy"]
+    req = urllib.request.Request(base + "/api/canal/enviar", data=b"{" + b" " * (3 * 1024 * 1024) + b"}", method="POST",
+                                 headers={"X-Robo-Painel": "1", "Content-Type": "application/json"})
+    with pytest.raises(urllib.error.HTTPError) as e:
+        urllib.request.urlopen(req)
+    assert e.value.code == 413
+
+
+def teste_canal_e_ti_pela_api(painel):
+    base, _ = painel
+    req = urllib.request.Request(base + "/api/canal/enviar", data=json.dumps({"texto": "como está hoje?"}).encode(),
+                                 method="POST", headers={"X-Robo-Painel": "1", "Content-Type": "application/json"})
+    with urllib.request.urlopen(req) as r:
+        msgs = json.loads(r.read())["mensagens"]
+    assert msgs[0]["autor"] == "dono" and msgs[1]["tipo"] == "resposta"
+    status, d = chamar(base, "/api/canal?busca=hoje")
+    assert status == 200 and d["mensagens"]

@@ -36,6 +36,13 @@ log = logging.getLogger("robo")
 
 ESTATICOS = Path(__file__).parent / "estaticos"
 LIMITE_UPLOAD = 300 * 1024 * 1024
+LIMITE_JSON = 2 * 1024 * 1024  # corpo de ações do painel (texto, configurações); planilhas usam o upload
+CABECALHOS_SEGURANCA = {
+    "X-Content-Type-Options": "nosniff",
+    "X-Frame-Options": "DENY",  # nenhum site pode exibir o painel dentro de uma moldura (clickjacking)
+    "Content-Security-Policy": "frame-ancestors 'none'",
+    "Referrer-Policy": "no-referrer",
+}
 CABECALHO_ACAO = "X-Robo-Painel"
 RE_CARIMBO = re.compile(r"^\d{8}_\d{6}_")
 TIPOS_ESTATICOS = {
@@ -780,6 +787,8 @@ def criar_manipulador(api: Api):
             self.send_response(status)
             self.send_header("Content-Type", "application/json; charset=utf-8")
             self.send_header("Cache-Control", "no-store")
+            for k, v in CABECALHOS_SEGURANCA.items():
+                self.send_header(k, v)
             self.send_header("Content-Length", str(len(corpo)))
             self.end_headers()
             self.wfile.write(corpo)
@@ -807,6 +816,8 @@ def criar_manipulador(api: Api):
                 return self._upload(caminho, tamanho)
             if caminho not in ROTAS_POST:
                 return self._json({"erro": "rota inexistente"}, 404)
+            if tamanho > LIMITE_JSON:
+                return self._json({"erro": "requisição grande demais"}, 413)
             try:
                 corpo = json.loads(self.rfile.read(tamanho) or b"{}") if tamanho else {}
             except json.JSONDecodeError:
@@ -852,6 +863,8 @@ def criar_manipulador(api: Api):
             self.send_response(200)
             self.send_header("Content-Type", tipo)
             self.send_header("Cache-Control", "no-cache")
+            for k, v in CABECALHOS_SEGURANCA.items():
+                self.send_header(k, v)
             self.send_header("Content-Length", str(len(corpo)))
             self.end_headers()
             self.wfile.write(corpo)
