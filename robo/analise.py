@@ -152,6 +152,42 @@ def detectar_indicadores(df: pd.DataFrame, papeis: dict, forcados: dict) -> dict
     return achados
 
 
+# escalas escritas por extenso → nota de 1 a 5 (5 = melhor). Comparação sem acento e sem maiúsculas.
+ESCALAS_TEXTO = [
+    ("csat", {"muito satisfeito": 5, "totalmente satisfeito": 5, "extremamente satisfeito": 5, "satisfeito": 4,
+              "nem satisfeito nem insatisfeito": 3, "neutro": 3, "indiferente": 3, "insatisfeito": 2,
+              "muito insatisfeito": 1, "totalmente insatisfeito": 1, "extremamente insatisfeito": 1}),
+    ("csat", {"otimo": 5, "excelente": 5, "muito bom": 5, "bom": 4, "regular": 3, "razoavel": 3, "ruim": 2,
+              "pessimo": 1, "muito ruim": 1}),
+    ("ces", {"muito facil": 5, "extremamente facil": 5, "facil": 4, "nem facil nem dificil": 3, "neutro": 3,
+             "dificil": 2, "muito dificil": 1, "extremamente dificil": 1}),
+]
+
+
+def converter_escalas(df: pd.DataFrame) -> tuple[pd.DataFrame, dict, dict]:
+    """Colunas de texto que são uma escala conhecida (≥ 90% dos valores, ≥ 3 níveis diferentes) ganham uma
+    coluna numérica '<coluna>_nota' (1 a 5). Devolve (tabela, {tipo: coluna_nota}, {coluna_nota: coluna_texto})."""
+    novas, origem, tipos = {}, {}, {}
+    for col in df.columns:
+        serie = df[col]
+        if pd.api.types.is_numeric_dtype(serie) or pd.api.types.is_datetime64_any_dtype(serie) or str(col).startswith("_"):
+            continue
+        valores = serie.dropna().astype(str).map(lambda x: re.sub(r"\s+", " ", sem_acento(x).lower().strip(" .!")))
+        if len(valores) < 5:
+            continue
+        for tipo, mapa in ESCALAS_TEXTO:
+            convertidos = valores.map(mapa)
+            if convertidos.notna().mean() >= 0.9 and convertidos.nunique() >= 3:
+                nome = f"{col}_nota"
+                novas[nome] = pd.Series(convertidos, index=valores.index).reindex(df.index).astype("Int64")
+                origem[nome] = col
+                tipos.setdefault(tipo, nome)
+                break
+    if not novas:
+        return df, {}, {}
+    return df.assign(**novas), tipos, origem
+
+
 # =============================================================================== indicadores
 def calcular_indicador(tipo: str, serie: pd.Series, z: float) -> dict | None:
     v = serie.dropna().astype(float)
@@ -177,17 +213,24 @@ def calcular_indicador(tipo: str, serie: pd.Series, z: float) -> dict | None:
 class Analise:
     def __init__(self, df: pd.DataFrame, tabela: str, arquivo: str, base: str, cfg_analise: dict, padroes_id: list[str],
                  forcados: dict | None = None, segmentos_forcados: list[str] | None = None):
+        df, escalas, self.origem_escalas = converter_escalas(df)
         self.df, self.tabela, self.arquivo, self.base = df, tabela, arquivo, base
         self.c = {**PADRAO_ANALISE, **(cfg_analise or {})}
         self.z = _z_critico(float(self.c["confianca"]))
         self.papeis = {col: papel_coluna(df[col], col, int(self.c["max_categorias"]), padroes_id) for col in df.columns}
         self.indicadores_cols = detectar_indicadores(df, self.papeis, forcados or {})
+        for tipo, col in escalas.items():
+            self.indicadores_cols.setdefault(tipo, col)
         if segmentos_forcados:
             self.segmentos = [normalizar_nome_coluna(s) for s in segmentos_forcados if normalizar_nome_coluna(s) in df.columns]
         else:
+            usadas = set(self.indicadores_cols.values()) | set(self.origem_escalas.values()) | set(self.origem_escalas)
             self.segmentos = [c for c, p in self.papeis.items() if p == "categoria" and 2 <= df[c].nunique() and
-                              c not in self.indicadores_cols.values()][: int(self.c["max_segmentos"])]
-        self.observacoes: list[str] = []
+                              c not in usadas][: int(self.c["max_segmentos"])]
+        if self.origem_escalas:
+            self.observacoes_iniciais = [f"Escala escrita '{o}' convertida em nota de 1 a 5 ('{n}')"
+                                         for n, o in self.origem_escalas.items()]
+        self.observacoes: list[str] = list(getattr(self, "observacoes_iniciais", []))
         self.perfil = pd.DataFrame()
         self.indicadores = pd.DataFrame()
         self.destaques = pd.DataFrame()

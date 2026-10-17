@@ -372,12 +372,17 @@ def gerar_entrega(tabelas: dict, arquivo: str, base: str, cfg, papeis: dict | No
     if df.empty or len(df) > int(c["max_linhas"]):
         return None
     try:
-        from robo.analise import detectar_indicadores, papel_coluna
+        from robo.analise import converter_escalas, detectar_indicadores, papel_coluna
+        df, escalas, _origem = converter_escalas(df)
         if papeis is None:
             papeis = {col: papel_coluna(df[col], col, int(c["max_categorias"]), cfg.limpeza.get("padroes_identificador", []))
                       for col in df.columns}
         if indicadores is None:
             indicadores = detectar_indicadores(df, papeis, {})
+            for tipo, col in escalas.items():
+                indicadores.setdefault(tipo, col)
+        for col in df.columns:
+            papeis.setdefault(col, "numero" if col in escalas.values() else "texto")
         entrega = Entrega(df, base, arquivo, papeis, indicadores or {}, c)
         for etapa in ("excel_pesquisa", "excel_formulas", "excel_trade", "excel_dinamicas", "excel_supervisor"):
             if ao_etapa:

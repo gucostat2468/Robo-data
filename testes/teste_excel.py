@@ -70,3 +70,17 @@ def teste_pipeline_entrega_excel(pastas, cfg_factory):
     assert r.status == SUCESSO and r.excel and r.excel["conferencias"] > 10
     assert (cfg.relatorios / "nps_excel.xlsx").exists()
     assert "excel_supervisor" in etapas
+
+
+@pytest.mark.skipif(not SOFFICE, reason="LibreOffice não instalado")
+def teste_escala_escrita_vira_csat_com_formulas_que_fecham(tmp_path, cfg_factory):
+    from robo.excel import gerar_entrega
+    escala = ["Muito satisfeito", "Satisfeito", "Neutro", "Insatisfeito", "Muito insatisfeito"]
+    df = pd.DataFrame({"canal": ["App", "Loja"] * 50, "avaliacao": [escala[i % 5] for i in range(100)]})
+    cfg = cfg_factory()
+    info = gerar_entrega({"dados": df}, "satisfacao.xlsx", "satisfacao", cfg, None, None)
+    caminho = cfg.relatorios / "satisfacao_excel.xlsx"
+    wb = _recalcular(caminho, tmp_path)
+    status = [c.value for c in wb["Conferência"]["E"][4:] if c.value]
+    assert info and status and all(s == "OK" for s in status), status
+    assert "Todas" in wb["Resumo"]["B3"].value

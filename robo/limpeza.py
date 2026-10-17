@@ -39,6 +39,14 @@ _RE_MOEDA = re.compile(r"^(r\$|us\$|u\$s|\$|€|£)\s*", re.IGNORECASE)
 _RE_NUM_VIRGULA = re.compile(r"^(\d{1,3}(\.\d{3})+|\d+)(,\d+)?$")   # 1.234,56 | 1234,5 | 12
 _RE_NUM_PONTO = re.compile(r"^(\d{1,3}(,\d{3})+|\d+)(\.\d+)?$")     # 1,234.56 | 1234.5 | 12
 _RE_TOTAL = re.compile(r"^(sub\s*-?\s*)?total(\s+geral)?\s*:?$", re.IGNORECASE)
+_RE_COMECA_TOTAL = re.compile(r"^(sub\s*-?\s*total|total)\b", re.IGNORECASE)
+_RE_SUBTOTAL = re.compile(r"^sub\s*-?\s*total\b", re.IGNORECASE)
+
+MESES = {"jan": 1, "fev": 2, "feb": 2, "mar": 3, "abr": 4, "apr": 4, "mai": 5, "may": 5, "jun": 6, "jul": 7, "ago": 8,
+         "aug": 8, "set": 9, "sep": 9, "out": 10, "oct": 10, "nov": 11, "dez": 12, "dec": 12}
+_RE_DATA_EXTENSO = re.compile(r"^(\d{1,2})\s*(?:de\s+|[-/. ])\s*([a-z]{3,10})\.?\s*(?:de\s+|[-/. ])\s*(\d{2}|\d{4})$")
+_RE_MES_ANO = re.compile(r"^([a-z]{3,10})\.?\s*(?:de\s+|[-/ ])\s*(\d{2}|\d{4})$")
+SERIAL_EXCEL_MIN, SERIAL_EXCEL_MAX = 20000, 80000  # 1954 a 2119: número que o Excel usa por baixo de uma data
 
 TIPOS_VALIDOS = {"texto", "inteiro", "decimal", "data", "datahora"}
 
@@ -53,12 +61,13 @@ def sem_acento(texto: str) -> str:
 def normalizar_nome_coluna(nome) -> str:
     """'  Data de Admissão (R$) ' -> 'data_de_admissao_r'"""
     s = sem_acento(str(nome)).lower().strip()
+    interna = s.startswith("_")  # colunas de controle do robô (_aba_origem, _arquivo_origem) mantêm o "_"
     s = re.sub(r"[^a-z0-9]+", "_", s).strip("_")
     if not s:
         s = "coluna"
     if s[0].isdigit():
         s = f"c_{s}"
-    return s
+    return f"_{s}" if interna else s
 
 
 def _nomes_unicos(nomes: list[str]) -> list[str]:
@@ -129,12 +138,17 @@ def numero_de(v, decimal: str = ","):
     return -x if negativo else x
 
 
-def data_de(v):
+def data_de(v, serial: bool = False):
+    """Data em qualquer formato comum: 01/02/2025, 2025-02-01, 05-fev-2025, 6 de fevereiro de 2025, fev/2025.
+    serial=True aceita também o número que o Excel guarda por baixo de uma data (ex.: 45697 = 10/02/2025);
+    só é usado quando a coluna JÁ é de datas em texto (um número solto nunca vira data)."""
     if _eh_data_nativa(v):
         try:
             return pd.Timestamp(v)
         except (ValueError, OverflowError):
             return None
+    if serial and _eh_numero_nativo(v) and not pd.isna(v) and SERIAL_EXCEL_MIN <= float(v) <= SERIAL_EXCEL_MAX:
+        return pd.Timestamp("1899-12-30") + pd.Timedelta(days=float(v))
     if not isinstance(v, str):
         return None
     s = v.strip()
@@ -143,7 +157,21 @@ def data_de(v):
             return pd.Timestamp(datetime.strptime(s, fmt))
         except ValueError:
             continue
-    return None
+    t = sem_acento(s).lower()
+    m = _RE_DATA_EXTENSO.match(t)
+    if m and m.group(2)[:3] in MESES:
+        dia, mes, ano = int(m.group(1)), MESES[m.group(2)[:3]], int(m.group(3))
+    else:
+        m = _RE_MES_ANO.match(t)
+        if not (m and m.group(1)[:3] in MESES):
+            return None
+        dia, mes, ano = 1, MESES[m.group(1)[:3]], int(m.group(2))
+    if ano < 100:
+        ano += 2000 if ano < 70 else 1900
+    try:
+        return pd.Timestamp(year=ano, month=mes, day=dia)
+    except ValueError:
+        return None
 
 
 def _detectar_decimal(valores) -> str:
@@ -173,8 +201,8 @@ def _como_numero(serie: pd.Series, decimal: str) -> pd.Series:
     return convertida
 
 
-def _como_data(serie: pd.Series) -> pd.Series:
-    return pd.Series([data_de(v) if not pd.isna(v) else pd.NaT for v in serie],
+def _como_data(serie: pd.Series, serial: bool = False) -> pd.Series:
+    return pd.Series([data_de(v, serial) if not pd.isna(v) else pd.NaT for v in serie],
                      index=serie.index, dtype="datetime64[ns]")
 
 
@@ -229,9 +257,11 @@ def _inferir(serie: pd.Series, coluna: str, cfg: dict, tabela: str, rel: Relator
             rel.info("Percentuais convertidos para decimal (45% -> 0,45)", tabela=tabela, coluna=coluna)
         return convertida
 
-    ok_data = sum(data_de(v) is not None for v in valores)
+    # números do Excel por baixo de datas só contam se a coluna já tem datas escritas como texto
+    serial = any(data_de(v) is not None for v in textos)
+    ok_data = sum(data_de(v, serial) is not None for v in valores)
     if ok_data / total >= limiar:
-        convertida = _como_data(serie)
+        convertida = _como_data(serie, serial)
         _registrar_perdas(serie, convertida, coluna, tabela, "data", rel)
         return convertida
 
@@ -274,6 +304,17 @@ def limpar_tabela(df: pd.DataFrame, tabela: str, cfg: dict, regra: dict, rel: Re
     alterados = [f"'{o}' -> {n}" for o, n in zip(originais, novos) if o != n]
     if alterados:
         rel.info("Nomes de colunas padronizados", tabela=tabela, quantidade=len(alterados), exemplos=alterados)
+
+    # 3a. sinônimos (regra): o mesmo dado com nomes diferentes em cada arquivo vira um nome só
+    for canonico, alternativas in (regra.get("sinonimos") or {}).items():
+        canonico = normalizar_nome_coluna(canonico)
+        if canonico in df.columns:
+            continue
+        alternativas = [alternativas] if isinstance(alternativas, str) else list(alternativas or [])
+        achada = next((normalizar_nome_coluna(a) for a in alternativas if normalizar_nome_coluna(a) in df.columns), None)
+        if achada:
+            df = df.rename(columns={achada: canonico})
+            rel.info(f"Sinônimo reconhecido: '{achada}' tratado como '{canonico}'", tabela=tabela)
 
     # 3. renomear / remover (regra)
     renomear = {normalizar_nome_coluna(k): normalizar_nome_coluna(v) for k, v in (regra.get("renomear") or {}).items()}
@@ -318,9 +359,18 @@ def limpar_tabela(df: pd.DataFrame, tabela: str, cfg: dict, regra: dict, rel: Re
 
     # 6. linhas de total
     if cfg.get("remover_linhas_total", True) and len(df.columns):
+        # "Total", "TOTAL GERAL", "Subtotal Sul" são totais. "Total Express" (nome de loja) não é:
+        # um rótulo que só COMEÇA com "Total" só é total se deixar vazias colunas que estão quase sempre preenchidas.
+        quase_cheias = [c for c in df.columns if df[c].notna().mean() >= 0.9]
+
         def _eh_total(linha):
             preenchidos = linha.dropna()
-            return len(preenchidos) > 0 and isinstance(preenchidos.iloc[0], str) and bool(_RE_TOTAL.match(preenchidos.iloc[0]))
+            if not len(preenchidos) or not isinstance(preenchidos.iloc[0], str):
+                return False
+            rotulo = preenchidos.iloc[0].strip()
+            if _RE_TOTAL.match(rotulo) or _RE_SUBTOTAL.match(rotulo):
+                return True
+            return bool(_RE_COMECA_TOTAL.match(rotulo)) and any(pd.isna(linha[c]) for c in quase_cheias)
         mascara = df.apply(_eh_total, axis=1) if len(df) else pd.Series(dtype=bool)
         if len(mascara) and mascara.any():
             rel.aviso("Linhas de Total/Subtotal removidas (evita contar valores em dobro)", tabela=tabela,

@@ -176,6 +176,12 @@ def _tratar(caminho: Path, cfg: Config, rel: Relatorio, ao_etapa=None) -> _Trata
         nome = normalizar_nome_coluna(cfg.saida["nome_aba"]) if unica else normalizar_nome_coluna(aba)
         rel.info(f"Aba '{aba}' lida: cabeçalho na linha {bruto.attrs.get('linha_cabecalho', '?')}, "
                  f"{len(bruto)} linhas, {len(bruto.columns)} colunas", tabela=nome)
+        if len(bruto.attrs.get("abas_empilhadas") or []) > 1:
+            rel.info(f"Abas com o mesmo cabeçalho empilhadas: {', '.join(bruto.attrs['abas_empilhadas'])} "
+                     f"(coluna _aba_origem diz de onde veio cada linha)", tabela=nome)
+        if bruto.attrs.get("abas_ignoradas"):
+            rel.aviso(f"Abas com estrutura diferente NÃO foram lidas: {', '.join(bruto.attrs['abas_ignoradas'])}. "
+                      f"Se elas também são dados, use 'abas: todas' na regra deste arquivo", tabela=nome)
         _sinal(ao_etapa, "limpeza", caminho.name)
         limpo = limpar_tabela(bruto, nome, cfg.limpeza, t.regra, rel)
         limpo = equipe.executar("limpeza", limpo, rel, nome, caminho.name, ao_etapa)

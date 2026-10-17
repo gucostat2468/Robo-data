@@ -11,6 +11,8 @@ Regras disponíveis no config.yaml (todas opcionais, por padrão de nome de arqu
 
 from __future__ import annotations
 
+import difflib
+
 import pandas as pd
 
 from robo.limpeza import normalizar_nome_coluna, sem_acento
@@ -36,7 +38,12 @@ def validar_tabela(df: pd.DataFrame, tabela: str, regra: dict, rel: Relatorio) -
     obrigatorias = _cols(regra.get("colunas_obrigatorias"))
     faltando = [c for c in obrigatorias if c not in df.columns]
     if faltando:
-        rel.erro("Colunas obrigatórias ausentes", tabela=tabela, quantidade=len(faltando), exemplos=faltando)
+        # sugere o nome parecido que veio no arquivo (o robô não troca sozinho: quem decide é a regra/sinônimos)
+        exemplos = []
+        for c in faltando:
+            parecida = difflib.get_close_matches(c, [str(x) for x in df.columns if not str(x).startswith("_")], n=1, cutoff=0.6)
+            exemplos.append(f"{c} (você quis dizer '{parecida[0]}'? se for, adicione em 'sinonimos' na regra)" if parecida else c)
+        rel.erro("Colunas obrigatórias ausentes", tabela=tabela, quantidade=len(faltando), exemplos=exemplos)
 
     for col in _cols(regra.get("nao_nulos")):
         if col not in df.columns:
