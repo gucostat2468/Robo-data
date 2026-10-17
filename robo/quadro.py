@@ -353,6 +353,33 @@ def conf_amostra_conferencias(c: Contexto) -> list[str]:
     return obs
 
 
+def conf_compatibilidade_excel(c: Contexto) -> list[str]:
+    """Ricardo (gerente da Sala Excel, coordena a limpeza): barra o que o Excel estragaria ao abrir a base."""
+    problemas = []
+    for nome, df in c.tabelas.items():
+        if len(df) > 1_048_575:
+            problemas.append(f"[{nome}] {len(df):,} linhas: passa do limite de uma aba do Excel (1.048.576)".replace(",", "."))
+        if len(df.columns) > 16_384:
+            problemas.append(f"[{nome}] {len(df.columns)} colunas: passa do limite do Excel (16.384)")
+        for col in df.columns:
+            s = df[col]
+            if pd.api.types.is_integer_dtype(s) or pd.api.types.is_float_dtype(s):
+                grandes = s.dropna().abs() >= 10 ** 15
+                if grandes.any():
+                    problemas.append(f"[{nome}.{col}] {int(grandes.sum())} número(s) com 16+ dígitos: o Excel arredonda "
+                                     f"(ex.: {s.dropna()[grandes].iloc[0]:.0f}). Se é código/ID, deve ser texto")
+            elif pd.api.types.is_datetime64_any_dtype(s):
+                antigas = s.dropna() < pd.Timestamp("1900-01-01")
+                if antigas.any():
+                    problemas.append(f"[{nome}.{col}] {int(antigas.sum())} data(s) antes de 1900: o Excel não mostra")
+            else:
+                longos = s.dropna().astype(str).str.len() > 32_767
+                if longos.any():
+                    problemas.append(f"[{nome}.{col}] {int(longos.sum())} texto(s) maiores que 32.767 caracteres: "
+                                     f"o Excel corta")
+    return problemas
+
+
 # =============================================================================== 4º andar · Governança e canal
 RE_EMAIL = re.compile(r"^[^@\s]+@[^@\s]+\.[a-z]{2,}$", re.IGNORECASE)
 RE_CPF = re.compile(r"^\d{3}\.?\d{3}\.?\d{3}-?\d{2}$")
@@ -505,6 +532,14 @@ GESTORES_EXISTENTES = {
 }
 
 
+# Conferências feitas por quem já existe em outro módulo (não duplicam no organograma).
+# Ricardo é gerente, mas coordena as equipes de limpeza: o que ele barra é limite objetivo do Excel.
+CONFERENCIAS_EXTRAS = [
+    {"id": "excel_supervisor", "nome": "Ricardo", "cargo": "Gerente da Sala Excel — coordenação da limpeza",
+     "nivel": "gerente", "andar": 3, "fase": "engenharia", "funcao": conf_compatibilidade_excel, "bloqueia": True},
+]
+
+
 def lotacao() -> dict:
     """Andar → níveis presentes (nativos, quadro e canal). Usado para provar que todo andar está completo."""
     from robo import rh
@@ -529,7 +564,7 @@ def lotacao() -> dict:
 def conferir(fase: str, ctx: Contexto) -> list[dict]:
     """Roda as conferências da fase. Falha de código vira achado (nunca derruba o robô)."""
     resultado = []
-    for p in QUADRO:
+    for p in QUADRO + CONFERENCIAS_EXTRAS:
         if p["fase"] != fase or p["funcao"] is None:
             continue
         try:
@@ -538,7 +573,7 @@ def conferir(fase: str, ctx: Contexto) -> list[dict]:
             achados = [f"não consegui concluir a conferência ({type(e).__name__}: {e})"]
         resultado.append({"id": p["id"], "nome": p["nome"], "cargo": p["cargo"], "nivel": p["nivel"], "andar": p["andar"],
                           "ok": not achados, "achados": achados[:20],
-                          "bloqueia": ESCOPO_NIVEL[p["nivel"]]["bloqueia"] and p["nivel"] != "estagiario"})
+                          "bloqueia": p.get("bloqueia", ESCOPO_NIVEL[p["nivel"]]["bloqueia"]) and p["nivel"] != "estagiario"})
     return resultado
 
 
@@ -624,6 +659,10 @@ def provas_quadro() -> dict:
         cat = json.loads((_Cfg.logs / "catalogo_dados.json").read_text(encoding="utf-8"))
         r["gov_estagiaria"] = [("Registra a tabela no catálogo", "prova.base" in cat),
                                ("Registra colunas e tipos", cat["prova.base"]["colunas"].get("nota_nps") == "Int64")]
+
+    id_grande = bom.assign(id_resposta=pd.array([1234567890123456, 2, 3], dtype="Int64"))
+    r["excel_supervisor"] = [("Base compatível com o Excel passa", not conf_compatibilidade_excel(c(bom))),
+                             ("Barra ID de 16 dígitos guardado como número", bool(conf_compatibilidade_excel(c(id_grande))))]
 
     class _CfgSla:
         dados = {"quadro": {"sla_segundos": 60}}

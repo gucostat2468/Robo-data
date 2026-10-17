@@ -78,7 +78,7 @@ def _conferencias_equipe(fase: str, ctx, rel, ao_etapa, bloquear: bool) -> list[
     Estagiário sempre fica em observação (AVISO). Gerente nunca bloqueia (AVISO).
     """
     from robo import quadro
-    for p in quadro.QUADRO:
+    for p in quadro.QUADRO + quadro.CONFERENCIAS_EXTRAS:
         if p["fase"] == fase and p["funcao"] is not None:
             _sinal(ao_etapa, p["id"], ctx.arquivo)
     resultado = quadro.conferir(fase, ctx)

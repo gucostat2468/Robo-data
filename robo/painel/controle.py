@@ -136,6 +136,11 @@ class ControleRobo:
                     estrategia.rotina(cfg)
                 except Exception:
                     log.exception("Falha na rotina de estratégia (avaliação/treinamento)")
+                try:
+                    from robo import backup
+                    backup.rotina(cfg)  # Dora: backup diário do PostgreSQL (guarda os últimos 7)
+                except Exception:
+                    log.exception("Falha na rotina de backup do PostgreSQL")
                 finally:
                     self._estrategia_rodando = False
             threading.Thread(target=_rodar, name="robo-estrategia", daemon=True).start()

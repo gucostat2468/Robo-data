@@ -126,7 +126,7 @@ def teste_etapas_emitidas_em_ordem(planilha_baguncada, cfg_factory):
     assert r.status == SUCESSO
     assert [e for e, _ in etapas] == ["leitura", "limpeza", "validacao", "modelagem", "supervisor",
                                       "eng_pleno_tipos", "eng_junior_espacos", "eng_junior_auditoria", "eng_estagiario",
-                                      "coord_engenharia", "publicacao", "eng_pleno_releitura",
+                                      "excel_supervisor", "coord_engenharia", "publicacao", "eng_pleno_releitura",
                                       "analise:perfil", "analise:indicadores", "analise:estatistica",
                                       "analise:monitoramento", "analise:relator",
                                       "ana_pleno_recalculo", "ana_pleno_base", "ana_junior_faixas", "ana_estagiario",

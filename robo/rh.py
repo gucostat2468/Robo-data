@@ -543,7 +543,10 @@ FICHAS = {
     "excel_supervisor": {"cargo": "Gerente da Sala Excel · ex-Microsoft", "nivel": "gerente", "area": "Storytelling e Negócio",
                          "metodologias": ["Excel de ponta a ponta: fórmulas, matrizes dinâmicas, Power Query, Power Pivot, tabelas dinâmicas",
                                           "Auditoria de planilhas (rastreabilidade célula a célula)", "Conferência independente de cada número"],
-                         "responsabilidades": ["Coordenar a Sala Excel", "Responder dúvidas de Excel no canal", "Assinar a entrega"],
+                         "responsabilidades": ["Coordenar a Sala Excel", "Responder dúvidas de Excel no canal", "Assinar a entrega",
+                                               "Coordenar as equipes de limpeza: barrar o que o Excel corromperia "
+                                               "(ID de 16+ dígitos como número, textos acima de 32.767 caracteres, "
+                                               "abas acima de 1.048.576 linhas, datas antes de 1900)"],
                          "criterios": ["Entrega só vale com 100% das conferências OK"],
                          "limites": ["Não cola valores: tudo em fórmula auditável"]},
     "canal_helena": {"cargo": "Coordenadora de RH e Desenvolvimento da Equipe", "nivel": "coordenador",
