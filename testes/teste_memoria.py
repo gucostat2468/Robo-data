@@ -115,3 +115,44 @@ def teste_nps_mostra_a_conta_e_a_conclusao():
     assert "Total: NPS 20 = 50,0% promotores (50) − 30,0% detratores (30) = 20,0, arredondado para 20" in texto
     assert "neutros 20,0% (20)" in texto and "Conclusão: B (40) está de fato acima de A (0)" in texto
     assert "Como ler: NPS = % de promotores" in texto
+
+
+def teste_pdca_checa_sozinho_e_vira_boa_pratica(planilha_baguncada, cfg, cfg_factory):
+    r = processar_arquivo(planilha_baguncada, cfg)
+    memoria.registrar_execucao(cfg, r)
+    h = next(x for x in memoria.handovers(cfg) if "lista permitida" in x["erro"])
+    assert memoria.FASE_PDCA[h["estado"]] == "P"
+    memoria.mudar_handover(cfg, h["id"], "aplicado")
+    assert memoria.checar_pdca(cfg)["verificados"] == []  # ainda sem prova de que não voltou
+    assert memoria.checar_pdca(cfg, agora=datetime.now() + timedelta(days=8))["verificados"] == [h["id"]]
+    bp = memoria.boas_praticas(cfg)
+    assert bp and bp[0]["handover_id"] == h["id"] and "dias sem o erro" in bp[0]["evidencia"]
+    assert memoria.resumo_pdca(cfg)["agir"] == 1
+
+
+def teste_rodada_de_estudo_de_todos(cfg):
+    from robo import desenvolvimento, organizacao
+    r = desenvolvimento.estudar(cfg, anunciar=False)
+    assert r["funcionarios"] == len(organizacao.lista(cfg)) and r["aprovados"] == r["funcionarios"]
+    assert any(e["origem"] == "estudo" for e in memoria.experiencias(cfg, "analise_estatistica"))
+    assert desenvolvimento.rotina(cfg) is None  # a próxima só depois de 3,5 dias
+
+
+def teste_iara_tira_ideias_da_memoria(planilha_baguncada, cfg):
+    from robo import atendimento
+    r = processar_arquivo(planilha_baguncada, cfg)
+    for _ in range(3):
+        memoria.registrar_execucao(cfg, r)
+    atendimento.conversar(cfg, "dba", "qual a capital da Mongólia segundo o relatório xyz")  # pedido sem resposta
+    resp = atendimento.conversar(cfg, "canal_iara", "quais ideias você tem?")["respostas"][-1]
+    assert resp["autor"] == "canal_iara" and resp["natureza"] == "ferramenta"
+    assert "Prevenir na origem" in resp["texto"] and "não soube fazer" in resp["texto"]
+
+
+def teste_coordenador_responde_reuniao_ao_vivo(planilha_baguncada, cfg):
+    from robo import atendimento
+    memoria.registrar_execucao(cfg, processar_arquivo(planilha_baguncada, cfg))
+    resp = atendimento.conversar(cfg, "coord_engenharia", "como está o andar?")["respostas"][-1]
+    assert resp["autor"] == "coord_engenharia" and "1º andar" in resp["texto"] and "PDCA" in resp["texto"]
+    from robo import reuniao
+    assert reuniao.listar(cfg) == []  # ao vivo não grava ata

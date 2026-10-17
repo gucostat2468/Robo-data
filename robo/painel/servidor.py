@@ -833,7 +833,9 @@ class Api:
 
     def funcionarios(self, q) -> dict:
         from robo import ia, organizacao
-        return {"funcionarios": [{k: v for k, v in p.items() if k != "_agente"} | {"nivel": organizacao.nivel_de(p["id"], p)}
+        return {"funcionarios": [{k: v for k, v in p.items() if k != "_agente"} |
+                                 {"nivel": organizacao.nivel_de(p["id"], p), "area": organizacao.area_de(p["id"]),
+                                  "lider": p["id"] in organizacao.LIDERES}
                                  for p in organizacao.lista(self.cfg)], "andares": organizacao.NOME_ANDAR,
                 "ia": ia.status(self.cfg)}
 
@@ -917,7 +919,10 @@ class Api:
     def memoria_resumo(self, q) -> dict:
         from robo import memoria, reuniao
         dias = int(q.get("dias", ["7"])[0])
+        from robo import desenvolvimento, ideias
         return {"desempenho": memoria.desempenho(self.cfg, dias), "handovers": memoria.handovers(self.cfg, limite=100),
+                "pdca": memoria.resumo_pdca(self.cfg), "boas_praticas": memoria.boas_praticas(self.cfg, limite=100),
+                "ideias": ideias.gerar(self.cfg), "ultimo_estudo": desenvolvimento.ultima_rodada(self.cfg),
                 "reunioes": [{k: r[k] for k in ("id", "inicio", "fim", "data_hora", "arquivo")} | {"ata": r["ata"]}
                              for r in reuniao.listar(self.cfg, 5)]}
 
@@ -928,6 +933,16 @@ class Api:
         except ValueError as e:
             raise ErroApi(str(e))
         return {"ok": True}
+
+    def reuniao_ao_vivo(self, q) -> dict:
+        from robo import reuniao
+        andar = q.get("andar", [""])[0]
+        return reuniao.ao_vivo(self.cfg, int(andar) if andar else None)
+
+    def estudo_rodar(self, _b) -> dict:
+        from robo import desenvolvimento
+        r = desenvolvimento.estudar(self.cfg)
+        return {k: r[k] for k in ("funcionarios", "aprovados")}
 
     def reuniao_gerar(self, _b) -> dict:
         from robo import reuniao
@@ -954,6 +969,7 @@ ROTAS_GET = {
     "/api/agentes/manual": Api.agente_manual_ler, "/api/consultas": Api.consultas, "/api/consulta": Api.consulta,
     "/api/funcionarios": Api.funcionarios, "/api/funcionario": Api.funcionario, "/api/conversa": Api.conversa,
     "/api/solicitacoes": Api.solicitacoes, "/api/solicitacao": Api.solicitacao, "/api/memoria": Api.memoria_resumo,
+    "/api/reuniao/ao-vivo": Api.reuniao_ao_vivo,
 }
 ROTAS_POST = {
     "/api/robo/ligar": Api.ligar, "/api/robo/pausar": Api.pausar, "/api/robo/processar-agora": Api.processar_agora,
@@ -969,7 +985,7 @@ ROTAS_POST = {
     "/api/estrategia/sincronizar": Api.estrategia_sincronizar, "/api/inicializacao": Api.inicializacao, "/api/atalhos": Api.atalhos, "/api/sair": Api.sair,
     "/api/conversa/enviar": Api.conversa_enviar, "/api/solicitacoes/criar": Api.solicitacao_criar,
     "/api/aprovacoes/decidir": Api.aprovacao_decidir, "/api/solicitacoes/cancelar": Api.solicitacao_cancelar,
-    "/api/handovers/estado": Api.handover_estado, "/api/reuniao/gerar": Api.reuniao_gerar,
+    "/api/handovers/estado": Api.handover_estado, "/api/reuniao/gerar": Api.reuniao_gerar, "/api/estudo/rodar": Api.estudo_rodar,
     "/api/memoria/exportar": Api.memoria_exportar, "/api/memoria/sincronizar": Api.memoria_sincronizar,
 }
 ROTAS_UPLOAD = {"/api/testar": Api.testar, "/api/enviar": Api.enviar, "/api/conversa/anexar": Api.anexar}

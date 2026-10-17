@@ -50,10 +50,12 @@ FERRAMENTAS_ANDAR = {
     5: ["ronda_ti"],
 }
 # Ferramentas extras por pessoa (especialidade)
+LIDERES = ["ger_engenharia", "coord_engenharia", "ger_analise", "coord_analise", "excel_supervisor", "coord_excel",
+           "ger_operacoes", "canal_helena", "ger_ti", "coord_devops"]
 FERRAMENTAS_PESSOA = {
     "recepcao": ["publicar_planilha"], "coord_engenharia": ["publicar_planilha", "calcular"],
     "supervisor": ["calcular"], "dba": ["consulta_sql"], "banco": ["consulta_sql"],
-    "canal_nina": ["calcular"], "canal_iara": ["historico"], "canal_helena": ["organizacao"],
+    "canal_nina": ["calcular"], "canal_iara": ["historico", "ideias"], "canal_helena": ["organizacao"],
     "ger_operacoes": ["organizacao"], "ger_ti": ["organizacao"], "excel_supervisor": ["diagnosticar_planilha"],
     "sec_senior": ["dados_pessoais"], "coord_devops": ["diagnosticar_planilha"],
 }
@@ -63,7 +65,7 @@ ENCAMINHAR = {
     "calcular": "analise_estatistica", "perfil_indicadores": "analise_indicadores",
     "resumo_executivo": "analise_relator", "diagnosticar_planilha": "coord_engenharia",
     "publicar_planilha": "recepcao", "consulta_sql": "dba", "dados_pessoais": "gov_pleno_lgpd",
-    "ronda_ti": "coord_devops", "organizacao": "canal_helena",
+    "ronda_ti": "coord_devops", "organizacao": "canal_helena", "reuniao_andar": "ger_operacoes", "ideias": "canal_iara",
     "conhecimento": "canal_nina", "historico": "canal_nina",
 }
 
@@ -151,6 +153,12 @@ def nivel_de(pid: str, pessoa: dict | None = None) -> str:
     return f.get("nivel") or (pessoa or {}).get("nivel") or "pleno"
 
 
+def area_de(pid: str) -> str:
+    from robo import quadro, rh, ti
+    f = rh.FICHAS.get(pid) or quadro.POR_ID.get(pid) or ti.POR_ID.get(pid) or {}
+    return f.get("area") or ""
+
+
 def gestor_de(pid: str) -> str | None:
     from robo import quadro, ti
     if pid in ti.GESTORES:
@@ -183,6 +191,8 @@ def revisor_de(pid: str, cfg=None) -> str:
 
 def ferramentas_de(pid: str, andar: int) -> list[str]:
     fs = list(FERRAMENTAS_COMUNS) + FERRAMENTAS_ANDAR.get(int(andar or 1), []) + FERRAMENTAS_PESSOA.get(pid, [])
+    if pid in LIDERES:
+        fs.append("reuniao_andar")  # gerentes e coordenadores respondem pela situação do andar a qualquer momento
     return list(dict.fromkeys(fs))
 
 

@@ -93,6 +93,9 @@ CREATE TABLE IF NOT EXISTS handovers (
   id TEXT PRIMARY KEY, chave TEXT UNIQUE, andar INTEGER, area TEXT, responsavel TEXT, detectado_por TEXT, erro TEXT,
   causa TEXT, regra TEXT, como_verificar TEXT, exemplo TEXT, recorrencias INTEGER DEFAULT 1, estado TEXT DEFAULT 'aberto',
   backlog_id TEXT, criado_em TEXT, ultima_ocorrencia TEXT, atualizado_em TEXT);
+CREATE TABLE IF NOT EXISTS boas_praticas (
+  id TEXT PRIMARY KEY, handover_id TEXT UNIQUE, andar INTEGER, area TEXT, responsavel TEXT, problema TEXT, pratica TEXT,
+  como_verificar TEXT, evidencia TEXT, criada_em TEXT);
 CREATE TABLE IF NOT EXISTS reunioes (
   id TEXT PRIMARY KEY, inicio TEXT, fim TEXT, data_hora TEXT, ata TEXT, arquivo TEXT);
 CREATE TABLE IF NOT EXISTS memoria (

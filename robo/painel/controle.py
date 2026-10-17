@@ -173,6 +173,12 @@ class ControleRobo:
                 except Exception:
                     log.exception("Falha ao copiar a memória para o PostgreSQL (segue no SQLite)")
                 try:
+                    from robo import desenvolvimento, memoria
+                    memoria.checar_pdca(cfg)          # etapa C do PDCA: o que foi corrigido e não voltou vira boa prática
+                    desenvolvimento.rotina(cfg)       # rodada de estudo de todos (duas vezes por semana)
+                except Exception:
+                    log.exception("Falha no PDCA/rodada de estudo")
+                try:
                     from robo import reuniao
                     reuniao.rotina(cfg)  # reunião semanal da liderança (uma por semana)
                 except Exception:

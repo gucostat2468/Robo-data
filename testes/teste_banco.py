@@ -234,3 +234,15 @@ def teste_dora_roda_select_livre_somente_leitura(planilha_baguncada, cfg_factory
     r = atendimento.conversar(cfg, "infra_pleno", "SELECT 1")  # Rodrigo (TI) não tem SQL no contrato: encaminha
     assert r["respostas"][0]["natureza"] == "limitacao" and r["respostas"][1]["autor"] == "dba"
     assert r["respostas"][1]["natureza"] == "execucao"
+
+
+def teste_conferencia_com_modelo_estrela_junta_dimensao(pastas, cfg_factory, banco_cfg):
+    from robo import ferramentas
+    regra = dict(REGRA_NPS, modelo={"fato": "fato_nps", "dimensoes": {"dim_curso": {"colunas": ["curso", "modalidade"],
+                                                                                     "chave": "id_curso"}}})
+    cfg = cfg_factory([regra], banco=banco_cfg)
+    linhas = [(i, "01/10/2026", i % 11, ["Direito", "Medicina"][i % 2], ["EAD", "Presencial"][i % 2], "SP") for i in range(1, 80)]
+    assert processar_arquivo(_planilha(pastas, "nps_estrela.xlsx", linhas), cfg).status == SUCESSO
+    r = ferramentas.executar("calcular", cfg, pergunta="nps por modalidade")
+    assert r["dados"]["conferencia"] == "conferido", r["texto"]
+    assert "JOIN" in r["dados"]["sql"] and "PROCX([@id_curso];dim_curso[id_curso];dim_curso[modalidade])" in r["texto"]

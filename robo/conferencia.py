@@ -85,7 +85,7 @@ def valores_pandas(op: str, df: pd.DataFrame, col: str | None, por: list[str], e
 
 # --------------------------------------------------------------------------- SQL e Excel equivalentes
 def montar_sql(op: str, col: str | None, por: list[str], filtros: list, tabela: str, arquivo: str | None,
-               escala: int = 5) -> str | None:
+               escala: int = 5, col_arquivo: str = '"_arquivo_origem"') -> str | None:
     if op == "csat":
         expr = f"100.0 * COUNT(*) FILTER (WHERE {_ident(col)} >= {escala - 1}) / NULLIF(COUNT({_ident(col)}), 0)"
     elif op in OPS_SQL:
@@ -94,7 +94,7 @@ def montar_sql(op: str, col: str | None, por: list[str], filtros: list, tabela: 
         return None
     onde = [f"{_ident(c)} {s} {_literal(v)}" for c, s, v in filtros]
     if arquivo:
-        onde.append(f'"_arquivo_origem" = {_literal(arquivo)}')
+        onde.append(f'{col_arquivo} = {_literal(arquivo)}')
     onde += [f"{_ident(c)} IS NOT NULL" for c in por]
     grupo = ", ".join(_ident(c) for c in por)
     sql = f"SELECT {grupo + ', ' if grupo else ''}{expr} AS valor, COUNT(*) AS linhas\nFROM {tabela}"
@@ -106,8 +106,9 @@ def montar_sql(op: str, col: str | None, por: list[str], filtros: list, tabela: 
 
 
 def montar_excel(op: str, col: str | None, por: list[str], filtros: list, exemplo_grupo: dict | None,
-                 escala: int = 5) -> str:
-    """Passo a passo no Excel (com a base como Tabela, Ctrl+T, chamada 'Tabela')."""
+                 escala: int = 5, dimensoes: dict | None = None) -> str:
+    """Passo a passo no Excel (com a base como Tabela, Ctrl+T, chamada 'Tabela').
+    dimensoes = {coluna: (aba_da_dimensao, chave)} para colunas que não estão na aba da fato."""
     crit = []
     for c, s, v in filtros:
         valor = f'"{s if s != "=" else ""}{v}"' if s != "=" or not isinstance(v, (int, float)) else str(v)
@@ -117,6 +118,9 @@ def montar_excel(op: str, col: str | None, por: list[str], filtros: list, exempl
     filtros_excel = ";".join(crit)
     passos = ["1. Abra a planilha publicada, clique numa célula da base e aperte Ctrl+T (vira uma Tabela); "
               "na guia Design da Tabela, dê o nome 'Tabela'."]
+    for c, (aba, chave) in (dimensoes or {}).items():
+        passos.append(f"1b. A coluna {c} está na aba {aba}. Faça dela uma Tabela chamada {aba} e, na Tabela principal, crie a "
+                      f"coluna {c} com: =PROCX([@{chave}];{aba}[{chave}];{aba}[{c}])")
     if op == "nps":
         f = ";" + filtros_excel if filtros_excel else ""
         passos += [f"2. Promotores: =CONT.SES(Tabela[{col}];\">=9\"{f})",
@@ -144,32 +148,76 @@ def montar_excel(op: str, col: str | None, por: list[str], filtros: list, exempl
     else:
         passos.append("2. Use uma Tabela Dinâmica: Inserir → Tabela Dinâmica → arraste a coluna para Linhas e para Valores.")
     if por:
-        passos.append(f"Para cada grupo de {', '.join(por)}: troque o valor do grupo na fórmula (exemplo acima usa "
-                      f"{exemplo_grupo or 'o primeiro grupo'}), ou faça uma Tabela Dinâmica com {', '.join(por)} em Linhas.")
+        ex = ", ".join(f"{k} = {v}" for k, v in (exemplo_grupo or {}).items()) or "o primeiro grupo"
+        passos.append(f"Para cada grupo de {', '.join(por)}: troque o valor do grupo na fórmula (o exemplo acima usa "
+                      f"{ex}), ou faça uma Tabela Dinâmica com {', '.join(por)} em Linhas.")
     return "\n".join(passos)
 
 
 # --------------------------------------------------------------------------- conferência no PostgreSQL
-def _tabela_no_banco(cfg, banco, base: str, arquivo: str, colunas: list[str]) -> tuple[str | None, str]:
-    """Tabela do schema tratado que recebeu este arquivo e tem todas as colunas usadas."""
+def _colunas(conn, schema: str, tabela: str) -> list[str]:
+    return [r[0] for r in conn.execute("SELECT column_name FROM information_schema.columns WHERE table_schema=%s "
+                                       "AND table_name=%s ORDER BY ordinal_position", (schema, tabela))]
+
+
+def _tabela_no_banco(cfg, banco, base: str, arquivo: str, colunas: list[str]) -> tuple[str | None, str, str]:
+    """FROM (fato, com JOIN nas dimensões quando preciso) que recebeu este arquivo e tem todas as colunas usadas.
+    Devolve (from_sql, coluna_do_arquivo, motivo_se_não_achou)."""
     from robo import historico
     exe = None
     for h in historico.ler(cfg.logs, 3000):
         if h.get("arquivo") == arquivo and h.get("status") == "sucesso":
             exe = historico.ler_execucao(cfg.logs, h.get("id") or "")
             break
-    candidatas = [t for t in (exe or {}).get("tabelas_banco") or [] if str(t).startswith(banco.schemas["tratado"] + ".")]
-    if not candidatas:
-        return None, "este arquivo não foi carregado no PostgreSQL"
+    schema_t = banco.schemas["tratado"]
+    tabelas = [str(t).split(".", 1)[1] for t in (exe or {}).get("tabelas_banco") or [] if str(t).startswith(schema_t + ".")]
+    if not tabelas:
+        return None, "", "este arquivo não foi carregado no PostgreSQL"
     with banco.conectar() as conn:
-        for t in candidatas:
-            schema, tabela = str(t).split(".", 1)
-            cols = {r[0] for r in conn.execute("SELECT column_name FROM information_schema.columns "
-                                               "WHERE table_schema=%s AND table_name=%s", (schema, tabela))}
-            if all(c in cols for c in colunas) and "_arquivo_origem" in cols:
-                return f"{_ident(schema)}.{_ident(tabela)}", ""
-    return None, ("as colunas usadas (" + ", ".join(colunas) + ") não estão juntas numa tabela do banco "
-                  "(provavelmente vêm de uma dimensão)")
+        cols = {t: _colunas(conn, schema_t, t) for t in tabelas}
+    fatos = [t for t in tabelas if "_arquivo_origem" in cols[t] and not t.startswith("dim_")]
+    for fato in fatos:
+        faltam = [c for c in colunas if c not in cols[fato]]
+        juncoes = []
+        for dim in [t for t in tabelas if t.startswith("dim_") and t != "dim_calendario"]:
+            usa = [c for c in faltam if c in cols[dim]]
+            chave = next((c for c in cols[dim] if c in cols[fato] and not c.startswith("_")), None)
+            if usa and chave:
+                juncoes.append(f"JOIN {_ident(schema_t)}.{_ident(dim)} d{len(juncoes)} USING ({_ident(chave)})")
+                faltam = [c for c in faltam if c not in usa]
+        if not faltam:
+            return (f"{_ident(schema_t)}.{_ident(fato)} f" + "".join("\n" + j for j in juncoes), 'f."_arquivo_origem"', "")
+    return None, "", ("as colunas usadas (" + ", ".join(colunas) + ") não estão na fato nem nas dimensões do banco")
+
+
+def dimensoes_do_arquivo(cfg, base: str, colunas: list[str]) -> dict:
+    """{coluna: (aba_dimensão, chave)} das colunas que, na planilha publicada, estão numa aba dim_*."""
+    try:
+        from openpyxl import load_workbook
+
+        from robo import calculos
+        saida = calculos.bases_publicadas(cfg)[base]["saidas"][0]
+        if not saida.lower().endswith(".xlsx"):
+            return {}
+        wb = load_workbook(saida, read_only=True)
+        try:
+            cab = {ws.title: [c.value for c in next(ws.iter_rows(max_row=1))] for ws in wb.worksheets}
+        finally:
+            wb.close()
+    except Exception:
+        return {}
+    fato = next((n for n in cab if not n.startswith("dim_") and n not in ("dicionario_dados", "log_qualidade")), None)
+    if not fato:
+        return {}
+    saida_d = {}
+    for c in colunas:
+        if c in cab[fato]:
+            continue
+        for aba, cols in cab.items():
+            if aba.startswith("dim_") and c in cols and cols and cols[0] in cab[fato]:
+                saida_d[c] = (aba, cols[0])
+                break
+    return saida_d
 
 
 def conferir(cfg, calc: dict) -> dict:
@@ -180,9 +228,11 @@ def conferir(cfg, calc: dict) -> dict:
     escala = _escala_csat(dados[col]) if op == "csat" and col else 5
     exemplo = None
     if por and len(dados):
-        primeiro = next(iter(dados.groupby(por, observed=True).groups))
-        exemplo = dict(zip(por, primeiro if isinstance(primeiro, tuple) else (primeiro,)))
-    excel = montar_excel(op, col, por, filtros, exemplo, escala)
+        linha = dados.dropna(subset=por)
+        exemplo = {c: linha.iloc[0][c] for c in por} if len(linha) else None
+    usadas = [c for c in [col, *por, *[f[0] for f in filtros]] if c]
+    dims = dimensoes_do_arquivo(cfg, calc["base"], usadas) if calc.get("fonte") == "publicada" else {}
+    excel = montar_excel(op, col, por, filtros, exemplo, escala, dims)
     base = {"excel": excel, "sql": montar_sql(op, col, por, filtros, "tratado.<tabela_da_base>", calc.get("arquivo"), escala)}
 
     def nao(motivo):
@@ -198,10 +248,10 @@ def conferir(cfg, calc: dict) -> dict:
     from robo.banco import Banco
     try:
         banco = Banco(cfg.banco, cfg.base)
-        tabela, motivo = _tabela_no_banco(cfg, banco, calc["base"], calc["arquivo"], [c for c in [col, *por, *[f[0] for f in filtros]] if c])
+        tabela, col_arq, motivo = _tabela_no_banco(cfg, banco, calc["base"], calc["arquivo"], usadas)
         if not tabela:
             return nao(motivo)
-        sql = montar_sql(op, col, por, filtros, tabela, calc["arquivo"], escala)
+        sql = montar_sql(op, col, por, filtros, tabela, calc["arquivo"], escala, col_arq)
         with banco.conectar() as conn:
             with conn.transaction():
                 conn.execute("SET TRANSACTION READ ONLY")

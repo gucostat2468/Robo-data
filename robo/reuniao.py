@@ -54,7 +54,9 @@ def _ultima(tb: Trabalho) -> dict | None:
     return dict(r) | {"ata": json.loads(r["ata"])} if r else None
 
 
-def gerar(cfg, ate: datetime | None = None, publicar: bool = True) -> dict:
+def gerar(cfg, ate: datetime | None = None, publicar: bool = True, registrar: bool = True) -> dict:
+    """registrar=False é a reunião AO VIVO: mesmos números, calculados agora, sem gravar ata, sem decidir PDI e sem
+    abrir proposta de desligamento (essas decisões só na reunião semanal oficial)."""
     ate = ate or datetime.now()
     desde = ate - timedelta(days=DIAS)
     tb = Trabalho(cfg)
@@ -107,13 +109,21 @@ def gerar(cfg, ate: datetime | None = None, publicar: bool = True) -> dict:
                           "responsavel_nome": (gente.get(resp) or {}).get("nome", resp),
                           "verificacao": h["como_verificar"], "prazo": (ate + timedelta(days=DIAS)).strftime("%d/%m/%Y"),
                           "handover": h["id"], "andar": andar})
+        andamento = [t for t in tb.listar(andar=andar, limite=200) if t["estado"] not in
+                     ("concluida", "concluida_parcialmente", "falhou", "cancelada") and t["tipo"] != "conversa"]
         andares.append({"andar": andar, "nome": organizacao.NOME_ANDAR[andar], "lider": lider,
+                        "pdca": memoria.resumo_pdca(cfg, andar),
+                        "agora": [f"{t['id']} — {t['titulo'][:80]} ({t['estado_nome']})" for t in andamento[:10]],
                         "lider_nome": (gente.get(lider) or {}).get("nome", lider), "deu_certo": certo or ["Sem entrega registrada na semana"],
                         "deu_errado": errado or ["Nenhum erro registrado na semana"], "plano_de_acao": acoes})
         acoes_todas += acoes
 
     insuf = [d for d in desemp.values() if d["situacao"] == "insuficiente"]
     pdi, propostas, defeitos = [], [], []
+    if not registrar:
+        return {"id": None, "ao_vivo": True, "inicio": desde.isoformat(timespec="seconds"),
+                "fim": ate.isoformat(timespec="seconds"), "andares": andares,
+                "em_risco": [{"id": d["id"], "nome": d["nome"], "taxa": d["taxa"], "andar": d["andar"]} for d in insuf]}
     for d in insuf:
         if not d["pode_ser_desligado"]:
             defeitos.append(d["id"])
@@ -234,6 +244,15 @@ def rotina(cfg) -> dict | None:
     if u and datetime.fromisoformat(u["data_hora"]) > datetime.now() - timedelta(days=DIAS):
         return None
     return gerar(cfg)
+
+
+def ao_vivo(cfg, andar: int | None = None) -> dict:
+    """Reunião em tempo real: a situação de agora, sem gravar nada. Com `andar`, só a daquele coordenador."""
+    r = gerar(cfg, publicar=False, registrar=False)
+    if andar:
+        r["andares"] = [a for a in r["andares"] if a["andar"] == int(andar)]
+        r["em_risco"] = [d for d in r["em_risco"] if d["andar"] == int(andar)]
+    return r
 
 
 def listar(cfg, limite: int = 20) -> list[dict]:

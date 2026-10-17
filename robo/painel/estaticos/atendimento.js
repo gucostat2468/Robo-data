@@ -165,6 +165,7 @@ const NOME_SITUACAO_DESEMP = { ok: ["Bom", "sucesso"], atencao: ["Atenção", "a
 function renderMemoria() {
   const m = E.memoria;
   const acoes = `<button class="btn" data-acao="memoria-pg">${icone("banco")}Copiar memória para o PostgreSQL</button>
+    <button class="btn" data-acao="estudo-rodar">${icone("frasco")}Rodada de estudo agora</button>
     <button class="btn primario" data-acao="reuniao-gerar">${icone("historico")}Fazer a reunião semanal agora</button>`;
   if (!m) return cabecalho("Memória e reuniões", "", acoes) + `<div class="carregando">Carregando…</div>`;
   const andar = E.memoriaAndar || "";
@@ -195,7 +196,19 @@ function renderMemoria() {
   return cabecalho("Memória e reuniões", "O que cada funcionário acertou, errou e aprendeu (com a origem de cada fato), os handovers de cada área — todo erro vira regra para não repetir — e a reunião semanal da liderança.", acoes) +
     `<div class="dica">${icone("info")}<p>Desempenho insuficiente (pelo menos 5 eventos e menos de 70% de acerto): 1ª reunião = plano de melhoria; 2ª = proposta de desligamento, que <b>só você</b> aprova em Solicitações.
       Cargos fixos são código do robô: desempenho ruim vira defeito para a TI corrigir com teste automatizado.</p></div>
-    <div class="secao-titulo">Última reunião ${r ? `· ${esc(dataT(r.data_hora))}` : ""}</div>${ata}
+    <div class="secao-titulo">Reunião ao vivo com cada coordenador (calculada agora, sem gravar)</div>
+    <div class="chips-colunas">${[1, 2, 3, 4, 5].map((a) => `<button class="btn pequeno ${String(E.aoVivoAndar) === String(a) ? "primario" : ""}" data-acao="ao-vivo" data-andar="${a}">${a}º andar</button>`).join("")}</div>
+    ${renderAoVivo()}
+    <div class="secao-titulo" style="margin-top:12px">PDCA contínuo (todos os andares)</div>
+    <div class="chips-colunas"><span class="etiqueta alerta">P · planejar ${m.pdca.planejar}</span><span class="etiqueta info">D · fazendo ${m.pdca.fazer}</span>
+      <span class="etiqueta">C · checando ${m.pdca.checar}</span><span class="etiqueta sucesso">A · padronizado ${m.pdca.agir}</span>
+      <span class="muted">Última rodada de estudo: ${m.ultimo_estudo ? esc(dataT(m.ultimo_estudo.criada_em)) + " — " + esc(m.ultimo_estudo.texto) : "ainda não houve"}</span></div>
+    <div class="secao-titulo" style="margin-top:12px">Ideias da Iara para o futuro (tiradas da memória)</div>
+    <ul class="lista-ficha">${m.ideias.map((i) => `<li><b>${esc(i.titulo)}</b> — por quê: ${esc(i.motivo)}. <i>Primeiro passo:</i> ${esc(i.primeiro_passo)} <span class="muted">(dono: ${esc(i.dono_nome)})</span></li>`).join("")}</ul>
+    <div class="secao-titulo" style="margin-top:12px">Boas práticas padronizadas (${m.boas_praticas.length})</div>
+    ${m.boas_praticas.length ? `<ul class="lista-ficha">${m.boas_praticas.map((b) => `<li><b>${esc(b.pratica)}</b> <span class="muted">— ${esc(b.area)} · ${esc(b.id)} · prova: ${esc(b.evidencia)}</span></li>`).join("")}</ul>`
+      : `<p class="muted">Ainda nenhuma: um handover vira boa prática quando é aplicado e o erro não volta.</p>`}
+    <div class="secao-titulo" style="margin-top:12px">Última reunião semanal ${r ? `· ${esc(dataT(r.data_hora))}` : ""}</div>${ata}
     ${r && (r.ata.pdi.length || r.ata.propostas_desligamento.length || r.ata.defeitos_de_codigo.length) ? `<p>Plano de melhoria: ${esc(r.ata.pdi.join(", ") || "ninguém")} · Desligamento proposto: ${esc(r.ata.propostas_desligamento.join(", ") || "ninguém")} · Defeito de código: ${esc(r.ata.defeitos_de_codigo.join(", ") || "nenhum")}</p>` : ""}
     <div class="secao-titulo" style="margin-top:12px">Desempenho por funcionário
       <select id="mem-dias">${[[7, "7 dias"], [30, "30 dias"], [90, "90 dias"]].map(([d, t]) => `<option value="${d}" ${Number(E.memoriaDias || 7) === d ? "selected" : ""}>${t}</option>`).join("")}</select>
@@ -205,12 +218,60 @@ function renderMemoria() {
     <div class="secao-titulo" style="margin-top:12px">Handovers por área (${m.handovers.length})</div>${hos || `<p class="muted">Nenhum erro registrado ainda.</p>`}`;
 }
 
+function renderAoVivo() {
+  const v = E.aoVivo;
+  if (!E.aoVivoAndar) return `<p class="muted">Escolha um andar para ouvir o coordenador agora.</p>`;
+  if (!v) return `<div class="carregando">Calculando…</div>`;
+  return v.andares.map((a) => `<div class="cartao" style="margin:8px 0"><div class="cartao-corpo">
+      <strong>${a.andar}º andar — ${esc(a.nome)}</strong> <span class="muted">coordenação: ${esc(a.lider_nome)}</span>
+      <button class="btn pequeno" data-acao="conversar" data-id="${esc(a.lider)}">${icone("chat")}Conversar com ${esc(a.lider_nome)}</button>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:6px">
+        <div><div class="secao-titulo">Deu certo</div><ul class="lista-ficha">${a.deu_certo.map((x) => `<li>${esc(x)}</li>`).join("")}</ul></div>
+        <div><div class="secao-titulo">Deu errado</div><ul class="lista-ficha">${a.deu_errado.map((x) => `<li>${esc(x)}</li>`).join("")}</ul></div></div>
+      <div class="secao-titulo">Em andamento agora</div><ul class="lista-ficha">${a.agora.map((x) => `<li>${esc(x)}</li>`).join("") || "<li>Nada em andamento.</li>"}</ul>
+      <div class="secao-titulo">Plano de ação</div><ul class="lista-ficha">${a.plano_de_acao.map((x) => `<li>${esc(x.acao)} — <b>${esc(x.quem_precisa_agir || x.responsavel_nome)}</b>, até ${esc(x.prazo)}</li>`).join("") || "<li>Nada novo.</li>"}</ul>
+      <div class="muted">PDCA do andar: ${a.pdca.planejar} planejar · ${a.pdca.fazer} fazendo · ${a.pdca.checar} checando · ${a.pdca.agir} padronizados</div>
+    </div></div>`).join("") + (v.em_risco.length ? `<p class="muted">Abaixo do mínimo: ${v.em_risco.map((d) => `${esc(d.nome)} (${d.taxa}%)`).join(", ")}</p>` : "");
+}
+
+// ------------------------------------------------------------------ chat da empresa (todos os funcionários, com filtros)
+async function carregarChat() {
+  try { E.chat = await api("/api/funcionarios"); } catch (e) { avisar(e.message, "erro"); }
+}
+
+function renderChat() {
+  const c = E.chat;
+  if (!c) return cabecalho("Chat da empresa", "") + `<div class="carregando">Carregando…</div>`;
+  const f = E.filtroChat || (E.filtroChat = {});
+  const areas = [...new Set(c.funcionarios.map((p) => p.area).filter(Boolean))].sort();
+  const niveis = [...new Set(c.funcionarios.map((p) => p.nivel))];
+  const busca = (f.texto || "").toLowerCase();
+  const lista = c.funcionarios.filter((p) => (!f.andar || String(p.andar) === f.andar) && (!f.area || p.area === f.area)
+    && (!f.nivel || p.nivel === f.nivel) && (!f.lideres || p.lider)
+    && (!busca || `${p.nome} ${p.papel} ${p.area}`.toLowerCase().includes(busca)));
+  const sel = (id, opcoes, rotulo) => `<select data-filtro-chat="${id}"><option value="">${rotulo}</option>${opcoes.map(([v, t]) => `<option value="${esc(v)}" ${String(f[id] || "") === String(v) ? "selected" : ""}>${esc(t)}</option>`).join("")}</select>`;
+  return cabecalho("Chat da empresa", `Fale com qualquer um dos ${c.funcionarios.length} funcionários. Cada um responde com a ferramenta do próprio contrato, mostra de onde veio a resposta e, se não for com ele, passa para quem faz. Quando não sabe, diz que não sabe. ${c.ia.configurado ? "" : "Sem IA: respostas por regras, cálculos e código."}`) +
+    `<div class="filtros-canal" style="margin-bottom:12px">${sel("andar", Object.entries(c.andares).map(([a, n]) => [a, `${a}º · ${n}`]), "Todos os andares")}
+      ${sel("area", areas.map((a) => [a, a]), "Todas as áreas")}${sel("nivel", niveis.map((n) => [n, n]), "Todos os níveis")}
+      <label style="display:flex;gap:6px;align-items:center"><input type="checkbox" data-filtro-chat="lideres" ${f.lideres ? "checked" : ""}> só coordenação</label>
+      <label class="campo-busca">${icone("busca")}<input type="text" id="chat-busca" placeholder="Nome, cargo ou área…" value="${esc(f.texto || "")}"></label></div>
+    <section class="equipe">${lista.map((p) => `<article class="cartao agente" data-acao="conversar" data-id="${esc(p.id)}" style="cursor:pointer">
+      <div class="agente-topo"><span class="avatar" style="background:${esc(p.cor || "#64748B")}">${esc(p.nome.slice(0, 1))}</span>
+        <div><strong>${esc(p.nome)}</strong><small>${esc(p.papel)} · ${esc(p.nivel)}</small></div></div>
+      <p class="muted" style="margin:6px 0 0">${p.andar}º andar${p.area ? ` · ${esc(p.area)}` : ""}${p.lider ? " · coordenação" : ""}</p></article>`).join("") || `<p class="muted">Ninguém com esses filtros.</p>`}</section>`;
+}
+
 // ------------------------------------------------------------------ registro de páginas e ações
 Object.assign(PAGINAS, {
   solicitacoes: { titulo: "Solicitações", render: renderSolicitacoes, carregar: carregarSolicitacoes },
   memoria: { titulo: "Memória e reuniões", render: renderMemoria, carregar: carregarMemoria },
+  chat: { titulo: "Chat da empresa", render: renderChat, carregar: carregarChat },
 });
 Object.assign(ACOES, {
+  "ao-vivo": async (el) => { E.aoVivoAndar = el.dataset.andar; E.aoVivo = null; desenhar();
+    try { E.aoVivo = await api(`/api/reuniao/ao-vivo?andar=${el.dataset.andar}`); } catch (e) { avisar(e.message, "erro"); } desenhar(); },
+  "estudo-rodar": (el) => comCarregando(el, async () => { const r = await api("/api/estudo/rodar", { corpo: {} });
+    avisar(`Rodada de estudo: ${r.funcionarios} funcionários, ${r.aprovados} aprovados na prova.`, "sucesso"); await carregarMemoria(); desenhar(); }),
   conversar: (el) => abrirConversa(el.dataset.id),
   "retomar-conversa": (el) => abrirConversa(el.dataset.id, el.dataset.conversa),
   "conversa-enviar": (el) => enviarConversa(el),
@@ -258,10 +319,16 @@ document.addEventListener("change", async (e) => {
     try { await api("/api/handovers/estado", { corpo: { id: e.target.dataset.handover, estado: e.target.value } }); } catch (err) { avisar(err.message, "erro"); }
     await carregarMemoria(); desenhar();
   }
+  if (e.target.dataset.filtroChat) { E.filtroChat[e.target.dataset.filtroChat] = e.target.type === "checkbox" ? e.target.checked : e.target.value; desenhar(); }
   if (e.target.id === "mem-dias") { E.memoriaDias = e.target.value; await carregarMemoria(); desenhar(); }
   if (e.target.id === "mem-andar") { E.memoriaAndar = e.target.value; desenhar(); }
 });
 document.addEventListener("input", (e) => {
+  if (e.target.id === "chat-busca") {
+    E.filtroChat.texto = e.target.value;
+    clearTimeout(E._buscaChat);
+    E._buscaChat = setTimeout(() => { desenhar(); const c = $("#chat-busca"); if (c) { c.focus(); c.setSelectionRange(c.value.length, c.value.length); } }, 250);
+  }
   if (e.target.id === "solic-busca") {
     E.filtroSolic.texto = e.target.value;
     clearTimeout(E._buscaSolic);

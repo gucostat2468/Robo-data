@@ -104,6 +104,11 @@ def _texto_contrato(c: dict) -> str:
 
 def _escolher_ferramenta(t: str, ctx: dict) -> str | None:
     """Ferramenta para uma pergunta (não tarefa). Ordem: mais específica primeiro."""
+    if re.search(r"como (esta|anda|vai) (o |a )?(andar|time|equipe|area|setor)|status do andar|reuniao|"
+                 r"o que (deu|esta dando) (certo|errado)|plano de acao|pdca", t):
+        return "reuniao_andar"
+    if re.search(r"\bideias?\b|o que (podemos|devemos) (melhorar|fazer)|futuro da operacao|sugest", t):
+        return "ideias"
     if re.search(r"historico|ultim(as|os) (execuc|arquivos|planilhas|processament)|o que (aconteceu|foi processado)", t):
         return "historico"
     if re.search(r"saude|ronda|disco|seguranca do (sistema|computador|robo)", t):
@@ -207,6 +212,8 @@ def _responder(cfg, tb, conversa_id, contrato, texto, ctx, arquivo) -> tuple[lis
     pergunta = _aplicar_correcoes(pergunta, ctx)
     ferr = _escolher_ferramenta(t, ctx)
     params = {"pergunta": pergunta, "arquivo": ctx.get("arquivo"), "base": ctx.get("base")}
+    if ferr == "reuniao_andar":
+        params = {"andar": contrato["andar"]}
     if not ferr:
         from robo.canal import INTENCOES, _pontuar
         sobre_o_robo = _pontuar(t, INTENCOES["erros"]) >= 2 or _pontuar(t, INTENCOES["status"]) >= 2

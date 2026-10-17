@@ -37,6 +37,10 @@ CATEGORIAS = [
      "Restringir o 'padrão de arquivos' do agente às bases que têm a coluna, ou corrigir o nome da coluna na habilidade "
      "(tela Equipe → agente → habilidades)",
      "A próxima carga dessa base não reprova por configuração"),
+    (r"colunas da dimensao nao existem|chave .* ja existe como coluna|coluna do calendario", 1, "modelagem",
+     "O modelo (fato/dimensões) do config.yaml cita colunas que esta planilha não tem",
+     "Ajustar 'modelo' na regra da base para os nomes de coluna reais (ou incluir sinônimos)",
+     "Próxima carga dessa base passa pela modelagem"),
     (r"erro de formula", 1, "leitura", "Fórmula quebrada na planilha de origem (#REF!, #DIV/0!, #N/D)",
      "Quem gera a planilha procura #REF!/#DIV/0!/#N/D (Ctrl+L) e corrige antes de salvar em Bases-Limpeza",
      "Leo (leitura) barra automaticamente; conferir que a próxima carga dessa base veio sem erro de fórmula"),
@@ -98,8 +102,11 @@ def categorizar(texto: str) -> tuple:
     for padrao, andar, resp, causa, regra, verificar in CATEGORIAS:
         if re.search(padrao, t):
             return andar, resp, causa, regra, verificar
-    return 1, "coord_engenharia", "Causa ainda não classificada", "A coordenação analisa o caso e escreve a regra", \
+    return 1, "coord_engenharia", CAUSA_DESCONHECIDA, "A coordenação analisa o caso e escreve a regra", \
         "Mesmo erro não aparece na próxima ocorrência"
+
+
+CAUSA_DESCONHECIDA = "Causa ainda não classificada"
 
 
 # --------------------------------------------------------------------------- registro
@@ -155,6 +162,14 @@ def handovers(cfg, andar: int | None = None, abertos: bool = False, limite: int 
         sql += " AND estado IN ('aberto','em_aplicacao','reaberto')"
     with Trabalho(cfg).tx() as c:
         linhas = [dict(r) for r in c.execute(sql + " ORDER BY recorrencias DESC, ultima_ocorrencia DESC LIMIT ?", args + [limite])]
+        for h in linhas:  # categoria aprendida depois: reclassifica registros antigos (não fica "não classificada" para sempre)
+            if h["causa"] == CAUSA_DESCONHECIDA:
+                andar, resp, causa, regra, verificar = categorizar(re.sub(r"^\[[^\]]+\]\s*", "", h["erro"]))
+                if causa != CAUSA_DESCONHECIDA:
+                    c.execute("UPDATE handovers SET andar=?, area=?, responsavel=?, causa=?, regra=?, como_verificar=? WHERE id=?",
+                              (andar, organizacao.NOME_ANDAR.get(andar, ""), resp, causa, regra, verificar, h["id"]))
+                    h.update(andar=andar, area=organizacao.NOME_ANDAR.get(andar, ""), responsavel=resp, causa=causa,
+                             regra=regra, como_verificar=verificar)
     gente = organizacao.por_id(cfg)
     return [h | explicar(h, gente) for h in linhas]
 
@@ -413,3 +428,65 @@ def sincronizar_postgres(cfg) -> dict:
                     cur.executemany(comando, linhas)
                 copiados[nome] = len(linhas)
     return {"ok": True, "schema": schema, **copiados}
+
+
+# --------------------------------------------------------------------------- PDCA contínuo
+# P (planejar) = handover aberto: causa + regra · D (fazer) = em aplicação, no backlog com responsável
+# C (checar)   = aplicado: o robô verifica sozinho se o erro voltou · A (agir) = verificado → vira boa prática padronizada
+FASE_PDCA = {"aberto": "P", "reaberto": "P", "em_aplicacao": "D", "aplicado": "C", "verificado": "A"}
+DIAS_SEM_VOLTAR = 7
+
+
+def _base_do_handover(h: dict) -> str:
+    m = re.match(r"^\[([^\]]+)\]", h.get("erro") or "")
+    return m.group(1) if m else ""
+
+
+def checar_pdca(cfg, agora: datetime | None = None) -> dict:
+    """Etapa C do PDCA, automática: handover 'aplicado' que não voltou passa a 'verificado' e vira boa prática.
+    Prova de que não voltou: a mesma base foi processada com sucesso depois da correção sem repetir o erro,
+    ou passaram 7 dias sem o erro. (Se o erro volta, `handover` já reabre na hora.)"""
+    from robo import historico
+    agora = agora or datetime.now()
+    tb = Trabalho(cfg)
+    hist = historico.ler(Path(cfg.logs), 3000)
+    verificados = []
+    for h in handovers(cfg, limite=1000):
+        if h["estado"] != "aplicado":
+            continue
+        desde = str(h["atualizado_em"])
+        base = _base_do_handover(h)
+        sucesso_depois = [x for x in hist if x.get("status") == "sucesso" and _base(x.get("arquivo", "")) == base
+                          and str(x.get("data_hora", "")).replace(" ", "T") > desde] if base else []
+        prazo = datetime.fromisoformat(desde) + timedelta(days=DIAS_SEM_VOLTAR) <= agora
+        if not (sucesso_depois or prazo):
+            continue
+        evidencia = (f"{len(sucesso_depois)} carga(s) de {base} aprovada(s) depois da correção, sem o erro"
+                     if sucesso_depois else f"{DIAS_SEM_VOLTAR} dias sem o erro voltar")
+        with tb.tx() as c:
+            c.execute("UPDATE handovers SET estado='verificado', atualizado_em=? WHERE id=?", (_agora(), h["id"]))
+            c.execute("INSERT OR IGNORE INTO boas_praticas (id, handover_id, andar, area, responsavel, problema, pratica, "
+                      "como_verificar, evidencia, criada_em) VALUES (?,?,?,?,?,?,?,?,?,?)",
+                      (h["id"].replace("HO-", "BP-"), h["id"], h["andar"], h["area"], h["responsavel"], h["erro"],
+                       h["regra"], h["como_verificar"], evidencia, _agora()))
+        experiencia(cfg, h["responsavel"], "aprendizado", f"Boa prática padronizada: {h['regra'][:150]}", "pdca", h["id"],
+                    evidencia, tb)
+        verificados.append(h["id"])
+    return {"verificados": verificados}
+
+
+def boas_praticas(cfg, andar: int | None = None, limite: int = 200) -> list[dict]:
+    sql, args = "SELECT * FROM boas_praticas", []
+    if andar:
+        sql += " WHERE andar=?"
+        args.append(int(andar))
+    with Trabalho(cfg).tx() as c:
+        return [dict(r) for r in c.execute(sql + " ORDER BY criada_em DESC LIMIT ?", args + [limite])]
+
+
+def resumo_pdca(cfg, andar: int | None = None) -> dict:
+    fases = {"P": 0, "D": 0, "C": 0, "A": 0}
+    for h in handovers(cfg, andar, limite=5000):
+        fases[FASE_PDCA.get(h["estado"], "P")] += 1
+    return {"planejar": fases["P"], "fazer": fases["D"], "checar": fases["C"], "agir": fases["A"],
+            "boas_praticas": len(boas_praticas(cfg, andar, 5000))}

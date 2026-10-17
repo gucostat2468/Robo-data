@@ -297,6 +297,34 @@ def f_organizacao(cfg, **_) -> dict:
     return resultado(True, "ferramenta", texto, {"lotacao": lot}, evidencia="registro único de funcionários")
 
 
+def f_reuniao_andar(cfg, andar: int | None = None, **_) -> dict:
+    from robo import reuniao
+    r = reuniao.ao_vivo(cfg, andar)
+    linhas = []
+    for a in r["andares"]:
+        p = a["pdca"]
+        linhas += [f"{a['andar']}º andar — {a['nome']} (agora, últimos 7 dias):",
+                   "Deu certo: " + "; ".join(a["deu_certo"]), "Deu errado: " + "; ".join(x[:200] for x in a["deu_errado"]),
+                   "Em andamento agora: " + ("; ".join(a["agora"]) or "nada"),
+                   "Plano de ação: " + ("; ".join(f"{x['acao']} ({x.get('quem_precisa_agir') or x['responsavel']}, até {x['prazo']})"
+                                                 for x in a["plano_de_acao"]) or "nada novo"),
+                   f"PDCA: {p['planejar']} planejar · {p['fazer']} fazendo · {p['checar']} checando · {p['agir']} padronizados "
+                   f"({p['boas_praticas']} boas práticas)"]
+    if r["em_risco"]:
+        linhas.append("Desempenho abaixo do mínimo: " + ", ".join(f"{d['nome']} ({d['taxa']}%)" for d in r["em_risco"]))
+    return resultado(True, "ferramenta", "\n".join(linhas), {"reuniao": r},
+                     evidencia="histórico, central de solicitações, memória e handovers (calculado agora)")
+
+
+def f_ideias(cfg, **_) -> dict:
+    from robo import ideias
+    lista = ideias.gerar(cfg)
+    texto = "\n".join(f"{n}. {i['titulo']} — por quê: {i['motivo']}. Primeiro passo: {i['primeiro_passo']} "
+                      f"(dono: {i['dono_nome']})" for n, i in enumerate(lista, 1))
+    return resultado(True, "ferramenta", texto, {"ideias": lista},
+                     evidencia="memória dos funcionários, handovers, solicitações e histórico")
+
+
 def f_resumo_executivo(cfg, titulo: str = "Resumo executivo", partes: list | None = None, ref: str = "", **_) -> dict:
     """Escreve um .md com os resultados REAIS das etapas anteriores (não cria número novo)."""
     partes = [p for p in partes or [] if p.get("texto")]
@@ -338,6 +366,10 @@ REGISTRO: dict[str, Ferramenta] = {f.id: f for f in [
     Ferramenta("dados_pessoais", "Verificar dados pessoais", "Procura e-mail, CPF e telefone (LGPD)", "baixo", False, f_dados_pessoais),
     Ferramenta("consulta_sql", "Consulta SQL", "Consulta da biblioteca em transação somente leitura", "baixo", False, f_consulta_sql),
     Ferramenta("ronda_ti", "Ronda de TI", "Verificações de saúde do computador e do robô", "baixo", False, f_ronda_ti),
+    Ferramenta("reuniao_andar", "Reunião ao vivo", "Situação de agora do andar: certo, errado, andamento, plano e PDCA",
+               "baixo", False, f_reuniao_andar),
+    Ferramenta("ideias", "Ideias para o futuro", "Propostas tiradas da memória de todos, com o dado de origem",
+               "baixo", False, f_ideias),
     Ferramenta("organizacao", "Organização", "Quem faz o quê, por andar e nível", "baixo", False, f_organizacao),
     Ferramenta("resumo_executivo", "Resumo executivo", "Arquivo .md com os resultados das etapas", "medio", False, f_resumo_executivo),
     Ferramenta("publicar_planilha", "Publicar planilha", "Envia a planilha para o pipeline de produção", "alto", True,
