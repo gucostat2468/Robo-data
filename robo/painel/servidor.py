@@ -1074,13 +1074,15 @@ class Api:
                 itens = b.get("itens")
                 return sala.pauta(self.cfg, cid, [str(x) for x in itens] if isinstance(itens, list) else None,
                                   int(b["marcar"]) if b.get("marcar") is not None else None)
-            if acao == "tarefa":
-                texto = str(b.get("texto") or "").strip()
-                if not texto:
-                    raise ErroApi("Descreva a tarefa.")
-                return sala.criar_tarefa(self.cfg, cid, texto, str(b.get("responsavel") or ""))
+            if acao in ("tarefa", "decisao"):
+                return sala.criar_tarefa(self.cfg, cid, str(b.get("texto") or "").strip(), str(b.get("responsavel") or ""),
+                                         str(b.get("prazo") or ""), str(b.get("criterio") or ""))
+            if acao == "repactuar":
+                return sala.repactuar(self.cfg, cid, str(b.get("id") or ""), str(b.get("prazo") or ""), str(b.get("motivo") or ""))
+            if acao == "cancelar_decisao":
+                return sala.cancelar_decisao(self.cfg, cid, str(b.get("id") or ""), str(b.get("motivo") or ""))
             if acao == "encerrar":
-                return sala.encerrar(self.cfg, cid)
+                return sala.encerrar(self.cfg, cid, str(b.get("justificativa") or ""))
         except ValueError as e:
             raise ErroApi(str(e))
         raise ErroApi("Ação desconhecida.")

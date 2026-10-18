@@ -156,9 +156,35 @@ def gerar(cfg, ate: datetime | None = None, publicar: bool = True, registrar: bo
                   (rid, ata["inicio"], ata["fim"], _agora(), json.dumps(ata, ensure_ascii=False, default=str), str(arq)))
     if publicar:
         _publicar(cfg, ata, acoes_todas, gente)
+        _registrar_decisoes(cfg, rid, acoes_todas)
     for pid in pdi:
         memoria.experiencia(cfg, pid, "treinamento", "Entrou em plano de melhoria (PDI) na reunião semanal", "reuniao", rid, tb=tb)
     return {"id": rid, "arquivo": str(arq), **ata}
+
+
+def _registrar_decisoes(cfg, rid: str, acoes: list[dict]) -> int:
+    """Plano de ação da semanal = decisões cobráveis, ligadas ao handover de origem (cumpridas quando o PDCA verifica).
+    Handover que já tem decisão aberta não ganha outra: a mesma pendência continua sendo cobrada."""
+    import re as _re
+    from robo import decisoes
+    decisoes.atualizar(cfg)
+    abertos = {d["vinculo_id"] for d in decisoes.listar(cfg, abertas=True, limite=5000) if d["vinculo_tipo"] == "handover"}
+    n = 0
+    for a in acoes:
+        m = _re.match(r"(HO-[\w-]+):", a.get("motivo", ""))
+        if not m or m.group(1) in abertos:
+            continue
+        try:
+            prazo = datetime.strptime(a["prazo"], "%d/%m/%Y").date()
+            decisoes.registrar(cfg, f"{a['acao']} (origem: {a['motivo'][:200]})", a["responsavel"], prazo,
+                               a.get("verificacao") or "o erro não volta na próxima carga (PDCA verifica)",
+                               (organizacao.por_id(cfg).get(a["responsavel"]) or {}).get("andar"), rid, "semanal",
+                               "ger_operacoes", ("handover", m.group(1)))
+            abertos.add(m.group(1))
+            n += 1
+        except ValueError:
+            continue  # prazo inválido ou texto curto: o plano continua na ata; não vira decisão
+    return n
 
 
 def _gravar_md(cfg, rid, ata, gente) -> Path:

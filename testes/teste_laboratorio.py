@@ -130,10 +130,14 @@ def teste_sala_teams_completa(planilha_baguncada, cfg):
     sala.pauta(cfg, cid, ["Erros abertos", "Próximos passos"])
     sala.pauta(cfg, cid, marcar=0)
     sala.anotar(cfg, cid, "Decidido: padronizar datas.")
-    t = sala.criar_tarefa(cfg, cid, "padronizar a coluna de data da base nps_outubro", "limpeza")
-    assert Trabalho(cfg).solicitacao(t["id"])
+    with pytest.raises(ValueError, match="prazo e de critério"):
+        sala.criar_tarefa(cfg, cid, "padronizar a coluna de data da base nps_outubro", "limpeza")  # nada vago
+    from datetime import date, timedelta
+    t = sala.criar_tarefa(cfg, cid, "padronizar a coluna de data da base nps_outubro", "limpeza",
+                          (date.today() + timedelta(days=7)).isoformat(), "duas cargas seguidas sem aviso de data em texto")
+    assert Trabalho(cfg).solicitacao(t["id"]) and t["decisao"].startswith("DEC-")
     d = sala.detalhes(cfg, cid)
-    assert d["mensagens"][-1]["texto"].startswith("✅ Tarefa")
+    assert d["mensagens"][-1]["texto"].startswith("📌 Decisão")
     assert any(m["reacoes"] for m in d["mensagens"]) and d["contexto"]["palco"]["tipo"] == "raio_x"
     # encerrar: recap salvo, reunião fecha, registro não se apaga
     fim = sala.encerrar(cfg, cid)
@@ -153,7 +157,7 @@ def teste_sala_teams_completa(planilha_baguncada, cfg):
     from robo import reuniao
     assert all("andares" in r["ata"] for r in reuniao.listar(cfg))
     tipos = [e["tipo"] for e in sala.eventos(cfg, cid)]
-    for t in ("abrir", "mao_levantada", "palavra", "reacao", "convite", "remocao", "compartilhar", "pauta", "notas", "tarefa", "encerrar"):
+    for t in ("abrir", "mao_levantada", "palavra", "reacao", "convite", "remocao", "compartilhar", "pauta", "notas", "decisao", "encerrar"):
         assert t in tipos, t
 
 

@@ -23,7 +23,7 @@ from __future__ import annotations
 
 import json
 import re
-from datetime import datetime
+from datetime import date, datetime
 from pathlib import Path
 
 from robo import lideranca, organizacao
@@ -132,8 +132,23 @@ def abrir(cfg, andar: int) -> dict:
     lab = ferramentas.executar("laboratorio", cfg, quem=lideranca.HEAD_DO_ANDAR.get(andar) or lider)
     if lab["ok"]:
         fala(head if head in ps else lider, lab)
+    # cobrança: a reunião começa pelo que foi decidido antes e ainda não está cumprido (situação apurada pelos registros)
+    from robo import decisoes
+    decisoes.atualizar(cfg)
+    pend = decisoes.listar(cfg, andar, abertas=True)
+    if pend:
+        icone = {"atrasada": "🔴", "em_andamento": "🟡"}
+        texto = (f"Pendências das reuniões anteriores ({len(pend)}). As atrasadas precisam ser tratadas hoje: novo prazo "
+                 f"com motivo ou cancelamento com motivo.\n" + "\n".join(
+                     f"{icone[d['estado']]} {d['id']} — {d['texto'][:140]} · dono {d['dono_nome']} · prazo "
+                     f"{date.fromisoformat(d['prazo']):%d/%m/%Y} ({'atrasada há ' + str(-d['dias_para_o_prazo']) + ' dia(s)' if d['dias_para_o_prazo'] < 0 else 'faltam ' + str(d['dias_para_o_prazo']) + ' dia(s)'})"
+                     f" · pronto quando: {d['criterio'][:120]}" + (f" · repactuada {d['repactuacoes']}x" if d["repactuacoes"] else "")
+                     for d in pend))
+        fala(lider, ferramentas.resultado(True, "ferramenta", texto, evidencia="decisões registradas e situação apurada agora"))
+        for d in pend:
+            decisoes.cobrar(cfg, d["id"], cid, lider, d["estado"])
     _tb(cfg)
-    _evento(tb, cid, "dono", "abrir", {"andar": andar, "participantes": ps})
+    _evento(tb, cid, "dono", "abrir", {"andar": andar, "participantes": ps, "pendencias": [d["id"] for d in pend]})
     filas = levantar_maos(cfg, cid)
     return {"conversa_id": cid, "participantes": ps, "lider": lider, "maos": filas}
 
@@ -165,6 +180,12 @@ def _motivo(cfg, pid: str, andar: int, evolucao: dict | None = None) -> tuple[st
             falas.append("O andar tem erro ainda não resolvido:\n" + "\n".join(
                 f"• {h['id']} ({h['recorrencias']}x): {h['erro'][:140]} → {h['regra'][:140]} "
                 f"(responsável: {h['responsavel']})" for h in abertos[:5]))
+        from robo import decisoes
+        atrasadas = [d for d in decisoes.listar(cfg, andar, abertas=True) if d["estado"] == "atrasada"]
+        if atrasadas:
+            motivos.append(f"{len(atrasadas)} decisão(ões) atrasada(s)")
+            falas.append("Decisões de reunião que passaram do prazo sem estarem cumpridas:\n" + "\n".join(
+                f"• {d['id']} — {d['texto'][:120]} (dono {d['dono_nome']}, prazo {d['prazo']})" for d in atrasadas[:5]))
         if piorando:
             motivos.append(f"{len(piorando)} pessoa(s) do andar com acerto em queda")
             falas.append("Gente da equipe com a taxa de acerto caindo 5 pontos ou mais (2 últimas semanas × anteriores):\n" +
@@ -331,24 +352,62 @@ def pauta(cfg, cid: str, itens: list[str] | None = None, marcar: int | None = No
     return {"pauta": atual}
 
 
-def criar_tarefa(cfg, cid: str, texto: str, responsavel: str) -> dict:
-    """Tarefa decidida na reunião vira solicitação de verdade na central (com plano, revisão e aprovação)."""
-    from robo import orquestrador
+def decidir(cfg, cid: str, texto: str, responsavel: str, prazo, criterio: str) -> dict:
+    """Decisão da reunião: dono + prazo + critério de pronto. Vira tarefa na central e é cobrada nas próximas reuniões."""
+    from robo import decisoes
     tb, conv = _sala(cfg, cid)
-    if responsavel not in organizacao.por_id(cfg):
-        raise ValueError("Responsável não existe.")
-    sid = orquestrador.criar(cfg, texto, responsavel, origem="reuniao")
-    tarefas = list(conv["contexto"].get("tarefas") or []) + [{"id": sid, "texto": texto[:300], "responsavel": responsavel}]
+    r = decisoes.registrar(cfg, texto, responsavel, prazo, criterio, conv["contexto"].get("andar"), cid, "sala", "dono")
+    sid = r["vinculo"][1]
+    tarefas = list(conv["contexto"].get("tarefas") or []) + [{"id": sid, "decisao": r["id"], "texto": texto[:300],
+                                                             "responsavel": responsavel, "prazo": r["prazo"],
+                                                             "criterio": criterio[:300]}]
     tb.atualizar_contexto(cid, tarefas=tarefas)
-    tb.mensagem(cid, "dono", f"✅ Tarefa {sid} para {organizacao.por_id(cfg)[responsavel]['nome']}: {texto}", "", {}, sid)
-    _evento(tb, cid, "dono", "tarefa", {"id": sid, "responsavel": responsavel})
-    return {"id": sid}
+    tb.mensagem(cid, "dono", f"📌 Decisão {r['id']} — {texto} · dono {organizacao.por_id(cfg)[responsavel]['nome']} · prazo "
+                             f"{date.fromisoformat(r['prazo']):%d/%m/%Y} · pronto quando: {criterio} (tarefa {sid})", "", {}, sid)
+    _evento(tb, cid, "dono", "decisao", {"id": r["id"], "tarefa": sid, "responsavel": responsavel, "prazo": r["prazo"],
+                                         "criterio": criterio[:300]})
+    return {"id": sid, "decisao": r["id"], "prazo": r["prazo"]}
+
+
+def criar_tarefa(cfg, cid: str, texto: str, responsavel: str, prazo=None, criterio: str = "") -> dict:
+    """Tarefa de reunião é uma decisão: sem prazo e critério de pronto ela não é registrada (nada vago)."""
+    if not prazo or not (criterio or "").strip():
+        raise ValueError("Toda tarefa de reunião precisa de prazo e de critério de pronto (como vamos verificar que foi feita).")
+    return decidir(cfg, cid, texto, responsavel, prazo, criterio)
+
+
+def repactuar(cfg, cid: str, decisao_id: str, novo_prazo, motivo: str) -> dict:
+    from robo import decisoes
+    tb, conv = _sala(cfg, cid)
+    r = decisoes.repactuar(cfg, decisao_id, novo_prazo, motivo, cid, "dono")
+    tb.mensagem(cid, "dono", f"🗓️ {decisao_id}: novo prazo {date.fromisoformat(r['prazo']):%d/%m/%Y}. Motivo: {motivo}", "", {})
+    _evento(tb, cid, "dono", "repactuar", {"id": decisao_id, "prazo": r["prazo"], "motivo": motivo[:500]})
+    return r
+
+
+def cancelar_decisao(cfg, cid: str, decisao_id: str, motivo: str) -> dict:
+    from robo import decisoes
+    tb, conv = _sala(cfg, cid)
+    r = decisoes.cancelar(cfg, decisao_id, motivo, cid, "dono")
+    tb.mensagem(cid, "dono", f"✖️ {decisao_id} cancelada. Motivo: {motivo}", "", {})
+    _evento(tb, cid, "dono", "cancelar_decisao", {"id": decisao_id, "motivo": motivo[:500]})
+    return r
 
 
 # ------------------------------------------------------------------ encerrar e resumo (recap)
-def encerrar(cfg, cid: str) -> dict:
+def encerrar(cfg, cid: str, justificativa: str = "") -> dict:
+    from robo import decisoes
+    import hashlib
     tb, conv = _sala(cfg, cid)
     ctx = conv["contexto"]
+    pendentes = decisoes.nao_tratadas(cfg, int(ctx.get("andar") or 0), cid)
+    if pendentes and len((justificativa or "").strip()) < 15:
+        raise ValueError(f"Há {len(pendentes)} decisão(ões) atrasada(s) sem tratamento nesta reunião: "
+                         + "; ".join(f"{d['id']} ({d['texto'][:60]})" for d in pendentes)
+                         + ". Dê novo prazo com motivo, cancele com motivo, ou escreva a justificativa para encerrar assim.")
+    for d in pendentes:
+        with decisoes._tb(cfg).tx() as c:
+            decisoes._evento(c, d["id"], "nao_tratada", d["estado"], d["estado"], "dono", cid, justificativa.strip())
     gente = organizacao.por_id(cfg)
     nome = lambda p: "Você" if p == "dono" else (gente.get(p) or {}).get("nome", p)
     msgs = conv["mensagens"]
@@ -374,11 +433,22 @@ def encerrar(cfg, cid: str) -> dict:
         "compartilhado": [e["dados"]["titulo"] for e in evs if e["tipo"] == "compartilhar"],
         "reacoes": {REACOES[k]: v for k, v in reacoes.items()},
         "notas": ctx.get("notas") or "",
+        "decisoes": [f"{d['id']} — {d['texto']} · dono {d['dono_nome']} · prazo {d['prazo']} · pronto quando: {d['criterio']}"
+                     for d in decisoes.listar(cfg) if d["reuniao_id"] == cid],
+        "pendencias_tratadas": [f"{e['decisao_id']}: {e['tipo']} ({e['detalhe'][:120]})" for e in _eventos_decisao(cfg, cid)],
+        "pendencias_sem_tratamento": [f"{d['id']} — {d['texto'][:120]}" for d in pendentes],
+        "justificativa": justificativa.strip(),
     }
     md = [f"# {recap['titulo']}", "", f"{inicio.replace('T', ' ')} → {fim.replace('T', ' ')} ({minutos} min)", "",
           "## Participantes", ""] + [f"- {p}" for p in recap["participantes"]]
     md += ["", "## Quem falou", ""] + [f"- {k}: {v} fala(s)" for k, v in recap["falas"].items()]
     md += ["", "## Pauta", ""] + (recap["pauta"] or ["- (sem pauta)"])
+    md += ["", "## Decisões (dono, prazo e critério de pronto — cobradas nas próximas reuniões)", ""] + \
+        ([f"- {d}" for d in recap["decisoes"]] or ["- nenhuma"])
+    md += ["", "## Pendências anteriores tratadas", ""] + ([f"- {d}" for d in recap["pendencias_tratadas"]] or ["- nenhuma"])
+    if recap["pendencias_sem_tratamento"]:
+        md += ["", "## Pendências atrasadas NÃO tratadas", "", f"Justificativa registrada: {recap['justificativa']}", ""] + \
+            [f"- {d}" for d in recap["pendencias_sem_tratamento"]]
     md += ["", "## Tarefas (na central de solicitações)", ""] + ([f"- {t}" for t in recap["tarefas"]] or ["- nenhuma"])
     md += ["", "## Mãos levantadas", ""] + [f"- atendida: {p}" for p in recap["maos_atendidas"]] + \
           [f"- sem palavra: {p}" for p in recap["maos_sem_palavra"]]
@@ -388,13 +458,23 @@ def encerrar(cfg, cid: str) -> dict:
     pasta = Path(cfg.logs) / "reunioes"
     pasta.mkdir(parents=True, exist_ok=True)
     arq = pasta / f"sala_{cid}.md"
-    arq.write_text("\n".join(md) + "\n", encoding="utf-8")
+    texto_ata = "\n".join(md) + "\n"
+    arq.write_text(texto_ata, encoding="utf-8")
+    recap["ata_sha256"] = hashlib.sha256(texto_ata.encode("utf-8")).hexdigest()  # prova de que a ata não foi mexida depois
     with tb.tx() as c:
         c.execute("INSERT INTO salas_encerradas (id, andar, inicio, fim, recap, arquivo) VALUES (?,?,?,?,?,?)",
                   (cid, ctx.get("andar"), inicio, fim, json.dumps(recap, ensure_ascii=False), str(arq)))
     tb.atualizar_contexto(cid, encerrada=True, recap=recap, arquivo=str(arq))
-    _evento(tb, cid, "dono", "encerrar", {"minutos": minutos, "arquivo": str(arq)})
+    _evento(tb, cid, "dono", "encerrar", {"minutos": minutos, "arquivo": str(arq), "ata_sha256": recap["ata_sha256"],
+                                          "pendencias_sem_tratamento": [d["id"] for d in pendentes]})
     return {"recap": recap, "arquivo": str(arq)}
+
+
+def _eventos_decisao(cfg, cid: str) -> list[dict]:
+    from robo import decisoes
+    with decisoes._tb(cfg).tx() as c:
+        return [dict(r) for r in c.execute("SELECT * FROM decisoes_eventos WHERE reuniao_id=? AND tipo IN "
+                                           "('repactuada','cancelada') ORDER BY id", (cid,))]
 
 
 def falar(cfg, conversa_id: str, texto: str, para: str | None = None) -> dict:
@@ -431,6 +511,8 @@ def detalhes(cfg, conversa_id: str) -> dict | None:
     for t in conv["contexto"].get("tarefas") or []:
         sol = tb.solicitacao(t["id"]) if hasattr(tb, "solicitacao") else None
         t["estado"] = (sol or {}).get("estado", "")
+    from robo import decisoes
+    conv["decisoes_pendentes"] = decisoes.listar(cfg, conv["contexto"].get("andar"), abertas=True)
     conv["eventos"] = evs[-200:]
     conv["reacoes_disponiveis"] = REACOES
     conv["compartilhaveis"] = COMPARTILHAVEIS

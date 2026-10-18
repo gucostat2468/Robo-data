@@ -110,13 +110,21 @@ function painelNotas(s) {
     <div class="secao-titulo" style="margin-top:12px">Anotações da reunião</div>
     <textarea id="sala-notas" rows="6" ${fechada ? "disabled" : ""} placeholder="Decisões, combinados, dúvidas…">${esc(s.contexto.notas || "")}</textarea>
     ${fechada ? "" : `<button class="btn pequeno" data-acao="sala-notas">Salvar anotações</button>`}
-    <div class="secao-titulo" style="margin-top:12px">Tarefas (viram solicitações na central)</div>
-    <ul class="lista-ficha">${tarefas.map((t) => `<li><button class="btn pequeno" data-acao="ver-solicitacao" data-id="${esc(t.id)}">${esc(t.id)}</button> ${esc(nomeNaSala(t.responsavel))}: ${esc(t.texto)}
-      ${t.estado ? etiquetaEstado(t.estado) : ""}</li>`).join("") || "<li class='muted'>Nenhuma tarefa.</li>"}</ul>
-    ${fechada ? "" : `<label>Nova tarefa<input id="sala-tarefa" placeholder="Ex.: padronizar a coluna de data da base nps_outubro"></label>
-      <div class="caixa-texto"><select id="sala-tarefa-resp" style="flex:1">${s.pessoas.map((p) => `<option value="${esc(p.id)}">${esc(p.nome)} · ${esc(p.cargo)}</option>`).join("")}
-        ${Object.entries(E.nomes || {}).filter(([id]) => !s.contexto.participantes.includes(id)).map(([id, n]) => `<option value="${esc(id)}">${esc(n)}</option>`).join("")}</select>
-      <button class="btn" data-acao="sala-tarefa">Criar tarefa</button></div>`}</div>`;
+    <div class="secao-titulo" style="margin-top:12px">Pendências do andar (decisões abertas — cobradas em toda reunião)</div>
+    <ul class="lista-ficha">${(s.decisoes_pendentes || []).map((d) => `<li><span class="etiqueta ${d.estado === "atrasada" ? "perigo" : "alerta"}">${esc(d.estado_nome)}</span>
+      <b>${esc(d.id)}</b> ${esc(d.texto)} <span class="muted">· ${esc(d.dono_nome)} · prazo ${esc(d.prazo.split("-").reverse().join("/"))}
+      ${d.dias_para_o_prazo < 0 ? `(${-d.dias_para_o_prazo} dia(s) de atraso)` : `(faltam ${d.dias_para_o_prazo})`} · pronto quando: ${esc(d.criterio)}${d.repactuacoes ? ` · repactuada ${d.repactuacoes}x` : ""}</span>
+      ${fechada ? "" : `<div class="acoes" style="margin-top:4px"><button class="btn pequeno" data-acao="sala-repactuar" data-id="${esc(d.id)}">Novo prazo</button>
+        <button class="btn pequeno" data-acao="sala-cancelar-decisao" data-id="${esc(d.id)}">Cancelar</button></div>`}</li>`).join("") || "<li class='muted'>Nenhuma decisão aberta neste andar.</li>"}</ul>
+    <div class="secao-titulo" style="margin-top:12px">Decisões desta reunião (viram tarefa na central)</div>
+    <ul class="lista-ficha">${tarefas.map((t) => `<li><button class="btn pequeno" data-acao="ver-solicitacao" data-id="${esc(t.id)}">${esc(t.id)}</button> ${t.decisao ? `<b>${esc(t.decisao)}</b> ` : ""}${esc(nomeNaSala(t.responsavel))}: ${esc(t.texto)}
+      ${t.prazo ? `<span class="muted">· prazo ${esc(t.prazo.split("-").reverse().join("/"))} · pronto quando: ${esc(t.criterio || "")}</span>` : ""} ${t.estado ? etiquetaEstado(t.estado) : ""}</li>`).join("") || "<li class='muted'>Nenhuma decisão ainda.</li>"}</ul>
+    ${fechada ? "" : `<label>O que foi decidido<input id="sala-tarefa" placeholder="Ex.: padronizar a coluna de data da base nps_outubro"></label>
+      <label>Dono (quem faz)<select id="sala-tarefa-resp">${s.pessoas.map((p) => `<option value="${esc(p.id)}">${esc(p.nome)} · ${esc(p.cargo)}</option>`).join("")}
+        ${Object.entries(E.nomes || {}).filter(([id]) => !s.contexto.participantes.includes(id)).map(([id, n]) => `<option value="${esc(id)}">${esc(n)}</option>`).join("")}</select></label>
+      <label>Prazo<input type="date" id="sala-tarefa-prazo"></label>
+      <label>Pronto quando (como vamos verificar)<input id="sala-tarefa-criterio" placeholder="Ex.: a base passa sem aviso de data em texto por 2 cargas seguidas"></label>
+      <button class="btn" data-acao="sala-tarefa">Registrar decisão</button>`}</div>`;
 }
 
 function recapSala(s) {
@@ -125,7 +133,9 @@ function recapSala(s) {
   return `<section class="cartao" style="margin-bottom:14px"><div class="cartao-corpo">
     <div class="secao-titulo">Resumo da reunião (recap) · ${r.minutos} min · salvo em <span class="mono">${esc(s.contexto.arquivo || "")}</span></div>
     ${lista("Participantes", r.participantes)}${lista("Quem falou", Object.entries(r.falas).map(([k, v]) => `${k}: ${v} fala(s)`))}
-    ${lista("Pauta", r.pauta)}${lista("Tarefas", r.tarefas)}${lista("Mãos atendidas", r.maos_atendidas)}${lista("Mãos sem palavra", r.maos_sem_palavra)}
+    ${lista("Pauta", r.pauta)}${lista("Decisões (dono, prazo e critério)", r.decisoes || [])}${lista("Pendências anteriores tratadas", r.pendencias_tratadas || [])}
+    ${(r.pendencias_sem_tratamento || []).length ? lista(`Pendências NÃO tratadas — justificativa: ${r.justificativa}`, r.pendencias_sem_tratamento) : ""}
+    ${r.ata_sha256 ? `<p class="muted mono" style="font-size:11px">Ata SHA-256: ${esc(r.ata_sha256)}</p>` : ""}${lista("Mãos atendidas", r.maos_atendidas)}${lista("Mãos sem palavra", r.maos_sem_palavra)}
     ${lista("Compartilhado na tela", r.compartilhado)}${lista("Reações", Object.entries(r.reacoes).map(([e, n]) => `${e} ${n}`))}
     <div class="secao-titulo" style="margin-top:10px">Anotações</div><p style="white-space:pre-wrap">${esc(r.notas || "—")}</p></div></section>`;
 }
@@ -139,7 +149,7 @@ function barraSala(s) {
     <span id="sala-timer" data-desde="${esc(s.criada_em)}" style="color:#fff;font-family:monospace;margin-right:6px">${fechada ? `${s.contexto.recap?.minutos ?? ""} min` : tempoDeSala(s.criada_em)}</span>
     ${b("sala-painel", "💬 Chat", E.salaPainel === "chat", 'data-painel="chat"')}
     ${b("sala-painel", `👥 Pessoas${(s.contexto.maos || []).length ? ` · ✋${s.contexto.maos.length}` : ""}`, E.salaPainel === "pessoas", 'data-painel="pessoas"')}
-    ${b("sala-painel", "📝 Notas, pauta e tarefas", E.salaPainel === "notas", 'data-painel="notas"')}
+    ${b("sala-painel", `📝 Pauta, notas e decisões${(s.decisoes_pendentes || []).some((d) => d.estado === "atrasada") ? " · 🔴" : ""}`, E.salaPainel === "notas", 'data-painel="notas"')}
     ${b("sala-visao", E.salaVisao === "galeria" ? "▦ Galeria" : "◱ Palestrante", false)}
     ${fechada ? "" : `<select id="sala-compartilhar" style="background:#3b3b3b;color:#fff;border:0;border-radius:6px;padding:4px 8px;width:auto;flex:0 0 auto;max-width:240px;min-height:0;height:30px"><option value="">📺 Compartilhar…</option>${comp}</select>`}
     ${b("sala-camera", E.camStream ? "📷 Câmera ligada" : "📷 Câmera", !!E.camStream)}
@@ -235,12 +245,28 @@ Object.assign(ACOES, {
   "sala-notas": (el) => comSala(el, async () => { await salaAcao("notas", { texto: $("#sala-notas").value }); avisar("Anotações salvas.", "sucesso"); }),
   "sala-pauta": (el) => comSala(el, () => salaAcao("pauta", { itens: $("#sala-pauta").value.split("\n").map((x) => x.trim()).filter(Boolean) })),
   "sala-tarefa": (el) => comSala(el, async () => {
-    const r = await salaAcao("tarefa", { texto: $("#sala-tarefa").value, responsavel: $("#sala-tarefa-resp").value });
-    limparCampo("sala-tarefa");
-    avisar(`Tarefa ${r.id} criada na central de solicitações.`, "sucesso"); }),
+    const r = await salaAcao("decisao", { texto: $("#sala-tarefa").value, responsavel: $("#sala-tarefa-resp").value,
+      prazo: $("#sala-tarefa-prazo").value, criterio: $("#sala-tarefa-criterio").value });
+    limparCampo("sala-tarefa"); limparCampo("sala-tarefa-criterio");
+    avisar(`Decisão ${r.decisao} registrada (tarefa ${r.id} na central).`, "sucesso"); }),
+  "sala-repactuar": (el) => comSala(el, async () => {
+    const prazo = prompt("Novo prazo (dd/mm/aaaa):"); if (!prazo) return;
+    const motivo = prompt("Motivo do novo prazo (o que mudou)?"); if (!motivo) return;
+    await salaAcao("repactuar", { id: el.dataset.id, prazo, motivo }); avisar("Novo prazo registrado.", "sucesso"); }),
+  "sala-cancelar-decisao": (el) => comSala(el, async () => {
+    const motivo = prompt("Por que cancelar esta decisão?"); if (!motivo) return;
+    await salaAcao("cancelar_decisao", { id: el.dataset.id, motivo }); avisar("Decisão cancelada (o registro fica).", "sucesso"); }),
   "sala-encerrar": async (el) => {
-    if (!(await confirmar({ titulo: "Encerrar a reunião?", texto: "O resumo (recap) e a transcrição são salvos. Depois de encerrada, ninguém fala mais nesta sala.", botao: "Encerrar", perigo: true }))) return;
-    await comSala(el, () => salaAcao("encerrar"));
+    if (!(await confirmar({ titulo: "Encerrar a reunião?", texto: "A ata (com hash), as decisões e a transcrição são salvas. Depois de encerrada, ninguém fala mais nesta sala.", botao: "Encerrar", perigo: true }))) return;
+    await comSala(el, async () => {
+      try { await salaAcao("encerrar"); }
+      catch (e) {
+        if (!/decisão\(ões\) atrasada/.test(e.message)) throw e;
+        const justificativa = prompt(`${e.message}\n\nPara encerrar mesmo assim, escreva a justificativa (fica na ata):`);
+        if (!justificativa) throw new Error("Reunião continua aberta: trate as pendências atrasadas.");
+        await salaAcao("encerrar", { justificativa });
+      }
+    });
   },
 });
 document.addEventListener("keydown", (e) => {
