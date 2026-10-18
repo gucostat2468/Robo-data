@@ -37,6 +37,8 @@ PAGINAS = [
      "andar": 4, "apis": ["/api/gestao"]},
     {"id": "chat", "titulo": "Chat da empresa", "para_que": "Conversar com qualquer funcionário, com filtros", "andar": 4,
      "apis": ["/api/funcionarios"]},
+    {"id": "registros", "titulo": "Banco da empresa", "para_que": "Cada tabela da memória: linhas, proteção, backups e cópia no PostgreSQL",
+     "andar": 5, "apis": ["/api/banco/registros"]},
     {"id": "treino", "titulo": "Treino contínuo", "para_que": "Todos treinando em casos com gabarito, no nível de cada um",
      "andar": 4, "apis": ["/api/treino"]},
     {"id": "solicitacoes", "titulo": "Solicitações", "para_que": "Pedidos, planos, aprovações e entregas", "andar": 4,

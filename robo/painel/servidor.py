@@ -1222,6 +1222,11 @@ class Api:
         except ValueError as e:
             raise ErroApi(str(e))
 
+    def banco_registros(self, _q) -> dict:
+        """O banco de registros ao vivo: tabelas, linhas, proteção, integridade, backups e cópia no PostgreSQL."""
+        from robo import dicionario_dados
+        return dicionario_dados.estado(self.cfg)
+
     def treino(self, _q) -> dict:
         from robo import treino
         return treino.painel(self.cfg)
@@ -1260,7 +1265,7 @@ ROTAS_GET = {
     "/api/reuniao/sala": Api.sala_ver, "/api/reuniao/salas": Api.salas,
     "/api/conhecimento": Api.conhecimento, "/api/conhecimento/caderno": Api.conhecimento_caderno,
     "/api/conhecimento/licao": Api.conhecimento_licao, "/api/conhecimento/buscar": Api.conhecimento_buscar,
-    "/api/erros": Api.erros_sistema, "/api/gestao": Api.gestao, "/api/treino": Api.treino, "/api/treino/pessoa": Api.treino_pessoa, "/api/aprendizado": Api.aprendizado,
+    "/api/erros": Api.erros_sistema, "/api/gestao": Api.gestao, "/api/treino": Api.treino, "/api/banco/registros": Api.banco_registros, "/api/treino/pessoa": Api.treino_pessoa, "/api/aprendizado": Api.aprendizado,
 }
 ROTAS_POST = {
     "/api/robo/ligar": Api.ligar, "/api/robo/pausar": Api.pausar, "/api/robo/processar-agora": Api.processar_agora,

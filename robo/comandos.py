@@ -124,7 +124,48 @@ def principal(argv: list[str] | None = None) -> int:
     si.add_argument("acao", choices=["ligar", "desligar", "status"])
     sb = sub.add_parser("banco", help="PostgreSQL: testar conexão, executar modelos SQL, ver tabelas")
     sb.add_argument("acao", choices=["testar", "modelos", "resumo"])
+    sib = sub.add_parser("instalar-banco", help="cria o banco REAL no seu PostgreSQL: usuários robo_app e robo_leitura, "
+                                              "schemas, permissões e senhas em variáveis de ambiente")
+    sib.add_argument("--host", default="localhost")
+    sib.add_argument("--porta", type=int, default=5432)
+    sib.add_argument("--banco", default="robo_dados")
+    sib.add_argument("--superusuario", default="postgres", help="o usuário administrador criado na instalação do PostgreSQL")
+    sib.add_argument("--sem-setx", action="store_true", help="não gravar as senhas nas variáveis do Windows")
+    sub.add_parser("banco-doc", help="regera documentacao/banco_de_dados.md a partir do dicionário de dados do código")
     args = p.parse_args(argv)
+
+    if args.comando == "banco-doc":
+        from robo import dicionario_dados
+        print(f"Gerado: {dicionario_dados.gravar_documentacao()}")
+        return 0
+
+    if args.comando == "instalar-banco":
+        import getpass
+        import os
+        from robo import instalacao_banco
+        from robo.config import RAIZ_PROJETO
+        senha = os.environ.get("ROBO_PG_SUPER_SENHA")
+        if senha is None:
+            print(f"Senha do usuário '{args.superusuario}' do PostgreSQL (a que você criou ao instalar o PostgreSQL):")
+            senha = getpass.getpass("Senha: ")
+        try:
+            r = instalacao_banco.instalar(Path(args.config) if args.config else RAIZ_PROJETO / "config.yaml", args.superusuario,
+                                          senha, args.host, args.porta, args.banco, gravar_variaveis=not args.sem_setx)
+        except Exception as e:
+            print(f"Não consegui instalar o banco: {type(e).__name__}: {e}", file=sys.stderr)
+            return 1
+        print(f"\nPostgreSQL {r['versao_postgres']} — banco instalado:")
+        for passo in r["passos"]:
+            print(f"  ✔ {passo}")
+        c = r["conexao"]
+        print("\nVARIÁVEIS DE CONEXÃO (guarde num gerenciador de senhas; elas NÃO ficam em nenhum arquivo):")
+        print(f"  servidor: {c['host']}   porta: {c['porta']}   banco: {c['banco']}")
+        for u, s in r["senhas"].items():
+            print(f"  usuário {u:13s} senha: {s}")
+        print(f"  (também em %{c['variavel_senha_app']}% e %{c['variavel_senha_leitura']}% — feche e abra o robô para ele ler)")
+        print("\nPower BI: Obter dados → Banco de dados PostgreSQL → Servidor localhost:5432, Banco robo_dados,"
+              " usuário robo_leitura (só leitura: o Power BI nunca altera nada).")
+        return 0
 
     if args.comando in ("atalhos", "inicializacao"):
         from robo.painel import sistema

@@ -356,3 +356,35 @@ def teste_treino_de_sql_nos_5_niveis_no_postgres(cfg_factory, banco_cfg):
         r = treino.tentar(cfg, "dba", "sql", caso, "T")
         assert r["acertou"], (nivel, r["detalhe"])
     assert _q(banco_cfg, "SELECT count(*) FROM information_schema.tables WHERE table_schema='treino'")[0][0] == 0
+
+
+def teste_instalar_banco_real_com_usuario_so_leitura(tmp_path, cfg_factory, banco_cfg):
+    """O instalador cria usuários e permissões de verdade; o de leitura não consegue escrever; nenhuma senha vai para o
+    config.yaml; a memória inteira é copiada."""
+    import psycopg
+    import yaml
+    from robo import instalacao_banco
+    sufixo = banco_cfg["banco"].split("_")[-1]
+    app, leitura = f"robo_app_{sufixo}", f"robo_leitura_{sufixo}"
+    base = cfg_factory()
+    base.criar_pastas()
+    caminho = tmp_path / "config.yaml"
+    caminho.write_text(yaml.safe_dump(base.dados, allow_unicode=True), encoding="utf-8")
+    try:
+        r = instalacao_banco.instalar(caminho, banco_cfg["usuario"], banco_cfg["senha"], banco_cfg["host"], banco_cfg["porta"],
+                                      banco_cfg["banco"], app, leitura, gravar_variaveis=False)
+        assert r["ok"] and any("recusou" in p for p in r["passos"])
+        b = yaml.safe_load(caminho.read_text(encoding="utf-8"))["banco"]
+        assert b["habilitado"] and b["usuario"] == app and b["usuario_leitura"] == leitura and not b.get("senha")
+        assert r["senhas"][app] not in caminho.read_text(encoding="utf-8")
+        with psycopg.connect(host=banco_cfg["host"], port=banco_cfg["porta"], user=leitura, password=r["senhas"][leitura],
+                             dbname=banco_cfg["banco"]) as c:
+            assert c.execute("SELECT count(*) FROM robo.memoria_experiencias").fetchone()[0] >= 0  # lê
+        instalacao_banco.instalar(caminho, banco_cfg["usuario"], banco_cfg["senha"], banco_cfg["host"], banco_cfg["porta"],
+                                  banco_cfg["banco"], app, leitura, gravar_variaveis=False)  # rodar de novo não estraga
+    finally:
+        with psycopg.connect(host=banco_cfg["host"], port=banco_cfg["porta"], user=banco_cfg["usuario"],
+                             password=banco_cfg["senha"], dbname="postgres", autocommit=True) as c:
+            c.execute(f'DROP DATABASE IF EXISTS "{banco_cfg["banco"]}" WITH (FORCE)')
+            for papel in (app, leitura):
+                c.execute(f'DROP ROLE IF EXISTS "{papel}"')
