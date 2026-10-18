@@ -12,7 +12,7 @@ async function carregarGestao() {
 }
 
 function miniSerie(taxas) {  // barrinhas por semana (cinza = sem dado)
-  return `<span style="display:inline-flex;gap:2px;align-items:flex-end;height:22px" title="${esc(taxas.map((t) => t == null ? "—" : `${t}%`).join(" · "))}">${taxas.map((t) =>
+  return `<span style="display:inline-flex;gap:2px;align-items:flex-end;height:22px" title="${esc(taxas.map((t) => t == null ? "—" : `${num(t)}%`).join(" · "))}">${taxas.map((t) =>
     `<span style="width:6px;height:${t == null ? 3 : Math.max(3, Math.round(t / 100 * 22))}px;background:${t == null ? "var(--borda)" : t >= 90 ? "var(--sucesso)" : t >= 70 ? "var(--alerta)" : "var(--perigo)"};border-radius:2px"></span>`).join("")}</span>`;
 }
 
@@ -28,9 +28,9 @@ function abaAndares(g) {
       <div style="display:flex;justify-content:space-between"><strong>${a.andar}º · ${esc(a.nome)}</strong><span title="scorecard do diretor">${FAROL_ANDAR[a.farol]}</span></div>
       <p class="muted" style="margin:4px 0 8px">${a.pessoas} pessoa(s) · diretor ${esc(E.nomes?.[a.diretor] || a.diretor || "—")} · head ${esc(E.nomes?.[a.head] || a.head || "—")}</p>
       <ul class="lista-ficha">
-        <li>Acerto em 30 dias: <b>${a.taxa_30d == null ? "sem dado" : `${a.taxa_30d}%`}</b> <span class="muted">(${a.acertos_30d} acertos, ${a.erros_30d} erros)</span></li>
+        <li>Acerto em 30 dias: <b>${a.taxa_30d == null ? "sem dado" : `${num(a.taxa_30d)}%`}</b> <span class="muted">(${a.acertos_30d} acertos, ${a.erros_30d} erros)</span></li>
         <li>Handovers abertos: <b>${a.handovers_abertos}</b>${a.handovers_recorrentes ? ` · <span class="etiqueta perigo">${a.handovers_recorrentes} recorrente(s)</span>` : ""}</li>
-        <li>Lições comprovadas: <b>${a.pct_licoes_aplicadas == null ? "—" : `${a.pct_licoes_aplicadas}%`}</b> <span class="muted">de ${a.licoes_atribuidas}</span></li>
+        <li>Lições comprovadas: <b>${a.pct_licoes_aplicadas == null ? "—" : `${num(a.pct_licoes_aplicadas)}%`}</b> <span class="muted">de ${a.licoes_atribuidas}</span></li>
         <li>Evolução: ${Object.entries(a.tendencias).map(([t, n]) => `${etiquetaTendencia(t)} ${n}`).join(" ")}</li>
         ${a.insuficientes.length ? `<li>Abaixo da exigência: <b>${esc(a.insuficientes.join(", "))}</b></li>` : ""}</ul>
       <button class="btn pequeno" data-acao="gestao-andar" data-andar="${a.andar}">Ver pessoas do andar</button></div></div>`).join("")}</div>`;
@@ -52,10 +52,21 @@ function abaFuncoes(g) {
     ${g.funcoes.map((f) => `<tr><td><b>${esc(f.nome)}</b> <span class="mono muted">${esc(f.id)}</span><br><small class="muted">${esc(f.descricao)}</small></td>
       <td><span class="etiqueta ${f.risco === "alto" ? "perigo" : f.risco === "medio" ? "alerta" : ""}">${esc(f.risco)}</span>${f.altera_dados ? ` <span class="etiqueta alerta">altera dados</span>` : ""}</td>
       <td>${esc(E.nomes?.[f.responsavel] || f.responsavel || "—")}<br><small class="muted">${f.autorizados} autorizado(s)</small></td>
-      <td class="direita">${f.usos}</td><td class="direita">${f.pct_ok == null ? "—" : `${f.pct_ok}%`}</td>
+      <td class="direita">${f.usos}</td><td class="direita">${f.pct_ok == null ? "—" : `${num(f.pct_ok)}%`}</td>
       <td class="direita">${f.excecoes ? `<span class="etiqueta perigo">${f.excecoes}</span>` : "0"}</td>
       <td class="direita">${f.segundos_medio == null ? "—" : `${f.segundos_medio}s`}</td>
       <td>${f.citada_em_testes ? `<span class="etiqueta sucesso">${f.citada_em_testes}</span>` : `<span class="etiqueta perigo">sem teste</span>`}</td></tr>`).join("")}</tbody></table></div>`;
+}
+
+function abaLaboratorio(g) {
+  return `<p class="muted" style="font-size:12px">O laboratório treina com planilhas sujas de resposta conhecida, em 4 níveis de dificuldade.
+    Cada barrinha é uma rodada (da mais antiga à mais recente). Quando o código do robô melhora, a linha do nível sobe: é a evolução medida,
+    não declarada. Nível sem rodada ainda aparece vazio.</p>
+    <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:12px">${(g.laboratorio || []).map((n) => `<div class="cartao"><div class="cartao-corpo">
+      <strong>Nível ${n.nivel}</strong> <span class="etiqueta ${n.taxa == null ? "" : n.taxa >= 90 ? "sucesso" : n.taxa >= 70 ? "alerta" : "perigo"}">${n.taxa == null ? "sem rodada" : `${num(n.taxa)}% de acerto`}</span>
+      <p class="muted" style="margin:6px 0">${esc(n.descricao)}</p>
+      <div>${miniSerie(n.linha_do_tempo.map((r) => r.taxa))}</div>
+      <small class="muted">${n.rodadas} rodada(s) · ${n.acertos}/${n.etapas} etapas certas</small></div></div>`).join("")}</div>`;
 }
 
 function abaModulos(g) {
@@ -76,11 +87,11 @@ function renderGestao() {
     ["Funcionários", r.funcionarios, Object.entries(r.tendencias).map(([t, n]) => `${(TENDENCIA[t] || [t])[0]}: ${n}`).join(" · ")],
     ["Funções", g.funcoes.length, `${r.funcoes_sem_teste.length} sem teste · ${r.funcoes_sem_uso_30d.length} sem uso em 30 dias`],
     ["Módulos", g.modulos.length, `${r.modulos_sem_teste.length} sem teste direto · ${r.modulos_com_erro_aberto.length} com erro aberto`],
-    ["Aprendizado real", `${g.aprendizado.regras_ativas} regra(s)`, `${(g.aprendizado.por_estado || {}).comprovada || 0} comprovada(s) · ${(g.aprendizado.por_estado || {}).pendente || 0} esperando você · lições comprovadas ${g.aprendizado.licoes_comprovadas_pct}% · cadeia ${g.aprendizado.integridade ? "íntegra" : "QUEBRADA"}`],
+    ["Aprendizado real", `${g.aprendizado.regras_ativas} regra(s)`, `${(g.aprendizado.por_estado || {}).comprovada || 0} comprovada(s) · ${(g.aprendizado.por_estado || {}).pendente || 0} esperando você · lições comprovadas ${num(g.aprendizado.licoes_comprovadas_pct)}% · cadeia ${g.aprendizado.integridade ? "íntegra" : "QUEBRADA"}`],
   ].map(([t, v, d]) => `<div class="cartao"><div class="cartao-corpo"><div class="muted">${esc(t)}</div><div style="font-size:26px;font-weight:700">${esc(String(v))}</div><small class="muted">${esc(d)}</small></div></div>`).join("");
-  const abas = [["paginas", "Páginas"], ["andares", "Andares"], ["evolucao", "Evolução por funcionário"], ["funcoes", "Funções"], ["modulos", "Módulos (código)"]]
+  const abas = [["paginas", "Páginas"], ["andares", "Andares"], ["evolucao", "Evolução por funcionário"], ["laboratorio", "Laboratório (termômetro)"], ["funcoes", "Funções"], ["modulos", "Módulos (código)"]]
     .map(([k, t]) => `<button class="btn ${E.gestaoAba === k ? "primario" : ""}" data-acao="gestao-aba" data-aba="${k}">${t}</button>`).join("");
-  const corpo = { paginas: abaPaginas, andares: abaAndares, evolucao: abaEvolucao, funcoes: abaFuncoes, modulos: abaModulos }[E.gestaoAba](g);
+  const corpo = { paginas: abaPaginas, andares: abaAndares, evolucao: abaEvolucao, laboratorio: abaLaboratorio, funcoes: abaFuncoes, modulos: abaModulos }[E.gestaoAba](g);
   return cabecalho("Gestão do projeto", `Conferido em ${esc(dataT(g.gerado_em))}. Código + registros, nada estimado.`, acoes) +
     `<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:12px">${cartoes}</div>
     <div style="display:flex;flex-wrap:wrap;gap:6px;margin:14px 0">${abas}</div>${corpo}`;

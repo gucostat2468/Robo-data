@@ -385,24 +385,26 @@ def _evidencia_pratica(cfg, licao: dict, pid: str, ctx: dict) -> tuple[bool, str
         partes = ref.split(":")
         if len(partes) == 4:  # formato antigo: area:semente:etapa:responsavel
             area, semente, etapa, resp = partes[0], int(partes[1]), _etapa_base(partes[2]), partes[3]
+            nivel = 1
         else:
             area, etapa, resp = partes[0], partes[1], partes[2]
             with _tb(cfg).tx() as c:
-                ult = c.execute("SELECT semente FROM laboratorio_exercicios WHERE ok=0 AND area=? AND responsavel=? AND "
-                                "etapa LIKE ? ORDER BY id DESC LIMIT 1", (area, resp, etapa + "%")).fetchone()
+                ult = c.execute("SELECT semente, COALESCE(nivel, 1) nivel FROM laboratorio_exercicios WHERE ok=0 AND area=? "
+                                "AND responsavel=? AND etapa LIKE ? ORDER BY id DESC LIMIT 1", (area, resp, etapa + "%")).fetchone()
             if not ult:
                 return False, "caso que falhou não encontrado"
-            semente = int(ult["semente"])
+            semente, nivel = int(ult["semente"]), int(ult["nivel"])
         lib = etapa.removeprefix("Revisão da biblioteca ").strip() if etapa.startswith("Revisão da biblioteca") else None
-        chave = (area, semente, lib)
+        chave = (area, semente, lib, nivel)
         if chave not in ctx["lab"]:
             if ctx["regressoes"] >= REGRESSOES_POR_RODADA:
                 return False, "reconferência fica para a próxima rodada (limite por rodada)"
             ctx["regressoes"] += 1
-            ctx["lab"][chave] = laboratorio.exercicio(cfg, area, semente, gravar=False, biblioteca=lib)  # sem efeitos
+            ctx["lab"][chave] = laboratorio.exercicio(cfg, area, semente, gravar=False, biblioteca=lib, nivel=nivel)
         r = ctx["lab"][chave]
         falhou = any(_etapa_base(x["etapa"]) == etapa and not x["ok"] for x in r.get("resultados", []))
-        return (not falhou, f"caso {area}/{semente} refeito ({_agora()[:16]}): {'passou' if not falhou else 'ainda falha'}")
+        return (not falhou, f"caso {area}/{semente} nível {nivel} refeito ({_agora()[:16]}): "
+                            f"{'passou' if not falhou else 'ainda falha'}")
     if tipo == "regra":  # regra aprendida: só conta com o arquivo passando depois dela
         with _tb(cfg).tx() as c:
             p = c.execute("SELECT estado, prova FROM propostas_regra WHERE id=?", (ref,)).fetchone()

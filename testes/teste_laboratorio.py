@@ -155,3 +155,47 @@ def teste_sala_teams_completa(planilha_baguncada, cfg):
     tipos = [e["tipo"] for e in sala.eventos(cfg, cid)]
     for t in ("abrir", "mao_levantada", "palavra", "reacao", "convite", "remocao", "compartilhar", "pauta", "notas", "tarefa", "encerrar"):
         assert t in tipos, t
+
+
+# ---------------- níveis de dificuldade (termômetro): cada nível planta sujeira real e a resposta certa é conhecida
+@pytest.mark.parametrize("valor,esperado", [
+    ("1.234,56-", -1234.56),     # SAP: menos no fim
+    ("−1.234,56", -1234.56),     # sinal − tipográfico (copiado de PDF)
+    ("R$ 1,2 mil", 1200.0),
+    ("R$ 3,5 mi", 3_500_000.0),
+    ("2k", 2000.0),
+    ("-", None),                 # traço sozinho é nulo, não zero
+    ("N/A", None),
+])
+def teste_formatos_dificeis_de_numero(valor, esperado):
+    from robo.limpeza import numero_de
+    r = numero_de(valor, ",")
+    assert r == pytest.approx(esperado) if esperado is not None else r is None
+
+
+def teste_rodape_de_relatorio_nao_vira_linha_de_dado():
+    import pandas as pd
+    from robo.config import PADROES
+    from robo.limpeza import limpar_tabela
+    from robo.relatorio import Relatorio
+    df = pd.DataFrame({"loja": ["A", "B", "C", "Gerado em 10/10/2026 por ERP"], "valor": [10, 20, 30, None]})
+    df.index = range(2, 6)
+    rel = Relatorio("t.xlsx")
+    out = limpar_tabela(df, "dados", PADROES["limpeza"], {}, rel)
+    assert len(out) == 3 and not out["loja"].astype(str).str.contains("Gerado").any()
+
+
+@pytest.mark.parametrize("nivel", [1, 2, 3, 4])
+@pytest.mark.parametrize("area", ["varejo", "rh", "financeiro"])
+def teste_cada_nivel_passa_com_resposta_certa(cfg, area, nivel):
+    r = laboratorio.exercicio(cfg, area, 21, gravar=False, nivel=nivel)
+    assert r["falhas"] == [], r
+
+
+def teste_nivel_fica_gravado_e_termometro_mostra_a_linha_do_tempo(cfg):
+    for n in (1, 4, 4):
+        laboratorio.exercicio(cfg, "varejo", 30 + n, nivel=n)
+    termo = {t["nivel"]: t for t in laboratorio.por_nivel(cfg)}
+    assert termo[1]["rodadas"] == 1 and termo[4]["rodadas"] == 2 and len(termo[4]["linha_do_tempo"]) == 2
+    assert termo[2]["taxa"] is None and termo[4]["taxa"] is not None
+    assert "por_nivel" in laboratorio.resumo(cfg)

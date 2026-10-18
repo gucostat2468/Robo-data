@@ -43,6 +43,11 @@ CREATE TABLE IF NOT EXISTS laboratorio_medidas (
   id INTEGER PRIMARY KEY AUTOINCREMENT, data_hora TEXT, area TEXT, linhas INTEGER, segundos REAL);
 """
 PADRAO = {"habilitado": True, "intervalo_minutos": 10}
+NIVEIS = {1: "básico (título, R$, data em texto, duplicata, Total)",
+          2: "escritório (título em várias linhas, nulos como '-' e 'N/A', subtotal no meio, espaços sobrando)",
+          3: "exportação de sistema (número americano, datas misturadas com número de série, coluna vazia, rodapé)",
+          4: "formatos difíceis de número (menos no fim como no SAP, sinal − copiado de PDF, '1,2 mil')"}
+_prontos: set[str] = set()
 
 
 def _c(cfg) -> dict:
@@ -51,8 +56,12 @@ def _c(cfg) -> dict:
 
 def _tb(cfg) -> Trabalho:
     tb = Trabalho(cfg)
-    with tb.tx() as c:
-        c.executescript(ESQUEMA)
+    if str(tb.arquivo) not in _prontos or not tb.arquivo.exists():
+        with tb.tx() as c:
+            c.executescript(ESQUEMA)
+            if "nivel" not in {r[1] for r in c.execute("PRAGMA table_info(laboratorio_exercicios)")}:
+                c.execute("ALTER TABLE laboratorio_exercicios ADD COLUMN nivel INTEGER DEFAULT 1")
+        _prontos.add(str(tb.arquivo))
     return tb
 
 
@@ -115,43 +124,112 @@ def gerar(area: str, semente: int) -> dict:
     raise ValueError(area)
 
 
+def aplicar_nivel(caso: dict, nivel: int, semente: int) -> dict:
+    """Planta a sujeira do nível e ajusta a VERDADE (ex.: célula com '-' vira vazio na resposta certa)."""
+    caso = {**caso, "nivel": nivel, "rotulos": {k: np.array(v, dtype=object) if k == caso["metrica"] else v
+                                                for k, v in caso["rotulos"].items()}}
+    rng = np.random.default_rng(semente + 7 * nivel)
+    if nivel >= 2:
+        nulos = sorted(int(i) for i in rng.choice(caso["n"], max(3, caso["n"] // 30), replace=False))
+        caso["nulos"] = nulos
+        met = caso["rotulos"][caso["metrica"]]
+        for i in nulos:
+            met[i] = None
+        caso["subtotal_em"] = int(caso["n"] // 2)
+    if nivel >= 4 and caso.get("moeda"):
+        met = caso["rotulos"][caso["metrica"]]
+        formatos = {}
+        for i in range(caso["n"]):
+            if met[i] is None:
+                continue
+            if i % 7 == 3:  # valor grande escrito "1,2 mil": a VERDADE passa a ser o valor arredondado que foi escrito
+                met[i] = round(float(met[i]) / 100) * 100.0 or 100.0
+                formatos[i] = "mil"
+            elif caso["area"] == "financeiro" and i % 5 == 1:  # estornos negativos em formatos de sistema
+                met[i] = -abs(float(met[i]))
+                formatos[i] = ["sap", "unicode"][i % 2]
+        caso["formatos"] = formatos
+    return caso
+
+
 def escrever_sujo(caso: dict, caminho: Path) -> None:
-    """Planilha como chega na vida real: título, linha vazia, valores em R$, datas em texto, duplicata e Total."""
+    """Planilha como chega na vida real, com a sujeira do nível do caso (1, 2 ou 3)."""
     from openpyxl import Workbook
+    nivel = caso.get("nivel", 1)
     rot = caso["rotulos"]
     cab = list(rot)
+    met = caso["metrica"]
+    rng = np.random.default_rng(caso["n"] * 31 + nivel)
     wb = Workbook()
     ws = wb.active
     ws.title = "Relatório"
     ws.append([f"Relatório gerado pelo laboratório — {caso['area']}"])
+    if nivel >= 2:
+        ws.append(["Fonte: ERP corporativo"])
+        ws.append(["Período: jan a out/2026"])
     ws.append([])
-    ws.append([f"  {c} " if i % 2 else c.upper() if i == 0 else c for i, c in enumerate(cab)])
+    cab_escrito = [f"  {c} " if i % 2 else c.upper() if i == 0 else c for i, c in enumerate(cab)]
+    if nivel >= 3:  # coluna vazia no meio (sem cabeçalho e sem dados)
+        meio = len(cab) // 2
+        cab_escrito = cab_escrito[:meio] + [None] + cab_escrito[meio:]
+    ws.append(cab_escrito)
+
+    def celula(c, v, i):
+        if v is None or (isinstance(v, float) and math.isnan(v)):
+            return ["-", "N/A", ""][i % 3]
+        if isinstance(v, date):
+            if nivel >= 3 and i % 3 == 1:   # número de série do Excel (célula sem formato de data)
+                return (v - date(1899, 12, 30)).days
+            if nivel >= 3 and i % 3 == 2:
+                return v.isoformat()
+            return v.strftime("%d/%m/%Y")
+        if c == met:
+            v = float(v)
+            fmt = caso.get("formatos", {}).get(i)
+            if fmt == "mil":
+                return f"R$ {v / 1000:.1f} mil".replace(".", ",")
+            if fmt == "sap":
+                return _br(abs(v)).replace("R$ ", "") + "-"          # 1.234,56-  (menos no fim)
+            if fmt == "unicode":
+                return "\u2212" + _br(abs(v)).replace("R$ ", "")      # −1.234,56  (sinal copiado de PDF)
+            if nivel == 3:
+                return f"{v:,.2f}"           # padrão americano: 1,234.56
+            if caso.get("moeda"):
+                return _br(v)
+            if nivel >= 4:
+                return f"{v:,.2f}"           # nível 4 mantém o padrão americano para as métricas sem moeda
+            return int(v) if float(v).is_integer() else v
+        if isinstance(v, (np.integer,)):
+            return int(v)
+        if isinstance(v, (np.floating,)):
+            return float(v)
+        if isinstance(v, (str, np.str_)):
+            return f" {v}  " if nivel >= 2 and i % 4 == 0 else str(v)   # espaços sobrando
+        return v
+
     linhas = []
     for i in range(caso["n"]):
-        linha = []
-        for c in cab:
-            v = rot[c][i]
-            if isinstance(v, date):
-                v = v.strftime("%d/%m/%Y")
-            elif c == caso["metrica"] and caso.get("moeda"):
-                v = _br(float(v))
-            elif isinstance(v, (np.integer,)):
-                v = int(v)
-            elif isinstance(v, (np.floating,)):
-                v = float(v)
-            elif isinstance(v, np.str_):
-                v = str(v)
-            linha.append(v)
+        linha = [celula(c, rot[c][i], i) for c in cab]
+        if nivel >= 3:
+            linha = linha[:meio] + [None] + linha[meio:]
         linhas.append(linha)
-    for linha in linhas:
+    for i, linha in enumerate(linhas):
         ws.append(linha)
-    ws.append(linhas[0])  # duplicata exata
-    ws.append(["Total"] + [None] * (len(cab) - 1))
+        if nivel >= 2 and i == caso.get("subtotal_em"):  # subtotal no meio da tabela
+            ws.append([f"Subtotal {str(rot[cab[1]][i])}"] + [None] * (len(linha) - 1))
+    ws.append(linhas[0])  # duplicata exata (com o mesmo ID)
+    ws.append(["Total"] + [None] * (len(linhas[0]) - 1))
+    if nivel >= 3:
+        ws.append([])
+        ws.append([f"Gerado em {date(2026, 10, 18):%d/%m/%Y} às 08:00 por sistema_erp (usuário: relatorios)"])
     wb.save(caminho)
 
 
 def verdade(caso: dict) -> pd.DataFrame:
-    return pd.DataFrame({normalizar_nome_coluna(c): v for c, v in caso["rotulos"].items()})
+    df = pd.DataFrame({normalizar_nome_coluna(c): v for c, v in caso["rotulos"].items()})
+    met = normalizar_nome_coluna(caso["metrica"])
+    df[met] = pd.to_numeric(df[met], errors="coerce")
+    return df
 
 
 # =============================================================================== exercício
@@ -180,7 +258,7 @@ def _iguais(a: dict, b: dict, tol: float = 1e-6) -> list[str]:
 
 
 def exercicio(cfg, area: str | None = None, semente: int | None = None, gravar: bool = True,
-              biblioteca: str | None = None) -> dict:
+              biblioteca: str | None = None, nivel: int | None = None) -> dict:
     """Um treino com resposta conhecida. gravar=False = reconferência (caderno de lições): refaz o MESMO caso e a
     MESMA biblioteca sem gravar nada (sem treino novo, sem acerto/erro, sem handover, sem pedido de ajuda)."""
     from robo import bibliotecas, calculos, ciencia, memoria
@@ -190,8 +268,11 @@ def exercicio(cfg, area: str | None = None, semente: int | None = None, gravar: 
         feitos = c.execute("SELECT COUNT(DISTINCT rodada) FROM laboratorio_exercicios").fetchone()[0]
     semente = int(semente if semente is not None else time.time_ns() % 2_000_000_000)
     area = area or AREAS[feitos % len(AREAS)]
-    rodada = f"LAB-{datetime.now():%Y%m%d-%H%M%S}-{area}"
-    caso = gerar(area, semente)
+    # dificuldade crescente: percorre as 6 áreas no nível 1, depois no 2, depois no 3 — e recomeça
+    nivel = int(nivel or 1 + (feitos // len(AREAS)) % len(NIVEIS))
+    # número sequencial no fim: duas rodadas no mesmo segundo não se misturam (nem a pasta, nem o termômetro)
+    rodada = f"LAB-{datetime.now():%Y%m%d-%H%M%S}-{area}-n{nivel}-{feitos + 1}"
+    caso = aplicar_nivel(gerar(area, semente), nivel, semente)
     certo = verdade(caso)
     seg, met = normalizar_nome_coluna(caso["segmento"]), normalizar_nome_coluna(caso["metrica"])
     pasta = Path(cfg.logs) / "laboratorio" / rodada
@@ -221,6 +302,18 @@ def exercicio(cfg, area: str | None = None, semente: int | None = None, gravar: 
             soma_ok = ok_tipo and math.isclose(float(pd.to_numeric(df[met]).sum()), float(certo[met].sum()), rel_tol=1e-9, abs_tol=1e-6)
             registrar("Limpar: tirar Total e duplicata, converter R$ e números", "limpeza", ok_linhas and soma_ok,
                       f"{len(df)} linhas (esperado {caso['n']}); {met} numérica: {ok_tipo}; soma confere: {soma_ok}", t0)
+            col_data = next((normalizar_nome_coluna(c) for c, v in caso["rotulos"].items()
+                             if len(v) and isinstance(v[0], date)), None)
+            if col_data and col_data in df.columns and ok_linhas:
+                t0 = time.perf_counter()
+                obtidas = df[col_data].dt.date.tolist() if pd.api.types.is_datetime64_any_dtype(df[col_data]) else []
+                esperadas = sorted(certo[col_data].tolist())
+                ok_datas = pd.api.types.is_datetime64_any_dtype(df[col_data]) and sorted(
+                    d for d in obtidas if d is not None and not pd.isna(d)) == esperadas
+                registrar("Converter as datas (texto, ISO e número de série)", "limpeza", ok_datas,
+                          "todas as datas certas" if ok_datas else
+                          f"{col_data}: ficou como {df[col_data].dtype} (não virou data)" if not obtidas else
+                          f"{col_data}: {sum(1 for d in obtidas if d is None or pd.isna(d))} data(s) vazia(s) ou diferente(s)", t0)
         if gravar:
             with tb.tx() as c:
                 c.execute("INSERT INTO laboratorio_medidas (data_hora, area, linhas, segundos) VALUES (?,?,?,?)",
@@ -284,16 +377,17 @@ def exercicio(cfg, area: str | None = None, semente: int | None = None, gravar: 
 
     falhas = [x for x in resultados if not x["ok"]]
     if not gravar:
-        return {"rodada": rodada, "area": area, "semente": semente, "linhas": caso["n"], "etapas": len(resultados),
+        return {"rodada": rodada, "area": area, "semente": semente, "nivel": nivel, "linhas": caso["n"], "etapas": len(resultados),
                 "acertos": len(resultados) - len(falhas), "falhas": [f"{x['etapa']}: {x['detalhe'][:120]}" for x in falhas],
                 "resultados": resultados}
     # ---- memória, handovers e pedidos de ajuda
     from robo import interacoes
     with tb.tx() as c:
         for x in resultados:
-            c.execute("INSERT INTO laboratorio_exercicios (rodada, data_hora, area, semente, etapa, responsavel, ok, detalhe, segundos) "
-                      "VALUES (?,?,?,?,?,?,?,?,?)", (rodada, _agora(), area, semente, x["etapa"], x["responsavel"], int(x["ok"]),
-                                                     x["detalhe"][:1000], x["segundos"]))
+            c.execute("INSERT INTO laboratorio_exercicios (rodada, data_hora, area, semente, etapa, responsavel, ok, detalhe, "
+                      "segundos, nivel) VALUES (?,?,?,?,?,?,?,?,?,?)",
+                      (rodada, _agora(), area, semente, x["etapa"], x["responsavel"], int(x["ok"]), x["detalhe"][:1000],
+                       x["segundos"], nivel))
     for x in resultados:
         memoria.experiencia(cfg, x["responsavel"], "acerto" if x["ok"] else "erro", f"Laboratório ({area}): {x['etapa']}",
                             "laboratorio", rodada, x["detalhe"], tb)
@@ -301,7 +395,7 @@ def exercicio(cfg, area: str | None = None, semente: int | None = None, gravar: 
             hid = memoria.handover(cfg, f"Laboratório: {x['etapa']} falhou — {x['detalhe'][:200]}", f"lab_{area}", x["responsavel"],
                                    f"semente {semente}", tb)
             interacoes.pedir_ajuda(cfg, x["responsavel"], f"{x['etapa']}: {x['detalhe'][:160]}", hid)
-    return {"rodada": rodada, "area": area, "semente": semente, "linhas": caso["n"], "etapas": len(resultados),
+    return {"rodada": rodada, "area": area, "semente": semente, "nivel": nivel, "linhas": caso["n"], "etapas": len(resultados),
             "acertos": len(resultados) - len(falhas), "falhas": [f"{x['etapa']}: {x['detalhe'][:120]}" for x in falhas]}
 
 
@@ -338,7 +432,25 @@ def resumo(cfg, dias: int = 7) -> dict:
         areas = {r["area"]: r["n"] for r in c.execute(
             "SELECT area, COUNT(DISTINCT rodada) n FROM laboratorio_exercicios WHERE data_hora>=? GROUP BY area", (desde,))}
         ultimas = [dict(r) for r in c.execute("SELECT * FROM laboratorio_exercicios ORDER BY id DESC LIMIT 30")]
-    return {"rodadas": rodadas, "por_area": areas, "por_pessoa": por, "ultimas": ultimas}
+    return {"rodadas": rodadas, "por_area": areas, "por_pessoa": por, "ultimas": ultimas, "por_nivel": por_nivel(cfg)}
+
+
+def por_nivel(cfg, ultimas_rodadas: int = 20) -> list[dict]:
+    """O termômetro: taxa de acerto de cada nível de dificuldade e a linha do tempo das últimas rodadas do nível.
+    Quando o código melhora, a linha sobe (ex.: nível 4 de 3/6 para 6/6 depois de ensinar 'R$ 1,2 mil')."""
+    with _tb(cfg).tx() as c:
+        linhas = [dict(r) for r in c.execute(
+            "SELECT COALESCE(nivel, 1) nivel, rodada, MIN(data_hora) data_hora, area, SUM(ok) ok, COUNT(*) total "
+            "FROM laboratorio_exercicios GROUP BY rodada ORDER BY MIN(id)")]
+    saida = []
+    for n, descricao in NIVEIS.items():
+        rs = [r for r in linhas if r["nivel"] == n]
+        ok, total = sum(r["ok"] for r in rs), sum(r["total"] for r in rs)
+        saida.append({"nivel": n, "descricao": descricao, "rodadas": len(rs), "acertos": ok, "etapas": total,
+                      "taxa": round(100 * ok / total, 1) if total else None,
+                      "linha_do_tempo": [{"data_hora": r["data_hora"], "area": r["area"],
+                                          "taxa": round(100 * r["ok"] / r["total"], 1)} for r in rs[-ultimas_rodadas:]]})
+    return saida
 
 
 def estrategia_ti(cfg) -> dict:

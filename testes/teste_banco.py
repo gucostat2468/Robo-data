@@ -271,7 +271,7 @@ def teste_laboratorio_no_postgres_em_schema_separado(cfg_factory, banco_cfg):
     from robo import laboratorio
     cfg = cfg_factory([], banco=banco_cfg)
     r = laboratorio.exercicio(cfg, "varejo", 5)
-    assert r["falhas"] == [] and r["etapas"] == 5, r  # cabeçalho, limpeza, cálculo, SQL e biblioteca
+    assert r["falhas"] == [] and r["etapas"] == 6, r  # cabeçalho, limpeza, datas, cálculo, SQL e biblioteca
     etapas = laboratorio.resumo(cfg)["ultimas"]
     assert any(e["responsavel"] == "dba" and e["ok"] for e in etapas)
     # a tabela de treino é apagada depois; nada vai para o schema de produção

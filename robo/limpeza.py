@@ -41,6 +41,9 @@ _RE_NUM_PONTO = re.compile(r"^(\d{1,3}(,\d{3})+|\d+)(\.\d+)?$")     # 1,234.56 |
 _RE_TOTAL = re.compile(r"^(sub\s*-?\s*)?total(\s+geral)?\s*:?$", re.IGNORECASE)
 _RE_COMECA_TOTAL = re.compile(r"^(sub\s*-?\s*total|total)\b", re.IGNORECASE)
 _RE_SUBTOTAL = re.compile(r"^sub\s*-?\s*total\b", re.IGNORECASE)
+# rodapé de relatório exportado ("Gerado em 18/10/2026 por sistema", "Fonte: ERP", "Página 1 de 3", "Emitido em…")
+_RE_RODAPE = re.compile(r"^(gerado|emitido|impresso|exportado|extra[ií]do)\s+(em|por)\b|^fonte\s*:|^p[aá]gina\s+\d+|"
+                        r"^relat[oó]rio\s+gerado|^data\s+de\s+(emiss[aã]o|gera[cç][aã]o)\b", re.IGNORECASE)
 
 MESES = {"jan": 1, "fev": 2, "feb": 2, "mar": 3, "abr": 4, "apr": 4, "mai": 5, "may": 5, "jun": 6, "jul": 7, "ago": 8,
          "aug": 8, "set": 9, "sep": 9, "out": 10, "oct": 10, "nov": 11, "dez": 12, "dec": 12}
@@ -105,14 +108,27 @@ def _texto_de(v) -> str:
     return str(v)
 
 
+_RE_ESCALA = re.compile(r"\s*(mil|k|mi|mm|milh[aã]o|milh[oõ]es|bi|bilh[aã]o|bilh[oõ]es)\.?$", re.IGNORECASE)
+ESCALAS = {"mil": 1e3, "k": 1e3, "mi": 1e6, "mm": 1e6, "milhao": 1e6, "milhoes": 1e6, "milhão": 1e6, "milhões": 1e6,
+           "bi": 1e9, "bilhao": 1e9, "bilhoes": 1e9, "bilhão": 1e9, "bilhões": 1e9}
+
+
 def numero_de(v, decimal: str = ","):
-    """Converte '1.234,56', 'R$ 10,00', '45%', '(1.000)' em número. Devolve None se não for número."""
+    """Converte '1.234,56', 'R$ 10,00', '45%', '(1.000)', '1.234,56-' (SAP), '−1.234,56' (sinal copiado de PDF) e
+    'R$ 1,2 mil' em número. Devolve None se não for número."""
     if _eh_numero_nativo(v):
         return None if pd.isna(v) else float(v)
     if not isinstance(v, str):
         return None
-    s = v.strip().replace(" ", " ")
+    # espaço não separável vira espaço; sinais de menos tipográficos (−, –, ‒, —) viram o hífen comum
+    s = v.strip().replace("\u00a0", " ").translate({0x2212: "-", 0x2013: "-", 0x2012: "-", 0x2014: "-"})
+    escala = 1.0
+    m = _RE_ESCALA.search(s)
+    if m and m.start() > 0 and any(ch.isdigit() for ch in s[:m.start()]):
+        escala, s = ESCALAS[m.group(1).lower()], s[:m.start()].strip()
     negativo = False
+    if len(s) > 1 and s.endswith("-") and any(ch.isdigit() for ch in s):  # menos no fim (SAP): 1.234,56-
+        negativo, s = True, s[:-1].strip()
     if s.startswith("(") and s.endswith(")"):
         negativo, s = True, s[1:-1].strip()
     if s.startswith("-"):
@@ -135,6 +151,8 @@ def numero_de(v, decimal: str = ","):
     x = float(s)
     if percentual:
         x /= 100
+    if escala != 1.0:
+        x = round(x * escala, 6)
     return -x if negativo else x
 
 
@@ -403,6 +421,22 @@ def limpar_tabela(df: pd.DataFrame, tabela: str, cfg: dict, regra: dict, rel: Re
             rel.aviso("Linhas de Total/Subtotal removidas (evita contar valores em dobro)", tabela=tabela,
                       quantidade=int(mascara.sum()), exemplos=[f"linha {i}" for i in df.index[mascara][:5]])
             df = df[~mascara]
+
+    # 6b. rodapé de sistema no FIM da tabela: só a 1ª célula preenchida, com texto de rodapé ("Gerado em… por…").
+    # Achado pelo laboratório nível 3: virava uma linha de dado a mais e inflava contagens.
+    if len(df) and len(df.columns) > 1:
+        rodape = []
+        for idx in reversed(df.index[-5:]):
+            preenchidos = df.loc[idx].dropna()
+            preenchidos = preenchidos[preenchidos.map(lambda v: not (isinstance(v, str) and not v.strip()))]
+            if len(preenchidos) == 1 and isinstance(preenchidos.iloc[0], str) and _RE_RODAPE.match(preenchidos.iloc[0].strip()):
+                rodape.append(idx)
+            elif len(preenchidos):
+                break
+        if rodape:
+            rel.aviso("Rodapé do relatório removido (não é linha de dado)", tabela=tabela, quantidade=len(rodape),
+                      exemplos=[str(df.loc[i].dropna().iloc[0])[:80] for i in rodape])
+            df = df.drop(index=rodape)
 
     # 7. tipos
     tipos_forcados = {normalizar_nome_coluna(k): str(v).lower() for k, v in (regra.get("tipos") or {}).items()}
