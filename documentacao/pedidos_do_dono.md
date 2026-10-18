@@ -74,4 +74,9 @@ Legenda: ✅ feito e testado · 🟡 feito em parte · ⏳ pendente
 | 68 | Ver a operação inteira na minha frente e interagir | ✅ | `python -m robo demo` / `Demonstracao.bat`: empresa separada, 6 áreas + 1 planilha com defeito real |
 | 69 | Engenharia reversa do Teams | ✅ | `documentacao/sala_teams.md`: mão levantada, reações, pessoas, compartilhar, galeria/palestrante/fixar, câmera local, leitura em voz, pauta, anotações, tarefas e recap |
 | 70 | Nada de erro na operação | ✅ | percurso automático no navegador: 20 páginas e 23 ações da sala sem erro; 255 testes; ronda de TI saudável |
+| 71 | Aprendem de verdade? | ✅ | regras aprendidas com aprovação do dono e prova (`robo/aprendizado.py`); antes era só registro — ver `documentacao/auditoria_e_gestao.md` |
+| 72 | Evoluem de verdade? | ✅ | evolução semanal por pessoa com amostra mínima (Gestão → Evolução); métricas infladas corrigidas |
+| 73 | Tudo registrado? | ✅ | nada se apaga (gatilhos), histórico de cada erro, cadeia com âncora, espelho completo no PostgreSQL |
+| 74 | Auditoria completa e correção de cada detalhe | ✅ | 4 revisões independentes + operação no navegador: 46+ achados, corrigidos com teste de regressão; abertos listados |
+| 75 | Visão de gestão de cada página, andar e função | ✅ | página Gestão do projeto (ao vivo) + `documentacao/auditoria_e_gestao.md` |
 | 38 | IA opcional sem fingir | 🟡 | `robo/ia.py`: só modelo local, desligado; ainda não usado nas respostas |

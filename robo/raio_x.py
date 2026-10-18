@@ -39,7 +39,9 @@ def montar(cfg) -> dict:
         exp_total = {r["tipo"]: r["n"] for r in c.execute("SELECT tipo, COUNT(*) n FROM experiencias GROUP BY tipo")}
         exp_semana = {r["tipo"]: r["n"] for r in c.execute(
             "SELECT tipo, COUNT(*) n FROM experiencias WHERE data_hora>=? GROUP BY tipo", (semana,))}
-        com_memoria = c.execute("SELECT COUNT(DISTINCT funcionario) FROM experiencias").fetchone()[0]
+        # só trabalho real conta (acerto/erro): a rodada de estudo grava 'treinamento' para todos e inflava este número
+        com_memoria = c.execute("SELECT COUNT(DISTINCT funcionario) FROM experiencias WHERE tipo IN ('acerto','erro') "
+                                "AND origem NOT IN ('estudo')").fetchone()[0]
         conversas = c.execute("SELECT COUNT(*) FROM conversas").fetchone()[0]
         mensagens = c.execute("SELECT COUNT(*) FROM mensagens").fetchone()[0]
         reunioes = c.execute("SELECT COUNT(*) FROM reunioes").fetchone()[0]
@@ -99,7 +101,7 @@ def texto(r: dict) -> str:
     total_conf = sum(conf.values())
     linhas = [
         f"Temos {r['pessoas']['total']} funcionários em {len(r['pessoas']['por_andar'])} andares; "
-        f"{r['pessoas']['com_memoria_registrada']} já têm memória registrada.",
+        f"{r['pessoas']['com_memoria_registrada']} já têm acerto ou erro de trabalho real registrado.",
         f"Nesta semana chegaram {p['semana']} planilha(s): {p['aprovadas_semana']} aprovada(s) e {p['reprovadas_semana']} reprovada(s).",
         f"Memória da semana: {m['semana'].get('acerto', 0)} acertos, {m['semana'].get('erro', 0)} erros, "
         f"{m['semana'].get('aprendizado', 0)} aprendizados e {m['semana'].get('treinamento', 0)} treinamentos registrados.",

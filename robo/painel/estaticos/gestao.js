@@ -59,7 +59,7 @@ function abaFuncoes(g) {
 }
 
 function abaModulos(g) {
-  return `<div class="tabela-envoltorio"><table class="tabela"><thead><tr><th>Módulo</th><th>Para que serve</th><th>Linhas</th><th>Funções</th><th>Testes que o cobrem</th><th>Erros abertos</th></tr></thead><tbody>
+  return `<div class="tabela-envoltorio"><table class="tabela"><thead><tr><th>Módulo</th><th>Para que serve</th><th>Linhas</th><th>Funções</th><th>Testes que o importam direto</th><th>Erros abertos</th></tr></thead><tbody>
     ${g.modulos.map((m) => `<tr><td class="mono">${esc(m.modulo)}</td><td>${esc(m.para_que)}</td><td class="direita">${m.linhas}</td><td class="direita">${m.funcoes}</td>
       <td>${m.testes.length ? `<small>${esc(m.testes.join(", "))}</small>` : `<span class="etiqueta perigo">nenhum</span>`}</td>
       <td class="direita">${m.erros_abertos ? `<span class="etiqueta perigo">${m.erros_abertos}</span>` : "0"}</td></tr>`).join("")}</tbody></table></div>`;
@@ -75,7 +75,7 @@ function renderGestao() {
     ["Páginas", `${g.paginas.length - falhas}/${g.paginas.length} ok`, falhas ? `${falhas} com falha agora` : "todas as rotas responderam"],
     ["Funcionários", r.funcionarios, Object.entries(r.tendencias).map(([t, n]) => `${(TENDENCIA[t] || [t])[0]}: ${n}`).join(" · ")],
     ["Funções", g.funcoes.length, `${r.funcoes_sem_teste.length} sem teste · ${r.funcoes_sem_uso_30d.length} sem uso em 30 dias`],
-    ["Módulos", g.modulos.length, `${r.modulos_sem_teste.length} sem teste · ${r.modulos_com_erro_aberto.length} com erro aberto`],
+    ["Módulos", g.modulos.length, `${r.modulos_sem_teste.length} sem teste direto · ${r.modulos_com_erro_aberto.length} com erro aberto`],
     ["Aprendizado real", `${g.aprendizado.regras_ativas} regra(s)`, `${(g.aprendizado.por_estado || {}).comprovada || 0} comprovada(s) · ${(g.aprendizado.por_estado || {}).pendente || 0} esperando você · lições comprovadas ${g.aprendizado.licoes_comprovadas_pct}% · cadeia ${g.aprendizado.integridade ? "íntegra" : "QUEBRADA"}`],
   ].map(([t, v, d]) => `<div class="cartao"><div class="cartao-corpo"><div class="muted">${esc(t)}</div><div style="font-size:26px;font-weight:700">${esc(String(v))}</div><small class="muted">${esc(d)}</small></div></div>`).join("");
   const abas = [["paginas", "Páginas"], ["andares", "Andares"], ["evolucao", "Evolução por funcionário"], ["funcoes", "Funções"], ["modulos", "Módulos (código)"]]
