@@ -18,11 +18,13 @@ async function carregarConhecimento() {
 
 function secaoAprendizado() {
   const a = E.aprendizado; if (!a) return "";
-  const itens = a.propostas.map((p) => { const [t, c] = ESTADO_PROPOSTA[p.estado] || [p.estado, ""];
+  const itens = a.propostas.map((p) => { let [t, c] = ESTADO_PROPOSTA[p.estado] || [p.estado, ""];
+    if (p.tipo === "apelido" && p.estado === "aprovada") t = "Aprovada · esperando um cálculo usar";
+    const regraDe = { mapeamento: `“${esc(p.valor)}” → “${esc(p.para)}”`, apelido: `“${esc(p.valor)}” = coluna ${esc(p.coluna)}` };
     return `<div class="ocorrencia ${p.estado === "pendente" ? "aviso" : p.estado === "nao_resolveu" ? "erro" : ""}"><div class="principal">
-      <strong>${esc(p.tipo_nome)}: ${esc(p.coluna)} ${p.tipo === "mapeamento" ? `“${esc(p.valor)}” → “${esc(p.para)}”` : `← “${esc(p.valor)}”`}</strong>
+      <strong>${esc(p.tipo_nome)}: ${p.tipo === "apelido" ? regraDe.apelido : `${esc(p.coluna)} ${regraDe[p.tipo] || `← “${esc(p.valor)}”`}`}</strong>
       <span class="etiqueta ${c}">${esc(t)}</span>${p.ativa === 0 ? ` <span class="etiqueta">Desativada</span>` : ""}
-      <span class="muted">· regra ${esc(p.padrao)} · proposta de ${esc(p.autor_nome)} · ${esc(dataT(p.criada_em))}</span>
+      <span class="muted">· ${p.padrao === "*" ? "vale para a empresa toda" : `regra ${esc(p.padrao)}`} · proposta de ${esc(p.autor_nome)} · ${esc(dataT(p.criada_em))}</span>
       <div>${esc(p.motivo)}</div><div class="muted" style="font-size:12px">Evidência: ${esc(p.evidencia)}</div>
       ${p.alerta ? `<div class="etiqueta perigo" style="margin-top:4px">${esc(p.alerta)}</div>` : ""}
       ${p.prova ? `<div class="muted" style="font-size:12px">Prova: ${esc(p.prova)}</div>` : ""}

@@ -262,10 +262,27 @@ def _csat(s: pd.Series) -> tuple[float, int]:
     return 100 * (v >= escala - 1).mean(), len(v)
 
 
-def calcular(cfg, pergunta: str, fontes: dict | None = None) -> dict | None:
+def calcular(cfg, pergunta: str, fontes: dict | None = None, apelidos: bool = True) -> dict | None:
     """Devolve {autor, texto} ou None (não é um pedido de cálculo). Erros de entendimento viram resposta honesta.
     fontes = {nome: (DataFrame, arquivo)} calcula sobre essas tabelas (ex.: arquivo anexado a uma conversa)
-    em vez das bases publicadas."""
+    em vez das bases publicadas.
+    apelidos=True aplica as correções do dono aprovadas para a empresa ('nota' = nota_nps — robo/aprendizado.py) e avisa
+    na resposta; o laboratório passa False (a resposta certa dele não pode depender de correção de conversa)."""
+    usados: list[dict] = []
+    if apelidos and cfg is not None:
+        from robo import aprendizado
+        pergunta, usados = aprendizado.aplicar_apelidos(cfg, pergunta)
+    r = _calcular(cfg, pergunta, fontes)
+    if r and usados:
+        aviso = "; ".join(f"“{u['termo']}” = coluna {u['coluna']}" for u in usados)
+        r = {**r, "texto": f"{r['texto']}\n(Usei a correção que você aprovou para a empresa: {aviso}.)", "apelidos": usados}
+        if r.get("calc"):  # deu resultado: é a prova de que a correção funciona
+            from robo import aprendizado
+            aprendizado.comprovar_apelido(cfg, usados, f"cálculo '{pergunta[:150]}' usou {aviso} e deu resultado")
+    return r
+
+
+def _calcular(cfg, pergunta: str, fontes: dict | None = None) -> dict | None:
     if fontes:
         bases = {b: {"arquivo": arq, "data_hora": "agora"} for b, (_, arq) in fontes.items()}
         carregar_base = lambda _cfg, b: (fontes[b][0], fontes[b][1])  # noqa: E731 (mesma assinatura da global)

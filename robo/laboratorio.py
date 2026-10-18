@@ -326,7 +326,7 @@ def exercicio(cfg, area: str | None = None, semente: int | None = None, gravar: 
         if df is not None and not faltam:
             t0 = time.perf_counter()
             pergunta = {"nps": f"nps por {seg}", "media": f"média de {met} por {seg}", "soma": f"soma de {met} por {seg}"}[caso["op"]]
-            resp = calculos.calcular(cfg_lab, pergunta, fontes={area: (df, arq.name)})
+            resp = calculos.calcular(cfg_lab, pergunta, fontes={area: (df, arq.name)}, apelidos=False)
             calc = (resp or {}).get("calc")
             if not calc:
                 registrar(f"Calcular “{pergunta}”", "analise_estatistica", False, f"não entendeu: {(resp or {}).get('texto', '')[:200]}", t0)

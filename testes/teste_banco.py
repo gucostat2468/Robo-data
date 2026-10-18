@@ -235,6 +235,17 @@ def teste_espelho_acompanha_coluna_nova_em_tabela_antiga_do_postgres(planilha_ba
     assert _q(banco_cfg, "SELECT DISTINCT nivel FROM robo.memoria_laboratorio_exercicios") == [(2,)]
 
 
+def teste_correcao_aprovada_aparece_na_resposta_conferida_no_postgres(planilha_baguncada, cfg_factory, banco_cfg):
+    from robo import aprendizado, ferramentas
+    cfg = cfg_factory([REGRA_NPS], banco=banco_cfg)
+    processar_arquivo(planilha_baguncada, cfg)
+    pid = aprendizado.propor_apelido(cfg, "recomendacao", "nota_nps", "analise_estatistica")
+    aprendizado.decidir(cfg, pid, True)
+    r = ferramentas.executar("calcular", cfg, pergunta="média de recomendacao por curso", quem="analise_estatistica")
+    assert r["dados"]["conferencia"] == "conferido" and r["texto"].count("Usei a correção que você aprovou") == 1
+    assert "Usei a correção" in r["texto"].split("## ")[0]  # na parte visível, não numa seção recolhida
+
+
 def teste_calculo_conferido_no_postgres_e_modo_manual(planilha_baguncada, cfg_factory, banco_cfg):
     from robo import conferencia, ferramentas
     cfg = cfg_factory([REGRA_NPS], banco=banco_cfg)

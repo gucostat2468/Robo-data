@@ -232,7 +232,9 @@ def _organizar_calculo(r: dict, conf: dict) -> str:
     cabecalho, corpo = linhas[0], linhas[1:]
     conclusao = next((l for l in corpo if l.startswith("Conclusão:")), "")
     como_ler = next((l for l in corpo if l.startswith("Como ler:")), "")
-    grupos = [l for l in corpo if l and l not in (conclusao, como_ler)]
+    # correção do dono aprovada para a empresa: o aviso fica na parte visível, não dentro de uma seção recolhida
+    correcao = next((l for l in corpo if l.startswith("(Usei a correção")), "")
+    grupos = [l for l in corpo if l and l not in (conclusao, como_ler, correcao)]
     resumo = _resumo_natural(r["calc"], conclusao) or cabecalho
     st = conf["status"]
     if st == "divergente":  # número não confirmado: a abertura não pode afirmar nada
@@ -247,7 +249,7 @@ def _organizar_calculo(r: dict, conf: dict) -> str:
     if st == "divergente":
         secoes.append(("Onde não bateu", "\n".join(conf["diferencas"][:10])))
     secoes += [("Faça você mesmo no Excel", conf["excel"]), ("A mesma conta em SQL", conf["sql"] or "—")]
-    return f"{resumo}\n{selo}" + "".join(f"\n\n## {t}\n{x}" for t, x in secoes)
+    return f"{resumo}\n{selo}" + (f"\n{correcao}" if correcao else "") + "".join(f"\n\n## {t}\n{x}" for t, x in secoes)
 
 
 def f_diagnosticar(cfg, arquivo: str | None = None, **_) -> dict:

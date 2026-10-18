@@ -18,6 +18,9 @@ Ciclo (com governança — ninguém aprova a própria proposta):
   4. Prova: quando aquele arquivo passa depois da regra, a proposta vira COMPROVADA (com o id da execução) e a lição
      correspondente vira "aplicada". Se reprovar de novo pelo mesmo motivo, vira NÃO RESOLVEU e a regra é DESATIVADA
      sozinha (regra que não resolve não fica valendo em silêncio). O dono também pode desativar uma regra (com motivo).
+Correção do dono no chat ("na verdade a coluna nota é nota_nps"): vale na hora naquela conversa e vira proposta de
+APELIDO para a empresa toda. Aprovada, toda pergunta de cálculo (qualquer conversa, qualquer funcionário, o canal) troca o
+termo pela coluna e a resposta avisa; a prova é o primeiro cálculo que usa o apelido e dá resultado.
 Tudo em logs/trabalho.db (propostas_regra, regras_aprendidas), sem apagar (gatilhos), e copiado para o PostgreSQL.
 """
 
@@ -46,7 +49,8 @@ CREATE TRIGGER IF NOT EXISTS regras_aprendidas_sem_apagar BEFORE DELETE ON regra
 BEGIN SELECT RAISE(ABORT, 'regras aprendidas não são apagadas: desative'); END;
 """
 TIPOS = {"sinonimo": "Sinônimo de coluna", "valor_permitido": "Novo valor permitido",
-         "mapeamento": "Correção de valor (de → para)"}
+         "mapeamento": "Correção de valor (de → para)", "apelido": "Correção do dono no chat (termo = coluna)"}
+TODOS = "*"  # padrão dos apelidos: valem para a empresa toda, não para um tipo de arquivo
 COLUNAS_NOVAS = {"propostas_regra": ["para"],
                  "regras_aprendidas": ["para", "desativada_em", "desativada_por", "motivo_desativacao"]}
 RE_SUGESTAO = re.compile(r"^(?P<col>.+?) \(você quis dizer '(?P<parecida>.+?)'")
@@ -231,6 +235,10 @@ def decidir(cfg, proposta_id: str, aprovar: bool, quem: str = "dono", motivo: st
             raise ValueError("Recusar exige o motivo (ele vira aprendizado também).")
         c.execute("UPDATE propostas_regra SET estado=?, decidido_por=?, decidido_em=?, motivo_decisao=? WHERE id=?",
                   ("aprovada" if aprovar else "recusada", quem, _agora(), motivo[:500], proposta_id))
+        if aprovar and p["tipo"] == "apelido":  # o mesmo termo só aponta para UMA coluna: a aprovação nova substitui
+            c.execute("UPDATE regras_aprendidas SET ativa=0, desativada_em=?, desativada_por='sistema', motivo_desativacao=? "
+                      "WHERE ativa=1 AND tipo='apelido' AND valor=?", (_agora(), f"substituída pela proposta {proposta_id}",
+                                                                       p["valor"]))
         if aprovar:
             c.execute("INSERT INTO regras_aprendidas (proposta_id, padrao, tipo, coluna, valor, para, aprovada_por, aprovada_em) "
                       "VALUES (?,?,?,?,?,?,?,?)", (proposta_id, p["padrao"], p["tipo"], p["coluna"], p["valor"], p["para"],
@@ -239,10 +247,16 @@ def decidir(cfg, proposta_id: str, aprovar: bool, quem: str = "dono", motivo: st
     andar = 1
     titulo = f"Regra aprendida ({TIPOS[p['tipo']]}): {_descrever(p)} em {p['padrao']}"
     if aprovar:
-        licoes.criar(cfg, "regra", proposta_id, titulo,
-                     f"{p['motivo']}\nDecisão: aprovada pelo dono.\nA partir de agora, arquivos '{p['padrao']}' aceitam isso "
-                     f"automaticamente.\nEvidência: {p['evidencia']}", f"{p['coluna']} {p['valor']}",
-                     "o arquivo que reprovou passa depois da regra", andar, p["autor"])
+        if p["tipo"] == "apelido":
+            licoes.criar(cfg, "regra", proposta_id, titulo,
+                         f"{p['motivo']}\nDecisão: aprovada pelo dono.\nA partir de agora, em qualquer conversa, quando "
+                         f"alguém disser '{p['valor']}' num cálculo, é a coluna '{p['coluna']}'.", f"{p['valor']} {p['coluna']}",
+                         "um cálculo usa a correção e dá resultado", None, None, "todos", "dono")
+        else:
+            licoes.criar(cfg, "regra", proposta_id, titulo,
+                         f"{p['motivo']}\nDecisão: aprovada pelo dono.\nA partir de agora, arquivos '{p['padrao']}' aceitam "
+                         f"isso automaticamente.\nEvidência: {p['evidencia']}", f"{p['coluna']} {p['valor']}",
+                         "o arquivo que reprovou passa depois da regra", andar, p["autor"])
         memoria.experiencia(cfg, p["autor"], "acerto", f"Proposta de regra aprovada: {titulo}", "aprendizado", proposta_id)
         reenviado = reenviar(cfg, p["arquivo_erros"]) if p["arquivo_erros"] else None
     else:
@@ -255,6 +269,8 @@ def decidir(cfg, proposta_id: str, aprovar: bool, quem: str = "dono", motivo: st
 def _descrever(p) -> str:
     if p["tipo"] == "mapeamento":
         return f"{p['coluna']}: '{p['valor']}' → '{p.get('para')}'"
+    if p["tipo"] == "apelido":
+        return f"'{p['valor']}' = coluna {p['coluna']}"
     return f"{p['coluna']} ← '{p['valor']}'"
 
 
@@ -323,6 +339,76 @@ def comprovar(cfg, r) -> list[str]:
             except ValueError:
                 pass  # já estava desativada
         mudou.append(p["id"])
+    return mudou
+
+
+# =============================================================================== correção do dono no chat → empresa
+def propor_apelido(cfg, termo: str, coluna: str, autor: str, conversa: str = "") -> str | None:
+    """O dono corrigiu no chat: registra a proposta de valer para a empresa toda (quem aprova é o dono, em Conhecimento)."""
+    from robo.limpeza import normalizar_nome_coluna
+    termo, coluna = str(termo).strip().lower(), normalizar_nome_coluna(coluna)
+    if not termo or not coluna or termo == coluna:
+        return None
+    alerta = ""
+    try:
+        from robo import calculos
+        bases = calculos.bases_publicadas(cfg)
+        com_coluna = [b for b in bases if coluna in calculos.carregar_base(cfg, b)[0].columns]
+        if bases and not com_coluna:
+            alerta = f"ATENÇÃO: nenhuma base publicada hoje tem a coluna '{coluna}'. Confira o nome antes de aprovar."
+        evid = f"conversa {conversa}; " + (f"bases com a coluna: {', '.join(com_coluna[:5])}" if com_coluna else
+                                           "nenhuma base publicada com essa coluna")
+    except Exception as e:  # sem bases legíveis: a proposta fica, sem a conferência
+        evid = f"conversa {conversa}; não deu para conferir as bases ({type(e).__name__})"
+    tb = _tb(cfg)
+    with tb.tx() as c:
+        if c.execute("SELECT 1 FROM propostas_regra WHERE padrao=? AND tipo='apelido' AND coluna=? AND valor=?",
+                     (TODOS, coluna, termo)).fetchone():
+            return None
+        pid = novo_id("REG")
+        c.execute("INSERT INTO propostas_regra (id, criada_em, arquivo, arquivo_erros, padrao, tipo, coluna, valor, motivo, "
+                  "evidencia, alerta, autor) VALUES (?,?,?,?,?,?,?,?,?,?,?,?)",
+                  (pid, _agora(), "", "", TODOS, "apelido", coluna, termo,
+                   f"Você corrigiu no chat: quando disser '{termo}', é a coluna '{coluna}'. Aprovada, vale para a empresa toda "
+                   f"(todas as conversas e o canal), não só para aquela conversa.", evid, alerta, autor))
+    return pid
+
+
+def apelidos_ativos(cfg) -> dict[str, tuple[str, str]]:
+    """{termo: (coluna, proposta_id)} dos apelidos aprovados e em vigor."""
+    try:
+        with _tb(cfg).tx() as c:
+            linhas = c.execute("SELECT valor, coluna, proposta_id FROM regras_aprendidas WHERE ativa=1 AND tipo='apelido' "
+                               "ORDER BY id").fetchall()
+    except Exception:
+        return {}
+    return {r["valor"]: (r["coluna"], r["proposta_id"]) for r in linhas}
+
+
+def aplicar_apelidos(cfg, pergunta: str) -> tuple[str, list[dict]]:
+    """Troca os termos aprovados pelas colunas na pergunta. Devolve (pergunta, [{termo, coluna, proposta}])."""
+    from robo.limpeza import sem_acento
+    usados = []
+    for termo, (coluna, pid) in apelidos_ativos(cfg).items():
+        padrao = re.compile(rf"(?<![\w-]){re.escape(termo)}(?![\w-])", re.IGNORECASE)
+        if padrao.search(pergunta):  # troca no texto original (preserva acentos de valores de filtro)
+            pergunta = padrao.sub(coluna, pergunta)
+        elif padrao.search(sem_acento(pergunta)):  # 'região' escrito com acento e o termo guardado sem
+            pergunta = padrao.sub(coluna, sem_acento(pergunta))
+        else:
+            continue
+        usados.append({"termo": termo, "coluna": coluna, "proposta": pid})
+    return pergunta, usados
+
+
+def comprovar_apelido(cfg, usados: list[dict], prova: str) -> list[str]:
+    """Um cálculo usou o apelido e deu resultado: a proposta vira comprovada (só na primeira vez)."""
+    mudou = []
+    with _tb(cfg).tx() as c:
+        for u in usados:
+            if c.execute("UPDATE propostas_regra SET estado='comprovada', comprovada_em=?, prova=? WHERE id=? AND "
+                         "estado='aprovada'", (_agora(), prova[:500], u["proposta"])).rowcount:
+                mudou.append(u["proposta"])
     return mudou
 
 

@@ -47,7 +47,9 @@ def _aplicar_correcoes(pergunta: str, ctx: dict) -> str:
 
 def _correcao(texto: str) -> dict | None:
     """'na verdade a coluna X é Y' / 'use a base Y' / 'considere o arquivo …' → mudança de contexto."""
-    t = _norm(texto)
+    from robo.limpeza import sem_acento
+    # normalização leve: mantém o '_' dos nomes de coluna e de base ('nota_nps' não pode virar 'nota')
+    t = re.sub(r"\s+", " ", re.sub(r"[^a-z0-9_\- ]", " ", sem_acento(str(texto or "")).lower())).strip()
     m = re.search(r"(?:use|usar|considere|troque para|mude para) (?:a )?base ([\w-]+)", t)
     if m:
         return {"base": m.group(1)}
@@ -214,8 +216,14 @@ def _responder(cfg, tb, conversa_id, contrato, texto, ctx, arquivo) -> tuple[lis
             correcoes = {**(ctx.get("correcoes") or {}), errado: certo}
             tb.atualizar_contexto(conversa_id, correcoes=correcoes)
             tb.lembrar("correcao", errado, f"Quando o dono diz '{errado}', é a coluna '{certo}'", "dono")
-            r = ferramentas.resultado(True, "ferramenta", f"Anotado: quando você disser “{errado}”, uso a coluna “{certo}”. "
-                                                          "Vale para esta conversa e fica registrado na memória da empresa.")
+            from robo import aprendizado
+            proposta = aprendizado.propor_apelido(cfg, errado, certo, pid, conversa_id)
+            r = ferramentas.resultado(True, "ferramenta", f"Anotado: quando você disser “{errado}”, uso a coluna “{certo}” "
+                                      "nesta conversa. " + (
+                                          "Para valer para a empresa toda (todas as conversas e o canal), deixei a proposta "
+                                          "esperando a sua aprovação em Conhecimento." if proposta else
+                                          "A proposta de valer para a empresa toda já existe (veja em Conhecimento)."),
+                                      evidencia=f"proposta {proposta}" if proposta else "")
         msgs = [_msg(pid, r)]
         return msgs, _registrar_pergunta(tb, contrato, texto, conversa_id, msgs)
 

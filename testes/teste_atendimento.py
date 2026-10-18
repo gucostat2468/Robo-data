@@ -75,6 +75,47 @@ def teste_correcao_do_dono_vale_na_conversa(planilha_baguncada, cfg):
     assert Trabalho(cfg).memorias("correcao")
 
 
+def teste_correcao_do_dono_vira_regra_da_empresa_com_aprovacao(planilha_baguncada, cfg):
+    from robo import aprendizado
+    processar_arquivo(planilha_baguncada, cfg)
+    r = atendimento.conversar(cfg, "analise_estatistica", "na verdade a coluna recomendacao é nota_nps")
+    assert "esperando a sua aprovação" in r["respostas"][0]["texto"]
+    [p] = [x for x in aprendizado.listar(cfg) if x["tipo"] == "apelido"]
+    assert p["estado"] == "pendente" and p["valor"] == "recomendacao" and p["coluna"] == "nota_nps" and not p["alerta"]
+    # antes da aprovação: OUTRA conversa, com OUTRO funcionário, não conhece a correção
+    antes = atendimento.conversar(cfg, "dir_dados", "média de recomendacao por curso")["respostas"][-1]["texto"]
+    assert "Usei a correção" not in antes
+    with pytest.raises(PermissionError):
+        aprendizado.decidir(cfg, p["id"], True, quem="analise_estatistica")  # quem propôs não aprova
+    aprendizado.decidir(cfg, p["id"], True)
+    # depois: vale para qualquer conversa e funcionário, avisa na resposta e o primeiro cálculo comprova
+    depois = atendimento.conversar(cfg, "dir_dados", "média de recomendacao por curso")["respostas"][-1]["texto"]
+    assert "nota_nps" in depois and "Usei a correção que você aprovou para a empresa" in depois
+    assert depois.count("Usei a correção") == 1
+    assert aprendizado.listar(cfg)[0]["estado"] == "comprovada"
+    # e no canal da empresa também (mesma calculadora)
+    from robo.calculos import calcular
+    assert "Usei a correção" in calcular(cfg, "média de recomendacao por curso")["texto"]
+    # o laboratório não usa correção de conversa
+    assert "Usei a correção" not in (calcular(cfg, "média de recomendacao por curso", apelidos=False) or {}).get("texto", "")
+
+
+def teste_apelido_novo_do_mesmo_termo_substitui_o_anterior(cfg):
+    from robo import aprendizado
+    cfg.criar_pastas()
+    a = aprendizado.propor_apelido(cfg, "nota", "nota_nps", "analise_estatistica")
+    aprendizado.decidir(cfg, a, True)
+    b = aprendizado.propor_apelido(cfg, "nota", "nota_csat", "analise_estatistica")
+    pend = aprendizado.listar(cfg, "pendente")[0]  # sem base publicada: avisa que não deu para conferir a coluna
+    assert "nenhuma base publicada" in pend["evidencia"]
+    aprendizado.decidir(cfg, b, True)
+    assert aprendizado.apelidos_ativos(cfg) == {"nota": ("nota_csat", b)}
+    antigo = next(x for x in aprendizado.listar(cfg) if x["id"] == a)
+    assert antigo["ativa"] == 0 and b in antigo["motivo_desativacao"]
+    assert aprendizado.aplicar_apelidos(cfg, "média de nota por região")[0] == "média de nota_csat por região"
+    assert aprendizado.aplicar_apelidos(cfg, "média de nota_nps")[0] == "média de nota_nps"   # não mexe em outra coluna
+
+
 def teste_fora_do_contrato_encaminha_para_o_colega(planilha_baguncada, cfg):
     processar_arquivo(planilha_baguncada, cfg)
     r = atendimento.conversar(cfg, "infra_pleno", "nps por curso")  # Rodrigo (TI) não calcula indicadores
