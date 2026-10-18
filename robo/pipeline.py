@@ -14,7 +14,9 @@ fica em Bases-Limpeza e o robô tenta de novo sozinho (status ADIADO).
 
 from __future__ import annotations
 
+import json
 import logging
+import os
 import shutil
 import time
 from dataclasses import dataclass, field
@@ -38,6 +40,31 @@ SUCESSO = "sucesso"
 REPROVADO = "reprovado"
 ADIADO = "adiado"
 DIAGNOSTICO = "diagnostico"
+
+
+def _queda_de_conexao(e: Exception) -> bool:
+    try:
+        import psycopg
+    except ImportError:
+        return False
+    return isinstance(e, (psycopg.OperationalError, psycopg.InterfaceError))
+
+
+def _saida_aberta(cfg, caminho: Path) -> Path | None:
+    """Algum arquivo publicado desta base está travado por outro programa (Excel/Power BI no Windows)?"""
+    nome_base = caminho.stem + (cfg.saida.get("sufixo") or "")
+    pasta = Path(cfg.tratadas)
+    if not pasta.exists():
+        return None
+    for arq in list(pasta.glob(f"{nome_base}.*")) + list(pasta.glob(f"{nome_base}__*.csv")):
+        try:
+            with open(arq, "r+b"):
+                pass
+        except PermissionError:
+            return arq
+        except OSError:
+            continue
+    return None
 
 
 def _regra_com_aprendizado(cfg, nome: str) -> dict:
@@ -144,11 +171,86 @@ def _destino_livre(pasta: Path, nome: str) -> Path:
     return destino
 
 
-def _mover(origem: Path, pasta: Path, nome: str) -> Path:
+def _mover(origem: Path, pasta: Path, nome: str, tentativas: int = 5) -> Path:
+    """Move o original para o arquivo morto. O OneDrive/antivírus às vezes trava o arquivo por segundos: tenta de novo.
+    A data do arquivo passa a ser a de hoje (a retenção conta a partir do arquivamento, não da criação na origem)."""
     pasta.mkdir(parents=True, exist_ok=True)
     destino = _destino_livre(pasta, nome)
-    shutil.move(str(origem), str(destino))
+    for i in range(tentativas):
+        try:
+            shutil.move(str(origem), str(destino))
+            break
+        except PermissionError:
+            if i == tentativas - 1:
+                raise
+            time.sleep(0.5 * (i + 1))
+    try:
+        os.utime(destino)
+    except OSError:
+        pass
     return destino
+
+
+MARCAS = "ja_publicados.json"
+
+
+def _arquivar_ou_marcar(cfg, origem: Path, pasta: Path, nome: str, rel) -> Path:
+    """Se não der para mover (travado), guarda uma CÓPIA e marca o original como já processado: o monitor não o
+    processa de novo e o retira da entrada assim que for liberado."""
+    try:
+        return _mover(origem, pasta, nome)
+    except OSError as e:
+        pasta.mkdir(parents=True, exist_ok=True)
+        copia = _destino_livre(pasta, nome)
+        shutil.copy2(str(origem), str(copia))
+        os.utime(copia)
+        st = origem.stat()
+        marcas = _ler_marcas(cfg)
+        marcas[origem.name] = [st.st_size, st.st_mtime_ns, str(copia)]
+        _gravar_marcas(cfg, marcas)
+        rel.aviso(f"O original estava travado ({type(e).__name__}); uma cópia foi arquivada em {copia.name} e ele sai da "
+                  "entrada assim que for liberado (não será processado de novo)")
+        return copia
+
+
+def _ler_marcas(cfg) -> dict:
+    arq = Path(cfg.logs) / MARCAS
+    try:
+        return json.loads(arq.read_text(encoding="utf-8")) if arq.exists() else {}
+    except (OSError, ValueError):
+        return {}
+
+
+def _gravar_marcas(cfg, marcas: dict) -> None:
+    arq = Path(cfg.logs) / MARCAS
+    arq.parent.mkdir(parents=True, exist_ok=True)
+    tmp = arq.with_suffix(".tmp")
+    tmp.write_text(json.dumps(marcas, ensure_ascii=False), encoding="utf-8")
+    os.replace(tmp, arq)
+
+
+def ja_publicado(cfg, arq: Path) -> bool:
+    """Arquivo já processado que ficou na entrada por estar travado? Tenta retirá-lo; nunca reprocessa."""
+    marcas = _ler_marcas(cfg)
+    m = marcas.get(arq.name)
+    if not m:
+        return False
+    try:
+        st = arq.stat()
+    except OSError:
+        return False
+    if [st.st_size, st.st_mtime_ns] != m[:2]:  # mudou: é uma versão nova do arquivo, processa normalmente
+        marcas.pop(arq.name, None)
+        _gravar_marcas(cfg, marcas)
+        return False
+    try:
+        arq.unlink()
+        marcas.pop(arq.name, None)
+        _gravar_marcas(cfg, marcas)
+        log.info("%s (já processado e arquivado em %s) foi retirado da entrada", arq.name, Path(m[2]).name)
+    except OSError:
+        pass
+    return True
 
 
 def nome_base_tabela(caminho: Path, regra: dict) -> str:
@@ -347,6 +449,12 @@ def processar_arquivo(caminho: str | Path, cfg: Config, gravar: bool = True, ao_
     if not rel.tem_erros and t.analisaveis:
         r.quadro += _conferencias_equipe("engenharia", ctx, rel, ao_etapa, bloquear=True)
 
+    # ---- a saída está aberta no Excel/Power BI? adia ANTES do banco (senão o banco gravaria e o arquivo não)
+    aberta = _saida_aberta(cfg, caminho) if not rel.tem_erros else None
+    if aberta:
+        _sinal(ao_etapa, "adiado", caminho.name)
+        return _adiar(r, inicio, f"o arquivo de saída {aberta.name} está aberto (feche o Excel/Power BI)")
+
     # ---- carga no banco (antes dos arquivos: se o banco recusar, o arquivo não é publicado)
     if cfg.banco.get("habilitado"):
         from robo.banco import ErroBancoIndisponivel
@@ -357,6 +465,9 @@ def processar_arquivo(caminho: str | Path, cfg: Config, gravar: bool = True, ao_
             _sinal(ao_etapa, "adiado", caminho.name)
             return _adiar(r, inicio, f"PostgreSQL indisponível: {e}")
         except Exception as e:
+            if _queda_de_conexao(e):  # conexão caiu no meio da carga: não é defeito da planilha — tenta de novo depois
+                _sinal(ao_etapa, "adiado", caminho.name)
+                return _adiar(r, inicio, f"a conexão com o PostgreSQL caiu durante a carga ({type(e).__name__})")
             log.exception("Falha inesperada no banco ao carregar %s", caminho.name)
             rel.erro(f"Falha inesperada no PostgreSQL: {type(e).__name__}: {e}")
 
@@ -379,7 +490,7 @@ def processar_arquivo(caminho: str | Path, cfg: Config, gravar: bool = True, ao_
         r.status = REPROVADO
         r.linhas_saida = 0
         r.id = _destino_livre(cfg.erros, f"{r.id}{caminho.suffix}").stem  # mantém o id (lote do banco) se estiver livre
-        r.destino_original = _mover(caminho, cfg.erros, f"{r.id}{caminho.suffix}")
+        r.destino_original = _arquivar_ou_marcar(cfg, caminho, cfg.erros, f"{r.id}{caminho.suffix}", rel)
         relatorio_txt = r.destino_original.with_name(f"{r.destino_original.stem}_ERROS.txt")
         relatorio_txt.write_text(rel.texto(), encoding="utf-8-sig")
         r.saidas = [relatorio_txt]
@@ -396,7 +507,14 @@ def processar_arquivo(caminho: str | Path, cfg: Config, gravar: bool = True, ao_
         except PermissionError:
             _restaurar_anteriores(anteriores)
             _sinal(ao_etapa, "adiado", caminho.name)
-            return _adiar(r, inicio, "o arquivo de saída está aberto (feche o Excel/Power BI)")
+            motivo = "o arquivo de saída está aberto (feche o Excel/Power BI)"
+            if r.tabelas_banco:  # o banco já tinha confirmado: desfaz o lote para a próxima tentativa não duplicar
+                try:
+                    from robo.banco import Banco
+                    Banco(cfg.banco, cfg.base).desfazer_lote(r.id, r.tabelas_banco, f"adiado: {motivo}")
+                except Exception:
+                    log.exception("Não consegui desfazer o lote %s no PostgreSQL", r.id)
+            return _adiar(r, inicio, motivo)
         except Exception as e:  # ex.: formato de saída inválido no config.yaml — reprova em vez de tentar para sempre
             _restaurar_anteriores(anteriores)
             rel.erro(f"Não consegui gravar a saída: {e}")
@@ -424,7 +542,8 @@ def processar_arquivo(caminho: str | Path, cfg: Config, gravar: bool = True, ao_
         if cfg.saida.get("versionar"):
             nome_base += f"_{carimbo}"
         r.status = SUCESSO
-        r.destino_original = _mover(caminho, cfg.originais / datetime.now().strftime("%Y-%m"), f"{r.id}{caminho.suffix}")
+        r.destino_original = _arquivar_ou_marcar(cfg, caminho, cfg.originais / datetime.now().strftime("%Y-%m"),
+                                                 f"{r.id}{caminho.suffix}", rel)
         _gravar_relatorio_qualidade(cfg, nome_base, rel, t.tabelas, r.checklist)
         destinos = [p.name for p in r.saidas] + r.tabelas_banco
         log.info("OK %s -> %s (%d linhas, %d aviso(s))", caminho.name, ", ".join(destinos), r.linhas_saida, len(rel.avisos))
@@ -530,5 +649,8 @@ def _gravar_relatorio_qualidade(cfg: Config, nome_base: str, rel: Relatorio, tab
             if checklist:
                 from robo.producao import tabela_checklist
                 tabela_checklist(checklist).to_excel(w, sheet_name="checklist_producao", index=False)
+            from robo.escrita import _neutralizar_formulas
+            for ws in w.sheets.values():  # textos da origem que começam com "=" ficam como texto
+                _neutralizar_formulas(ws)
     except PermissionError:
         log.warning("Relatório de qualidade de %s não foi atualizado (arquivo aberto).", nome_base)

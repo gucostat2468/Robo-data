@@ -7,6 +7,7 @@ definitivo. Assim o Power BI/OneDrive nunca enxerga um arquivo pela metade.
 from __future__ import annotations
 
 import os
+import re
 from pathlib import Path
 
 import pandas as pd
@@ -80,8 +81,22 @@ def _gravar_xlsx(tabelas: dict[str, pd.DataFrame], destino: Path):
             temporario.unlink(missing_ok=True)
 
 
+RE_FORMULA_CSV = re.compile(r"^(=|@|[+-][^\d\s.,])")
+
+
+def _texto_seguro(v):
+    """Texto que o Excel executaria como fórmula ao abrir o CSV ganha um apóstrofo na frente (fica só texto).
+    Números e telefones ("-5", "+55 11…") não são tocados."""
+    return "'" + v if isinstance(v, str) and RE_FORMULA_CSV.match(v) else v
+
+
 def _gravar_csv(df: pd.DataFrame, destino: Path, sep: str, decimal: str):
     temporario = destino.with_name(f"~robo_tmp_{destino.name}")
+    textos = [c for c in df.columns if df[c].dtype == object or str(df[c].dtype).startswith("str")]
+    if textos:
+        df = df.copy()
+        for c in textos:
+            df[c] = df[c].map(_texto_seguro)
     try:
         df.to_csv(temporario, sep=sep, decimal=decimal, index=False, encoding="utf-8-sig", date_format="%Y-%m-%d %H:%M:%S")
         os.replace(temporario, destino)

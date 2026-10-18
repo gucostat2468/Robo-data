@@ -80,7 +80,12 @@ def _kmeans(X: np.ndarray, k: int, rng: np.random.Generator, iteracoes: int = 10
 
 
 def _silhueta(X: np.ndarray, rotulos: np.ndarray) -> float:
-    dist = np.sqrt(((X[:, None, :] - X[None]) ** 2).sum(-1))
+    # distâncias por produto escalar: n×n (não n×n×colunas) — 3.000 linhas × 20 colunas usava ~720 MB
+    if len(X) > 4000:  # amostra fixa: a silhueta é uma estimativa de qualidade, não precisa de todas as linhas
+        idx = np.random.default_rng(0).choice(len(X), 4000, replace=False)
+        X, rotulos = X[idx], rotulos[idx]
+    sq = (X ** 2).sum(1)
+    dist = np.sqrt(np.maximum(sq[:, None] + sq[None, :] - 2 * X @ X.T, 0))
     s = []
     for i in range(len(X)):
         mesmo = rotulos == rotulos[i]

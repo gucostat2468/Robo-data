@@ -201,9 +201,21 @@ def _como_numero(serie: pd.Series, decimal: str) -> pd.Series:
     return convertida
 
 
+DATA_MIN, DATA_MAX = pd.Timestamp("1900-01-01"), pd.Timestamp("2200-12-31")
+
+
 def _como_data(serie: pd.Series, serial: bool = False) -> pd.Series:
-    return pd.Series([data_de(v, serial) if not pd.isna(v) else pd.NaT for v in serie],
-                     index=serie.index, dtype="datetime64[ns]")
+    """Datas fora de 1900–2200 (ex.: '01/02/0202', erro de digitação) viram 'não convertido' com a linha — antes
+    derrubavam o arquivo inteiro com OutOfBoundsDatetime."""
+    def uma(v):
+        if pd.isna(v):
+            return pd.NaT
+        try:
+            d = data_de(v, serial)
+        except (ValueError, OverflowError):
+            return pd.NaT
+        return d if d is not None and DATA_MIN <= d <= DATA_MAX else pd.NaT
+    return pd.Series([uma(v) for v in serie], index=serie.index, dtype="datetime64[ns]")
 
 
 def _como_texto(serie: pd.Series) -> pd.Series:
@@ -368,15 +380,25 @@ def limpar_tabela(df: pd.DataFrame, tabela: str, cfg: dict, regra: dict, rel: Re
         # um rótulo que só COMEÇA com "Total" só é total se deixar vazias colunas que estão quase sempre preenchidas.
         quase_cheias = [c for c in df.columns if df[c].notna().mean() >= 0.9]
 
+        # "Total" que se repete numa coluna é CATEGORIA (ex.: cobertura Total/Parcial), não linha de total
+        def _vezes_total(col) -> int:
+            return int(df[col].map(lambda x: isinstance(x, str) and bool(_RE_TOTAL.match(x.strip()))).sum())
+        categoria_total = {c for c in df.columns if df[c].dtype == object and _vezes_total(c) >= 3}
+
         def _eh_total(linha):
             preenchidos = linha.dropna()
             if not len(preenchidos) or not isinstance(preenchidos.iloc[0], str):
+                return False
+            if preenchidos.index[0] in categoria_total:
                 return False
             rotulo = preenchidos.iloc[0].strip()
             if _RE_TOTAL.match(rotulo) or _RE_SUBTOTAL.match(rotulo):
                 return True
             return bool(_RE_COMECA_TOTAL.match(rotulo)) and any(pd.isna(linha[c]) for c in quase_cheias)
         mascara = df.apply(_eh_total, axis=1) if len(df) else pd.Series(dtype=bool)
+        if categoria_total:
+            rel.info("'Total' aparece como categoria (várias vezes na mesma coluna): essas linhas foram mantidas",
+                     tabela=tabela, exemplos=sorted(categoria_total))
         if len(mascara) and mascara.any():
             rel.aviso("Linhas de Total/Subtotal removidas (evita contar valores em dobro)", tabela=tabela,
                       quantidade=int(mascara.sum()), exemplos=[f"linha {i}" for i in df.index[mascara][:5]])
@@ -426,9 +448,18 @@ def limpar_tabela(df: pd.DataFrame, tabela: str, cfg: dict, regra: dict, rel: Re
     if remover_dup and len(df):
         dup = df.duplicated(keep="first")
         if dup.any():
-            rel.aviso("Linhas duplicadas (idênticas em todas as colunas) removidas", tabela=tabela,
-                      quantidade=int(dup.sum()), exemplos=[f"linha {i}" for i in df.index[dup][:5]])
-            df = df[~dup]
+            # Sem identificador, duas linhas iguais podem ser DUAS pessoas que responderam igual (pesquisa sem ID):
+            # apagar mudaria o resultado (ex.: o NPS). Só removemos quando há como saber que é a mesma linha.
+            ids = [c for c in df.columns if _eh_identificador(str(c), cfg.get("padroes_identificador", []))]
+            tem_id = bool(regra.get("chave_unica")) or bool(ids)
+            if tem_id:
+                rel.aviso("Linhas duplicadas (idênticas em todas as colunas, inclusive o identificador) removidas",
+                          tabela=tabela, quantidade=int(dup.sum()), exemplos=[f"linha {i}" for i in df.index[dup][:5]])
+                df = df[~dup]
+            else:
+                rel.aviso("Linhas idênticas MANTIDAS: a base não tem coluna de identificação, então podem ser pessoas "
+                          "diferentes que responderam igual. Se forem cópias, inclua um ID ou use 'chave_unica' na regra",
+                          tabela=tabela, quantidade=int(dup.sum()), exemplos=[f"linha {i}" for i in df.index[dup][:5]])
 
     rel.info(f"Limpeza concluída: {linhas_iniciais} -> {len(df)} linhas, {len(df.columns)} colunas", tabela=tabela)
     return df

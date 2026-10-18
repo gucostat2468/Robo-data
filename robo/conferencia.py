@@ -23,7 +23,10 @@ OPS_SQL = {
     "soma": "SUM({c})", "media": "AVG({c})", "minimo": "MIN({c})", "maximo": "MAX({c})",
     "mediana": "percentile_cont(0.5) WITHIN GROUP (ORDER BY {c})", "desvio": "stddev_samp({c})",
     "distintos": "COUNT(DISTINCT {c})",
-    "nps": "100.0 * (COUNT(*) FILTER (WHERE {c} >= 9) - COUNT(*) FILTER (WHERE {c} <= 6)) / NULLIF(COUNT({c}), 0)",
+    # só notas válidas (inteiros de 0 a 10) — a mesma regra do cálculo em Python (calculos.notas_nps)
+    "nps": "100.0 * (COUNT(*) FILTER (WHERE {c} BETWEEN 9 AND 10 AND {c} = floor({c})) "
+           "- COUNT(*) FILTER (WHERE {c} BETWEEN 0 AND 6 AND {c} = floor({c}))) "
+           "/ NULLIF(COUNT(*) FILTER (WHERE {c} BETWEEN 0 AND 10 AND {c} = floor({c})), 0)",
 }
 EXCEL = {  # fórmula do Excel em português (o mesmo vale em inglês com os nomes entre parênteses)
     "contagem": ("CONT.SES (COUNTIFS)", "=CONT.SES({filtros_excel})"),
@@ -73,6 +76,8 @@ def valores_pandas(op: str, df: pd.DataFrame, col: str | None, por: list[str], e
         if op == "distintos":
             return float(sub[col].nunique())
         if op == "nps":
+            from robo.calculos import notas_nps
+            s, _ = notas_nps(s)
             return 100 * ((s >= 9).sum() - (s <= 6).sum()) / len(s) if len(s) else float("nan")
         if op == "csat":
             return 100 * (s >= escala - 1).sum() / len(s) if len(s) else float("nan")
@@ -125,8 +130,10 @@ def montar_excel(op: str, col: str | None, por: list[str], filtros: list, exempl
         f = ";" + filtros_excel if filtros_excel else ""
         c = f"Tabela[{col}]"
         passos += [f"2. NPS numa fórmula só (promotores − detratores, dividido por quem respondeu):\n"
-                   f"=ARRED((CONT.SES({c};\">=9\"{f}) - CONT.SES({c};\"<=6\"{f})) / CONT.SES({c};\">=0\"{f}) * 100; 0)",
-                   "Os neutros (7 e 8) não aparecem na fórmula, mas estão no total de respondentes (o último CONT.SES)."]
+                   f"=ARRED((CONT.SES({c};\">=9\";{c};\"<=10\"{f}) - CONT.SES({c};\">=0\";{c};\"<=6\"{f})) / "
+                   f"CONT.SES({c};\">=0\";{c};\"<=10\"{f}) * 100; 0)",
+                   "Os neutros (7 e 8) não aparecem na fórmula, mas estão no total de respondentes (o último CONT.SES). "
+                   "Valores fora de 0 a 10 (ex.: 99 = não sabe) ficam de fora, igual ao cálculo do robô."]
     elif op == "csat":
         f = ";" + filtros_excel if filtros_excel else ""
         c = f"Tabela[{col}]"

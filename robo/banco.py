@@ -477,6 +477,18 @@ class Banco:
                     "INSERT INTO {} (lote_id, arquivo, status_lote, nivel, tabela, coluna, mensagem, quantidade, exemplos) "
                     "VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)").format(tabela), linhas)
 
+    def desfazer_lote(self, lote_id: str, tabelas: list[str], motivo: str) -> None:
+        """Tira do banco as linhas de um lote já confirmado (ex.: o arquivo de saída travou depois do commit), para a
+        próxima tentativa não duplicar. O lote fica registrado como 'adiado' com o motivo."""
+        _, sql = _psycopg()
+        with self.conectar() as conn, conn.transaction():
+            for nome in tabelas:
+                schema, _, tabela = nome.partition(".")
+                if tabela and "_lote_id" in self._colunas_existentes(conn, schema, tabela):
+                    self._apagar(conn, schema, tabela, "_lote_id = %s", (lote_id,))
+            conn.execute(sql.SQL("UPDATE {}.lotes SET status = 'adiado', mensagem = %s, processado_em = now() "
+                                 "WHERE lote_id = %s").format(sql.Identifier(self.schemas["controle"])), (motivo, lote_id))
+
     # ------------------------------------------------------------------ painel
     def resumo(self) -> dict:
         """Tabelas por camada com quantidade de linhas e últimas cargas (para o painel)."""

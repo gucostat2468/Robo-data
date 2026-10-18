@@ -28,6 +28,7 @@ from openpyxl.styles import Alignment, Border, Font, PatternFill, Side
 from openpyxl.utils import get_column_letter
 from openpyxl.workbook.properties import CalcProperties
 
+from robo.calculos import notas_nps
 from robo.limpeza import sem_acento
 
 log = logging.getLogger("robo")
@@ -73,6 +74,14 @@ def _igual_excel(serie: pd.Series, valor) -> pd.Series:
     """Mesma regra do CONT.SES: texto compara sem diferenciar maiúsculas."""
     alvo = str(valor).strip().lower()
     return serie.map(lambda v: v is not None and not (not isinstance(v, str) and pd.isna(v)) and str(v).strip().lower() == alvo)
+
+
+def _rotulo(ws, linha: int, coluna: int, valor):
+    """Rótulo vindo dos dados é sempre TEXTO: um valor "=HYPERLINK(...)" da origem não vira fórmula ativa."""
+    c = ws.cell(row=linha, column=coluna, value=valor)
+    if c.data_type == "f":
+        c.data_type = "s"
+    return c
 
 
 class Entrega:
@@ -162,20 +171,21 @@ class Entrega:
                 linha += 1
                 mascara = _igual_excel(self.df[seg], v)
                 n_esp = int(mascara.sum())
-                ws.cell(row=linha, column=1, value=v).border = BORDA
+                _rotulo(ws, linha, 1, v).border = BORDA
                 c = ws.cell(row=linha, column=2, value=f"=COUNTIFS({self._faixa(seg)},{_criterio(v)})")
                 c.number_format, c.border = "#,##0", BORDA
                 self._conferir(f"[{seg}] base de {v}", "Plano tabular", f"B{linha}", n_esp)
                 c = ws.cell(row=linha, column=3, value=f"=IF($B${{TOTAL}}=0,0,B{linha}/$B${{TOTAL}})")
                 c.number_format, c.border = "0.0%", BORDA
                 if nps:
-                    notas = self.df.loc[mascara, nps].dropna().astype(float)
+                    notas, _ = notas_nps(self.df.loc[mascara, nps])
                     p, d = int((notas >= 9).sum()), int((notas <= 6).sum())
-                    c = ws.cell(row=linha, column=4, value=f'=COUNTIFS({self._faixa(seg)},{_criterio(v)},{self._faixa(nps)},">=9")')
+                    fx = self._faixa(nps)
+                    c = ws.cell(row=linha, column=4, value=f'=COUNTIFS({self._faixa(seg)},{_criterio(v)},{fx},">=9",{fx},"<=10")')
                     c.number_format, c.border = "#,##0", BORDA
-                    c = ws.cell(row=linha, column=5, value=f'=COUNTIFS({self._faixa(seg)},{_criterio(v)},{self._faixa(nps)},"<=6")')
+                    c = ws.cell(row=linha, column=5, value=f'=COUNTIFS({self._faixa(seg)},{_criterio(v)},{fx},">=0",{fx},"<=6")')
                     c.number_format, c.border = "#,##0", BORDA
-                    n_resp = f'COUNTIFS({self._faixa(seg)},{_criterio(v)},{self._faixa(nps)},">=0")'
+                    n_resp = f'COUNTIFS({self._faixa(seg)},{_criterio(v)},{fx},">=0",{fx},"<=10")'
                     c = ws.cell(row=linha, column=6, value=f"=IF({n_resp}=0,\"\",(D{linha}-E{linha})/{n_resp}*100)")
                     c.number_format, c.border = "0", BORDA  # NPS sem casas decimais (padrão da casa)
                     ws.cell(row=linha, column=7, value=f'=IF({n_resp}<30,"sim","não")').border = BORDA
@@ -208,12 +218,12 @@ class Entrega:
         linha = 4
         if "nps" in self.indicadores:
             col = self.indicadores["nps"]
-            notas = self.df[col].dropna().astype(float)
+            notas, _ = notas_nps(self.df[col])
             n, p, d = len(notas), int((notas >= 9).sum()), int((notas <= 6).sum())
             faixa = self._faixa(col)
-            itens = [("Respostas (n)", f"=COUNT({faixa})", "#,##0", n),
-                     ("Promotores (9-10)", f'=COUNTIF({faixa},">=9")', "#,##0", p),
-                     ("Detratores (0-6)", f'=COUNTIF({faixa},"<=6")', "#,##0", d),
+            itens = [("Respostas (n)", f'=COUNTIFS({faixa},">=0",{faixa},"<=10")', "#,##0", n),
+                     ("Promotores (9-10)", f'=COUNTIFS({faixa},">=9",{faixa},"<=10")', "#,##0", p),
+                     ("Detratores (0-6)", f'=COUNTIFS({faixa},">=0",{faixa},"<=6")', "#,##0", d),
                      ("% Promotores", "=IF(B5=0,0,B6/B5)", "0.0%", p / n if n else 0),
                      ("% Detratores", "=IF(B5=0,0,B7/B5)", "0.0%", d / n if n else 0),
                      ("NPS", "=(B8-B9)*100", "0", 100 * (p - d) / n if n else 0),
@@ -279,7 +289,7 @@ class Entrega:
                 linha += 1
                 rot = str(g["rotulo"]).strip()
                 mascara = _igual_excel(self.df[dim], rot)
-                ws.cell(row=linha, column=1, value=rot).border = BORDA
+                _rotulo(ws, linha, 1, rot).border = BORDA
                 c = ws.cell(row=linha, column=2, value=f"=SUMIFS({self._faixa(valor)},{self._faixa(dim)},{_criterio(rot)})")
                 c.number_format, c.border = "#,##0.00", BORDA
                 soma = float(self.df.loc[mascara, valor].sum())

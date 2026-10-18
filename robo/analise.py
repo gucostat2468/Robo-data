@@ -195,6 +195,11 @@ def calcular_indicador(tipo: str, serie: pd.Series, z: float) -> dict | None:
     if n == 0:
         return None
     if tipo == "nps":
+        from robo.calculos import notas_nps
+        v, _ = notas_nps(v)  # só inteiros de 0 a 10 (99 = 'não sabe' fica fora), igual em todo o robô
+        n = len(v)
+        if n == 0:
+            return None
         p, d = (v >= 9).mean(), (v <= 6).mean()
         var = p + d - (p - d) ** 2
         return {"indicador": "NPS", "n": n, "valor": 100 * (p - d), "margem": 100 * z * math.sqrt(var / n),

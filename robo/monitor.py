@@ -76,7 +76,10 @@ class Monitor:
             log.error("Pasta de entrada não encontrada: %s", self.cfg.entrada)
             return resultados
 
+        from robo.pipeline import ja_publicado
         for arq in arquivos:
+            if ja_publicado(self.cfg, arq):  # processado, mas o original estava travado: não processa de novo
+                continue
             try:
                 st = arq.stat()
             except OSError:

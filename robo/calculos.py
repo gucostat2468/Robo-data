@@ -77,7 +77,9 @@ def carregar_base(cfg, base: str) -> tuple[pd.DataFrame, str]:
     chave = (str(caminho), caminho.stat().st_mtime_ns)
     if chave not in _CACHE:
         if caminho.suffix.lower() == ".csv":
-            df = pd.read_csv(caminho, sep=None, engine="python", encoding="utf-8-sig")
+            saida = getattr(cfg, "saida", {}) or {}  # o mesmo separador e decimal com que o robô gravou o CSV
+            df = pd.read_csv(caminho, sep=saida.get("csv_separador", ";"), decimal=saida.get("csv_decimal", ","),
+                             encoding="utf-8-sig")
         else:
             abas = pd.read_excel(caminho, sheet_name=None)
             nome = next((n for n in abas if not n.startswith("dim_") and n not in ("dicionario_dados", "log_qualidade")),
@@ -176,8 +178,15 @@ def _fmt(v) -> str:
     return str(v)
 
 
+def notas_nps(s: pd.Series) -> tuple[pd.Series, int]:
+    """Só notas válidas de NPS: inteiros de 0 a 10. Códigos como 99 ('não sabe') ficam fora — e são contados."""
+    v = pd.to_numeric(s, errors="coerce").dropna().astype(float)
+    validas = v[(v >= 0) & (v <= 10) & (v == v.round())]
+    return validas, int(len(v) - len(validas))
+
+
 def _nps(s: pd.Series) -> tuple[float, int, float]:
-    v = pd.to_numeric(s, errors="coerce").dropna()
+    v, _ = notas_nps(s)
     n = len(v)
     if not n:
         return float("nan"), 0, float("nan")
@@ -213,17 +222,18 @@ def _f0(v) -> str:
 
 def _nps_explicado(s: pd.Series) -> str:
     """NPS sem casas decimais, com a conta aberta: % promotores − % detratores, quantidades, neutros e margem."""
-    v = pd.to_numeric(s, errors="coerce").dropna()
+    v, fora = notas_nps(s)
     n = len(v)
     if not n:
-        return "sem notas válidas"
+        return "sem notas válidas (0 a 10)" + (f"; {fora} valor(es) fora da escala ignorado(s)" if fora else "")
     prom, det = int((v >= 9).sum()), int((v <= 6).sum())
     neu = n - prom - det
     nps, _, margem = _nps(v)
     pp, pd_, pn = 100 * prom / n, 100 * det / n, 100 * neu / n
     return (f"NPS {_f0(nps)} = {_f1(pp)}% promotores ({prom}) − {_f1(pd_)}% detratores ({det}) = {_f1(nps)}, "
             f"arredondado para {_f0(nps)}; neutros {_f1(pn)}% ({neu}); n={n}; margem ±{_f0(margem)} pts"
-            + (" ⚠ base pequena (menos de 30): use com cautela" if n < 30 else ""))
+            + (" ⚠ base pequena (menos de 30): use com cautela" if n < 30 else "")
+            + (f" · {fora} valor(es) fora de 0–10 ignorado(s) (ex.: 99 = não sabe)" if fora else ""))
 
 
 EXPLICA_NPS = ("Como ler: NPS = % de promotores (notas 9 e 10) − % de detratores (notas 0 a 6). Os neutros (7 e 8) não "
@@ -376,9 +386,17 @@ def calcular(cfg, pergunta: str, fontes: dict | None = None) -> dict | None:
 
 def _coluna_indicador(op: str, df: pd.DataFrame) -> str | None:
     """Coluna numérica de NPS (0–10) ou CSAT/satisfação, reconhecida pelo nome."""
-    palavra = r"nps|recomend" if op == "nps" else r"csat|satisf|atendimento"
-    return next((c for c in df.columns if re.search(palavra, str(c)) and pd.api.types.is_numeric_dtype(df[c])
-                 and not str(c).startswith(("id_", "_"))), None)
+    palavra = r"nps|recomend" if op == "nps" else r"(^|_)(csat|satisf)"
+    for c in df.columns:
+        if not re.search(palavra, str(c)) or str(c).startswith(("id_", "_")) or not pd.api.types.is_numeric_dtype(df[c]):
+            continue
+        v = pd.to_numeric(df[c], errors="coerce").dropna()
+        # nota de pesquisa: a grande maioria é inteiro de 0 a 10 (códigos como 99 = 'não sabe' podem existir e são
+        # descartados na conta); tempo de atendimento em minutos não passa nesse teste
+        validas, _ = notas_nps(v)
+        if len(v) and len(validas) / len(v) >= 0.8:
+            return c
+    return None
 
 
 def _milhar(n: int) -> str:

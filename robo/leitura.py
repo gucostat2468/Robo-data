@@ -11,6 +11,7 @@ import csv
 import io
 from pathlib import Path
 
+import numpy as np
 import pandas as pd
 from openpyxl import load_workbook
 
@@ -39,6 +40,12 @@ def _vazio(v) -> bool:
 
 
 def _decodificar(conteudo: bytes) -> tuple[str, str]:
+    # "Texto Unicode" do Excel é UTF-16 (começa com FF FE ou FE FF); lido como cp1252 virava lixo cheio de \x00
+    if conteudo[:2] in (b"\xff\xfe", b"\xfe\xff") or (len(conteudo) > 3 and conteudo[1:200:2].count(0) > 0.6 * len(conteudo[1:200:2])):
+        try:
+            return conteudo.decode("utf-16"), "utf-16"
+        except UnicodeDecodeError:
+            pass
     for cod in CODIFICACOES:
         try:
             return conteudo.decode(cod), cod
@@ -115,12 +122,18 @@ def _ler_brutos(caminho: Path) -> dict[str, pd.DataFrame]:
         texto, _ = _decodificar(caminho.read_bytes())
         if not texto.strip():
             return {}
+        if "\x00" in texto:
+            raise ErroLeitura("O arquivo de texto tem caracteres nulos (codificação não reconhecida). "
+                              "No Excel, salve como 'CSV UTF-8 (delimitado por vírgulas)'.")
         sep = _detectar_separador(texto)
         try:
-            df = pd.read_csv(io.StringIO(texto), sep=sep, header=None, dtype=str,
-                             keep_default_na=False, engine="python", skip_blank_lines=False)
-        except Exception as e:
+            # csv.reader aceita linhas com números de campos diferentes (ex.: um título acima da tabela);
+            # o pandas recusava o arquivo inteiro ("Expected 1 fields in line 2, saw 3")
+            linhas = list(csv.reader(io.StringIO(texto), delimiter=sep))
+        except csv.Error as e:
             raise ErroLeitura(f"Não consegui ler o texto como tabela ({e}).") from e
+        largura = max((len(l) for l in linhas), default=0)
+        df = pd.DataFrame([l + [""] * (largura - len(l)) for l in linhas], dtype=object)
         return {caminho.stem: df}
     raise ErroLeitura(f"Formato '{ext}' não suportado. Use: {', '.join(sorted(EXTENSOES_SUPORTADAS))}.")
 
@@ -141,7 +154,9 @@ def _localizar_cabecalho(df: pd.DataFrame, max_linhas: int) -> int:
         textos = sum(isinstance(v, str) for v in valores)
         if textos / len(valores) >= 0.5:
             return pos
-    return 0
+    # nenhuma linha "de texto" (ex.: cabeçalho com anos 2023, 2024…): fica com a primeira linha mais cheia —
+    # nunca com a linha 0 por padrão, que costuma ser o título
+    return int(np.argmax(preenchidas.values)) if len(preenchidas) else 0
 
 
 def _montar_tabela(bruto: pd.DataFrame, max_linhas: int) -> pd.DataFrame | None:
