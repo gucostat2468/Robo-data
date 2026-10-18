@@ -100,7 +100,20 @@ CREATE TABLE IF NOT EXISTS reunioes (
   id TEXT PRIMARY KEY, inicio TEXT, fim TEXT, data_hora TEXT, ata TEXT, arquivo TEXT);
 CREATE TABLE IF NOT EXISTS memoria (
   id INTEGER PRIMARY KEY AUTOINCREMENT, tipo TEXT, chave TEXT, texto TEXT, origem TEXT, solicitacao_id TEXT, criada_em TEXT);
+CREATE TABLE IF NOT EXISTS handover_eventos (
+  id INTEGER PRIMARY KEY AUTOINCREMENT, handover_id TEXT, data_hora TEXT, tipo TEXT, de TEXT, para TEXT, quem TEXT, detalhe TEXT);
+CREATE INDEX IF NOT EXISTS ix_hev ON handover_eventos(handover_id, id);
+CREATE TRIGGER IF NOT EXISTS handover_eventos_sem_alterar BEFORE UPDATE ON handover_eventos
+BEGIN SELECT RAISE(ABORT, 'histórico de handover é imutável'); END;
 """
+# registro é permanente: nenhuma destas tabelas aceita DELETE (o que muda, muda de estado — e o histórico fica)
+TABELAS_PERMANENTES = ("experiencias", "handovers", "handover_eventos", "boas_praticas", "memoria", "reunioes", "conversas",
+                       "mensagens", "solicitacoes", "etapas", "aprovacoes", "eventos")
+ESQUEMA += "".join(f"""CREATE TRIGGER IF NOT EXISTS {t}_sem_apagar BEFORE DELETE ON {t}
+BEGIN SELECT RAISE(ABORT, 'registro permanente: {t} não pode ser apagado'); END;
+""" for t in TABELAS_PERMANENTES)
+COLUNAS_NOVAS = {"boas_praticas": {"valida": "INTEGER DEFAULT 1", "invalidada_em": "TEXT", "motivo_invalidacao": "TEXT"}}
+_prontos: set[str] = set()
 
 _travas: dict[str, threading.RLock] = {}
 _trava_global = threading.Lock()
@@ -137,8 +150,15 @@ class Trabalho:
         self.arquivo.parent.mkdir(parents=True, exist_ok=True)
         with _trava_global:
             self.trava = _travas.setdefault(str(self.arquivo.resolve()), threading.RLock())
-        with self.tx() as c:
-            c.executescript(ESQUEMA)
+        if str(self.arquivo.resolve()) not in _prontos or not self.arquivo.exists():  # esquema uma vez por banco
+            with self.tx() as c:
+                c.executescript(ESQUEMA)
+                for tabela, colunas in COLUNAS_NOVAS.items():
+                    existentes = {r[1] for r in c.execute(f"PRAGMA table_info({tabela})")}
+                    for col, tipo in colunas.items():
+                        if col not in existentes:
+                            c.execute(f"ALTER TABLE {tabela} ADD COLUMN {col} {tipo}")
+            _prontos.add(str(self.arquivo.resolve()))
 
     @contextmanager
     def tx(self):

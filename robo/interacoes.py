@@ -80,7 +80,7 @@ def pedir_ajuda(cfg, quem: str, problema: str, ref: str = "") -> dict | None:
     k = ferramentas.executar("conhecimento", cfg, pergunta=problema, quem=ajudante)
     if k["ok"]:
         resposta = f"{nome(quem)}, já passamos por isso. {k['texto'][:400]} (fonte: {k['evidencia']})"
-        memoria.experiencia(cfg, ajudante, "acerto", f"Ajudou {nome(quem)} com conhecimento registrado", "interacao", ref)
+        memoria.experiencia(cfg, ajudante, "colaboracao", f"Ajudou {nome(quem)} com conhecimento registrado", "interacao", ref)
         memoria.experiencia(cfg, quem, "aprendizado", f"Aprendeu com {nome(ajudante)}: {k['texto'][:150]}", "interacao", ref)
     else:
         resposta = (f"{nome(quem)}, não temos solução registrada para isso ainda — não vou chutar. Fica no {ref or 'handover'} "
@@ -117,7 +117,7 @@ def trocar_experiencias(cfg, dias: int = 7, limite: int = 6) -> list[dict]:
         texto = (f"{a['nome']}, vi que você teve dificuldade em “{assunto[:90]}”. Eu acertei “{exemplo['resumo'][:90]}” — "
                  "vamos rever juntos o caso e o que mudou?")
         falar(cfg, mentor, aprendiz, texto, "troca", exemplo.get("referencia") or "")
-        memoria.experiencia(cfg, mentor, "acerto", f"Mentoria para {a['nome']}", "interacao", exemplo.get("referencia") or "")
+        memoria.experiencia(cfg, mentor, "colaboracao", f"Mentoria para {a['nome']}", "interacao", exemplo.get("referencia") or "")
         memoria.experiencia(cfg, aprendiz, "aprendizado", f"Troca de experiência com {gente[mentor]['nome']}", "interacao", "")
         trocas.append({"mentor": mentor, "aprendiz": aprendiz, "assunto": assunto})
         if len(trocas) >= limite:

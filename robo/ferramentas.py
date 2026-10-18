@@ -88,6 +88,8 @@ def f_conhecimento(cfg, pergunta: str = "", quem: str | None = None, **_) -> dic
     melhor = max(pont) if pont else (0, -1)
     pontos_md, secao = canal._buscar_markdown(cfg, t)
     if secao and pontos_md >= 3 and pontos_md > melhor[0]:
+        from robo import licoes
+        licoes.registrar_uso_por_origem(cfg, "manual", f"{Path(secao['arquivo']).name}#{secao['titulo']}", quem, pergunta)
         corpo = secao["corpo"] if len(secao["corpo"]) <= 1500 else secao["corpo"][:1500].rsplit(" ", 1)[0] + "…"
         return resultado(True, "conhecimento", f"{secao['titulo']}: {corpo}", {"fonte": secao["arquivo"]},
                          evidencia=f"manual {secao['arquivo']}, seção “{secao['titulo']}”")
@@ -105,6 +107,7 @@ def f_conhecimento(cfg, pergunta: str = "", quem: str | None = None, **_) -> dic
     achadas = licoes.buscar(cfg, pergunta, quem) or licoes.buscar(cfg, pergunta)
     if achadas:
         l = achadas[0]
+        licoes.registrar_uso(cfg, l["id"], quem, pergunta)  # usar a lição numa resposta é a prova de 'aplicada' 
         corpo = l["conteudo"] if len(l["conteudo"]) <= 1500 else l["conteudo"][:1500].rsplit(" ", 1)[0] + "…"
         return resultado(True, "conhecimento", f"{l['titulo']}\n\n{corpo}", {"fonte": l["id"], "versao": l["versao"]},
                          evidencia=f"caderno de lições {l['id']} (v{l['versao']}, origem {l['origem_tipo']})")

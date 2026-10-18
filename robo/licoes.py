@@ -21,7 +21,9 @@ Governança e segurança:
   - toda mudança entra numa cadeia de registros (cada registro guarda o hash do anterior): qualquer adulteração quebra
     a cadeia e `verificar_integridade` acusa; o próprio banco recusa UPDATE/DELETE na cadeia;
   - só o dono cria lição manual, publica versão nova ou arquiva (arquivar não apaga: tira da atribuição);
-  - cópia em JSONL (logs/conhecimento/) e no PostgreSQL (robo.conhecimento_licoes) a cada hora.
+  - cópia em JSONL (logs/conhecimento/) e no PostgreSQL (robo.memoria_licoes, robo.memoria_licoes_funcionario,
+    robo.memoria_registro_conhecimento) a cada hora; uma âncora fora do banco (logs/conhecimento/ancora.jsonl) denuncia
+    se alguém apagar os últimos registros da cadeia.
 """
 
 from __future__ import annotations
@@ -29,6 +31,7 @@ from __future__ import annotations
 import hashlib
 import json
 import re
+import threading
 from datetime import datetime, timedelta
 from pathlib import Path
 
@@ -56,15 +59,25 @@ CREATE TRIGGER IF NOT EXISTS registro_sem_alterar BEFORE UPDATE ON registro_conh
 BEGIN SELECT RAISE(ABORT, 'registro de conhecimento é imutável'); END;
 CREATE TRIGGER IF NOT EXISTS licoes_conteudo_imutavel BEFORE UPDATE OF titulo, conteudo, pergunta, como_aplicar ON licoes
 BEGIN SELECT RAISE(ABORT, 'conteúdo de lição não muda: publique uma versão nova'); END;
+CREATE TABLE IF NOT EXISTS licoes_uso (
+  id INTEGER PRIMARY KEY AUTOINCREMENT, licao_id TEXT, funcionario TEXT, data_hora TEXT, contexto TEXT);
+CREATE INDEX IF NOT EXISTS ix_licoes_uso ON licoes_uso(licao_id, funcionario);
+CREATE TRIGGER IF NOT EXISTS licoes_uso_sem_apagar BEFORE DELETE ON licoes_uso
+BEGIN SELECT RAISE(ABORT, 'uso de lição é registro permanente'); END;
 """
 ESTADOS = ["atribuida", "estudada", "avaliada", "aplicada"]
 REGRESSOES_POR_RODADA = 25
 
 
+_prontos: set[str] = set()
+
+
 def _tb(cfg) -> Trabalho:
     tb = Trabalho(cfg)
-    with tb.tx() as c:
-        c.executescript(ESQUEMA)
+    if str(tb.arquivo) not in _prontos or not tb.arquivo.exists():
+        with tb.tx() as c:
+            c.executescript(ESQUEMA)
+        _prontos.add(str(tb.arquivo))
     return tb
 
 
@@ -83,21 +96,77 @@ def _registrar(c, tipo: str, ref: str, quem: str, dados: dict) -> None:
 
 
 def verificar_integridade(cfg) -> dict:
-    """Recalcula a cadeia inteira. Qualquer registro alterado, removido ou inserido fora de ordem quebra a conta."""
+    """Três conferências:
+    1. a cadeia: cada registro guarda o hash do anterior — alterar, remover ou inserir fora de ordem quebra a conta;
+    2. a âncora fora do banco (logs/conhecimento/ancora.jsonl): se a cadeia ficou MENOR ou o hash de um ponto ancorado
+       mudou, alguém apagou ou trocou o fim da cadeia (o que a conferência 1 sozinha não vê);
+    3. as tabelas batem com a cadeia: o estado de cada lição de cada pessoa é o do último evento registrado."""
     with _tb(cfg).tx() as c:
         linhas = c.execute("SELECT * FROM registro_conhecimento ORDER BY id").fetchall()
+        estados = {(r["licao_id"], r["funcionario"]): r["estado"] for r in c.execute(
+            "SELECT licao_id, funcionario, estado FROM licoes_funcionario")}
     anterior = "0" * 64
+    por_id = {}
+    esperado: dict[tuple, str] = {}
     for r in linhas:
-        corpo = {"data_hora": r["data_hora"], "tipo": r["tipo"], "ref": r["ref"], "quem": r["quem"], "dados": json.loads(r["dados"])}
+        dados = json.loads(r["dados"])
+        corpo = {"data_hora": r["data_hora"], "tipo": r["tipo"], "ref": r["ref"], "quem": r["quem"], "dados": dados}
         if r["hash_anterior"] != anterior or r["hash"] != _hash(anterior, corpo):
-            return {"integra": False, "registros": len(linhas), "quebra_em": r["id"]}
+            return {"integra": False, "registros": len(linhas), "quebra_em": r["id"],
+                    "motivo": f"registro {r['id']} alterado ou fora de ordem"}
         anterior = r["hash"]
-    return {"integra": True, "registros": len(linhas), "ultimo_hash": anterior}
+        por_id[r["id"]] = r["hash"]
+        if r["tipo"] == "licao_atribuida":
+            for pid in dados.get("para") or []:
+                esperado.setdefault((r["ref"], pid), "atribuida")
+        elif r["tipo"] in ("licao_estudada", "licao_avaliada", "licao_aplicada"):
+            esperado[(r["ref"], r["quem"])] = r["tipo"].removeprefix("licao_")
+        elif r["tipo"] == "licao_regrediu":
+            esperado[(r["ref"], r["quem"])] = "avaliada"
+    for ancora in _ancoras(cfg):
+        if ancora["registros"] > len(linhas) or por_id.get(ancora["ultimo_id"]) != ancora["ultimo_hash"]:
+            return {"integra": False, "registros": len(linhas), "quebra_em": ancora["ultimo_id"],
+                    "motivo": f"a âncora de {ancora['data_hora'][:16]} registrou {ancora['registros']} registros e hash "
+                              f"{ancora['ultimo_hash'][:12]}…; a cadeia atual não confere (fim apagado ou trocado)"}
+    divergentes = [k for k, v in estados.items() if esperado.get(k, v) != v or k not in esperado]
+    if divergentes:
+        lid, pid = divergentes[0]
+        return {"integra": False, "registros": len(linhas), "quebra_em": None, "divergencias": len(divergentes),
+                "motivo": f"{len(divergentes)} estado(s) de lição sem registro na cadeia (ex.: {lid} de {pid} está "
+                          f"'{estados[divergentes[0]]}', a cadeia diz '{esperado.get(divergentes[0], 'nada')}')"}
+    return {"integra": True, "registros": len(linhas), "ultimo_hash": anterior,
+            "ultimo_id": linhas[-1]["id"] if linhas else 0}
+
+
+def _ancoras(cfg) -> list[dict]:
+    arq = Path(cfg.logs) / "conhecimento" / "ancora.jsonl"
+    if not arq.exists():
+        return []
+    saida = []
+    for linha in arq.read_text(encoding="utf-8").splitlines()[-50:]:
+        try:
+            saida.append(json.loads(linha))
+        except ValueError:
+            continue
+    return saida
+
+
+def ancorar(cfg) -> dict | None:
+    """Grava fora do banco o ponto atual da cadeia (número de registros e hash do último)."""
+    v = verificar_integridade(cfg)
+    if not v["integra"] or not v["registros"]:
+        return None
+    pasta = Path(cfg.logs) / "conhecimento"
+    pasta.mkdir(parents=True, exist_ok=True)
+    ancora = {"data_hora": _agora(), "registros": v["registros"], "ultimo_id": v["ultimo_id"], "ultimo_hash": v["ultimo_hash"]}
+    with open(pasta / "ancora.jsonl", "a", encoding="utf-8") as f:
+        f.write(json.dumps(ancora) + "\n")
+    return ancora
 
 
 # =============================================================================== criação e atribuição
-def _publico(cfg, andar: int | None, responsavel: str | None, publico: str) -> list[str]:
-    gente = organizacao.lista(cfg)
+def _publico(cfg, andar: int | None, responsavel: str | None, publico: str, gente: list | None = None) -> list[str]:
+    gente = gente if gente is not None else organizacao.lista(cfg)
     if publico == "lideranca":
         return [p["id"] for p in gente if p["id"] in organizacao.LIDERES or organizacao.nivel_de(p["id"], p) in
                 ("gerente", "coordenador", "head", "diretor")]
@@ -131,8 +200,9 @@ def criar(cfg, origem_tipo: str, origem_ref: str, titulo: str, conteudo: str, pe
     return lid
 
 
-def nova_versao(cfg, licao_id: str, conteudo: str, motivo: str, quem: str = "dono") -> str:
-    """Só o dono. A versão antiga continua guardada; a nova é reatribuída a todos que tinham a antiga."""
+def nova_versao(cfg, licao_id: str, conteudo: str, motivo: str, quem: str = "dono", _origem: str = "") -> str:
+    """Só o dono (ou a edição que o próprio dono fez no arquivo .md). A versão antiga continua guardada; a nova é
+    reatribuída a todos que tinham a antiga."""
     if quem != "dono":
         raise PermissionError("Só o dono publica versão nova de uma lição.")
     tb = _tb(cfg)
@@ -151,8 +221,9 @@ def nova_versao(cfg, licao_id: str, conteudo: str, motivo: str, quem: str = "don
         for pid in donos:
             c.execute("INSERT OR IGNORE INTO licoes_funcionario (licao_id, funcionario, estado, atribuida_em) VALUES (?,?,?,?)",
                       (nid, pid, "atribuida", _agora()))
-        _registrar(c, "licao_versao", nid, quem, {"substitui": licao_id, "motivo": motivo,
+        _registrar(c, "licao_versao", nid, quem, {"substitui": licao_id, "motivo": motivo, "origem": _origem or "painel",
                                                   "conteudo_sha256": hashlib.sha256(conteudo.encode()).hexdigest()})
+        _registrar(c, "licao_atribuida", nid, quem, {"para": donos})
     return nid
 
 
@@ -181,33 +252,46 @@ def _secoes_md(pasta: Path) -> list[tuple[str, str, str]]:
     return saida
 
 
+def _etapa_base(etapa: str) -> str:
+    """'Revisão da biblioteca numpy 2.5.3' → 'Revisão da biblioteca numpy' (a versão muda; o assunto não)."""
+    return re.sub(r"\s+\d+(\.\d+)+\S*$", "", etapa.strip())
+
+
 def colher(cfg) -> dict:
     """Transforma tudo o que a empresa aprendeu em lições (só o que ainda não virou lição)."""
-    from robo import memoria
     from robo.config import RAIZ_PROJETO
-    novas = {"handover": 0, "boa_pratica": 0, "laboratorio": 0, "correcao": 0, "manual": 0}
-    for h in memoria.handovers(cfg, limite=100_000):
+    novas = {"handover": 0, "boa_pratica": 0, "laboratorio": 0, "correcao": 0, "manual": 0, "versoes": 0}
+    tb = _tb(cfg)
+    with tb.tx() as c:  # leitura direta (memoria.handovers() reclassifica e explica: caro e desnecessário aqui)
+        hs = [dict(r) for r in c.execute("SELECT * FROM handovers ORDER BY criado_em")]
+        bps = [dict(r) for r in c.execute("SELECT * FROM boas_praticas ORDER BY criada_em")]
+        try:
+            falhas = [dict(r) for r in c.execute(
+                "SELECT area, etapa, responsavel, MAX(id) id, MAX(semente) semente, MAX(detalhe) detalhe "
+                "FROM laboratorio_exercicios WHERE ok=0 GROUP BY area, etapa, responsavel")]
+        except Exception:
+            falhas = []
+    for h in hs:
         if criar(cfg, "handover", h["id"], f"Erro: {h['erro'][:200]}",
                  f"O que aconteceu: {h['erro']}\nPor quê: {h['causa']}\nComo não repetir: {h['regra']}\nComo verificar: {h['como_verificar']}",
                  h["erro"][:200], h["como_verificar"], h["andar"], h["responsavel"]):
             novas["handover"] += 1
-    for b in memoria.boas_praticas(cfg, limite=100_000):
+    for b in bps:
         if criar(cfg, "boa_pratica", b["id"], f"Boa prática: {b['pratica'][:200]}",
                  f"Problema: {b['problema']}\nPrática padronizada: {b['pratica']}\nProva: {b['evidencia']}",
                  b["problema"][:200], b["como_verificar"], b["andar"], b["responsavel"]):
             novas["boa_pratica"] += 1
-    tb = _tb(cfg)
-    with tb.tx() as c:
-        try:
-            falhas = c.execute("SELECT * FROM laboratorio_exercicios WHERE ok=0 ORDER BY id").fetchall()
-        except Exception:
-            falhas = []
     gente = organizacao.por_id(cfg)
-    for f in falhas:
-        ref = f"{f['area']}:{f['semente']}:{f['etapa']}:{f['responsavel']}"
-        if criar(cfg, "laboratorio", ref, f"Laboratório ({f['area']}): {f['etapa']}",
-                 f"Falhou no treino da área {f['area']} (semente {f['semente']}): {f['detalhe']}",
-                 f"{f['etapa']} {f['area']}", f"refazer o caso {f['area']} semente {f['semente']} e a etapa passar",
+    vistas = set()
+    for f in falhas:  # uma lição por (área, etapa, responsável) — não uma por semente (antes: ~144 lições/dia)
+        etapa = _etapa_base(f["etapa"])
+        ref = f"{f['area']}:{etapa}:{f['responsavel']}"
+        if ref in vistas:
+            continue
+        vistas.add(ref)
+        if criar(cfg, "laboratorio", ref, f"Laboratório ({f['area']}): {etapa}",
+                 f"Falhou no treino da área {f['area']} (última semente {f['semente']}): {f['detalhe']}",
+                 f"{etapa} {f['area']}", f"refazer o último caso que falhou ({f['area']}) e a etapa passar",
                  (gente.get(f["responsavel"]) or {}).get("andar"), f["responsavel"]):
             novas["laboratorio"] += 1
     for m in tb.memorias("correcao", limite=100_000):
@@ -222,97 +306,200 @@ def colher(cfg) -> dict:
             publico = "lideranca" if "lideranca" in arq else "todos"
             responsavel = Path(arq).stem if tipo == "agente" else None
             andar = (gente.get(responsavel) or {}).get("andar") if responsavel else None
-            if criar(cfg, "manual", f"{arq}#{titulo}", f"{titulo} ({arq})", corpo, titulo, "saber responder quando perguntado",
+            ref = f"{arq}#{titulo}"
+            if criar(cfg, "manual", ref, f"{titulo} ({arq})", corpo, titulo, "usar a lição numa resposta",
                      andar, responsavel, publico if not responsavel else "andar"):
                 novas["manual"] += 1
+            elif _versao_do_manual(cfg, ref, corpo):  # o dono editou o .md: a lição ganha versão nova (a antiga fica)
+                novas["versoes"] += 1
     return novas
 
 
+def _versao_do_manual(cfg, ref: str, corpo: str) -> bool:
+    with _tb(cfg).tx() as c:
+        atual = c.execute("SELECT id, conteudo FROM licoes WHERE origem_tipo='manual' AND origem_ref=? AND arquivada=0 "
+                          "ORDER BY versao DESC LIMIT 1", (ref,)).fetchone()
+    if not atual or atual["conteudo"] == corpo[:6000]:
+        return False
+    nova_versao(cfg, atual["id"], corpo, "o arquivo .md foi editado", quem="dono", _origem="arquivo .md editado pelo dono")
+    return True
+
+
 # =============================================================================== estudo, avaliação e aplicação
-def _passar(c, lid: str, pid: str, estado: str, evidencia: str = "") -> None:
+def _passar(c, lid: str, pid: str, de: str, estado: str, evidencia: str = "") -> bool:
+    """Muda o estado só se ele ainda for o esperado (duas rodadas ao mesmo tempo não aplicam nada em dobro)."""
     campo = {"estudada": "estudada_em", "avaliada": "avaliada_em", "aplicada": "aplicada_em"}.get(estado)
-    c.execute(f"UPDATE licoes_funcionario SET estado=?, evidencia=?{', ' + campo + '=?' if campo else ''}, "
-              "tentativas=tentativas+1 WHERE licao_id=? AND funcionario=?",
-              (estado, evidencia[:500], *([_agora()] if campo else []), lid, pid))
+    cur = c.execute(f"UPDATE licoes_funcionario SET estado=?, evidencia=?{', ' + campo + '=?' if campo else ''}, "
+                    "tentativas=tentativas+1 WHERE licao_id=? AND funcionario=? AND estado=?",
+                    (estado, evidencia[:500], *([_agora()] if campo else []), lid, pid, de))
+    if not cur.rowcount:
+        return False
     _registrar(c, f"licao_{estado}", lid, pid, {"evidencia": evidencia[:300]})
+    return True
 
 
 def _recupera(cfg, licao: dict, cache: dict) -> bool:
-    """Teste de recuperação: perguntado com a pergunta-chave, o conhecimento da empresa devolve ESTA lição?"""
+    """Teste de recuperação: perguntado com a pergunta-chave (ou o título), o conhecimento da empresa devolve ESTA
+    lição entre os resultados? (Lições de texto parecido não se escondem umas às outras: olhamos 50 resultados.)"""
     if licao["id"] in cache:
         return cache[licao["id"]]
-    achou = any(l["id"] == licao["id"] for l in buscar(cfg, licao["pergunta"] or licao["titulo"], limite=5))
+    achou = any(any(l["id"] == licao["id"] for l in buscar(cfg, q, limite=50))
+                for q in (licao["pergunta"], licao["titulo"], licao["conteudo"][:300]) if q)
     cache[licao["id"]] = achou
     return achou
 
 
-def _evidencia_pratica(cfg, licao: dict, cache: dict) -> tuple[bool, str]:
-    from robo import laboratorio, memoria
-    if licao["origem_tipo"] == "boa_pratica":
-        return True, "boa prática comprovada pelo PDCA"
-    if licao["origem_tipo"] == "handover":
-        h = next((x for x in memoria.handovers(cfg, limite=100_000) if x["id"] == licao["origem_ref"]), None)
-        if h and h["estado"] == "verificado":
-            return True, "handover verificado pelo PDCA (o erro não voltou)"
-        return False, f"handover ainda {h['estado'] if h else 'sem registro'}"
-    if licao["origem_tipo"] == "laboratorio":
-        area, semente, etapa, resp = licao["origem_ref"].split(":", 3)
-        chave = (area, int(semente))
-        if chave not in cache:
-            if cache.setdefault("_regressoes", 0) >= REGRESSOES_POR_RODADA:
-                return False, "regressão fica para a próxima rodada (limite por rodada)"
-            cache["_regressoes"] += 1
-            cache[chave] = laboratorio.exercicio(cfg, area, int(semente))
-        r = cache[chave]
-        falhou = any(f.startswith(etapa) for f in r["falhas"])
-        return (not falhou, f"caso {area}/{semente} refeito: {'passou' if not falhou else 'ainda falha'}")
-    if licao["origem_tipo"] == "regra":  # regra aprendida: só conta com o arquivo passando depois dela
+def registrar_uso(cfg, licao_id: str, funcionario: str | None, contexto: str = "") -> None:
+    """A lição foi usada de verdade numa resposta (é a prova de 'aplicada' para manuais e correções)."""
+    if not funcionario:
+        return
+    with _tb(cfg).tx() as c:
+        c.execute("INSERT INTO licoes_uso (licao_id, funcionario, data_hora, contexto) VALUES (?,?,?,?)",
+                  (licao_id, funcionario, _agora(), contexto[:300]))
+
+
+def registrar_uso_por_origem(cfg, origem_tipo: str, origem_ref: str, funcionario: str | None, contexto: str = "") -> None:
+    if not funcionario:
+        return
+    with _tb(cfg).tx() as c:
+        l = c.execute("SELECT id FROM licoes WHERE origem_tipo=? AND origem_ref=? AND arquivada=0 ORDER BY versao DESC LIMIT 1",
+                      (origem_tipo, origem_ref)).fetchone()
+    if l:
+        registrar_uso(cfg, l["id"], funcionario, contexto)
+
+
+def _evidencia_pratica(cfg, licao: dict, pid: str, ctx: dict) -> tuple[bool, str]:
+    from robo import laboratorio
+    tipo, ref = licao["origem_tipo"], licao["origem_ref"]
+    if tipo == "boa_pratica":
+        bp = ctx["boas"].get(ref)
+        if bp and bp.get("valida", 1):
+            return True, f"boa prática comprovada pelo PDCA: {bp['evidencia']}"
+        return False, "boa prática invalidada (o erro voltou)" if bp else "boa prática sem registro"
+    if tipo == "handover":
+        estado = ctx["handovers"].get(ref)
+        if estado == "verificado":
+            return True, "handover verificado pelo PDCA (com prova de que o erro não voltou)"
+        return False, f"handover ainda {estado or 'sem registro'}"
+    if tipo == "laboratorio":
+        partes = ref.split(":")
+        if len(partes) == 4:  # formato antigo: area:semente:etapa:responsavel
+            area, semente, etapa, resp = partes[0], int(partes[1]), _etapa_base(partes[2]), partes[3]
+        else:
+            area, etapa, resp = partes[0], partes[1], partes[2]
+            with _tb(cfg).tx() as c:
+                ult = c.execute("SELECT semente FROM laboratorio_exercicios WHERE ok=0 AND area=? AND responsavel=? AND "
+                                "etapa LIKE ? ORDER BY id DESC LIMIT 1", (area, resp, etapa + "%")).fetchone()
+            if not ult:
+                return False, "caso que falhou não encontrado"
+            semente = int(ult["semente"])
+        lib = etapa.removeprefix("Revisão da biblioteca ").strip() if etapa.startswith("Revisão da biblioteca") else None
+        chave = (area, semente, lib)
+        if chave not in ctx["lab"]:
+            if ctx["regressoes"] >= REGRESSOES_POR_RODADA:
+                return False, "reconferência fica para a próxima rodada (limite por rodada)"
+            ctx["regressoes"] += 1
+            ctx["lab"][chave] = laboratorio.exercicio(cfg, area, semente, gravar=False, biblioteca=lib)  # sem efeitos
+        r = ctx["lab"][chave]
+        falhou = any(_etapa_base(x["etapa"]) == etapa and not x["ok"] for x in r.get("resultados", []))
+        return (not falhou, f"caso {area}/{semente} refeito ({_agora()[:16]}): {'passou' if not falhou else 'ainda falha'}")
+    if tipo == "regra":  # regra aprendida: só conta com o arquivo passando depois dela
         with _tb(cfg).tx() as c:
-            p = c.execute("SELECT estado, prova FROM propostas_regra WHERE id=?", (licao["origem_ref"],)).fetchone()
+            p = c.execute("SELECT estado, prova FROM propostas_regra WHERE id=?", (ref,)).fetchone()
         if p and p["estado"] == "comprovada":
             return True, p["prova"]
         return False, f"regra ainda {p['estado'] if p else 'sem proposta'}: espera o arquivo passar"
-    if licao["origem_tipo"] in ("manual", "correcao", "dono"):
-        return True, "conhecimento de referência: aplicado ao ser usado nas respostas"
+    if tipo in ("manual", "correcao", "dono"):  # conhecimento de referência: aplicada = a PESSOA usou numa resposta
+        uso = ctx["usos"].get((licao["id"], pid))
+        if uso:
+            return True, f"usada numa resposta em {uso[:16]}"
+        return False, "ainda não foi usada numa resposta"
     return False, "sem critério de aplicação"
+
+
+_rodando: set[str] = set()
+_trava_rodadas = threading.Lock()
+
+
+def _atribuir_faltantes(cfg, c) -> int:
+    """Quem entrou depois (contratado) também recebe as lições que já existiam."""
+    novos = 0
+    gente = organizacao.lista(cfg)
+    ids_validos = {p["id"] for p in gente}
+    licoes_ativas = [dict(r) for r in c.execute("SELECT id, andar, publico FROM licoes WHERE arquivada=0")]
+    ja = {}
+    for r in c.execute("SELECT licao_id, funcionario FROM licoes_funcionario"):
+        ja.setdefault(r["licao_id"], set()).add(r["funcionario"])
+    for l in licoes_ativas:
+        responsavel = None
+        alvos = set(_publico(cfg, l["andar"], responsavel, l["publico"] or "andar", gente)) & ids_validos
+        faltam = sorted(alvos - ja.get(l["id"], set()))
+        if not faltam:
+            continue
+        for pid in faltam:
+            c.execute("INSERT OR IGNORE INTO licoes_funcionario (licao_id, funcionario, estado, atribuida_em) VALUES (?,?,?,?)",
+                      (l["id"], pid, "atribuida", _agora()))
+        _registrar(c, "licao_atribuida", l["id"], "robo", {"para": faltam, "motivo": "funcionário novo"})
+        novos += len(faltam)
+    return novos
 
 
 def rodada(cfg) -> dict:
     """Colhe, faz cada pessoa estudar o que é novo, testa se acha e comprova se funciona na prática."""
-    novas = colher(cfg)
     tb = _tb(cfg)
+    chave = str(tb.arquivo)
+    with _trava_rodadas:
+        if chave in _rodando:
+            return {"em_andamento": True, "novas": {}, "estudada": 0, "avaliada": 0, "aplicada": 0,
+                    "integridade": verificar_integridade(cfg)}
+        _rodando.add(chave)
+    try:
+        return _rodada(cfg, tb)
+    finally:
+        with _trava_rodadas:
+            _rodando.discard(chave)
+
+
+def _rodada(cfg, tb) -> dict:
+    novas = colher(cfg)
     with tb.tx() as c:
+        novas["atribuicoes_novas"] = _atribuir_faltantes(cfg, c)
         pendentes = [dict(r) | {"licao": dict(l)} for r in c.execute(
             "SELECT * FROM licoes_funcionario WHERE estado <> 'aplicada'") for l in
             [c.execute("SELECT * FROM licoes WHERE id=?", (r["licao_id"],)).fetchone()] if l and not l["arquivada"]]
-    # 1) decide (só leitura e regressões do laboratório — nenhuma transação aberta aqui)
-    cache_rec, cache_lab = {}, {}
-    mudancas: list[tuple[str, str, str, str]] = []
+        ctx = {"handovers": {r["id"]: r["estado"] for r in c.execute("SELECT id, estado FROM handovers")},
+               "boas": {r["id"]: dict(r) for r in c.execute("SELECT * FROM boas_praticas")},
+               "usos": {(r["licao_id"], r["funcionario"]): r["ult"] for r in c.execute(
+                   "SELECT licao_id, funcionario, MAX(data_hora) ult FROM licoes_uso GROUP BY licao_id, funcionario")},
+               "lab": {}, "regressoes": 0}
+    # 1) decide (só leitura; reconferências do laboratório sem efeito colateral — nenhuma transação aberta aqui)
+    cache_rec = {}
+    mudancas: list[tuple[str, str, str, str, str]] = []
     for item in pendentes:
         lid, pid, licao, estado = item["licao_id"], item["funcionario"], item["licao"], item["estado"]
         if estado == "atribuida":
-            mudancas.append((lid, pid, "estudada", "lição lida e guardada no caderno"))
+            mudancas.append((lid, pid, "atribuida", "estudada", "lição lida e guardada no caderno"))
             estado = "estudada"
         if estado == "estudada" and _recupera(cfg, licao, cache_rec):
-            mudancas.append((lid, pid, "avaliada", "acha a lição quando perguntado"))
+            mudancas.append((lid, pid, "estudada", "avaliada", "acha a lição quando perguntado"))
             estado = "avaliada"
         if estado == "avaliada":
-            ok, evid = _evidencia_pratica(cfg, licao, cache_lab)
+            ok, evid = _evidencia_pratica(cfg, licao, pid, ctx)
             if ok:
-                mudancas.append((lid, pid, "aplicada", evid))
+                mudancas.append((lid, pid, "avaliada", "aplicada", evid))
     # 2) grava tudo numa transação só (ou entra a rodada inteira na cadeia, ou nada)
     contagem = {"estudada": 0, "avaliada": 0, "aplicada": 0}
     with tb.tx() as c:
-        for lid, pid, estado, evid in mudancas:
-            _passar(c, lid, pid, estado, evid)
-            contagem[estado] += 1
+        for lid, pid, de, estado, evid in mudancas:
+            if _passar(c, lid, pid, de, estado, evid):
+                contagem[estado] += 1
     integ = verificar_integridade(cfg)
     tb.lembrar("licoes_rodada", datetime.now().strftime("%Y-%m-%d %H:%M"),
-               f"{sum(novas.values())} lição(ões) nova(s); {contagem['estudada']} estudadas, {contagem['avaliada']} avaliadas, "
-               f"{contagem['aplicada']} aplicadas; cadeia {'íntegra' if integ['integra'] else 'QUEBRADA'}", "rh_td")
+               f"{sum(v for k, v in novas.items())} novidade(s); {contagem['estudada']} estudadas, {contagem['avaliada']} "
+               f"avaliadas, {contagem['aplicada']} aplicadas; cadeia {'íntegra' if integ['integra'] else 'QUEBRADA'}", "rh_td")
     if not integ["integra"]:
         from robo import memoria
-        memoria.handover(cfg, f"Cadeia do registro de conhecimento quebrada no registro {integ['quebra_em']} (possível adulteração)",
+        memoria.handover(cfg, f"Cadeia do registro de conhecimento com problema: {integ.get('motivo', '')} (possível adulteração)",
                          "conhecimento", "sec_senior", "verificar_integridade", tb)
     return {"novas": novas, **contagem, "integridade": integ}
 
@@ -409,6 +596,11 @@ def exportar(cfg) -> Path:
     with _tb(cfg).tx() as c, open(arq, "w", encoding="utf-8") as f:
         for r in c.execute("SELECT * FROM licoes ORDER BY criada_em"):
             f.write(json.dumps(dict(r), ensure_ascii=False) + "\n")
+        for r in c.execute("SELECT * FROM licoes_funcionario ORDER BY licao_id, funcionario"):
+            f.write(json.dumps({"caderno": dict(r)}, ensure_ascii=False) + "\n")
+        for r in c.execute("SELECT * FROM licoes_uso ORDER BY id"):
+            f.write(json.dumps({"uso": dict(r)}, ensure_ascii=False) + "\n")
         for r in c.execute("SELECT * FROM registro_conhecimento ORDER BY id"):
             f.write(json.dumps({"cadeia": dict(r)}, ensure_ascii=False) + "\n")
+    ancorar(cfg)
     return arq

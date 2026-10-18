@@ -40,7 +40,17 @@ def teste_ciclo_estudada_avaliada_aplicada_sem_mentira(cfg):
     cad = licoes.caderno(cfg, "limpeza")
     h = next(l for l in cad["licoes"] if l["origem_tipo"] == "handover")
     assert h["estado"] == "avaliada"  # o handover ainda não foi verificado: NÃO pode virar "aplicada"
-    assert any(l["estado"] == "aplicada" for l in cad["licoes"] if l["origem_tipo"] == "manual")
+    # manual também não vira "aplicada" só por existir: precisa ser USADO numa resposta por aquela pessoa
+    assert not any(l["estado"] == "aplicada" for l in cad["licoes"] if l["origem_tipo"] == "manual")
+    from robo import ferramentas
+    usada = ferramentas.executar("conhecimento", cfg, pergunta="quais as boas práticas de ingestão na engenharia de dados?",
+                                 quem="limpeza")
+    assert usada["ok"] and "boas_praticas.md" in usada["evidencia"]
+    licoes.rodada(cfg)
+    cad = {l["licao_id"]: l for l in licoes.caderno(cfg, "limpeza")["licoes"]}
+    lid = next(k for k, l in cad.items() if l["titulo"].startswith("Engenharia de dados: ingestão"))
+    assert cad[lid]["estado"] == "aplicada" and "usada numa resposta" in cad[lid]["evidencia"]
+    assert licoes.verificar_integridade(cfg)["integra"]
 
 
 def teste_falha_do_laboratorio_so_vira_aplicada_quando_o_caso_passa(cfg, monkeypatch):
@@ -119,3 +129,51 @@ def teste_estudo_aplica_licoes(planilha_baguncada, cfg):
     memoria.registrar_execucao(cfg, processar_arquivo(planilha_baguncada, cfg))
     r = desenvolvimento.estudar(cfg, anunciar=False)
     assert r["licoes"]["integridade"]["integra"] and r["licoes"]["estudada"] > 0
+
+
+def teste_ancora_pega_fim_apagado_e_estado_forjado(cfg):
+    licoes.rodada(cfg)
+    licoes.exportar(cfg)  # grava a âncora fora do banco
+    c = _banco(cfg)
+    # forjar um estado sem passar pela cadeia
+    c.execute("UPDATE licoes_funcionario SET estado='aplicada' WHERE rowid=(SELECT rowid FROM licoes_funcionario "
+              "WHERE estado<>'aplicada' LIMIT 1)")
+    c.commit()
+    v = licoes.verificar_integridade(cfg)
+    assert not v["integra"] and "sem registro na cadeia" in v["motivo"]
+    # apagar o fim da cadeia (derrubando o gatilho): a âncora denuncia
+    c.execute("DROP TRIGGER registro_sem_apagar")
+    c.execute("DELETE FROM registro_conhecimento WHERE id=(SELECT MAX(id) FROM registro_conhecimento)")
+    c.commit()
+    c.close()
+    v = licoes.verificar_integridade(cfg)
+    assert not v["integra"] and "âncora" in v["motivo"]
+
+
+def teste_reconferencia_do_laboratorio_nao_grava_nada(cfg):
+    laboratorio.exercicio(cfg, "varejo", 5)  # cria as tabelas (e um treino normal, que grava)
+    c = _banco(cfg)
+    antes = lambda t: c.execute(f"SELECT COUNT(*) FROM {t}").fetchone()[0] if c.execute(
+        "SELECT 1 FROM sqlite_master WHERE name=?", (t,)).fetchone() else 0
+    n = {t: antes(t) for t in ("laboratorio_exercicios", "experiencias", "handovers")}
+    r = laboratorio.exercicio(cfg, "varejo", 7, gravar=False, biblioteca="numpy")
+    assert r["resultados"] and any("numpy" in x["etapa"] for x in r["resultados"])
+    assert {t: antes(t) for t in n} == n
+    c.close()
+
+
+def teste_funcionario_novo_recebe_licoes_antigas(cfg):
+    from robo import organizacao
+    licoes.rodada(cfg)
+    real = organizacao.lista
+
+    def com_novato(c=None, com_contratados=True):
+        return real(c, com_contratados) + [{"id": "novato_x", "nome": "Novato", "andar": 1, "papel": "Analista"}]
+    import robo.organizacao as org
+    org.lista = com_novato
+    try:
+        r = licoes.rodada(cfg)
+    finally:
+        org.lista = real
+    assert r["novas"]["atribuicoes_novas"] > 0 and licoes.caderno(cfg, "novato_x")["total"] > 0
+    assert licoes.verificar_integridade(cfg)["integra"]

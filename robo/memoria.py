@@ -96,7 +96,9 @@ def _norm(t: str) -> str:
 
 
 def _chave(texto: str, base: str) -> str:
-    t = re.sub(r"\d+([.,]\d+)?", "#", _norm(texto))
+    # só números SOLTOS viram '#' (valores: "12 linhas"); dígitos dentro de nomes ('nota1', 'nota2') continuam,
+    # senão erros de colunas diferentes viravam um handover só
+    t = re.sub(r"(?<![\w])\d+([.,]\d+)?(?![\w])", "#", _norm(texto))
     t = re.sub(r"\s+", " ", t)[:200]
     return hashlib.sha1(f"{base}|{t}".encode()).hexdigest()[:16]
 
@@ -116,7 +118,8 @@ CAUSA_DESCONHECIDA = "Causa ainda não classificada"
 # --------------------------------------------------------------------------- registro
 def experiencia(cfg, funcionario: str, tipo: str, resumo: str, origem: str, referencia: str = "", detalhe: str = "",
                 tb: Trabalho | None = None) -> None:
-    assert tipo in ("acerto", "erro", "aprendizado", "correcao", "treinamento"), tipo
+    # colaboracao = ajudou ou ensinou um colega (conta como participação, NÃO como acerto do próprio trabalho)
+    assert tipo in ("acerto", "erro", "aprendizado", "correcao", "treinamento", "colaboracao"), tipo
     tb = tb or Trabalho(cfg)
     andar = (organizacao.por_id(cfg).get(funcionario) or {}).get("andar")
     with tb.tx() as c:
@@ -137,13 +140,43 @@ def handover(cfg, erro: str, base: str = "", detectado_por: str = "", exemplo: s
             estado = "reaberto" if h["estado"] in ("aplicado", "verificado") else h["estado"]
             c.execute("UPDATE handovers SET recorrencias=recorrencias+1, ultima_ocorrencia=?, atualizado_em=?, estado=? WHERE id=?",
                       (agora, agora, estado, h["id"]))
+            evento_handover(c, h["id"], "ocorrencia", h["estado"], estado, detectado_por, exemplo[:300])
+            if estado == "reaberto" and h["estado"] == "verificado":
+                _regressao(c, h["id"], f"o erro voltou em {agora} ({exemplo[:120] or base})")
             return h["id"]
-        hid = f"HO-{datetime.now():%Y%m%d}-{chave[:6]}"
+        hid = f"HO-{datetime.now():%Y%m%d}-{chave[:12]}"
         c.execute("INSERT INTO handovers (id, chave, andar, area, responsavel, detectado_por, erro, causa, regra, como_verificar, "
                   "exemplo, criado_em, ultima_ocorrencia, atualizado_em) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?)",
                   (hid, chave, andar, organizacao.NOME_ANDAR.get(andar, ""), resp, detectado_por,
                    (f"[{base}] " if base else "") + erro[:500], causa, regra, verificar, exemplo[:500], agora, agora, agora))
+        evento_handover(c, hid, "criado", None, "aberto", detectado_por, exemplo[:300])
     return hid
+
+
+def evento_handover(c, hid: str, tipo: str, de, para, quem: str = "", detalhe: str = "") -> None:
+    """Histórico imutável do handover: cada ocorrência e cada mudança de estado (manual ou automática)."""
+    c.execute("INSERT INTO handover_eventos (handover_id, data_hora, tipo, de, para, quem, detalhe) VALUES (?,?,?,?,?,?,?)",
+              (hid, _agora(), tipo, de, para, quem or "robo", (detalhe or "")[:500]))
+
+
+def _regressao(c, hid: str, motivo: str) -> None:
+    """O erro voltou depois de verificado: a boa prática fica sob suspeita e quem tinha a lição como 'aplicada' volta
+    para 'avaliada' (a prova antiga deixou de valer). Tudo registrado."""
+    c.execute("UPDATE boas_praticas SET valida=0, invalidada_em=?, motivo_invalidacao=? WHERE handover_id=?",
+              (_agora(), motivo[:300], hid))
+    try:
+        from robo import licoes
+        afetados = c.execute(
+            "SELECT lf.licao_id, lf.funcionario FROM licoes_funcionario lf JOIN licoes l ON l.id=lf.licao_id "
+            "WHERE lf.estado='aplicada' AND ((l.origem_tipo='handover' AND l.origem_ref=?) OR "
+            "(l.origem_tipo='boa_pratica' AND l.origem_ref=?))", (hid, hid.replace("HO-", "BP-"))).fetchall()
+        for a in afetados:
+            c.execute("UPDATE licoes_funcionario SET estado='avaliada', evidencia=? WHERE licao_id=? AND funcionario=?",
+                      (f"regrediu: {motivo}"[:500], a["licao_id"], a["funcionario"]))
+            licoes._registrar(c, "licao_regrediu", a["licao_id"], a["funcionario"], {"motivo": motivo[:300]})
+    except Exception as e:  # caderno de lições ainda não existe neste banco
+        if "no such table" not in str(e):
+            raise
 
 
 def mudar_handover(cfg, hid: str, estado: str, quem: str = "dono") -> None:
@@ -151,9 +184,11 @@ def mudar_handover(cfg, hid: str, estado: str, quem: str = "dono") -> None:
         raise ValueError("estado inválido")
     tb = Trabalho(cfg)
     with tb.tx() as c:
-        if not c.execute("SELECT 1 FROM handovers WHERE id=?", (hid,)).fetchone():
+        h = c.execute("SELECT estado FROM handovers WHERE id=?", (hid,)).fetchone()
+        if not h:
             raise ValueError("handover não existe")
         c.execute("UPDATE handovers SET estado=?, atualizado_em=? WHERE id=?", (estado, _agora(), hid))
+        evento_handover(c, hid, "estado", h["estado"], estado, quem, "mudança manual")
     tb.lembrar("handover", hid, f"{quem} marcou {hid} como {estado}", quem)
 
 
@@ -172,6 +207,8 @@ def handovers(cfg, andar: int | None = None, abertos: bool = False, limite: int 
                 if causa != CAUSA_DESCONHECIDA:
                     c.execute("UPDATE handovers SET andar=?, area=?, responsavel=?, causa=?, regra=?, como_verificar=? WHERE id=?",
                               (andar, organizacao.NOME_ANDAR.get(andar, ""), resp, causa, regra, verificar, h["id"]))
+                    evento_handover(c, h["id"], "reclassificado", h["responsavel"], resp, "robo",
+                                    f"causa: {causa}; regra: {regra}")
                     h.update(andar=andar, area=organizacao.NOME_ANDAR.get(andar, ""), responsavel=resp, causa=causa,
                              regra=regra, como_verificar=verificar)
     gente = organizacao.por_id(cfg)
@@ -439,6 +476,15 @@ TABELAS_PG = {
                        "traceback_primeiro", "traceback_ultimo", "handover_id", "estado"]),
 }
 CHAVE_PG = {"licoes_funcionario": ["licao_id", "funcionario"]}
+# tabelas só de inclusão: no PostgreSQL a linha já copiada NUNCA é sobrescrita (adulterar o SQLite não "conserta" a cópia)
+IMUTAVEIS_PG = {"experiencias", "registro_conhecimento"}
+# demais registros copiados com as colunas do próprio SQLite (tipos simples); o que não existir ainda é pulado
+ESPELHO_EXTRA = {
+    "boas_praticas": "atualiza", "memoria": "imutavel", "handover_eventos": "imutavel", "reunioes": "atualiza",
+    "laboratorio_exercicios": "imutavel", "interacoes": "imutavel", "rotinas_execucoes": "imutavel",
+    "propostas_regra": "atualiza", "regras_aprendidas": "atualiza", "uso_ferramentas": "imutavel",
+    "sala_eventos": "imutavel", "salas_encerradas": "imutavel", "licoes_uso": "imutavel", "auditorias": "imutavel",
+}
 
 
 def sincronizar_postgres(cfg) -> dict:
@@ -470,10 +516,48 @@ def sincronizar_postgres(cfg) -> dict:
                 comando = sql.SQL("INSERT INTO {} ({}) VALUES ({}) ON CONFLICT ({}) DO UPDATE SET {}").format(
                     tabela, sql.SQL(", ").join(map(sql.Identifier, cols)), sql.SQL(", ").join(sql.Placeholder() * len(cols)),
                     sql.SQL(", ").join(map(sql.Identifier, chave)), atualizar)
+                if nome in IMUTAVEIS_PG:
+                    comando = sql.SQL("INSERT INTO {} ({}) VALUES ({}) ON CONFLICT ({}) DO NOTHING").format(
+                        tabela, sql.SQL(", ").join(map(sql.Identifier, cols)), sql.SQL(", ").join(sql.Placeholder() * len(cols)),
+                        sql.SQL(", ").join(map(sql.Identifier, chave)))
                 with conn.cursor() as cur:
                     cur.executemany(comando, linhas)
                 copiados[nome] = len(linhas)
+            copiados.update(_espelhar_extras(conn, sql, schema, tb))
     return {"ok": True, "schema": schema, **copiados}
+
+
+def _espelhar_extras(conn, sql, schema: str, tb: Trabalho) -> dict:
+    """Copia as demais tabelas de registro com as colunas que elas têm no SQLite."""
+    tipos = {"INTEGER": "BIGINT", "REAL": "DOUBLE PRECISION"}
+    feitos = {}
+    with tb.tx() as c:
+        existentes = {r[0] for r in c.execute("SELECT name FROM sqlite_master WHERE type='table'")}
+        dados = {}
+        for nome in ESPELHO_EXTRA:
+            if nome not in existentes:
+                continue
+            info = [(r[1], (r[2] or "TEXT").split()[0].upper(), r[5]) for r in c.execute(f"PRAGMA table_info({nome})")]
+            dados[nome] = (info, [tuple(r) for r in c.execute(f"SELECT {', '.join(i[0] for i in info)} FROM {nome}")])
+    for nome, (info, linhas) in dados.items():
+        cols = [i[0] for i in info]
+        pk = [i[0] for i in info if i[2]] or [cols[0]]
+        tabela = sql.Identifier(schema, f"memoria_{nome}")
+        ddl = sql.SQL(", ").join(sql.SQL("{} " + tipos.get(t, "TEXT")).format(sql.Identifier(n)) for n, t, _ in info)
+        conn.execute(sql.SQL("CREATE TABLE IF NOT EXISTS {} ({}, PRIMARY KEY ({}))").format(
+            tabela, ddl, sql.SQL(", ").join(map(sql.Identifier, pk))))
+        if ESPELHO_EXTRA[nome] == "imutavel" or not [x for x in cols if x not in pk]:
+            fim = sql.SQL("DO NOTHING")
+        else:
+            fim = sql.SQL("DO UPDATE SET ") + sql.SQL(", ").join(
+                sql.SQL("{0} = EXCLUDED.{0}").format(sql.Identifier(x)) for x in cols if x not in pk)
+        comando = sql.SQL("INSERT INTO {} ({}) VALUES ({}) ON CONFLICT ({}) ").format(
+            tabela, sql.SQL(", ").join(map(sql.Identifier, cols)), sql.SQL(", ").join(sql.Placeholder() * len(cols)),
+            sql.SQL(", ").join(map(sql.Identifier, pk))) + fim
+        with conn.cursor() as cur:
+            cur.executemany(comando, linhas)
+        feitos[nome] = len(linhas)
+    return feitos
 
 
 # --------------------------------------------------------------------------- PDCA contínuo
@@ -505,20 +589,46 @@ def checar_pdca(cfg, agora: datetime | None = None) -> dict:
         sucesso_depois = [x for x in hist if x.get("status") == "sucesso" and _base(x.get("arquivo", "")) == base
                           and str(x.get("data_hora", "")).replace(" ", "T") > desde] if base else []
         prazo = datetime.fromisoformat(desde) + timedelta(days=DIAS_SEM_VOLTAR) <= agora
-        if not (sucesso_depois or prazo):
-            continue
-        evidencia = (f"{len(sucesso_depois)} carga(s) de {base} aprovada(s) depois da correção, sem o erro"
-                     if sucesso_depois else f"{DIAS_SEM_VOLTAR} dias sem o erro voltar")
+        if base:
+            # erro de uma base: só uma carga aprovada DEPOIS da correção prova que não volta (tempo sozinho não prova:
+            # a base pode simplesmente não ter chegado de novo)
+            if not sucesso_depois:
+                continue
+            evidencia = f"{len(sucesso_depois)} carga(s) de {base} aprovada(s) depois da correção, sem o erro"
+        else:
+            # erro sem base (laboratório, rotinas, sistema): prazo + os detectores rodaram no período sem o erro voltar
+            if not prazo:
+                continue
+            rodadas = _execucoes_desde(tb, desde)
+            if not rodadas:
+                continue
+            evidencia = f"{DIAS_SEM_VOLTAR} dias sem o erro voltar, com {rodadas} execução(ões) de laboratório/rotinas no período"
         with tb.tx() as c:
             c.execute("UPDATE handovers SET estado='verificado', atualizado_em=? WHERE id=?", (_agora(), h["id"]))
-            c.execute("INSERT OR IGNORE INTO boas_praticas (id, handover_id, andar, area, responsavel, problema, pratica, "
-                      "como_verificar, evidencia, criada_em) VALUES (?,?,?,?,?,?,?,?,?,?)",
+            evento_handover(c, h["id"], "estado", "aplicado", "verificado", "pdca", evidencia)
+            c.execute("INSERT INTO boas_praticas (id, handover_id, andar, area, responsavel, problema, pratica, como_verificar, "
+                      "evidencia, criada_em, valida) VALUES (?,?,?,?,?,?,?,?,?,?,1) ON CONFLICT(id) DO UPDATE SET "
+                      "valida=1, evidencia=excluded.evidencia, invalidada_em=NULL, motivo_invalidacao=NULL",
                       (h["id"].replace("HO-", "BP-"), h["id"], h["andar"], h["area"], h["responsavel"], h["erro"],
                        h["regra"], h["como_verificar"], evidencia, _agora()))
         experiencia(cfg, h["responsavel"], "aprendizado", f"Boa prática padronizada: {h['regra'][:150]}", "pdca", h["id"],
                     evidencia, tb)
         verificados.append(h["id"])
     return {"verificados": verificados}
+
+
+def _execucoes_desde(tb: Trabalho, desde: str) -> int:
+    with tb.tx() as c:
+        n = 0
+        for tabela, coluna in (("laboratorio_exercicios", "data_hora"), ("rotinas_execucoes", "inicio")):
+            if c.execute("SELECT 1 FROM sqlite_master WHERE type='table' AND name=?", (tabela,)).fetchone():
+                n += c.execute(f"SELECT COUNT(*) FROM {tabela} WHERE {coluna} > ?", (desde,)).fetchone()[0]
+        return n
+
+
+def historico_handover(cfg, hid: str) -> list[dict]:
+    with Trabalho(cfg).tx() as c:
+        return [dict(r) for r in c.execute("SELECT * FROM handover_eventos WHERE handover_id=? ORDER BY id", (hid,))]
 
 
 def boas_praticas(cfg, andar: int | None = None, limite: int = 200) -> list[dict]:

@@ -39,8 +39,10 @@ def estudar(cfg, anunciar: bool = True) -> dict:
         try:
             agente = p.get("_agente") or {"id": pid, "habilidades": []}
             prova = rh.ficha(agente)["provas"]
-        except Exception as e:
-            prova = {"aprovado": False, "acertos": 0, "total": 0, "bloqueios": [f"prova não rodou: {type(e).__name__}: {e}"]}
+        except Exception as e:  # falha do CÓDIGO da prova: erro de sistema (TI), não erro da pessoa
+            import logging
+            logging.getLogger("robo").exception("Prova de %s não rodou", pid)
+            prova = {"aprovado": None, "acertos": 0, "total": 0, "bloqueios": [f"prova não rodou: {type(e).__name__}: {e}"]}
         meus_erros = [e for e in memoria.experiencias(cfg, pid, desde=semana, limite=200) if e["tipo"] == "erro"]
         abertos = memoria.handovers(cfg, andar, abertos=True, limite=10)
         praticas = [b for b in memoria.boas_praticas(cfg, andar, 20) if b["criada_em"] >= semana]
@@ -52,7 +54,13 @@ def estudar(cfg, anunciar: bool = True) -> dict:
                             + [f"Handover {h['id']}: {h['regra']}" for h in abertos[:5]]
                             + [f"Boa prática {b['id']}: {b['pratica']}" for b in praticas[:5]])
         memoria.experiencia(cfg, pid, "treinamento", "Rodada de estudo: " + "; ".join(conteudo), "estudo", "", detalhe, tb)
-        if not prova["aprovado"]:
+        # a MESMA reprovação de sempre não vira erro novo a cada rodada: só conta quando o resultado muda
+        impressao = "ok" if prova["aprovado"] else "; ".join(sorted(prova.get("bloqueios") or []))[:500]
+        anterior = tb.memorias("prova_estado", pid, limite=1)
+        mudou = not anterior or anterior[0]["texto"] != impressao
+        if mudou:
+            tb.lembrar("prova_estado", pid, impressao, "desenvolvimento")
+        if prova["aprovado"] is False and mudou:
             memoria.experiencia(cfg, pid, "erro", "Reprovado na prova da rodada de estudo", "estudo", "",
                                 "; ".join(prova.get("bloqueios") or []), tb)
             for b in (prova.get("bloqueios") or [])[:3]:
@@ -68,7 +76,7 @@ def estudar(cfg, anunciar: bool = True) -> dict:
     # caderno de lições: todo aprendizado vira lição, cada pessoa estuda, é testada e comprova na prática
     from robo import licoes
     rodada_licoes = licoes.rodada(cfg)
-    aprovados = sum(r["prova_ok"] for r in resultado)
+    aprovados = sum(bool(r["prova_ok"]) for r in resultado)
     tb.lembrar("estudo_rodada", datetime.now().strftime("%Y-%m-%d"),
                f"{len(resultado)} funcionário(s) estudaram; {aprovados} aprovados na prova", "desenvolvimento")
     if anunciar:

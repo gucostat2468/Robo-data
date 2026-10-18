@@ -124,10 +124,24 @@ def teste_pdca_checa_sozinho_e_vira_boa_pratica(planilha_baguncada, cfg, cfg_fac
     assert memoria.FASE_PDCA[h["estado"]] == "P"
     memoria.mudar_handover(cfg, h["id"], "aplicado")
     assert memoria.checar_pdca(cfg)["verificados"] == []  # ainda sem prova de que não voltou
-    assert memoria.checar_pdca(cfg, agora=datetime.now() + timedelta(days=8))["verificados"] == [h["id"]]
+    # auditoria: só o tempo passando NÃO prova nada para erro de uma base (ela pode não ter chegado de novo)
+    assert memoria.checar_pdca(cfg, agora=datetime.now() + timedelta(days=8))["verificados"] == []
+    # a base volta corrigida e passa: agora há prova
+    import shutil
+    from conftest import REGRA_NPS
+    reprovado = next(cfg.erros.glob("*nps_outubro.xlsx"))
+    shutil.copy(reprovado, cfg.entrada / "nps_outubro.xlsx")
+    ok = processar_arquivo(cfg.entrada / "nps_outubro.xlsx", cfg_factory(regras=[REGRA_NPS]))
+    assert ok.status == "sucesso"
+    assert memoria.checar_pdca(cfg)["verificados"] == [h["id"]]
     bp = memoria.boas_praticas(cfg)
-    assert bp and bp[0]["handover_id"] == h["id"] and "dias sem o erro" in bp[0]["evidencia"]
+    assert bp and bp[0]["handover_id"] == h["id"] and "aprovada(s) depois da correção" in bp[0]["evidencia"]
     assert memoria.resumo_pdca(cfg)["agir"] == 1
+    assert [e["para"] for e in memoria.historico_handover(cfg, h["id"])] == ["aberto", "aplicado", "verificado"]
+    # o erro volta: reabre, a boa prática perde a validade e o histórico guarda tudo
+    memoria.handover(cfg, h["erro"].split("] ", 1)[1], "nps_outubro", "validacao", "voltou")
+    assert memoria.boas_praticas(cfg)[0]["valida"] == 0
+    assert memoria.historico_handover(cfg, h["id"])[-1]["para"] == "reaberto"
 
 
 def teste_rodada_de_estudo_de_todos(cfg):

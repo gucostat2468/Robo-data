@@ -208,6 +208,16 @@ def teste_memoria_dos_funcionarios_vai_para_o_postgres(planilha_baguncada, cfg_f
     assert _q(banco_cfg, "SELECT count(*) FROM robo.memoria_registro_conhecimento")[0][0] == s["registro_conhecimento"]
     ultimo = _q(banco_cfg, "SELECT hash FROM robo.memoria_registro_conhecimento ORDER BY id DESC LIMIT 1")[0][0]
     assert ultimo == licoes.verificar_integridade(cfg)["ultimo_hash"]
+    # histórico de cada erro e uso das ferramentas também vão para o banco
+    assert s["handover_eventos"] > 0 and _q(banco_cfg, "SELECT count(*) FROM robo.memoria_handover_eventos")[0][0] == s["handover_eventos"]
+    # registro imutável: adulterar o SQLite não sobrescreve a cópia do PostgreSQL
+    import sqlite3
+    c = sqlite3.connect(cfg.logs / "trabalho.db")
+    c.execute("UPDATE experiencias SET resumo='ADULTERADO' WHERE id=1")
+    c.commit()
+    c.close()
+    memoria.sincronizar_postgres(cfg)
+    assert _q(banco_cfg, "SELECT resumo FROM robo.memoria_experiencias WHERE id=1")[0][0] != "ADULTERADO"
 
 
 def teste_calculo_conferido_no_postgres_e_modo_manual(planilha_baguncada, cfg_factory, banco_cfg):

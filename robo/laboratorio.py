@@ -179,7 +179,10 @@ def _iguais(a: dict, b: dict, tol: float = 1e-6) -> list[str]:
     return erros
 
 
-def exercicio(cfg, area: str | None = None, semente: int | None = None) -> dict:
+def exercicio(cfg, area: str | None = None, semente: int | None = None, gravar: bool = True,
+              biblioteca: str | None = None) -> dict:
+    """Um treino com resposta conhecida. gravar=False = reconferência (caderno de lições): refaz o MESMO caso e a
+    MESMA biblioteca sem gravar nada (sem treino novo, sem acerto/erro, sem handover, sem pedido de ajuda)."""
     from robo import bibliotecas, calculos, ciencia, memoria
     from robo.pipeline import processar_arquivo
     tb = _tb(cfg)
@@ -218,9 +221,10 @@ def exercicio(cfg, area: str | None = None, semente: int | None = None) -> dict:
             soma_ok = ok_tipo and math.isclose(float(pd.to_numeric(df[met]).sum()), float(certo[met].sum()), rel_tol=1e-9, abs_tol=1e-6)
             registrar("Limpar: tirar Total e duplicata, converter R$ e números", "limpeza", ok_linhas and soma_ok,
                       f"{len(df)} linhas (esperado {caso['n']}); {met} numérica: {ok_tipo}; soma confere: {soma_ok}", t0)
-        with tb.tx() as c:
-            c.execute("INSERT INTO laboratorio_medidas (data_hora, area, linhas, segundos) VALUES (?,?,?,?)",
-                      (_agora(), area, caso["n"], round(seg_pipeline, 3)))
+        if gravar:
+            with tb.tx() as c:
+                c.execute("INSERT INTO laboratorio_medidas (data_hora, area, linhas, segundos) VALUES (?,?,?,?)",
+                          (_agora(), area, caso["n"], round(seg_pipeline, 3)))
         for a in avisos:
             esp = bibliotecas.especialista_do_aviso(a)
             resultados.append({"etapa": "Código do robô sem aviso de depreciação", "responsavel": esp, "ok": False,
@@ -270,13 +274,19 @@ def exercicio(cfg, area: str | None = None, semente: int | None = None) -> dict:
                 registrar("Mesma conta no PostgreSQL (schema laboratorio)", "dba", False, f"{type(e).__name__}: {e}", t0)
         # ---- 5. guilda Python: uma biblioteca por rodada
         t0 = time.perf_counter()
-        nome_lib = list(bibliotecas.BIBLIOTECAS)[feitos % len(bibliotecas.BIBLIOTECAS)]
+        nome_lib = biblioteca if biblioteca in bibliotecas.BIBLIOTECAS else \
+            list(bibliotecas.BIBLIOTECAS)[feitos % len(bibliotecas.BIBLIOTECAS)]
         rev = bibliotecas.revisar(nome_lib)
         registrar(f"Revisão da biblioteca {nome_lib} {rev['versao']}", rev["especialista"], rev["ok"],
                   "tudo como o robô espera" if rev["ok"] else "; ".join(rev["falhas"]), t0)
     finally:
         shutil.rmtree(pasta, ignore_errors=True)
 
+    falhas = [x for x in resultados if not x["ok"]]
+    if not gravar:
+        return {"rodada": rodada, "area": area, "semente": semente, "linhas": caso["n"], "etapas": len(resultados),
+                "acertos": len(resultados) - len(falhas), "falhas": [f"{x['etapa']}: {x['detalhe'][:120]}" for x in falhas],
+                "resultados": resultados}
     # ---- memória, handovers e pedidos de ajuda
     from robo import interacoes
     with tb.tx() as c:
@@ -291,7 +301,6 @@ def exercicio(cfg, area: str | None = None, semente: int | None = None) -> dict:
             hid = memoria.handover(cfg, f"Laboratório: {x['etapa']} falhou — {x['detalhe'][:200]}", f"lab_{area}", x["responsavel"],
                                    f"semente {semente}", tb)
             interacoes.pedir_ajuda(cfg, x["responsavel"], f"{x['etapa']}: {x['detalhe'][:160]}", hid)
-    falhas = [x for x in resultados if not x["ok"]]
     return {"rodada": rodada, "area": area, "semente": semente, "linhas": caso["n"], "etapas": len(resultados),
             "acertos": len(resultados) - len(falhas), "falhas": [f"{x['etapa']}: {x['detalhe'][:120]}" for x in falhas]}
 
