@@ -94,6 +94,10 @@ regras: []
 #       uf: maiusculo
 #     valores_permitidos:
 #       uf: [AC, AL, AP, AM, BA, CE, DF, ES, GO, MA, MT, MS, MG, PA, PB, PR, PE, PI, RJ, RN, RS, RO, RR, SC, SP, SE, TO]
+#     mapear_valores:                # corrige antes de validar (sem acento/maiúscula/pontuação); conta no relatório
+#       uf: {"Sp.": SP, "Sao Paulo": SP}
+#     sinonimos:                     # a mesma coluna com outro nome em cada arquivo
+#       nota_nps: [nota_recomendacao, nota_nps_professor]
 #     destino:                       # opcional: como carregar no PostgreSQL
 #       tabela: nps                  # nome da tabela (padrão: nome do arquivo)
 #       modo: mesclar                # por_arquivo | substituir | mesclar | anexar

@@ -1186,6 +1186,14 @@ class Api:
         except ValueError as e:
             raise ErroApi(str(e))
 
+    def aprendizado_desativar(self, b) -> dict:
+        """Só o dono desativa uma regra aprendida (com motivo). Não apaga: o registro fica."""
+        from robo import aprendizado
+        try:
+            return aprendizado.desativar(self.cfg, str(b.get("id") or ""), "dono", str(b.get("motivo") or ""))
+        except ValueError as e:
+            raise ErroApi(str(e))
+
     def erros_sistema(self, _q) -> dict:
         from robo import erros
         return {"erros": erros.listar(self.cfg)}
@@ -1232,7 +1240,7 @@ ROTAS_POST = {
     "/api/memoria/exportar": Api.memoria_exportar, "/api/memoria/sincronizar": Api.memoria_sincronizar,
     "/api/conhecimento/rodar": Api.conhecimento_rodar, "/api/conhecimento/criar": Api.conhecimento_criar,
     "/api/conhecimento/versao": Api.conhecimento_versao, "/api/conhecimento/arquivar": Api.conhecimento_arquivar,
-    "/api/erros/resolver": Api.erros_resolver, "/api/aprendizado/decidir": Api.aprendizado_decidir,
+    "/api/erros/resolver": Api.erros_resolver, "/api/aprendizado/decidir": Api.aprendizado_decidir, "/api/aprendizado/desativar": Api.aprendizado_desativar,
 }
 ROTAS_UPLOAD = {"/api/testar": Api.testar, "/api/enviar": Api.enviar, "/api/conversa/anexar": Api.anexar}
 

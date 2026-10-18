@@ -546,6 +546,9 @@ def _espelhar_extras(conn, sql, schema: str, tb: Trabalho) -> dict:
         ddl = sql.SQL(", ").join(sql.SQL("{} " + tipos.get(t, "TEXT")).format(sql.Identifier(n)) for n, t, _ in info)
         conn.execute(sql.SQL("CREATE TABLE IF NOT EXISTS {} ({}, PRIMARY KEY ({}))").format(
             tabela, ddl, sql.SQL(", ").join(map(sql.Identifier, pk))))
+        for n, t, _ in info:  # tabela criada por uma versão anterior: acompanha as colunas novas (senão a cópia falha)
+            conn.execute(sql.SQL("ALTER TABLE {} ADD COLUMN IF NOT EXISTS {} " + tipos.get(t, "TEXT")).format(
+                tabela, sql.Identifier(n)))
         if ESPELHO_EXTRA[nome] == "imutavel" or not [x for x in cols if x not in pk]:
             fim = sql.SQL("DO NOTHING")
         else:

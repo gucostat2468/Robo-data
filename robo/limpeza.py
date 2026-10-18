@@ -382,6 +382,21 @@ def limpar_tabela(df: pd.DataFrame, tabela: str, cfg: dict, regra: dict, rel: Re
     if contagem_nulos:
         rel.info("Marcadores de vazio (-, N/A, null...) convertidos para vazio", tabela=tabela, quantidade=contagem_nulos)
 
+    # 4b. correção de valores (regra 'mapear_valores' do config.yaml ou aprendida e aprovada pelo dono):
+    # 'Sp.' → 'SP'. Compara sem acento, sem maiúscula e sem pontuação; cada troca é contada no relatório.
+    for col, pares in (regra.get("mapear_valores") or {}).items():
+        col = normalizar_nome_coluna(col)
+        if col not in df.columns or not pares:
+            continue
+        chave = lambda v: re.sub(r"[^a-z0-9]+", " ", sem_acento(str(v)).lower()).strip()
+        mapa = {chave(de): para for de, para in pares.items() if chave(de)}
+        trocar = df[col].map(lambda v: isinstance(v, str) and chave(v) in mapa and v != mapa[chave(v)])
+        if trocar.any():
+            exemplos = [f"linha {i}: '{df.at[i, col]}' → '{mapa[chave(df.at[i, col])]}'" for i in df.index[trocar][:5]]
+            df.loc[trocar, col] = df.loc[trocar, col].map(lambda v: mapa[chave(v)])
+            rel.info("Valores corrigidos pela regra (mapear_valores)", tabela=tabela, coluna=col,
+                     quantidade=int(trocar.sum()), exemplos=exemplos)
+
     # 5. linhas e colunas vazias
     colunas_vazias = [c for c in df.columns if df[c].isna().all()]
     if colunas_vazias:

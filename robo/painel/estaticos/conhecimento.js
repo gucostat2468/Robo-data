@@ -20,12 +20,15 @@ function secaoAprendizado() {
   const a = E.aprendizado; if (!a) return "";
   const itens = a.propostas.map((p) => { const [t, c] = ESTADO_PROPOSTA[p.estado] || [p.estado, ""];
     return `<div class="ocorrencia ${p.estado === "pendente" ? "aviso" : p.estado === "nao_resolveu" ? "erro" : ""}"><div class="principal">
-      <strong>${esc(p.tipo_nome)}: ${esc(p.coluna)} ← “${esc(p.valor)}”</strong> <span class="etiqueta ${c}">${esc(t)}</span>
+      <strong>${esc(p.tipo_nome)}: ${esc(p.coluna)} ${p.tipo === "mapeamento" ? `“${esc(p.valor)}” → “${esc(p.para)}”` : `← “${esc(p.valor)}”`}</strong>
+      <span class="etiqueta ${c}">${esc(t)}</span>${p.ativa === 0 ? ` <span class="etiqueta">Desativada</span>` : ""}
       <span class="muted">· regra ${esc(p.padrao)} · proposta de ${esc(p.autor_nome)} · ${esc(dataT(p.criada_em))}</span>
       <div>${esc(p.motivo)}</div><div class="muted" style="font-size:12px">Evidência: ${esc(p.evidencia)}</div>
       ${p.alerta ? `<div class="etiqueta perigo" style="margin-top:4px">${esc(p.alerta)}</div>` : ""}
       ${p.prova ? `<div class="muted" style="font-size:12px">Prova: ${esc(p.prova)}</div>` : ""}
       ${p.motivo_decisao ? `<div class="muted" style="font-size:12px">Sua decisão: ${esc(p.motivo_decisao)}</div>` : ""}
+      ${p.ativa === 0 ? `<div class="muted" style="font-size:12px">Desativada em ${esc(dataT(p.desativada_em))} por ${p.desativada_por === "sistema" ? "não ter resolvido" : "você"}: ${esc(p.motivo_desativacao)}</div>` : ""}
+      ${p.ativa === 1 ? `<div class="acoes" style="margin-top:6px"><button class="btn pequeno" data-acao="regra-desativar" data-id="${esc(p.id)}">Desativar esta regra</button></div>` : ""}
       ${p.estado === "pendente" ? `<div class="acoes" style="margin-top:6px"><button class="btn pequeno primario" data-acao="regra-aprovar" data-id="${esc(p.id)}">Aprovar (vale a partir de agora)</button>
         <button class="btn pequeno" data-acao="regra-recusar" data-id="${esc(p.id)}">Recusar</button></div>` : ""}</div></div>`; }).join("");
   const por = a.por_estado || {};
@@ -145,6 +148,13 @@ Object.assign(ACOES, {
     const motivo = prompt("Por que recusar? (o motivo vira aprendizado)");
     if (!motivo || !motivo.trim()) return;
     try { await api("/api/aprendizado/decidir", { corpo: { id: el.dataset.id, aprovar: false, motivo } }); } catch (e) { return avisar(e.message, "erro"); }
+    await carregarConhecimento(); desenhar();
+  },
+  "regra-desativar": async (el) => {
+    const motivo = prompt("Por que desativar? (a regra deixa de valer; o registro fica)");
+    if (!motivo || !motivo.trim()) return;
+    try { await api("/api/aprendizado/desativar", { corpo: { id: el.dataset.id, motivo } }); avisar("Regra desativada.", "sucesso"); }
+    catch (e) { return avisar(e.message, "erro"); }
     await carregarConhecimento(); desenhar();
   },
   "recarregar-conhecimento": async () => { await carregarConhecimento(); desenhar(); },

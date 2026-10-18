@@ -220,6 +220,21 @@ def teste_memoria_dos_funcionarios_vai_para_o_postgres(planilha_baguncada, cfg_f
     assert _q(banco_cfg, "SELECT resumo FROM robo.memoria_experiencias WHERE id=1")[0][0] != "ADULTERADO"
 
 
+def teste_espelho_acompanha_coluna_nova_em_tabela_antiga_do_postgres(planilha_baguncada, cfg_factory, banco_cfg):
+    """Banco criado por uma versão anterior (sem a coluna 'nivel' do laboratório): a cópia não pode falhar."""
+    from robo import laboratorio, memoria
+    cfg = cfg_factory([], banco=banco_cfg)
+    laboratorio.exercicio(cfg, "varejo", 9, nivel=2)
+    import psycopg
+    with psycopg.connect(host=banco_cfg["host"], port=banco_cfg["porta"], user=banco_cfg["usuario"],
+                         password=banco_cfg["senha"], dbname=banco_cfg["banco"]) as c:
+        c.execute("CREATE SCHEMA IF NOT EXISTS robo")
+        c.execute("CREATE TABLE robo.memoria_laboratorio_exercicios (id BIGINT PRIMARY KEY, rodada TEXT)")
+    s = memoria.sincronizar_postgres(cfg)
+    assert s["ok"] and s["laboratorio_exercicios"] > 0
+    assert _q(banco_cfg, "SELECT DISTINCT nivel FROM robo.memoria_laboratorio_exercicios") == [(2,)]
+
+
 def teste_calculo_conferido_no_postgres_e_modo_manual(planilha_baguncada, cfg_factory, banco_cfg):
     from robo import conferencia, ferramentas
     cfg = cfg_factory([REGRA_NPS], banco=banco_cfg)
