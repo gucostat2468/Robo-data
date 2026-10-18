@@ -67,6 +67,30 @@ def teste_falha_do_laboratorio_so_vira_aplicada_quando_o_caso_passa(cfg, monkeyp
     assert all(l["estado"] == "aplicada" and "passou" in l["evidencia"] for l in lab)
 
 
+def teste_licao_do_laboratorio_com_dois_pontos_na_etapa(cfg, monkeypatch):
+    """Etapa 'Limpar: tirar Total…' tem ':' — antes era lida como formato antigo e a rodada inteira quebrava."""
+    laboratorio.exercicio(cfg, "varejo", 5)  # cria as tabelas
+    etapa = "Limpar: tirar Total e duplicata, converter R$ e números"
+    c = _banco(cfg)
+    c.execute("INSERT INTO laboratorio_exercicios (rodada, data_hora, area, semente, etapa, responsavel, ok, detalhe, nivel) "
+              "VALUES ('LAB-x', '2026-10-18T10:00:00', 'varejo', 77, ?, 'limpeza', 0, 'falhou', 3)", (etapa,))
+    c.commit()
+    c.close()
+    chamadas = []
+    monkeypatch.setattr(laboratorio, "exercicio", lambda cfg, area, semente, **k: chamadas.append((area, semente, k["nivel"]))
+                        or {"resultados": [{"etapa": etapa, "ok": True}]})
+    licao = {"id": "L1", "origem_tipo": "laboratorio", "origem_ref": f"varejo:{etapa}:limpeza"}
+    ok, evid = licoes._evidencia_pratica(cfg, licao, "limpeza", {"lab": {}, "regressoes": 0})
+    assert ok and "passou" in evid and chamadas == [("varejo", 77, 3)]  # refez o MESMO caso, no MESMO nível
+
+
+def teste_licao_com_problema_nao_derruba_a_rodada(cfg, monkeypatch):
+    licoes.colher(cfg)
+    monkeypatch.setattr(licoes, "_evidencia_pratica", lambda *a: 1 / 0)
+    licoes.rodada(cfg)  # não levanta
+    assert any(e["modulo"] == "licoes" and "ZeroDivisionError" in e["tipo"] for e in erros.listar(cfg))
+
+
 def teste_nada_e_apagado_e_adulteracao_e_detectada(cfg):
     licoes.colher(cfg)
     c = _banco(cfg)

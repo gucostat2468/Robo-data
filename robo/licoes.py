@@ -383,11 +383,12 @@ def _evidencia_pratica(cfg, licao: dict, pid: str, ctx: dict) -> tuple[bool, str
         return False, f"handover ainda {estado or 'sem registro'}"
     if tipo == "laboratorio":
         partes = ref.split(":")
-        if len(partes) == 4:  # formato antigo: area:semente:etapa:responsavel
-            area, semente, etapa, resp = partes[0], int(partes[1]), _etapa_base(partes[2]), partes[3]
+        # o nome da etapa pode ter ':' ("Limpar: tirar Total…"): área é a 1ª parte e responsável a última
+        if len(partes) >= 4 and partes[1].isdigit():  # formato antigo: area:semente:etapa:responsavel
+            area, semente, etapa, resp = partes[0], int(partes[1]), _etapa_base(":".join(partes[2:-1])), partes[-1]
             nivel = 1
         else:
-            area, etapa, resp = partes[0], partes[1], partes[2]
+            area, etapa, resp = partes[0], ":".join(partes[1:-1]), partes[-1]
             with _tb(cfg).tx() as c:
                 ult = c.execute("SELECT semente, COALESCE(nivel, 1) nivel FROM laboratorio_exercicios WHERE ok=0 AND area=? "
                                 "AND responsavel=? AND etapa LIKE ? ORDER BY id DESC LIMIT 1", (area, resp, etapa + "%")).fetchone()
@@ -486,7 +487,14 @@ def _rodada(cfg, tb) -> dict:
             mudancas.append((lid, pid, "estudada", "avaliada", "acha a lição quando perguntado"))
             estado = "avaliada"
         if estado == "avaliada":
-            ok, evid = _evidencia_pratica(cfg, licao, pid, ctx)
+            try:
+                ok, evid = _evidencia_pratica(cfg, licao, pid, ctx)
+            except Exception as e:  # uma lição com problema não derruba a rodada de todo mundo — mas fica registrada
+                import traceback
+                from robo import erros
+                erros.registrar(cfg, "licoes", "_evidencia_pratica", type(e).__name__,
+                                f"lição {lid} ({licao['origem_tipo']}): {e}", traceback.format_exc())
+                ok = False
             if ok:
                 mudancas.append((lid, pid, "avaliada", "aplicada", evid))
     # 2) grava tudo numa transação só (ou entra a rodada inteira na cadeia, ou nada)
