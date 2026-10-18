@@ -155,3 +155,28 @@ def teste_texto_com_igual_nao_vira_formula_ativa(pastas, cfg_factory):
     assert r.status == SUCESSO
     celula = load_workbook(r.saidas[0])["dados"]["B2"]
     assert celula.data_type == "s" and celula.value.startswith("=HYPERLINK")
+
+
+def teste_dois_monitores_da_mesma_pasta_nao_processam_ao_mesmo_tempo(planilha_baguncada, cfg_factory, monkeypatch):
+    """Depois de recarregar a configuração nasce um Monitor novo; um 'Processar agora' no antigo não pode correr junto."""
+    import threading
+    import time
+    from robo import monitor as mod
+    cfg = cfg_factory([REGRA_NPS])
+    original, rodando, maximo, processados = mod.processar_arquivo, [0], [0], []
+
+    def lento(arq, cfg, **k):
+        rodando[0] += 1
+        maximo[0] = max(maximo[0], rodando[0])
+        time.sleep(0.3)
+        processados.append(arq.name)
+        try:
+            return original(arq, cfg, **k)
+        finally:
+            rodando[0] -= 1
+    monkeypatch.setattr(mod, "processar_arquivo", lento)
+    antigo, novo = Monitor(cfg), Monitor(cfg_factory([REGRA_NPS]))
+    ts = [threading.Thread(target=m.ciclo, kwargs={"forcar": True}) for m in (antigo, novo)]
+    [t.start() for t in ts]
+    [t.join() for t in ts]
+    assert maximo[0] == 1 and processados == ["nps_outubro.xlsx"]  # um de cada vez, e o arquivo uma vez só

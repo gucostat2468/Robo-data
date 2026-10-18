@@ -319,3 +319,22 @@ def teste_tarefa_sem_etapa_nao_sai_concluida_e_registro_automatico_interrompido_
     tb.mudar_estado(sid, "em_execucao", "robo")
     assert orquestrador.retomar_pendentes(cfg) == []
     assert tb.solicitacao(sid)["estado"] == "falhou"
+
+
+def teste_envios_simultaneos_com_o_mesmo_nome_nao_se_sobrescrevem(tmp_path, monkeypatch):
+    """Os dois envios passam pela checagem 'já existe?' ao mesmo tempo: só um pode entrar; o outro recebe 409."""
+    from pathlib import Path
+    from robo.painel.servidor import ErroApi
+    entrada = tmp_path / "entrada"
+    entrada.mkdir()
+    api = Api.__new__(Api)
+    monkeypatch.setattr(Path, "exists", lambda self: False)  # simula a corrida: a checagem rápida não vê o outro envio
+    primeiro, segundo = tmp_path / "a.bin", tmp_path / "b.bin"
+    primeiro.write_bytes(b"PRIMEIRO")
+    segundo.write_bytes(b"SEGUNDO")
+    api._publicar_sem_sobrescrever(primeiro, "base.xlsx", entrada)
+    with pytest.raises(ErroApi) as e:
+        api._publicar_sem_sobrescrever(segundo, "base.xlsx", entrada)
+    monkeypatch.undo()
+    assert e.value.status == 409 and (entrada / "base.xlsx").read_bytes() == b"PRIMEIRO"
+    assert [p.name for p in entrada.iterdir()] == ["base.xlsx"]  # nenhum temporário largado na fila

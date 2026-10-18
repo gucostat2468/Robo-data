@@ -90,6 +90,7 @@ regras: []
 #       nota_nps: inteiro
 #     faixas:
 #       nota_nps: {min: 0, max: 10}
+#     escala_csat: 5                 # CSAT de 1 a 5 (ou 7, 10). Sem isso o robô deduz pelo maior valor e avisa
 #     texto:
 #       uf: maiusculo
 #     valores_permitidos:

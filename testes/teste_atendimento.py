@@ -184,6 +184,24 @@ def teste_etapa_sem_ferramenta_fica_parcial_nunca_concluida(planilha_baguncada, 
     assert s["resultado"]["nao_feitas"][0]["titulo"].startswith("Gerar arquivo de slides")
 
 
+def teste_cancelar_durante_a_execucao_para_as_proximas_etapas(planilha_baguncada, cfg, monkeypatch):
+    processar_arquivo(planilha_baguncada, cfg)
+    sid = orquestrador.criar(cfg, "monte uma apresentação para a diretoria", "ger_analise", iniciar=False)
+    feitas, original = [], ferramentas.executar
+
+    def executar(nome, cfg_, **k):
+        feitas.append(nome)
+        if len(feitas) == 1:  # o dono cancela enquanto a 1ª etapa está rodando
+            orquestrador.cancelar(cfg_, sid, "mudei de ideia")
+        return original(nome, cfg_, **k)
+    monkeypatch.setattr(ferramentas, "executar", executar)
+    assert orquestrador.executar(cfg, sid) == "cancelada"
+    s = Trabalho(cfg).solicitacao(sid)
+    assert len(feitas) == 1 and s["estado"] == "cancelada"
+    assert s["etapas"][0]["estado"] == "concluida"                     # a que estava rodando termina
+    assert all(e["estado"] == "cancelada" for e in s["etapas"][1:])     # as próximas não começam
+
+
 def teste_pedido_sem_arquivo_pede_esclarecimento(cfg):
     sid = orquestrador.criar(cfg, "verifique a planilha", "validacao", iniciar=False)
     assert Trabalho(cfg).solicitacao(sid)["estado"] == "aguardando_esclarecimento"

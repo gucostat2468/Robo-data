@@ -283,6 +283,7 @@ def _inferir(serie: pd.Series, coluna: str, cfg: dict, tabela: str, rel: Relator
     if ok_num / total >= limiar:
         convertida = _como_numero(serie, decimal)
         _registrar_perdas(serie, convertida, coluna, tabela, "número", rel)
+        _avisar_formatos_misturados(textos, decimal, coluna, tabela, rel)
         if any(isinstance(v, str) and v.strip().endswith("%") for v in valores):
             rel.info("Percentuais convertidos para decimal (45% -> 0,45)", tabela=tabela, coluna=coluna)
         return convertida
@@ -296,6 +297,24 @@ def _inferir(serie: pd.Series, coluna: str, cfg: dict, tabela: str, rel: Relator
         return convertida
 
     return _como_texto(serie)
+
+
+_RE_MILHAR = {".": re.compile(r"^-?\d{1,3}(\.\d{3})+$"), ",": re.compile(r"^-?\d{1,3}(,\d{3})+$")}
+_RE_DECIMAL_CURTO = {".": re.compile(r"^-?\d+\.\d{1,2}$"), ",": re.compile(r"^-?\d+,\d{1,2}$")}
+
+
+def _avisar_formatos_misturados(textos: list, decimal: str, coluna: str, tabela: str, rel: Relatorio) -> None:
+    """'1.500' (mil e quinhentos? um e meio?) e '1.5' na MESMA coluna: um dos dois está no formato errado e um erro de
+    1000x passaria calado. O robô converte pelo formato da maioria, mas avisa com exemplos dos dois lados."""
+    for sep in (".", ","):
+        milhar = [t.strip() for t in textos if _RE_MILHAR[sep].match(t.strip())]
+        curto = [t.strip() for t in textos if _RE_DECIMAL_CURTO[sep].match(t.strip())]
+        if milhar and curto:
+            leitura = (f"'{milhar[0]}' foi lido como {numero_de(milhar[0], decimal):g}" if numero_de(milhar[0], decimal)
+                       is not None else f"'{milhar[0]}' não foi convertido")
+            rel.aviso(f"Formatos de número misturados com '{sep}': '{milhar[0]}' (parece milhar) e '{curto[0]}' (parece "
+                      f"decimal). {leitura}. Confira na origem qual é o certo", tabela=tabela, coluna=coluna,
+                      quantidade=len(milhar) + len(curto), exemplos=(milhar[:3] + curto[:3]))
 
 
 def _registrar_perdas(original, convertida, coluna, tabela, tipo, rel: Relatorio):

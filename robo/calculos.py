@@ -244,22 +244,35 @@ EXPLICA_CSAT = ("Como ler: CSAT (top-2-box) = % de quem deu as duas notas mais a
                 "sobre o total de quem respondeu.")
 
 
-def _csat_explicado(s: pd.Series) -> str:
+ESCALAS_CSAT = (5, 7, 10)
+
+
+def escala_csat(serie: pd.Series, declarada=None) -> tuple[int, str]:
+    """A escala do CSAT, decidida UMA vez para a coluna inteira (nunca por grupo: numa pesquisa de 1 a 7, um segmento
+    cuja maior nota foi 5 seria lido como 1 a 5 e teria o CSAT inflado). Prioridade: 'escala_csat' declarada na regra;
+    sem ela, deduz pelo maior valor da coluna e diz que deduziu. Usada pela calculadora, conferência, Excel e análise."""
+    if declarada is not None:
+        try:
+            return int(declarada), "declarada na regra"
+        except (TypeError, ValueError):
+            pass
+    v = pd.to_numeric(serie, errors="coerce").dropna()
+    maior = v.max() if len(v) else 5
+    escala = 5 if maior <= 5 else 7 if maior <= 7 else 10
+    return escala, (f"deduzida pelo maior valor ({_fmt(float(maior))}); declare 'escala_csat: {escala}' na regra "
+                    f"para não depender disso")
+
+
+def _csat_explicado(s: pd.Series, escala: int) -> str:
     v = pd.to_numeric(s, errors="coerce").dropna()
+    fora = int(((v < 0) | (v > escala)).sum())
+    v = v[(v >= 0) & (v <= escala)]  # nota acima da escala (ex.: 99 = 'não sabe') não conta como satisfeito
     if not len(v):
-        return "sem notas válidas"
-    escala = 5 if v.max() <= 5 else 7 if v.max() <= 7 else 10
+        return "sem notas válidas" + (f"; {fora} valor(es) fora da escala ignorado(s)" if fora else "")
     sat = int((v >= escala - 1).sum())
     return (f"CSAT {_f1(100 * sat / len(v))}% = {sat} de {len(v)} deram nota {escala - 1} ou {escala} (escala até {escala})"
+            + (f"; {fora} valor(es) fora da escala ignorado(s)" if fora else "")
             + (" ⚠ base pequena (menos de 30)" if len(v) < 30 else ""))
-
-
-def _csat(s: pd.Series) -> tuple[float, int]:
-    v = pd.to_numeric(s, errors="coerce").dropna()
-    if not len(v):
-        return float("nan"), 0
-    escala = 5 if v.max() <= 5 else 7 if v.max() <= 7 else 10
-    return 100 * (v >= escala - 1).mean(), len(v)
 
 
 def calcular(cfg, pergunta: str, fontes: dict | None = None, apelidos: bool = True) -> dict | None:
@@ -393,12 +406,18 @@ def _calcular(cfg, pergunta: str, fontes: dict | None = None) -> dict | None:
     if not len(dados):
         return {"autor": pedido["autor"], "texto": f"Nenhuma linha da base {base} atende ao filtro ({'; '.join(filtros_txt)})."}
 
-    titulo, tabela = _executar(op, dados, metricas, por)
+    escala, origem_escala = None, ""
+    if op == "csat" and metricas:  # escala da coluna INTEIRA da base (não do filtro nem do grupo)
+        declarada = cfg.regra_para(arquivo).get("escala_csat") if cfg is not None and arquivo else None
+        escala, origem_escala = escala_csat(df[metricas[0]], declarada)
+    titulo, tabela = _executar(op, dados, metricas, por, escala)
     contexto = f"Base {base} ({arquivo}), {_milhar(len(dados))} linha(s)" + (
         f", filtro: {'; '.join(filtros_txt)}" if filtros_txt else "") + "."
+    if escala:
+        tabela += f"\nEscala do CSAT: 1 a {escala} ({origem_escala})."
     return {"autor": pedido["autor"], "texto": f"{titulo} — {contexto}\n{tabela}",
             "calc": {"op": op, "metricas": metricas, "por": por, "filtros": filtros_ok, "base": base, "arquivo": arquivo,
-                     "fonte": "arquivo" if fontes else "publicada", "dados": dados}}
+                     "fonte": "arquivo" if fontes else "publicada", "dados": dados, "escala_csat": escala}}
 
 
 def _coluna_indicador(op: str, df: pd.DataFrame) -> str | None:
@@ -428,7 +447,7 @@ def _tipo(s: pd.Series) -> str:
     return "texto"
 
 
-def _executar(op: str, df: pd.DataFrame, metricas: list[str], por: list[str]) -> tuple[str, str]:
+def _executar(op: str, df: pd.DataFrame, metricas: list[str], por: list[str], escala: int | None = None) -> tuple[str, str]:
     col = metricas[0] if metricas else None
     linhas: list[str] = []
     if op == "correlacao":
@@ -445,7 +464,7 @@ def _executar(op: str, df: pd.DataFrame, metricas: list[str], por: list[str]) ->
         if op == "nps":
             return _nps_explicado(sub[col])
         if op == "csat":
-            return _csat_explicado(sub[col])
+            return _csat_explicado(sub[col], escala or escala_csat(df[col])[0])
         if op == "contagem":
             return f"{len(sub):,}".replace(",", ".")
         if op == "distintos":

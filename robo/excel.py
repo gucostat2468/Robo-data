@@ -241,7 +241,8 @@ class Entrega:
         if "csat" in self.indicadores:
             col = self.indicadores["csat"]
             notas = self.df[col].dropna().astype(float)
-            escala = 5 if notas.max() <= 5 else 7 if notas.max() <= 7 else 10
+            from robo.calculos import escala_csat
+            escala = escala_csat(notas, self.c.get("escala_csat"))[0]
             corte = escala - 1
             n, sat = len(notas), int((notas >= corte).sum())
             faixa = self._faixa(col)
@@ -378,7 +379,7 @@ class Entrega:
 
 def gerar_entrega(tabelas: dict, arquivo: str, base: str, cfg, papeis: dict | None, indicadores: dict | None, ao_etapa=None) -> dict | None:
     """Ponto de entrada usado pelo pipeline. Nunca levanta exceção: falha vira log."""
-    c = {**PADRAO_EXCEL, **(cfg.dados.get("excel") or {})}
+    c = {**PADRAO_EXCEL, **(cfg.dados.get("excel") or {}), "escala_csat": cfg.regra_para(arquivo).get("escala_csat")}
     if not c.get("habilitado", True) or not tabelas:
         return None
     nome, df = next(iter(tabelas.items()))

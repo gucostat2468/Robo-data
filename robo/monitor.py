@@ -46,6 +46,18 @@ def pode_abrir(caminho: Path) -> bool:
         return False
 
 
+# Uma trava por PASTA de entrada, compartilhada por todos os monitores do processo: depois de recarregar a configuração
+# nasce um Monitor novo, e um "Processar agora" ainda rodando no antigo não pode processar a mesma pasta ao mesmo tempo.
+_TRAVAS_POR_PASTA: dict[str, threading.Lock] = {}
+_TRAVA_DAS_TRAVAS = threading.Lock()
+
+
+def _trava_da_pasta(pasta: Path) -> threading.Lock:
+    chave = os.path.normcase(str(Path(pasta).resolve()))
+    with _TRAVA_DAS_TRAVAS:
+        return _TRAVAS_POR_PASTA.setdefault(chave, threading.Lock())
+
+
 class Monitor:
     def __init__(self, cfg: Config, ao_processar=None, ao_etapa=None):
         self.cfg = cfg
@@ -54,7 +66,7 @@ class Monitor:
         # caminho -> (tamanho, modificação, momento em que essa assinatura foi vista pela 1ª vez)
         self._vistos: dict[Path, tuple[int, float, float]] = {}
         self._ultima_manutencao: date | None = None
-        self._trava = threading.Lock()
+        self._trava = _trava_da_pasta(cfg.entrada)
         self.ao_processar = ao_processar      # função chamada com cada Resultado (painel/notificações)
         self.ao_etapa = ao_etapa              # função chamada a cada etapa (escritório 3D)
         self.processando: str | None = None

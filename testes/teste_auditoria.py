@@ -118,3 +118,42 @@ def teste_segmentacao_nao_estoura_memoria():
     pico = tracemalloc.get_traced_memory()[1]
     tracemalloc.stop()
     assert pico < 200e6
+
+
+def teste_coluna_com_milhar_e_decimal_misturados_gera_aviso():
+    from robo.config import PADROES
+    from robo.limpeza import limpar_tabela
+    from robo.relatorio import Relatorio
+    df = pd.DataFrame({"valor": ["1.500", "1.5", "2.25", "3.10", "4.75", "5.5", "6.2", "7.8", "8.9", "9.1"] * 2})
+    df.index = range(2, 2 + len(df))
+    rel = Relatorio("t.xlsx")
+    limpar_tabela(df, "dados", PADROES["limpeza"], {}, rel)
+    aviso = [o for o in rel.ocorrencias if o.mensagem.startswith("Formatos de número misturados")]
+    assert aviso and "1.500" in aviso[0].exemplos and "1.5" in aviso[0].exemplos and "lido como 1.5" in aviso[0].mensagem
+    # coluna só com milhar brasileiro: nenhum aviso falso
+    rel2 = Relatorio("t.xlsx")
+    df2 = pd.DataFrame({"valor": ["1.500", "2.300", "10.000", "350"]}, index=range(2, 6))
+    limpar_tabela(df2, "dados", PADROES["limpeza"], {}, rel2)
+    assert not [o for o in rel2.ocorrencias if o.mensagem.startswith("Formatos de número misturados")]
+
+
+def teste_csat_usa_a_mesma_escala_em_todos_os_grupos():
+    """Pesquisa de 1 a 7: o grupo B só tem notas até 5. Antes, B era lido como escala 1–5 (corte 4) e saía com CSAT
+    inflado; com a escala da coluna inteira (1 a 7, corte 6), B tem 0% de satisfeitos."""
+    df = pd.DataFrame({"csat": [7, 6, 7, 2, 6] * 4 + [5, 4, 5, 4, 3] * 4, "grupo": ["A"] * 20 + ["B"] * 20})
+    t = calculos.calcular(None, "csat por grupo", fontes={"b": (df, "b.xlsx")})["texto"]
+    assert "B: CSAT 0,0% = 0 de 20 deram nota 6 ou 7" in t and "Escala do CSAT: 1 a 7 (deduzida" in t
+    from robo.analise import Analise
+    a = Analise(df, "t", "b.xlsx", "b", {}, [], {"csat": "csat"}, ["grupo"])
+    a.fazer_indicadores()
+    linhas = {l["segmento"]: l for l in a.indicadores.to_dict("records")}
+    assert linhas["B"]["valor"] == 0 and linhas["B"]["escala"] == "1 a 7"
+
+
+def teste_escala_do_csat_declarada_na_regra(cfg):
+    """Escala 1 a 10 declarada; ninguém deu mais de 5: deduzindo, o robô usaria 1 a 5 e diria 'satisfeito' para nota 4."""
+    df = pd.DataFrame({"csat": [5, 4, 4, 3, 5, 2, 4, 5, 99, 1] * 3})
+    cfg.regra_para = lambda nome: {"padrao": "b*", "escala_csat": 10}
+    t = calculos.calcular(cfg, "csat", fontes={"b": (df, "b.xlsx")}, apelidos=False)["texto"]
+    assert "CSAT 0,0% = 0 de 27 deram nota 9 ou 10" in t and "3 valor(es) fora da escala" in t
+    assert "Escala do CSAT: 1 a 10 (declarada na regra)" in t

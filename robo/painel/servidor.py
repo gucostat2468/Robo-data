@@ -17,6 +17,7 @@ import threading
 import time
 import urllib.parse
 import urllib.request
+import uuid
 from datetime import date, datetime
 from decimal import Decimal
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
@@ -775,6 +776,31 @@ class Api:
         shutil.move(str(corpo), str(alvo))
         return alvo
 
+    def _publicar_sem_sobrescrever(self, corpo: Path, nome: str, destino: Path) -> Path:
+        """Coloca o arquivo na fila sem nunca sobrescrever outro com o mesmo nome, nem com dois envios ao mesmo tempo.
+        Copia para um nome que o monitor ignora (~robo_tmp_…) e publica com os.link, que é atômico e FALHA se o nome
+        já existir (no Windows, os.rename também falha nesse caso)."""
+        nome = Path(nome).name
+        if Path(nome).suffix.lower() not in EXTENSOES_SUPORTADAS:
+            raise ErroApi(f"Formato não suportado. Envie {', '.join(sorted(EXTENSOES_SUPORTADAS))}.", 415)
+        alvo = destino / nome
+        temp = destino / f"~robo_tmp_{uuid.uuid4().hex}_{nome}"
+        shutil.move(str(corpo), str(temp))
+        try:
+            try:
+                os.link(temp, alvo)
+                temp.unlink()
+            except FileExistsError:
+                raise
+            except OSError:  # sistema de arquivos sem link: no Windows, rename não sobrescreve
+                if os.name != "nt" and alvo.exists():
+                    raise FileExistsError(alvo)
+                os.rename(temp, alvo)
+        except FileExistsError:
+            temp.unlink(missing_ok=True)
+            raise ErroApi(f"Já existe '{nome}' aguardando em Bases-Limpeza.", 409)
+        return alvo
+
     def testar(self, corpo: Path, nome: str):
         pasta = Path(tempfile.mkdtemp(prefix="robo_teste_"))
         try:
@@ -799,9 +825,9 @@ class Api:
 
     def enviar(self, corpo: Path, nome: str):
         cfg = self.cfg
-        if (cfg.entrada / Path(nome).name).exists():
+        if (cfg.entrada / Path(nome).name).exists():  # resposta rápida; a garantia de verdade é a publicação atômica
             raise ErroApi(f"Já existe '{Path(nome).name}' aguardando em Bases-Limpeza.", 409)
-        alvo = self._salvar_upload(corpo, nome, cfg.entrada)
+        alvo = self._publicar_sem_sobrescrever(corpo, nome, cfg.entrada)
         log.info("Arquivo enviado pelo painel: %s", alvo.name)
         return {"ok": True, "nome": alvo.name}
 

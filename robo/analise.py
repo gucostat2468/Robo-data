@@ -189,7 +189,8 @@ def converter_escalas(df: pd.DataFrame) -> tuple[pd.DataFrame, dict, dict]:
 
 
 # =============================================================================== indicadores
-def calcular_indicador(tipo: str, serie: pd.Series, z: float) -> dict | None:
+def calcular_indicador(tipo: str, serie: pd.Series, z: float, escala: int | None = None) -> dict | None:
+    """escala: a da coluna INTEIRA (ou da regra). Sem ela, deduz desta série — só serve para a coluna inteira."""
     v = serie.dropna().astype(float)
     n = len(v)
     if n == 0:
@@ -205,7 +206,12 @@ def calcular_indicador(tipo: str, serie: pd.Series, z: float) -> dict | None:
         return {"indicador": "NPS", "n": n, "valor": 100 * (p - d), "margem": 100 * z * math.sqrt(var / n),
                 "variancia": var, "pct_promotores": 100 * p, "pct_neutros": 100 * (1 - p - d), "pct_detratores": 100 * d,
                 "media": v.mean()}
-    escala = 5 if v.max() <= 5 else 7 if v.max() <= 7 else 10
+    if escala is None:
+        escala = 5 if v.max() <= 5 else 7 if v.max() <= 7 else 10
+    v = v[v <= escala]  # nota acima da escala (ex.: 99 = 'não sabe') não conta como satisfeito
+    n = len(v)
+    if n == 0:
+        return None
     corte = escala - 1 if tipo == "csat" else (escala - 2 if escala >= 7 else escala - 1)
     p = (v >= corte).mean()
     var = p * (1 - p)
@@ -266,12 +272,19 @@ class Analise:
             linhas.append(item)
         self.perfil = pd.DataFrame(linhas)
 
+    def _escala(self, tipo: str, col: str) -> int | None:
+        """Escala do CSAT/CES decidida uma vez pela coluna inteira (ou pela regra), igual para todos os segmentos."""
+        if tipo == "nps":
+            return None
+        from robo.calculos import escala_csat
+        return escala_csat(self.df[col], self.c.get("escala_csat") if tipo == "csat" else None)[0]
+
     # ---------------------------------------------------------------- Caio · Indicadores
     def fazer_indicadores(self):
         linhas = []
         minimo = int(self.c["base_minima"])
         for tipo, col in self.indicadores_cols.items():
-            geral = calcular_indicador(tipo, self.df[col], self.z)
+            geral = calcular_indicador(tipo, self.df[col], self.z, self._escala(tipo, col))
             if not geral:
                 continue
             linhas.append({"indicador": geral["indicador"], "coluna": col, "segmento_coluna": "(geral)", "segmento": "Total",
@@ -279,7 +292,7 @@ class Analise:
                            "base_pequena": geral["n"] < minimo})
             for seg in self.segmentos:
                 for grupo, sub in self.df.groupby(seg, dropna=True, observed=True):
-                    r = calcular_indicador(tipo, sub[col], self.z)
+                    r = calcular_indicador(tipo, sub[col], self.z, self._escala(tipo, col))
                     if r:
                         linhas.append({"indicador": r["indicador"], "coluna": col, "segmento_coluna": seg, "segmento": str(grupo),
                                        **{k: _r(v, 1) if isinstance(v, float) else v for k, v in r.items()
@@ -310,7 +323,8 @@ class Analise:
                         ep = math.sqrt(dentro.var() / len(dentro) + fora.var() / len(fora))
                         nome = f"Média de {col}"
                     else:
-                        ra, rb = calcular_indicador(tipo, dentro, self.z), calcular_indicador(tipo, fora, self.z)
+                        esc = self._escala(tipo, col)
+                        ra, rb = calcular_indicador(tipo, dentro, self.z, esc), calcular_indicador(tipo, fora, self.z, esc)
                         a, b = ra["valor"], rb["valor"]
                         ep = 100 * math.sqrt(ra["variancia"] / ra["n"] + rb["variancia"] / rb["n"])
                         nome = ra["indicador"]
@@ -362,7 +376,7 @@ class Analise:
                 item["categorias"] = sorted(map(str, s.dropna().unique()))[:200]
             foto["colunas"][col] = item
         for tipo, col in self.indicadores_cols.items():
-            r = calcular_indicador(tipo, self.df[col], self.z)
+            r = calcular_indicador(tipo, self.df[col], self.z, self._escala(tipo, col))
             if r:
                 foto["indicadores"][tipo] = {"valor": r["valor"], "variancia": r["variancia"], "n": r["n"], "nome": r["indicador"]}
         self.foto = foto
@@ -499,7 +513,8 @@ def _guardar_foto(pasta: Path, base: str, foto: dict):
 
 def analisar(tabelas: dict[str, pd.DataFrame], arquivo: str, id_execucao: str, cfg, regra: dict, ao_etapa=None) -> dict | None:
     """Roda os 5 analistas. Devolve um resumo para o painel. Nunca levanta exceção."""
-    c = {**PADRAO_ANALISE, **(cfg.dados.get("analise") or {}), **((regra or {}).get("analise") or {})}
+    c = {**PADRAO_ANALISE, **(cfg.dados.get("analise") or {}), **((regra or {}).get("analise") or {}),
+         "escala_csat": (regra or {}).get("escala_csat")}
     if not c.get("habilitado", True) or c.get("desligar"):
         return None
     desligados = set(c.get("analistas_desligados") or [])

@@ -230,6 +230,8 @@ def _executar(cfg, sid: str) -> str:
     rotulo = f"{sid} · {s['titulo'][:40]}"
     por_ordem = {e["ordem"]: e for e in s["etapas"]}
     for e in s["etapas"]:
+        if _cancelada(tb, sid):  # o dono cancelou enquanto rodava: a etapa em curso termina, as próximas não começam
+            return "cancelada"
         if e["estado"] in ("concluida", "falhou", "bloqueada", "pulada", "cancelada"):
             continue
         deps = [por_ordem[d] for d in e["depende"] if d in por_ordem]
@@ -286,7 +288,15 @@ def _executar(cfg, sid: str) -> str:
         for a in r["artefatos"]:
             tb.artefato(sid, a, Path(a).suffix.lstrip(".") or "arquivo", e["titulo"], e["id"])
         por_ordem[e["ordem"]].update(estado=estado, resultado=r)
+    if _cancelada(tb, sid):
+        return "cancelada"
     return _revisar(cfg, sid)
+
+
+def _cancelada(tb: Trabalho, sid: str) -> bool:
+    """Relê do banco (a lista de etapas em memória é de antes do cancelamento)."""
+    atual = tb.solicitacao(sid)
+    return bool(atual and atual["estado"] == "cancelada")
 
 
 def _revisar(cfg, sid: str) -> str:

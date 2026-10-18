@@ -48,8 +48,8 @@ def _literal(v) -> str:
 
 
 def _escala_csat(serie: pd.Series) -> int:
-    v = pd.to_numeric(serie, errors="coerce").dropna()
-    return 5 if not len(v) or v.max() <= 5 else 7 if v.max() <= 7 else 10
+    from robo.calculos import escala_csat
+    return escala_csat(serie)[0]
 
 
 # --------------------------------------------------------------------------- valores no pandas (por grupo)
@@ -232,7 +232,8 @@ def conferir(cfg, calc: dict) -> dict:
     op, por, filtros = calc["op"], list(calc["por"] or []), list(calc["filtros"] or [])
     col = (calc["metricas"] or [None])[0]
     dados = calc["dados"]
-    escala = _escala_csat(dados[col]) if op == "csat" and col else 5
+    # a mesma escala que a calculadora usou (regra ou coluna inteira): conferir com outra escala seria outra conta
+    escala = (calc.get("escala_csat") or _escala_csat(dados[col])) if op == "csat" and col else 5
     exemplo = None
     if por and len(dados):
         linha = dados.dropna(subset=por)
