@@ -685,6 +685,8 @@ def _registrar_uso(cfg, ferramenta: str, quem, r: dict, segundos: float) -> None
         from robo.trabalho import Trabalho, _agora
         with Trabalho(cfg).tx() as c:
             c.executescript(USO_ESQUEMA)
+            from robo.trabalho import proteger
+            proteger(c)
             c.execute("INSERT INTO uso_ferramentas (data_hora, ferramenta, quem, ok, natureza, excecao, segundos) "
                       "VALUES (?,?,?,?,?,?,?)", (_agora(), ferramenta, quem, int(bool(r.get("ok"))), r.get("natureza"),
                                                 r.get("excecao"), round(segundos, 4)))

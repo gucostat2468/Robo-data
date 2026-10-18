@@ -63,6 +63,8 @@ def _tb(cfg) -> Trabalho:
     if str(tb.arquivo) not in _bancos_prontos:
         with tb.tx() as c:
             c.executescript(ESQUEMA)
+            from robo.trabalho import proteger
+            proteger(c)
             for tabela, colunas in COLUNAS_NOVAS.items():  # bancos criados antes destes campos
                 existentes = {r[1] for r in c.execute(f"PRAGMA table_info({tabela})")}
                 for col in colunas:

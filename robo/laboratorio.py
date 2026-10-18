@@ -59,6 +59,8 @@ def _tb(cfg) -> Trabalho:
     if str(tb.arquivo) not in _prontos or not tb.arquivo.exists():
         with tb.tx() as c:
             c.executescript(ESQUEMA)
+            from robo.trabalho import proteger
+            proteger(c)
             if "nivel" not in {r[1] for r in c.execute("PRAGMA table_info(laboratorio_exercicios)")}:
                 c.execute("ALTER TABLE laboratorio_exercicios ADD COLUMN nivel INTEGER DEFAULT 1")
         _prontos.add(str(tb.arquivo))

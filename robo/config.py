@@ -96,8 +96,8 @@ PADROES: dict = {
         "notificacoes": True,
     },
     "manutencao": {
-        "dias_retencao_originais": 180,
-        "dias_retencao_relatorios": 180,
+        "dias_retencao_originais": 0,
+        "dias_retencao_relatorios": 0,
         "dias_retencao_logs": 60,
     },
     "regras": [],

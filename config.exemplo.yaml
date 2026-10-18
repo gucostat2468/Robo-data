@@ -66,8 +66,8 @@ painel:
   notificacoes: true
 
 manutencao:
-  dias_retencao_originais: 180
-  dias_retencao_relatorios: 180
+  dias_retencao_originais: 0      # 0 = guardar para sempre (a planilha original é a prova e a base para ML)
+  dias_retencao_relatorios: 0     # 0 = guardar para sempre
   dias_retencao_logs: 60
 
 # =====================================================================

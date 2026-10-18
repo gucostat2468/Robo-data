@@ -25,6 +25,8 @@ def _tb(cfg) -> Trabalho:
     tb = Trabalho(cfg)
     with tb.tx() as c:
         c.executescript(ESQUEMA)
+        from robo.trabalho import proteger
+        proteger(c)
     return tb
 
 

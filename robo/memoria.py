@@ -484,7 +484,10 @@ ESPELHO_EXTRA = {
     "laboratorio_exercicios": "imutavel", "interacoes": "imutavel", "rotinas_execucoes": "imutavel",
     "propostas_regra": "atualiza", "regras_aprendidas": "atualiza", "uso_ferramentas": "imutavel",
     "sala_eventos": "imutavel", "salas_encerradas": "imutavel", "licoes_uso": "imutavel", "auditorias": "imutavel",
+    "eventos": "imutavel", "mensagens": "imutavel", "laboratorio_medidas": "imutavel",
 }
+# Toda tabela do trabalho.db vai para o PostgreSQL (inclusive as criadas no futuro): a que não está acima é copiada
+# como "atualiza" (o estado mais novo substitui). "imutavel" = a cópia do banco nunca é sobrescrita.
 
 
 def sincronizar_postgres(cfg) -> dict:
@@ -533,10 +536,11 @@ def _espelhar_extras(conn, sql, schema: str, tb: Trabalho) -> dict:
     tipos = {"INTEGER": "BIGINT", "REAL": "DOUBLE PRECISION"}
     feitos = {}
     with tb.tx() as c:
-        existentes = {r[0] for r in c.execute("SELECT name FROM sqlite_master WHERE type='table'")}
+        existentes = [r[0] for r in c.execute("SELECT name FROM sqlite_master WHERE type='table' AND name NOT LIKE 'sqlite_%' "
+                                             "ORDER BY name")]
         dados = {}
-        for nome in ESPELHO_EXTRA:
-            if nome not in existentes:
+        for nome in existentes:
+            if nome in TABELAS_PG:
                 continue
             info = [(r[1], (r[2] or "TEXT").split()[0].upper(), r[5]) for r in c.execute(f"PRAGMA table_info({nome})")]
             dados[nome] = (info, [tuple(r) for r in c.execute(f"SELECT {', '.join(i[0] for i in info)} FROM {nome}")])
@@ -550,7 +554,7 @@ def _espelhar_extras(conn, sql, schema: str, tb: Trabalho) -> dict:
         for n, t, _ in info:  # tabela criada por uma versão anterior: acompanha as colunas novas (senão a cópia falha)
             conn.execute(sql.SQL("ALTER TABLE {} ADD COLUMN IF NOT EXISTS {} " + tipos.get(t, "TEXT")).format(
                 tabela, sql.Identifier(n)))
-        if ESPELHO_EXTRA[nome] == "imutavel" or not [x for x in cols if x not in pk]:
+        if ESPELHO_EXTRA.get(nome, "atualiza") == "imutavel" or not [x for x in cols if x not in pk]:
             fim = sql.SQL("DO NOTHING")
         else:
             fim = sql.SQL("DO UPDATE SET ") + sql.SQL(", ").join(

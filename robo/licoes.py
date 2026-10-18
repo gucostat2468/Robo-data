@@ -77,6 +77,8 @@ def _tb(cfg) -> Trabalho:
     if str(tb.arquivo) not in _prontos or not tb.arquivo.exists():
         with tb.tx() as c:
             c.executescript(ESQUEMA)
+            from robo.trabalho import proteger
+            proteger(c)
         _prontos.add(str(tb.arquivo))
     return tb
 

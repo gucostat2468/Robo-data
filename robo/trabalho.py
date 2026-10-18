@@ -112,6 +112,26 @@ TABELAS_PERMANENTES = ("experiencias", "handovers", "handover_eventos", "boas_pr
 ESQUEMA += "".join(f"""CREATE TRIGGER IF NOT EXISTS {t}_sem_apagar BEFORE DELETE ON {t}
 BEGIN SELECT RAISE(ABORT, 'registro permanente: {t} não pode ser apagado'); END;
 """ for t in TABELAS_PERMANENTES)
+# Tabelas de ESTADO ATUAL (sobrescritas de propósito); a história delas fica em outra tabela que é protegida.
+TABELAS_DE_ESTADO = {"rotinas_estado": "a história de cada rotina fica em rotinas_execucoes"}
+
+
+def proteger(c) -> list[str]:
+    """Toda tabela de registro ganha o gatilho que impede apagar — inclusive as que forem criadas no futuro por qualquer
+    módulo. Chamado sempre que um módulo cria o seu esquema. Devolve as tabelas que acabaram de ser protegidas."""
+    tabelas = [r[0] for r in c.execute("SELECT name FROM sqlite_master WHERE type='table' AND name NOT LIKE 'sqlite_%'")]
+    com_gatilho = {r[0] for r in c.execute("SELECT tbl_name FROM sqlite_master WHERE type='trigger' "
+                                           "AND upper(sql) LIKE '%BEFORE DELETE%'")}
+    novas = []
+    for t in tabelas:
+        if t in TABELAS_DE_ESTADO or t in com_gatilho:
+            continue
+        c.execute(f"CREATE TRIGGER IF NOT EXISTS {t}_sem_apagar BEFORE DELETE ON {t} "
+                  f"BEGIN SELECT RAISE(ABORT, 'registro permanente: {t} não pode ser apagado'); END")
+        novas.append(t)
+    return novas
+
+
 COLUNAS_NOVAS = {"boas_praticas": {"valida": "INTEGER DEFAULT 1", "invalidada_em": "TEXT", "motivo_invalidacao": "TEXT"}}
 _prontos: set[str] = set()
 
@@ -158,6 +178,7 @@ class Trabalho:
                     for col, tipo in colunas.items():
                         if col not in existentes:
                             c.execute(f"ALTER TABLE {tabela} ADD COLUMN {col} {tipo}")
+                proteger(c)
             _prontos.add(str(self.arquivo.resolve()))
 
     @contextmanager
