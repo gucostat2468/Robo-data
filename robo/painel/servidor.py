@@ -1174,6 +1174,18 @@ class Api:
         licoes.arquivar(self.cfg, str(b.get("id") or ""), str(b.get("motivo") or ""), "dono")
         return {"ok": True}
 
+    def aprendizado(self, _q) -> dict:
+        from robo import aprendizado
+        return {"propostas": aprendizado.listar(self.cfg), **aprendizado.resumo(self.cfg)}
+
+    def aprendizado_decidir(self, b) -> dict:
+        """Só o dono (quem está no painel) aprova ou recusa uma regra nova."""
+        from robo import aprendizado
+        try:
+            return aprendizado.decidir(self.cfg, str(b.get("id") or ""), bool(b.get("aprovar")), "dono", str(b.get("motivo") or ""))
+        except ValueError as e:
+            raise ErroApi(str(e))
+
     def erros_sistema(self, _q) -> dict:
         from robo import erros
         return {"erros": erros.listar(self.cfg)}
@@ -1197,7 +1209,7 @@ ROTAS_GET = {
     "/api/reuniao/sala": Api.sala_ver, "/api/reuniao/salas": Api.salas,
     "/api/conhecimento": Api.conhecimento, "/api/conhecimento/caderno": Api.conhecimento_caderno,
     "/api/conhecimento/licao": Api.conhecimento_licao, "/api/conhecimento/buscar": Api.conhecimento_buscar,
-    "/api/erros": Api.erros_sistema, "/api/gestao": Api.gestao,
+    "/api/erros": Api.erros_sistema, "/api/gestao": Api.gestao, "/api/aprendizado": Api.aprendizado,
 }
 ROTAS_POST = {
     "/api/robo/ligar": Api.ligar, "/api/robo/pausar": Api.pausar, "/api/robo/processar-agora": Api.processar_agora,
@@ -1220,7 +1232,7 @@ ROTAS_POST = {
     "/api/memoria/exportar": Api.memoria_exportar, "/api/memoria/sincronizar": Api.memoria_sincronizar,
     "/api/conhecimento/rodar": Api.conhecimento_rodar, "/api/conhecimento/criar": Api.conhecimento_criar,
     "/api/conhecimento/versao": Api.conhecimento_versao, "/api/conhecimento/arquivar": Api.conhecimento_arquivar,
-    "/api/erros/resolver": Api.erros_resolver,
+    "/api/erros/resolver": Api.erros_resolver, "/api/aprendizado/decidir": Api.aprendizado_decidir,
 }
 ROTAS_UPLOAD = {"/api/testar": Api.testar, "/api/enviar": Api.enviar, "/api/conversa/anexar": Api.anexar}
 

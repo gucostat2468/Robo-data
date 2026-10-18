@@ -158,9 +158,9 @@ function renderSala() {
         ${x.contexto?.encerrada ? `<span class="etiqueta">encerrada</span>` : `<span class="etiqueta sucesso">aberta</span>`} <span class="muted">${esc(dataT(x.atualizada_em))}</span></li>`).join("")}</ul>` : "");
   }
   const lateral = E.salaPainel === "pessoas" ? painelPessoas(s) : E.salaPainel === "notas" ? painelNotas(s) : painelChat(s);
-  return cabecalho(esc(s.titulo), `${s.contexto.encerrada ? "Reunião encerrada" : "Reunião ao vivo"} · ${s.pessoas.length + 1} pessoa(s). Clique na tela de alguém para falar com essa pessoa.`, botoes) +
+  return cabecalho(s.titulo, `${s.contexto.encerrada ? "Reunião encerrada" : "Reunião ao vivo"} · ${s.pessoas.length + 1} pessoa(s). Clique na tela de alguém para falar com essa pessoa.`, botoes) +
     barraSala(s) + recapSala(s) +
-    `<div style="display:grid;grid-template-columns:minmax(0,1fr) 420px;gap:14px;align-items:start">
+    `<div class="sala-grade">
       <section style="background:#1F1F1F;border-radius:14px;padding:14px">${palcoSala(s)}</section>
       <section class="cartao" style="display:flex;flex-direction:column;max-height:76vh">${lateral}</section></div>`;
 }
@@ -196,6 +196,7 @@ async function falarNaSala(el) {
   const texto = ($("#sala-texto")?.value || "").trim(); if (!texto) return;
   await comCarregando(el, async () => {
     await api("/api/reuniao/sala/falar", { corpo: { conversa_id: E.salaId, texto, para: E.salaPara || null } });
+    limparCampo("sala-texto");
     await atualizarSala();
     $("#sala-texto")?.focus();
   });
@@ -235,6 +236,7 @@ Object.assign(ACOES, {
   "sala-pauta": (el) => comSala(el, () => salaAcao("pauta", { itens: $("#sala-pauta").value.split("\n").map((x) => x.trim()).filter(Boolean) })),
   "sala-tarefa": (el) => comSala(el, async () => {
     const r = await salaAcao("tarefa", { texto: $("#sala-tarefa").value, responsavel: $("#sala-tarefa-resp").value });
+    limparCampo("sala-tarefa");
     avisar(`Tarefa ${r.id} criada na central de solicitações.`, "sucesso"); }),
   "sala-encerrar": async (el) => {
     if (!(await confirmar({ titulo: "Encerrar a reunião?", texto: "O resumo (recap) e a transcrição são salvos. Depois de encerrada, ninguém fala mais nesta sala.", botao: "Encerrar", perigo: true }))) return;

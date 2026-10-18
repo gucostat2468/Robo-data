@@ -77,3 +77,10 @@ body.escritorio { overflow: hidden; background: #dfe6ef; }
 .ficha-lista { margin: 0; padding-left: 18px; color: var(--texto-2); font-size: 13px; }
 .ficha-lista li { margin: 2px 0; }
 @media (max-width: 1200px) { .hud-topo .acoes .btn:not(#btn-agora) { padding: 0 10px; } }
+
+/* celular: os botões de andar rolam em vez de sair da tela; a ficha não cobre o topo */
+@media (max-width: 700px) {
+  .hud-topo { flex-wrap: wrap; gap: 8px; }
+  .hud-topo .andares { overflow-x: auto; max-width: 100%; }
+  .hud-ficha { top: auto; bottom: 12px; max-height: 55vh; overflow: auto; left: 8px; right: 8px; width: auto; }
+}

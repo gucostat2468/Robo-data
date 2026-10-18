@@ -242,10 +242,16 @@ def teste_modo_demonstracao_isolado_e_com_erro_real(tmp_path):
     assert str(cfg.entrada).startswith(str(tmp_path)) and str(cfg.logs).startswith(str(tmp_path))  # não toca a produção
     assert not demonstracao.tem_senha(caminho)
     arquivos = sorted(cfg.entrada.glob("*.xlsx"))
-    assert len(arquivos) == 7
-    status = {a.stem: processar_arquivo(a, cfg).status for a in arquivos}
-    assert status.pop("pedidos_com_formula_quebrada") == "reprovado" and set(status.values()) == {"sucesso"}
-    assert len(historico.ler(cfg.logs, 50)) == 7
+    assert len(arquivos) == 8
+    from robo import aprendizado
+    resultados = {a.stem: processar_arquivo(a, cfg) for a in arquivos}
+    status = {k: r.status for k, r in resultados.items()}
+    assert status.pop("pedidos_com_formula_quebrada") == "reprovado"
+    assert status.pop("nps_pesquisa_professores") == "reprovado" and set(status.values()) == {"sucesso"}
+    # a demonstração mostra o aprendizado real: a reprovação dos professores vira proposta de sinônimo
+    [pid] = aprendizado.propor(cfg, resultados["nps_pesquisa_professores"])
+    assert aprendizado.listar(cfg)[0]["valor"] == "nota_nps_professor"
+    assert len(historico.ler(cfg.logs, 50)) == 8
     assert demonstracao.preparar(tmp_path / "demo") == caminho  # reabrir não recria nem duplica
 
 

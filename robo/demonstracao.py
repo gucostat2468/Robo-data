@@ -48,12 +48,17 @@ def preparar(pasta: Path = PASTA, recomecar: bool = False, porta: int = 8799) ->
                            "habilidades": str(pasta / "habilidades")}
         dados.setdefault("painel", {}).update({"porta": porta, "ligar_robo_ao_abrir": True, "notificacoes": False})
         dados["laboratorio"] = {"intervalo_minutos": 3}
+        # regra de pesquisas NPS: exige o ID e a nota. A planilha dos professores chega com a coluna da nota com outro
+        # nome → é reprovada → o funcionário PROPÕE a regra (sinônimo) → você aprova em Conhecimento → ela passa
+        dados["regras"] = [{"padrao": "nps_*", "colunas_obrigatorias": ["id", "nota_nps"], "chave_unica": ["id"],
+                            "faixas": {"nota_nps": {"min": 0, "max": 10}}}]
         dados["banco"] = _banco_da_producao() or {**(dados.get("banco") or {}), "habilitado": False}
         caminho.write_text("# Config da DEMONSTRAÇÃO (gerado por python -m robo demo). Não é o da produção.\n"
                            + yaml.safe_dump(dados, allow_unicode=True, sort_keys=False), encoding="utf-8")
         for area, semente in SEMENTES.items():
             laboratorio.escrever_sujo(laboratorio.gerar(area, semente), entrada / f"{NOMES[area]}.xlsx")
         _com_defeito(entrada / "pedidos_com_formula_quebrada.xlsx")
+        _nps_com_coluna_renomeada(entrada / "nps_pesquisa_professores.xlsx")
     return caminho
 
 
@@ -65,6 +70,19 @@ def _com_defeito(caminho: Path) -> None:
     ws.append(["Pedido", "Cliente", "Valor", "Desconto", "Margem"])
     for i in range(1, 41):
         ws.append([i, f"Cliente {i:02d}", 100 + i * 7.5, 0.05, "#REF!" if i % 9 == 0 else ("#DIV/0!" if i % 13 == 0 else 0.3)])
+    wb.save(caminho)
+
+
+def _nps_com_coluna_renomeada(caminho: Path) -> None:
+    """Pesquisa de professores: a coluna da nota veio como 'Nota NPS Professor' (a regra espera 'nota_nps')."""
+    from openpyxl import Workbook
+    import random
+    rnd = random.Random(7)
+    wb = Workbook()
+    ws = wb.active
+    ws.append(["ID", "Curso", "Nota NPS Professor"])
+    for i in range(1, 121):
+        ws.append([5000 + i, rnd.choice(["Direito", "Medicina", "Pedagogia", "Engenharia"]), rnd.choice([10, 9, 9, 8, 7, 6, 10, 5, 9, 3])])
     wb.save(caminho)
 
 

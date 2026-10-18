@@ -354,7 +354,7 @@ Object.assign(ACOES, {
     const texto = ($("#solic-texto")?.value || "").trim();
     if (!texto) throw new Error("Descreva o que você precisa.");
     const r = await api("/api/solicitacoes/criar", { corpo: { texto, prioridade: $("#solic-prioridade").value, arquivo: E.solicAnexo?.arquivo || null } });
-    E.solicAnexo = null; avisar(`Registrado: ${r.id}`, "sucesso");
+    E.solicAnexo = null; limparCampo("solic-texto"); avisar(`Registrado: ${r.id}`, "sucesso");
     await carregarSolicitacoes(); desenhar(); verSolicitacao(r.id);
   }),
   aprovar: (el) => comCarregando(el, async () => {

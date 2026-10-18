@@ -76,6 +76,7 @@ function renderGestao() {
     ["Funcionários", r.funcionarios, Object.entries(r.tendencias).map(([t, n]) => `${(TENDENCIA[t] || [t])[0]}: ${n}`).join(" · ")],
     ["Funções", g.funcoes.length, `${r.funcoes_sem_teste.length} sem teste · ${r.funcoes_sem_uso_30d.length} sem uso em 30 dias`],
     ["Módulos", g.modulos.length, `${r.modulos_sem_teste.length} sem teste · ${r.modulos_com_erro_aberto.length} com erro aberto`],
+    ["Aprendizado real", `${g.aprendizado.regras_ativas} regra(s)`, `${(g.aprendizado.por_estado || {}).comprovada || 0} comprovada(s) · ${(g.aprendizado.por_estado || {}).pendente || 0} esperando você · lições comprovadas ${g.aprendizado.licoes_comprovadas_pct}% · cadeia ${g.aprendizado.integridade ? "íntegra" : "QUEBRADA"}`],
   ].map(([t, v, d]) => `<div class="cartao"><div class="cartao-corpo"><div class="muted">${esc(t)}</div><div style="font-size:26px;font-weight:700">${esc(String(v))}</div><small class="muted">${esc(d)}</small></div></div>`).join("");
   const abas = [["paginas", "Páginas"], ["andares", "Andares"], ["evolucao", "Evolução por funcionário"], ["funcoes", "Funções"], ["modulos", "Módulos (código)"]]
     .map(([k, t]) => `<button class="btn ${E.gestaoAba === k ? "primario" : ""}" data-acao="gestao-aba" data-aba="${k}">${t}</button>`).join("");

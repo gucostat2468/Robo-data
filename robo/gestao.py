@@ -212,7 +212,13 @@ def visao(cfg) -> dict:
     contagem = {}
     for e in evol:
         contagem[e["tendencia"]] = contagem.get(e["tendencia"], 0) + 1
+    from robo import aprendizado, licoes
+    lp = licoes.painel(cfg)
+    at = lp["atribuicoes"]
+    total = sum(at.values()) or 1
     return {
+        "aprendizado": {**aprendizado.resumo(cfg), "licoes_comprovadas_pct": round(100 * at.get("aplicada", 0) / total),
+                        "integridade": lp["integridade"]["integra"]},
         "gerado_em": datetime.now().isoformat(timespec="seconds"),
         "paginas": PAGINAS,
         "andares": andares(cfg, evol),

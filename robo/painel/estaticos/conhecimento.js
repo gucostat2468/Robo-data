@@ -5,12 +5,35 @@ const ESTADO_LICAO = { atribuida: ["Atribuída", ""], estudada: ["Estudada", "in
 const ORIGEM_LICAO = { handover: "Erro (handover)", boa_pratica: "Boa prática (PDCA)", laboratorio: "Laboratório", correcao: "Correção do dono",
   manual: "Manual", dono: "Lição do dono" };
 const etiquetaLicao = (e) => { const [t, c] = ESTADO_LICAO[e] || [e, ""]; return `<span class="etiqueta ${c}">${esc(t)}</span>`; };
-Object.assign(E, { conhecimento: null, errosSistema: null, buscaLicao: "", achadasLicao: null });
+Object.assign(E, { conhecimento: null, errosSistema: null, buscaLicao: "", achadasLicao: null, aprendizado: null });
+const ESTADO_PROPOSTA = { pendente: ["Esperando você", "alerta"], aprovada: ["Aprovada · esperando o arquivo passar", "info"],
+  comprovada: ["Comprovada (o comportamento mudou)", "sucesso"], nao_resolveu: ["Não resolveu", "perigo"], recusada: ["Recusada", ""] };
 
 async function carregarConhecimento() {
   await nomesDaEquipe();
   try { E.conhecimento = await api("/api/conhecimento"); } catch (e) { avisar(e.message, "erro"); }
   try { E.errosSistema = (await api("/api/erros")).erros; } catch { E.errosSistema = []; }
+  try { E.aprendizado = await api("/api/aprendizado"); } catch { E.aprendizado = null; }
+}
+
+function secaoAprendizado() {
+  const a = E.aprendizado; if (!a) return "";
+  const itens = a.propostas.map((p) => { const [t, c] = ESTADO_PROPOSTA[p.estado] || [p.estado, ""];
+    return `<div class="ocorrencia ${p.estado === "pendente" ? "aviso" : p.estado === "nao_resolveu" ? "erro" : ""}"><div class="principal">
+      <strong>${esc(p.tipo_nome)}: ${esc(p.coluna)} ← “${esc(p.valor)}”</strong> <span class="etiqueta ${c}">${esc(t)}</span>
+      <span class="muted">· regra ${esc(p.padrao)} · proposta de ${esc(p.autor_nome)} · ${esc(dataT(p.criada_em))}</span>
+      <div>${esc(p.motivo)}</div><div class="muted" style="font-size:12px">Evidência: ${esc(p.evidencia)}</div>
+      ${p.alerta ? `<div class="etiqueta perigo" style="margin-top:4px">${esc(p.alerta)}</div>` : ""}
+      ${p.prova ? `<div class="muted" style="font-size:12px">Prova: ${esc(p.prova)}</div>` : ""}
+      ${p.motivo_decisao ? `<div class="muted" style="font-size:12px">Sua decisão: ${esc(p.motivo_decisao)}</div>` : ""}
+      ${p.estado === "pendente" ? `<div class="acoes" style="margin-top:6px"><button class="btn pequeno primario" data-acao="regra-aprovar" data-id="${esc(p.id)}">Aprovar (vale a partir de agora)</button>
+        <button class="btn pequeno" data-acao="regra-recusar" data-id="${esc(p.id)}">Recusar</button></div>` : ""}</div></div>`; }).join("");
+  const por = a.por_estado || {};
+  return `<div class="secao-titulo" style="margin-top:14px">Aprendizado que muda o comportamento (regras aprendidas com erros)</div>
+    <p class="muted" style="font-size:12px">Quando uma planilha é reprovada por algo que uma regra resolve, o funcionário propõe a regra; só você aprova.
+      Aprovada, ela vale na hora e o arquivo volta para a fila; se passar, a proposta vira <b>comprovada</b>. ${a.regras_ativas} regra(s) ativa(s) ·
+      ${por.pendente || 0} esperando você · ${por.comprovada || 0} comprovada(s) · ${por.nao_resolveu || 0} não resolveu.</p>
+    ${itens || `<p class="muted">Nenhuma proposta ainda. Elas aparecem quando uma planilha é reprovada por coluna com outro nome ou valor novo.</p>`}`;
 }
 
 function renderConhecimento() {
@@ -52,6 +75,7 @@ function renderConhecimento() {
       <div class="caixa-texto"><input id="licao-busca" value="${esc(E.buscaLicao)}" placeholder="Ex.: como calcular o NPS? o que fazer com data em texto?" style="flex:1">
       <button class="btn" data-acao="licao-buscar">${icone("busca")}Buscar</button></div>
       ${achadas ? `<ul class="lista-ficha">${achadas}</ul>` : ""}</div></section>
+    ${secaoAprendizado()}
     <div class="secao-titulo" style="margin-top:14px">Quem tem mais lição sem comprovar (de quem cobrar primeiro)</div>
     <div class="tabela-envoltorio"><table class="tabela"><thead><tr><th>Funcionário</th><th>Lições</th><th>Aplicadas</th><th>Novas</th><th>% comprovado</th><th></th></tr></thead><tbody>${pessoas}</tbody></table></div>
     <div class="secao-titulo" style="margin-top:14px">Lições mais recentes</div><ul class="lista-ficha">${recentes || "<li>Nenhuma lição ainda.</li>"}</ul>
@@ -111,6 +135,18 @@ Object.assign(PAGINAS, {
   conhecimento: { titulo: "Conhecimento", render: renderConhecimento, carregar: carregarConhecimento },
 });
 Object.assign(ACOES, {
+  "regra-aprovar": async (el) => {
+    if (!(await confirmar({ titulo: "Aprovar esta regra?", texto: "Ela passa a valer agora para todos os arquivos dessa regra e o arquivo reprovado volta para a fila.", botao: "Aprovar" }))) return;
+    try { const r = await api("/api/aprendizado/decidir", { corpo: { id: el.dataset.id, aprovar: true } });
+      avisar(r.reenviado ? `Regra aprovada. ${r.reenviado} voltou para a fila.` : "Regra aprovada.", "sucesso"); } catch (e) { return avisar(e.message, "erro"); }
+    await carregarConhecimento(); desenhar();
+  },
+  "regra-recusar": async (el) => {
+    const motivo = prompt("Por que recusar? (o motivo vira aprendizado)");
+    if (!motivo || !motivo.trim()) return;
+    try { await api("/api/aprendizado/decidir", { corpo: { id: el.dataset.id, aprovar: false, motivo } }); } catch (e) { return avisar(e.message, "erro"); }
+    await carregarConhecimento(); desenhar();
+  },
   "recarregar-conhecimento": async () => { await carregarConhecimento(); desenhar(); },
   caderno: (el) => verCaderno(el.dataset.id),
   "licao-ver": (el) => verLicao(el.dataset.id),

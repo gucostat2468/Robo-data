@@ -296,3 +296,10 @@ def teste_sql_livre_nao_escapa_do_somente_leitura(banco_cfg):
             consultas.executar_texto(b, sql)
     assert consultas.executar_texto(b, "SELECT 'a;b' AS t, count(*) FROM alvo -- comentário; ok")["linhas"] == [("a;b", 2)]
     assert _q(banco_cfg, "SELECT count(*) FROM alvo")[0][0] == 2
+
+
+def teste_ti_no_computador_novo_nao_acusa_banco_ainda_nao_criado(banco_cfg, cfg_factory):
+    """Achado no teste da operação: a ronda de TI da abertura rodava antes da 1ª carga criar o banco e dava vermelho."""
+    from robo import ti
+    cfg = cfg_factory(banco={**banco_cfg, "banco": "robo_ainda_nao_existe_x"})
+    assert ti.chk_cloud(cfg) == []

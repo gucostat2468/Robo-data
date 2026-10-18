@@ -151,9 +151,11 @@ def chk_cloud(cfg) -> list[str]:
     try:
         from robo.banco import Banco
         b = Banco(cfg.banco, cfg.base)
-        with b.conectar() as conn:
+        # a versão é do SERVIDOR: consulta no banco de manutenção 'postgres', que sempre existe (o banco do robô só
+        # nasce na primeira carga — antes, a ronda de TI na abertura acusava falha num computador novo)
+        with b.conectar("postgres") as conn:
             versao = conn.execute("SHOW server_version").fetchone()[0]
-    except Exception as e:  # sem banco não há o que avaliar; a DBA já cuida da conexão
+    except Exception as e:  # servidor fora do ar: aí sim é um problema real
         return [f"não consegui consultar a versão do PostgreSQL ({type(e).__name__})"]
     principal = _versao(versao)[0]
     return [f"PostgreSQL {versao}: abaixo da versão {RDS_POSTGRES_MINIMO}, sem suporte padrão no Amazon RDS — "

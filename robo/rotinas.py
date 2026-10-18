@@ -12,6 +12,7 @@ from __future__ import annotations
 
 import logging
 
+import threading
 import time
 from contextlib import contextmanager
 from datetime import datetime, timedelta
@@ -57,9 +58,27 @@ def _medir():
     yield lambda: round(time.perf_counter() - t, 2)
 
 
+_em_execucao: set[tuple[str, str]] = set()
+_trava_execucao = threading.Lock()
+
+
 def executar(cfg, nome: str, funcao) -> object:
     """Roda a rotina e registra. Resultado vazio/None = 'em dia' (nada a fazer agora): só atualiza a verificação.
-    Erro nunca derruba o robô: fica registrado com o motivo."""
+    Erro nunca derruba o robô: fica registrado com o motivo. A mesma rotina nunca roda duas vezes ao mesmo tempo
+    (ex.: botão do painel + horário automático): a segunda chamada devolve {'em_andamento': True}."""
+    chave = (str(cfg.logs), nome)
+    with _trava_execucao:
+        if chave in _em_execucao:
+            return {"em_andamento": True, "rotina": nome}
+        _em_execucao.add(chave)
+    try:
+        return _executar(cfg, nome, funcao)
+    finally:
+        with _trava_execucao:
+            _em_execucao.discard(chave)
+
+
+def _executar(cfg, nome: str, funcao) -> object:
     tb = _tb(cfg)
     inicio = _agora()
     status, detalhe, r = "fez", "", None

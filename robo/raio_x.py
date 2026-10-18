@@ -22,6 +22,10 @@ ONDE = {
     "Laboratório (treino contínuo)": "logs/trabalho.db → laboratorio_exercicios e laboratorio_medidas; PostgreSQL: schema laboratorio",
     "Caderno de lições (conhecimento)": "logs/trabalho.db → licoes, licoes_funcionario e registro_conhecimento (cadeia com hash; "
                                         "nada se apaga) + logs/conhecimento/licoes_AAAAMMDD.jsonl + PostgreSQL robo.memoria_licoes",
+    "Regras aprendidas (aprendizado que muda o comportamento)": "logs/trabalho.db → propostas_regra e regras_aprendidas "
+                                                               "(só o dono aprova; prova = o arquivo passa depois)",
+    "Histórico de cada erro (handover)": "logs/trabalho.db → handover_eventos (cada ocorrência e mudança de estado; imutável)",
+    "Uso de cada ferramenta": "logs/trabalho.db → uso_ferramentas (quem usou, se deu certo, tempo)",
     "Erros de sistema (permanente)": "logs/trabalho.db → erros_sistema (não pode ser apagado; cada tipo vira handover)",
     "Conversas entre funcionários": "logs/trabalho.db → interacoes (e o canal da equipe)",
     "Canal da equipe": "logs/canal/mensagens.jsonl",

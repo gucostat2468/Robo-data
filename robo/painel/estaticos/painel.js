@@ -205,11 +205,70 @@ async function irPara(pagina) {
   $("#conteudo").scrollTop = 0;
 }
 
+// O que você está digitando não some quando a página se redesenha (atualização automática, troca de painel…):
+// guarda valor, cursor, foco e rolagem dos campos com id e devolve depois. Quem ENVIA limpa o campo (limparCampo).
+function guardarCampos(raiz) {
+  const campos = {};
+  raiz.querySelectorAll("input[id], textarea[id], select[id]").forEach((el) => {
+    if (el.type === "file" || el.type === "password") return;
+    campos[el.id] = { valor: el.type === "checkbox" ? el.checked : el.value, inicio: el.selectionStart, fim: el.selectionEnd,
+      rolagem: el.scrollTop };
+  });
+  const ativo = document.activeElement && raiz.contains(document.activeElement) ? document.activeElement.id : null;
+  const rolagens = {};
+  raiz.querySelectorAll("[id]").forEach((el) => { if (el.scrollTop) rolagens[el.id] = el.scrollTop; });
+  return { campos, ativo, rolagens };
+}
+function devolverCampos(raiz, g) {
+  for (const [id, c] of Object.entries(g.campos)) {
+    const el = raiz.querySelector(`#${CSS.escape(id)}`);
+    if (!el || el.dataset.semRascunho !== undefined) continue;
+    if (el.type === "checkbox") { if (el.checked !== c.valor && el.dataset.manterMarcacao !== undefined) el.checked = c.valor; continue; }
+    if (el.tagName === "SELECT") continue;  // select reflete o estado (E.*): não sobrescreve
+    if (c.valor && el.value !== c.valor) el.value = c.valor;
+    if (c.rolagem) el.scrollTop = c.rolagem;
+  }
+  for (const [id, y] of Object.entries(g.rolagens)) { const el = raiz.querySelector(`#${CSS.escape(id)}`); if (el && !g.campos[id]) el.scrollTop = y; }
+  if (g.ativo) {
+    const el = raiz.querySelector(`#${CSS.escape(g.ativo)}`);
+    if (el) { el.focus({ preventScroll: true }); const c = g.campos[g.ativo];
+      if (c && c.inicio != null && el.setSelectionRange) try { el.setSelectionRange(c.inicio, c.fim); } catch { /* tipo sem seleção */ } }
+  }
+}
+function limparCampo(id) { const el = $(`#${id}`); if (el) el.value = ""; }
+
+// acessibilidade: o que é clicável também funciona pelo teclado; campos e botões sem nome ganham um
+function acessivel(raiz) {
+  raiz.querySelectorAll("[data-acao]:not(button):not(a):not(input):not(select):not(textarea)").forEach((el) => {
+    if (!el.hasAttribute("tabindex")) el.setAttribute("tabindex", "0");
+    if (!el.hasAttribute("role")) el.setAttribute("role", "button");
+  });
+  raiz.querySelectorAll("input:not([aria-label]), textarea:not([aria-label]), select:not([aria-label])").forEach((el) => {
+    if (el.labels && el.labels.length) return;
+    const nome = el.getAttribute("placeholder") || el.options?.[0]?.textContent || el.title || el.id;
+    if (nome) el.setAttribute("aria-label", nome.trim().slice(0, 120));
+  });
+  raiz.querySelectorAll('[role="switch"]:not([aria-label])').forEach((el) => {
+    const rotulo = el.closest("label, .opcao, .linha-opcao, li, div")?.querySelector("strong, b")?.textContent;
+    if (rotulo) el.setAttribute("aria-label", rotulo.trim().slice(0, 120));
+  });
+  raiz.querySelectorAll("button:not([aria-label])").forEach((el) => {
+    if (!el.textContent.trim()) {
+      const nome = el.title || el.dataset.rotulo || ({ "estrategia-editar": "Editar", "estrategia-excluir": "Excluir" })[el.dataset.acao] || el.dataset.acao;
+      if (nome) el.setAttribute("aria-label", nome);
+    }
+  });
+}
+
 function desenhar() {
   const alvo = $("#conteudo");
   if (!E.geral) { alvo.innerHTML = `<div class="carregando">Conectando ao robô…</div>`; return; }
-  if (E.geral.erro_config && E.pagina !== "atividade") { alvo.innerHTML = renderBoasVindas(); return; }
+  if (E.geral.erro_config && E.pagina !== "atividade") { alvo.innerHTML = renderBoasVindas(); acessivel(alvo); return; }
+  const guardado = E._paginaDesenhada === E.pagina ? guardarCampos(alvo) : null;
   alvo.innerHTML = `<div class="pagina">${PAGINAS[E.pagina].render()}</div>`;
+  if (guardado) devolverCampos(alvo, guardado);
+  E._paginaDesenhada = E.pagina;
+  acessivel(alvo);
   if (E.pagina === "atividade") rolarLog();
   if (E.pagina === "canal") { const m = $("#mensagens"); if (m) m.scrollTop = m.scrollHeight; }
 }
@@ -224,7 +283,14 @@ async function atualizarEstado() {
     E.geral = await api("/api/estado");
     atualizarLateral();
     if (!anterior || Boolean(anterior.erro_config) !== Boolean(E.geral.erro_config)) return desenhar();
-    if (E.pagina === "inicio") desenharSemPerderFoco();
+    // a Visão geral só redesenha quando o dado muda (ou a cada 30 s, para o "há X min"): antes era a cada 2 s,
+    // o que tirava o foco do botão, perdia cliques e apagava texto selecionado
+    const { agora: _a, ...semRelogio } = E.geral;
+    const assinatura = JSON.stringify(semRelogio);
+    if (E.pagina === "inicio" && (assinatura !== E._assinaturaInicio || Date.now() - (E._desenhoInicio || 0) > 30000)) {
+      E._assinaturaInicio = assinatura; E._desenhoInicio = Date.now();
+      desenharSemPerderFoco();
+    }
     const k = E.geral.kpis || {};
     const assRep = `${k.reprovados_pendentes}`;
     if (E.pagina === "reprovados" && assRep !== E.assinaturaRep) { await carregarReprovados(); desenhar(); }
@@ -1077,6 +1143,7 @@ async function enviarCanal() {
   if (!texto) return;
   E.canalRascunho = "";
   try { await api("/api/canal/enviar", { corpo: { texto, canal: E.canalAtual } }); } catch (e) { avisar(e.message, "erro"); return; }
+  limparCampo("canal-texto");
   await carregarCanal(); desenhar();
   const lista = $("#mensagens"); if (lista) lista.scrollTop = lista.scrollHeight;
   $("#canal-texto")?.focus();
@@ -1489,7 +1556,14 @@ document.addEventListener("click", (ev) => {
   if (acao) { ev.preventDefault(); acao(el); }
 });
 $("#gaveta-fundo").addEventListener("click", fecharGaveta);
-document.addEventListener("keydown", (e) => { if (e.key === "Escape") fecharGaveta(); });
+document.addEventListener("keydown", (e) => {
+  if (e.key === "Escape") fecharGaveta();
+  // elemento clicável que não é botão (cartão, linha de tabela, tela da reunião): Enter/Espaço = clique
+  const el = e.target;
+  if ((e.key === "Enter" || e.key === " ") && el.getAttribute?.("role") === "button" && el.dataset?.acao && el.tagName !== "BUTTON") {
+    e.preventDefault(); el.click();
+  }
+});
 document.addEventListener("input", (e) => {
   if (e.target.id === "busca-habilidade") {
     E.buscaHabilidade = e.target.value;
@@ -1572,6 +1646,9 @@ window.addEventListener("hashchange", () => irPara(location.hash.slice(1)));
   setInterval(async () => {  // central de dados ao vivo (não redesenha enquanto você interage com um campo)
     if (E.pagina !== "central") return;
     await carregarCentral();
+    const assinatura = JSON.stringify(E.central || {});
+    if (assinatura === E._assinaturaCentral) return;  // nada mudou: não mexe na tela (foco, seleção e cliques ficam)
+    E._assinaturaCentral = assinatura;
     if (!["SELECT", "INPUT"].includes(document.activeElement?.tagName)) desenharSemPerderFoco();
   }, 3000);
   setInterval(atualizarLog, 2000);
