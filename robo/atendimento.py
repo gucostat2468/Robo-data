@@ -247,7 +247,7 @@ def _responder(cfg, tb, conversa_id, contrato, texto, ctx, arquivo) -> tuple[lis
         from robo.canal import INTENCOES, _pontuar
         sobre_o_robo = _pontuar(t, INTENCOES["erros"]) >= 2 or _pontuar(t, INTENCOES["status"]) >= 2
         calc = None if sobre_o_robo or re.match(r"^(como|o que|qual a diferenca|por que)\b", t) else \
-            ferramentas.executar("calcular", cfg, **params)
+            ferramentas.executar("calcular", cfg, **{"quem": pid, **params})
         if calc and (calc["ok"] or "Não reconheci" not in calc["texto"]):
             ferr, pronto = "calcular", calc
         else:
@@ -256,7 +256,7 @@ def _responder(cfg, tb, conversa_id, contrato, texto, ctx, arquivo) -> tuple[lis
         pronto = None
 
     if not ferr:
-        k = ferramentas.executar("conhecimento", cfg, pergunta=texto)
+        k = ferramentas.executar("conhecimento", cfg, pergunta=texto, quem=pid)
         if k["ok"]:
             msgs = [_msg(pid, k)]
             return msgs, _registrar_pergunta(tb, contrato, texto, conversa_id, msgs)

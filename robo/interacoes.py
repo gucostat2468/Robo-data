@@ -77,7 +77,7 @@ def pedir_ajuda(cfg, quem: str, problema: str, ref: str = "") -> dict | None:
     gente = organizacao.por_id(cfg)
     nome = lambda x: (gente.get(x) or {}).get("nome", x)  # noqa: E731
     falar(cfg, quem, ajudante, f"Errei aqui e preciso da sua ajuda: {problema}", "pedido", ref)
-    k = ferramentas.executar("conhecimento", cfg, pergunta=problema)
+    k = ferramentas.executar("conhecimento", cfg, pergunta=problema, quem=ajudante)
     if k["ok"]:
         resposta = f"{nome(quem)}, já passamos por isso. {k['texto'][:400]} (fonte: {k['evidencia']})"
         memoria.experiencia(cfg, ajudante, "acerto", f"Ajudou {nome(quem)} com conhecimento registrado", "interacao", ref)

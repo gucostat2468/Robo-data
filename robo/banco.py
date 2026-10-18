@@ -111,31 +111,35 @@ class Banco:
         return bool(self.cfg.get("habilitado"))
 
     # ------------------------------------------------------------------ conexão
-    def _parametros(self, banco: str | None = None) -> dict:
+    def _parametros(self, banco: str | None = None, leitura: bool = False) -> dict:
         import os
         senha = self.cfg.get("senha") or ""
         variavel = self.cfg.get("senha_variavel_ambiente")
         if variavel and os.environ.get(variavel):
             senha = os.environ[variavel]
+        usuario = self.cfg.get("usuario", "postgres")
+        if leitura and self.cfg.get("usuario_leitura"):  # usuário só com SELECT para consultas livres (o mais seguro)
+            usuario = self.cfg["usuario_leitura"]
+            senha = self.cfg.get("senha_leitura") or os.environ.get(self.cfg.get("senha_leitura_variavel_ambiente") or "", "")
         return {
             "host": self.cfg.get("host", "localhost"),
             "port": int(self.cfg.get("porta", 5432)),
             "dbname": banco or self.cfg.get("banco", "robo_dados"),
-            "user": self.cfg.get("usuario", "postgres"),
+            "user": usuario,
             "password": senha,
             "connect_timeout": int(self.cfg.get("tempo_limite_conexao", 5)),
             "application_name": "robo_planilhas",
         }
 
-    def conectar(self, banco: str | None = None):
+    def conectar(self, banco: str | None = None, leitura: bool = False):
         psycopg, _ = _psycopg()
         try:
-            return psycopg.connect(**self._parametros(banco))
+            return psycopg.connect(**self._parametros(banco, leitura))
         except psycopg.OperationalError as e:
             m = str(e).lower()
             classe = ErroBancoNaoExiste if (("database" in m and "does not exist" in m)
                                             or ("banco de dados" in m and "não existe" in m)) else ErroBancoIndisponivel
-            raise classe(_explicar_erro_conexao(str(e), self._parametros(banco))) from e
+            raise classe(_explicar_erro_conexao(str(e), self._parametros(banco, leitura))) from e
 
     def criar_banco_se_preciso(self) -> bool:
         """Conecta no banco 'postgres' (sempre existe) e cria o banco do robô se ainda não existir."""

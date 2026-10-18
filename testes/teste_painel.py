@@ -247,3 +247,69 @@ def teste_modo_demonstracao_isolado_e_com_erro_real(tmp_path):
     assert status.pop("pedidos_com_formula_quebrada") == "reprovado" and set(status.values()) == {"sucesso"}
     assert len(historico.ler(cfg.logs, 50)) == 7
     assert demonstracao.preparar(tmp_path / "demo") == caminho  # reabrir não recria nem duplica
+
+
+# ---------------------------------------------------------------- achados da auditoria de segurança (regressão)
+def _painel_com_senha(tmp_path, entrada_auto=False):
+    from robo.painel.acesso import gerar_hash
+    entrada = tmp_path / "OneDrive" / "Bases-Limpeza"
+    entrada.mkdir(parents=True, exist_ok=True)
+    cfgp = tmp_path / "config.yaml"
+    cfgp.write_text(yaml.safe_dump({"pastas": {"entrada": "auto" if entrada_auto else str(entrada), "logs": str(tmp_path / "logs"),
+                                               "agentes": str(tmp_path / "agentes"), "habilidades": str(tmp_path / "habilidades")},
+                                    "painel": {"notificacoes": False, "senha_hash": gerar_hash("SenhaForte123")}}), encoding="utf-8")
+    controle = ControleRobo(cfgp)
+    servidor = ThreadingHTTPServer(("127.0.0.1", 0), None)
+    porta = servidor.server_address[1]
+    servidor.RequestHandlerClass = criar_manipulador(Api(controle, porta))
+    threading.Thread(target=servidor.serve_forever, daemon=True).start()
+    return servidor, f"http://127.0.0.1:{porta}", cfgp
+
+
+def teste_senha_continua_valendo_quando_a_config_nao_carrega(tmp_path, monkeypatch):
+    monkeypatch.setenv("OneDrive", str(tmp_path / "nao_existe"))
+    monkeypatch.setenv("OneDriveConsumer", str(tmp_path / "nao_existe"))
+    monkeypatch.setenv("OneDriveCommercial", str(tmp_path / "nao_existe"))
+    servidor, base, cfgp = _painel_com_senha(tmp_path, entrada_auto=True)
+    try:
+        antes = cfgp.read_text(encoding="utf-8")
+        assert chamar(base, "/api/acesso")[1] == {"senha": True, "logado": False}
+        assert chamar(base, "/api/config")[0] == 401
+        assert chamar(base, "/api/senha", {"nova": "atacante123", "confirmacao": "atacante123"})[0] == 401
+        assert chamar(base, "/api/config/entrada", {"caminho": str(tmp_path)})[0] == 401
+        assert cfgp.read_text(encoding="utf-8") == antes  # nada foi gravado
+    finally:
+        servidor.shutdown()
+
+
+def teste_corpo_invalido_vira_400_e_excluir_agente_nao_sai_da_pasta(tmp_path):
+    servidor, base, cfgp = _painel_com_senha(tmp_path)
+    try:
+        req = urllib.request.Request(base + "/api/login", data=json.dumps({"senha": "SenhaForte123"}).encode(),
+                                     headers={"X-Robo-Painel": "1", "Content-Type": "application/json"}, method="POST")
+        with urllib.request.urlopen(req) as r:
+            cookie = r.headers["Set-Cookie"].split(";")[0]
+        h = {"Cookie": cookie}
+        assert chamar(base, "/api/login", dados=b"[1]", cabecalhos={"Content-Type": "application/json"})[0] == 400
+        assert chamar(base, "/api/robo/pausar", dados=b'{"a":"\x80"}', cabecalhos={**h, "Content-Type": "application/json"})[0] == 400
+        assert chamar(base, "/api/canal/enviar", dados=b"[1]", cabecalhos={**h, "Content-Type": "application/json"})[0] == 400
+        assert chamar(base, "/api/config/salvar", {"alteracoes": [1]}, h)[0] == 400
+        assert chamar(base, "/api/agentes/salvar", {"agente": "x"}, h)[0] == 400
+        segredo = tmp_path / "segredo.yaml"
+        segredo.write_text("x: 1", encoding="utf-8")
+        assert chamar(base, "/api/agentes/excluir", {"id": "../segredo"}, h)[0] == 400
+        assert chamar(base, "/api/agentes/excluir", {"id": "../config"}, h)[0] == 400
+        assert segredo.exists() and cfgp.exists()
+    finally:
+        servidor.shutdown()
+
+
+def teste_tarefa_sem_etapa_nao_sai_concluida_e_registro_automatico_interrompido_falha(tmp_path, cfg_factory):
+    from robo import orquestrador
+    from robo.trabalho import Trabalho
+    cfg = cfg_factory()
+    tb = Trabalho(cfg)
+    sid = tb.criar_solicitacao("tarefa", "x", "x", "automatica", "recepcao", 1, "media", modelo="pipeline", estado="na_fila")
+    tb.mudar_estado(sid, "em_execucao", "robo")
+    assert orquestrador.retomar_pendentes(cfg) == []
+    assert tb.solicitacao(sid)["estado"] == "falhou"

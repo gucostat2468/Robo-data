@@ -40,6 +40,15 @@ ADIADO = "adiado"
 DIAGNOSTICO = "diagnostico"
 
 
+def _regra_com_aprendizado(cfg, nome: str) -> dict:
+    """Regra do config.yaml + o que foi aprendido e aprovado pelo dono (sinônimos e valores novos — robo/aprendizado.py)."""
+    regra = cfg.regra_para(nome)
+    if not regra.get("padrao"):
+        return regra
+    from robo import aprendizado
+    return aprendizado.aplicar_overlay(regra, aprendizado.regras_ativas(cfg, str(regra["padrao"])))
+
+
 @dataclass
 class Resultado:
     arquivo: Path
@@ -179,7 +188,7 @@ def obter_equipe(cfg: Config):
 
 
 def _tratar(caminho: Path, cfg: Config, rel: Relatorio, ao_etapa=None) -> _Tratamento:
-    t = _Tratamento(regra=cfg.regra_para(caminho.name))
+    t = _Tratamento(regra=_regra_com_aprendizado(cfg, caminho.name))
     if t.regra:
         rel.info(f"Regra aplicada: padrão '{t.regra.get('padrao')}'")
 

@@ -655,9 +655,34 @@ def executar(id_ferramenta: str, cfg, **params) -> dict:
     faltando = [p for p in f.precisa if not params.get(p)]
     if faltando:
         return resultado(False, "limitacao", f"{f.nome} precisa de: {', '.join(faltando)}.")
+    import time
+    inicio = time.perf_counter()
     try:
-        return f.executar(cfg, **params)
+        r = f.executar(cfg, **params)
     except Exception as e:
         import logging
         logging.getLogger("robo").exception("Ferramenta %s falhou: %s", id_ferramenta, e)  # registro permanente (erros.py)
-        return resultado(False, "limitacao", f"{f.nome} falhou ({type(e).__name__}: {e}). Nada foi dado como concluído.")
+        r = resultado(False, "limitacao", f"{f.nome} falhou ({type(e).__name__}: {e}). Nada foi dado como concluído.")
+        r["excecao"] = type(e).__name__
+    _registrar_uso(cfg, id_ferramenta, params.get("quem"), r, time.perf_counter() - inicio)
+    return r
+
+
+USO_ESQUEMA = """CREATE TABLE IF NOT EXISTS uso_ferramentas (
+  id INTEGER PRIMARY KEY AUTOINCREMENT, data_hora TEXT, ferramenta TEXT, quem TEXT, ok INTEGER, natureza TEXT,
+  excecao TEXT, segundos REAL);
+CREATE INDEX IF NOT EXISTS ix_uso_ferr ON uso_ferramentas(ferramenta, data_hora);"""
+
+
+def _registrar_uso(cfg, ferramenta: str, quem, r: dict, segundos: float) -> None:
+    """Cada uso de ferramenta fica registrado (base da visão de gestão: quanto cada função roda e quanto acerta)."""
+    try:
+        from robo.trabalho import Trabalho, _agora
+        with Trabalho(cfg).tx() as c:
+            c.executescript(USO_ESQUEMA)
+            c.execute("INSERT INTO uso_ferramentas (data_hora, ferramenta, quem, ok, natureza, excecao, segundos) "
+                      "VALUES (?,?,?,?,?,?,?)", (_agora(), ferramenta, quem, int(bool(r.get("ok"))), r.get("natureza"),
+                                                r.get("excecao"), round(segundos, 4)))
+    except Exception:  # registrar o uso nunca pode derrubar o trabalho
+        import logging
+        logging.getLogger("robo").warning("Não consegui registrar o uso da ferramenta %s", ferramenta)

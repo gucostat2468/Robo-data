@@ -266,6 +266,12 @@ def _evidencia_pratica(cfg, licao: dict, cache: dict) -> tuple[bool, str]:
         r = cache[chave]
         falhou = any(f.startswith(etapa) for f in r["falhas"])
         return (not falhou, f"caso {area}/{semente} refeito: {'passou' if not falhou else 'ainda falha'}")
+    if licao["origem_tipo"] == "regra":  # regra aprendida: só conta com o arquivo passando depois dela
+        with _tb(cfg).tx() as c:
+            p = c.execute("SELECT estado, prova FROM propostas_regra WHERE id=?", (licao["origem_ref"],)).fetchone()
+        if p and p["estado"] == "comprovada":
+            return True, p["prova"]
+        return False, f"regra ainda {p['estado'] if p else 'sem proposta'}: espera o arquivo passar"
     if licao["origem_tipo"] in ("manual", "correcao", "dono"):
         return True, "conhecimento de referência: aplicado ao ser usado nas respostas"
     return False, "sem critério de aplicação"

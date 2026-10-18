@@ -231,6 +231,12 @@ class ControleRobo:
                 memoria.sincronizar_postgres(self.cfg)               # e a mesma memória no PostgreSQL (schema robo)
         except Exception:
             log.exception("Não consegui registrar a execução na central/memória")
+        try:  # aprendizado operacional: reprovou → proposta de regra; regra aprovada → prova de que mudou
+            from robo import aprendizado
+            aprendizado.comprovar(self.cfg, r)
+            aprendizado.propor(self.cfg, r)
+        except Exception:
+            log.exception("Não consegui registrar o aprendizado da execução")
         if not self.cfg.painel.get("notificacoes", True):
             return
         if r.status == SUCESSO:

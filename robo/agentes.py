@@ -40,7 +40,7 @@ from robo import habilidades as catalogo_habilidades
 log = logging.getLogger("robo")
 
 POSICOES = ["limpeza", "validacao", "modelagem"]
-RE_ID = re.compile(r"^[a-z][a-z0-9_]{1,39}$")
+RE_ID = re.compile(r"[a-z][a-z0-9_]{1,39}\Z")  # \Z: "$" aceitaria um "\n" no fim
 ANDAR_MAXIMO = 9  # o prédio cresce: contratar para o 5º andar cria o 5º andar no escritório 3D
 TAMANHO_MAXIMO_MANUAL = 50_000
 
@@ -310,6 +310,8 @@ class Equipe:
         return arq.read_text(encoding="utf-8")[:TAMANHO_MAXIMO_MANUAL]
 
     def excluir(self, agente_id: str):
+        if not RE_ID.match(str(agente_id)):  # sem isto, "../config" moveria arquivos de fora da pasta de agentes
+            raise ErroAgente("Identificador de agente inválido.")
         if agente_id in IDS_NATIVOS:
             raise ErroAgente("Agentes nativos não podem ser excluídos (você pode remover as habilidades deles).")
         arq = self.pasta / f"{agente_id}.yaml"

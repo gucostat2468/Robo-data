@@ -127,7 +127,7 @@ def abrir(cfg, andar: int) -> dict:
                  + f"\n\n## Plano de ação\n{plano or 'Nada novo a corrigir.'}\n\n## Em andamento agora\n"
                  + ("\n".join(a["agora"]) or "Nada em andamento."))
         fala(lider, ferramentas.resultado(True, "ferramenta", texto, evidencia="histórico, memória, handovers e central (agora)"))
-    lab = ferramentas.executar("laboratorio", cfg)
+    lab = ferramentas.executar("laboratorio", cfg, quem=lideranca.HEAD_DO_ANDAR.get(andar) or lider)
     if lab["ok"]:
         fala(head if head in ps else lider, lab)
     _tb(cfg)

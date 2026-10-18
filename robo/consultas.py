@@ -76,22 +76,57 @@ def executar(banco, id_consulta: str, pasta: Path = PASTA_PADRAO, limite: int = 
     return executar_texto(banco, caminho_seguro(id_consulta, pasta).read_text(encoding="utf-8-sig"), limite)
 
 
+# funções do servidor que têm efeito mesmo numa transação somente leitura (administração, arquivos, sinais, sessão)
+FUNCOES_PROIBIDAS = re.compile(
+    r"\b(pg_terminate_backend|pg_cancel_backend|pg_reload_conf|pg_rotate_logfile|pg_switch_wal|pg_promote|"
+    r"pg_read_file|pg_read_binary_file|pg_ls_\w+|pg_stat_file|pg_stat_reset\w*|pg_create_\w+|pg_drop_\w+|"
+    r"pg_advisory\w*|pg_notify|set_config|lo_\w+|dblink\w*|pg_file_\w+|pg_logdir_ls|pg_import_system_collations|"
+    r"txid_current|pg_current_xact_id)\s*\(", re.IGNORECASE)
+
+
+def _sem_textos(sql: str) -> str:
+    """Tira comentários e textos entre aspas (para procurar ';' e palavras só no código SQL)."""
+    sql = re.sub(r"--[^\n]*|/\*.*?\*/", " ", sql, flags=re.S)
+    sql = re.sub(r"\$(\w*)\$.*?\$\1\$", "''", sql, flags=re.S)       # $$ ... $$
+    return re.sub(r"'(?:[^']|'')*'|\"(?:[^\"]|\"\")*\"", "''", sql)  # 'texto' e "identificador"
+
+
+def validar_leitura(texto: str) -> None:
+    """Camadas antes do banco (o banco é a última): um comando só, sem controle de transação nem funções perigosas."""
+    codigo = _sem_textos(texto).strip().rstrip(";").strip()
+    if not codigo:
+        raise ValueError("Consulta vazia.")
+    if ";" in codigo:
+        raise ValueError("Consulta recusada: rode um comando por vez (sem ';' no meio).")
+    if not re.match(r"^\(?\s*(select|with|values|table|explain)\b", codigo, re.IGNORECASE):
+        raise ValueError("Consulta recusada: o painel roda somente leitura (SELECT/WITH).")
+    if re.search(r"\b(commit|rollback|begin|start\s+transaction|savepoint|set|reset|copy|call|do|lock|notify|listen|"
+                 r"prepare|execute|deallocate|discard|vacuum|analyze\s+\w|grant|revoke)\b",
+                 re.sub(r"\bexplain\s+(\(.*?\)\s*)?analyze\b", "explain", codigo, flags=re.IGNORECASE | re.S),
+                 re.IGNORECASE):
+        raise ValueError("Consulta recusada: só leitura (sem SET, COPY, COMMIT, CALL, DO, LOCK…).")
+    m = FUNCOES_PROIBIDAS.search(codigo)
+    if m:
+        raise ValueError(f"Consulta recusada: a função {m.group(1)} tem efeito no servidor e não é permitida aqui.")
+
+
 def executar_texto(banco, texto: str, limite: int = LIMITE_LINHAS) -> dict:
-    """Roda qualquer SQL de leitura escrito pelo dono. A proteção é do próprio PostgreSQL: a transação é aberta
-    como READ ONLY, então INSERT/UPDATE/DELETE/CREATE/DROP são recusados pelo banco, não por uma lista de palavras."""
-    sem_comentarios = re.sub(r"--[^\n]*|/\*.*?\*/", " ", texto, flags=re.S)
-    if re.search(r"\b(commit|rollback|begin|start\s+transaction|savepoint|set\s+(session|transaction))\b",
-                 sem_comentarios, re.IGNORECASE):
-        raise ValueError("Consulta recusada: o painel só roda consultas de leitura (sem COMMIT/ROLLBACK/BEGIN).")
+    """Roda qualquer SQL de leitura escrito pelo dono, em camadas:
+    1. validar_leitura: um comando só, começa com SELECT/WITH, sem SET/COPY/controle de transação/funções perigosas;
+    2. conexão em modo somente leitura (psycopg read_only) + SET TRANSACTION READ ONLY;
+    3. a transação SEMPRE é desfeita no fim (force_rollback), mesmo que algo tenha passado;
+    4. tempo limite de 60 s.
+    O mais forte de tudo é usar um usuário do PostgreSQL que só tem SELECT (banco.usuario_leitura no config)."""
+    validar_leitura(texto)
     inicio = time.perf_counter()
-    with banco.conectar() as conn:
-        with conn.transaction():
+    with banco.conectar(leitura=True) as conn:
+        conn.read_only = True
+        with conn.transaction(force_rollback=True):
             conn.execute("SET TRANSACTION READ ONLY")
             conn.execute("SET LOCAL statement_timeout = '60s'")
-            cur = conn.execute(texto)
+            cur = conn.execute(texto, prepare=True)  # protocolo estendido: o servidor aceita um comando só
             colunas = [d.name for d in cur.description] if cur.description else []
             linhas = cur.fetchmany(limite + 1) if colunas else []
-        conn.rollback()
     return {
         "colunas": colunas,
         "linhas": linhas[:limite],

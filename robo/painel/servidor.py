@@ -9,6 +9,7 @@ from __future__ import annotations
 import json
 import logging
 import mimetypes
+import os
 import re
 import shutil
 import tempfile
@@ -22,6 +23,7 @@ from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
 
 import pandas as pd
+import yaml
 
 from robo import __version__, historico
 from robo.config import RAIZ_PROJETO
@@ -110,6 +112,9 @@ def _dentro(caminho: Path, pastas) -> bool:
 
 
 # ---------------------------------------------------------------------------- API
+SENHA_ILEGIVEL = "!config-ilegivel"  # nenhuma senha confere com isto: painel trancado até o arquivo ser corrigido
+
+
 class Api:
     def __init__(self, controle: ControleRobo, porta: int):
         self.c = controle
@@ -120,7 +125,21 @@ class Api:
 
     @property
     def senha_hash(self) -> str | None:
-        return (self.c.cfg.painel.get("senha_hash") if self.c.cfg else None) or None
+        """Lida do ARQUIVO de configuração, não da config carregada: se a config falhar (pasta não achada, YAML
+        quebrado), o painel continua com senha. Arquivo ilegível = trancado (falha fechada), nunca aberto."""
+        arq = Path(self.c.caminho_config) if self.c.caminho_config else RAIZ_PROJETO / "config.yaml"
+        try:
+            chave = (str(arq), arq.stat().st_mtime_ns)
+        except OSError:
+            return (self.c.cfg.painel.get("senha_hash") if self.c.cfg else None) or None
+        if getattr(self, "_senha_cache", (None, None))[0] != chave:
+            try:
+                dados = yaml.safe_load(arq.read_text(encoding="utf-8")) or {}
+                h = ((dados.get("painel") or {}) if isinstance(dados, dict) else {}).get("senha_hash") or None
+            except Exception:
+                h = SENHA_ILEGIVEL
+            self._senha_cache = (chave, h)
+        return self._senha_cache[1]
 
     def acesso_estado(self, q, token=None) -> dict:
         return {"senha": bool(self.senha_hash), "logado": not self.senha_hash or self.acesso.valida(token)}
@@ -136,8 +155,12 @@ class Api:
             h = gerar_hash(nova)
         except ValueError as e:
             raise ErroApi(str(e))
+        if self.senha_hash == SENHA_ILEGIVEL:
+            raise ErroApi("O config.yaml não pôde ser lido; por segurança a senha não pode ser trocada pelo painel. "
+                          "Corrija o arquivo ou use: python -m robo senha", 409)
         configuracao.definir_senha(configuracao.garantir_arquivo(self.c.caminho_config), h)
-        self.c.cfg.painel["senha_hash"] = h
+        if self.c.cfg:
+            self.c.cfg.painel["senha_hash"] = h
         self.acesso.sair_de_todas()  # senha nova derruba as sessões antigas
         log.info("Senha do painel definida/alterada.")
         return {"ok": True}
@@ -491,6 +514,8 @@ class Api:
         from robo.agentes import IDS_NATIVOS, ErroAgente
         from robo.pipeline import obter_equipe
         dados = b.get("agente") or {}
+        if not isinstance(dados, dict):
+            raise ErroApi("'agente' precisa ser um objeto.")
         novo = not (self.cfg.agentes / f"{dados.get('id', '')}.yaml").exists()
         try:
             if novo and dados.get("id") not in IDS_NATIVOS:
@@ -794,6 +819,8 @@ class Api:
     def salvar_config(self, b):
         arquivo = configuracao.garantir_arquivo(self.c.caminho_config)
         alteracoes = b.get("alteracoes") or {}
+        if not isinstance(alteracoes, dict) or not all(isinstance(v, dict) or v is None for v in alteracoes.values()):
+            raise ErroApi("'alteracoes' precisa ser {seção: {chave: valor}}.")
         try:
             for secao, valores in alteracoes.items():
                 for chave, valor in (valores or {}).items():
@@ -1068,6 +1095,31 @@ class Api:
         from robo import memoria
         return memoria.sincronizar_postgres(self.cfg)
 
+    # ------------------------------------------------------------------ gestão do projeto
+    def gestao(self, _q) -> dict:
+        """Visão de gestão + checagem ao vivo de cada página: chama as mesmas rotas que a página usa."""
+        import time
+        from robo import gestao
+        v = gestao.visao(self.cfg)
+        for pg in v["paginas"]:
+            pg["checagens"] = []
+            for rota in pg["apis"]:
+                if rota == "/api/gestao":
+                    pg["checagens"].append({"rota": rota, "ok": True, "ms": None, "erro": None})
+                    continue
+                inicio = time.perf_counter()
+                try:
+                    ROTAS_GET[rota](self, {})
+                    ok, erro = True, None
+                except ErroApi as e:  # resposta controlada (ex.: banco desligado) não é defeito da página
+                    ok, erro = e.status < 500, str(e)
+                except Exception as e:
+                    log.exception("Gestão: rota %s falhou", rota)
+                    ok, erro = False, f"{type(e).__name__}: {e}"
+                pg["checagens"].append({"rota": rota, "ok": ok, "ms": round(1000 * (time.perf_counter() - inicio)), "erro": erro})
+            pg["ok"] = all(c["ok"] for c in pg["checagens"])
+        return v
+
     # ------------------------------------------------------------------ caderno de lições e erros de sistema
     # Quem usa o painel é o dono (entrou com a senha): só daqui saem lição manual, versão nova e arquivamento.
     def conhecimento(self, _q) -> dict:
@@ -1145,7 +1197,7 @@ ROTAS_GET = {
     "/api/reuniao/sala": Api.sala_ver, "/api/reuniao/salas": Api.salas,
     "/api/conhecimento": Api.conhecimento, "/api/conhecimento/caderno": Api.conhecimento_caderno,
     "/api/conhecimento/licao": Api.conhecimento_licao, "/api/conhecimento/buscar": Api.conhecimento_buscar,
-    "/api/erros": Api.erros_sistema,
+    "/api/erros": Api.erros_sistema, "/api/gestao": Api.gestao,
 }
 ROTAS_POST = {
     "/api/robo/ligar": Api.ligar, "/api/robo/pausar": Api.pausar, "/api/robo/processar-agora": Api.processar_agora,
@@ -1179,6 +1231,7 @@ def criar_manipulador(api: Api):
 
     class Manipulador(BaseHTTPRequestHandler):
         server_version = "RoboPlanilhas"
+        timeout = 30  # conexão lenta ou corpo menor que o anunciado não segura uma linha de execução para sempre
 
         def log_message(self, *args):  # silencia o log padrão de cada requisição
             pass
@@ -1248,17 +1301,20 @@ def criar_manipulador(api: Api):
                 return self._json({"erro": "requisição grande demais"}, 413)
             try:
                 corpo = json.loads(self.rfile.read(tamanho) or b"{}") if tamanho else {}
-            except json.JSONDecodeError:
+            except ValueError:  # JSON inválido e também bytes que não são UTF-8
                 return self._json({"erro": "JSON inválido"}, 400)
+            if not isinstance(corpo, dict):
+                return self._json({"erro": "O corpo precisa ser um objeto JSON ({...})."}, 400)
             return self._executar(lambda: ROTAS_POST[caminho](api, corpo))
 
         def _upload(self, caminho, tamanho):
             if tamanho <= 0 or tamanho > LIMITE_UPLOAD:
                 return self._json({"erro": "Arquivo vazio ou maior que 300 MB"}, 413)
             nome = urllib.parse.unquote(self.headers.get("X-Nome-Arquivo", "")) or "arquivo"
-            temp = Path(tempfile.mkstemp(prefix="robo_upload_")[1])
+            fd, nome_temp = tempfile.mkstemp(prefix="robo_upload_")
+            temp = Path(nome_temp)
             try:
-                with open(temp, "wb") as f:
+                with os.fdopen(fd, "wb") as f:  # usa o descritor do mkstemp (antes ele vazava a cada upload)
                     restante = tamanho
                     while restante > 0:
                         bloco = self.rfile.read(min(1 << 20, restante))
@@ -1280,6 +1336,8 @@ def criar_manipulador(api: Api):
                 b = json.loads(self.rfile.read(tamanho) or b"{}")
             except ValueError:
                 return self._json({"erro": "JSON inválido"}, 400)
+            if not isinstance(b, dict):
+                return self._json({"erro": "O corpo precisa ser um objeto JSON ({...})."}, 400)
             if caminho == "/api/logout":
                 api.acesso.sair(self._token())
                 return self._json({"ok": True}, cabecalhos={"Set-Cookie": f"{NOME_COOKIE}=; Path=/; Max-Age=0; HttpOnly; SameSite=Strict"})

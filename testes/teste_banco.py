@@ -7,6 +7,7 @@ import uuid
 
 import pandas as pd
 import pytest
+from pathlib import Path
 from openpyxl import Workbook
 
 from conftest import REGRA_NPS
@@ -266,3 +267,22 @@ def teste_laboratorio_no_postgres_em_schema_separado(cfg_factory, banco_cfg):
     # a tabela de treino é apagada depois; nada vai para o schema de produção
     assert _q(banco_cfg, "SELECT count(*) FROM information_schema.tables WHERE table_schema='laboratorio'")[0][0] == 0
     assert _q(banco_cfg, "SELECT count(*) FROM information_schema.tables WHERE table_schema='tratado'")[0][0] == 0
+
+
+def teste_sql_livre_nao_escapa_do_somente_leitura(banco_cfg):
+    """Achados da auditoria: ';' com SET + DELETE apagava dados; funções administrativas passavam."""
+    from robo import consultas
+    from robo.banco import Banco
+    b = Banco(banco_cfg, Path("."))
+    b.criar_banco_se_preciso()
+    with b.conectar() as c:
+        c.execute("CREATE TABLE alvo (x int)")
+        c.execute("INSERT INTO alvo VALUES (1), (2)")
+    for sql in ["SET transaction_read_only = off; DELETE FROM alvo RETURNING x",
+                "SELECT pg_terminate_backend(pid) FROM pg_stat_activity", "SELECT pg_read_file('/etc/hostname')",
+                "SELECT pg_reload_conf()", "SELECT set_config('role','postgres',true)", "COPY alvo TO STDOUT",
+                "WITH x AS (DELETE FROM alvo RETURNING 1) SELECT * FROM x", "DELETE FROM alvo"]:
+        with pytest.raises(Exception):
+            consultas.executar_texto(b, sql)
+    assert consultas.executar_texto(b, "SELECT 'a;b' AS t, count(*) FROM alvo -- comentário; ok")["linhas"] == [("a;b", 2)]
+    assert _q(banco_cfg, "SELECT count(*) FROM alvo")[0][0] == 2

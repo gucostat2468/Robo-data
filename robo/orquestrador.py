@@ -279,7 +279,7 @@ def _executar(cfg, sid: str) -> str:
             params.update(titulo=s["titulo"], ref=sid, partes=[
                 {"titulo": d["titulo"], **(d["resultado"] or {})} for d in s["etapas"] if d["ordem"] < e["ordem"]
                 and por_ordem[d["ordem"]]["estado"] == "concluida"])
-        r = ferramentas.executar(e["ferramenta"], cfg, **params)
+        r = ferramentas.executar(e["ferramenta"], cfg, **{"quem": quem, **params})
         estado = "concluida" if r["ok"] else "falhou"
         tb.atualizar_etapa(e["id"], quem, estado=estado, natureza=r["natureza"], resultado=r,
                            fim=datetime.now().isoformat(timespec="seconds"))
@@ -328,7 +328,9 @@ def _revisar(cfg, sid: str) -> str:
         return "falhou"
     todas = s["etapas"]
     ok = len(concluidas)
-    if ok == len(todas):
+    if not todas:  # tarefa sem etapa nenhuma não pode sair "concluída" (0 de 0)
+        final = "falhou"
+    elif ok == len(todas):
         final = "concluida"
     elif ok:
         final = "concluida_parcialmente"
@@ -419,12 +421,44 @@ def cancelar(cfg, sid: str, motivo: str = "") -> None:
             tb.decidir(a["id"], False, "dono", "tarefa cancelada")
 
 
+CAMINHO_ATE_FALHA = {"na_fila": ["em_execucao"], "em_correcao": ["em_execucao"], "aguardando_dependencia": ["em_execucao"],
+                     "em_revisao": ["reprovada_revisao"], "reprovada_revisao": [], "em_execucao": []}
+
+
+def _encerrar_como_falha(tb: Trabalho, sid: str, estado: str, motivo: str) -> None:
+    """Leva a tarefa até 'falhou' pelos estados permitidos (a máquina de estados não deixa pular)."""
+    try:
+        for passo in CAMINHO_ATE_FALHA.get(estado, []):
+            tb.mudar_estado(sid, passo, "robo", motivo)
+        tb.mudar_estado(sid, "falhou", "robo", motivo)
+    except Exception:
+        log.exception("Não consegui encerrar %s depois do reinício", sid)
+
+
+def _revisar_seguro(cfg, sid: str) -> None:
+    try:
+        _revisar(cfg, sid)
+    except Exception:
+        log.exception("Revisão retomada de %s falhou", sid)
+
+
 def retomar_pendentes(cfg) -> list[str]:
     """Depois de reiniciar: tarefas que estavam na fila ou em execução voltam a rodar (nada se perde)."""
     tb = Trabalho(cfg)
     retomadas = []
-    for estado in ("na_fila", "em_execucao", "em_correcao"):
+    # registro automático do pipeline: não se "refaz" — a planilha já foi processada; se ficou no meio, é falha registrada
+    for estado in ("na_fila", "em_execucao", "em_correcao", "em_revisao", "reprovada_revisao", "aguardando_dependencia"):
         for s in tb.listar(estado=estado, tipo="tarefa"):
+            if s.get("modelo") == "pipeline":
+                _encerrar_como_falha(tb, s["id"], estado,
+                                     "Registro automático interrompido por reinício (a planilha está no histórico)")
+                continue
+            if estado == "em_revisao":  # a execução terminou; falta a revisão independente
+                retomadas.append(s["id"])
+                threading.Thread(target=_revisar_seguro, args=(cfg, s["id"]), daemon=True, name=f"revisao-{s['id']}").start()
+                continue
+            if estado == "reprovada_revisao":
+                tb.mudar_estado(s["id"], "em_correcao", "robo", "Retomada depois de reiniciar: refazer o que a revisão apontou")
             if estado == "em_execucao":
                 for e in tb.solicitacao(s["id"])["etapas"]:
                     if e["estado"] == "em_execucao":  # interrompida no meio: roda de novo
