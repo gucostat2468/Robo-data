@@ -23,13 +23,21 @@ def teste_backup_real_e_rodizio(cfg_factory, monkeypatch, com_pg_dump):
                              "usuario": partes.get("user", "postgres"), "senha": partes.get("password", ""),
                              "banco": f"robo_bkp_{uuid.uuid4().hex[:8]}"}, backup={"manter": 2})
     from robo.banco import Banco
-    Banco(cfg.banco, cfg.base).criar_banco_se_preciso()
-    if not com_pg_dump:
-        monkeypatch.setattr(backup, "localizar_pg_dump", lambda: None)
-    elif not backup.localizar_pg_dump():
-        pytest.skip("pg_dump não instalado")
-    for _ in range(3):
-        r = backup.fazer_backup(cfg)
-        assert r["ok"], r
-    assert r["metodo"] == ("pg_dump" if com_pg_dump else "csv")
-    assert len([d for d in backup.pasta(cfg).iterdir() if d.is_dir()]) <= 2, "guarda só os últimos N"
+    b = Banco(cfg.banco, cfg.base)
+    b.criar_banco_se_preciso()
+    try:
+        if not com_pg_dump:
+            monkeypatch.setattr(backup, "localizar_pg_dump", lambda: None)
+        elif not backup.localizar_pg_dump():
+            pytest.skip("pg_dump não instalado")
+        for _ in range(3):
+            r = backup.fazer_backup(cfg)
+            assert r["ok"], r
+        assert r["metodo"] == ("pg_dump" if com_pg_dump else "csv")
+        dirs = sorted(d.name for d in backup.pasta(cfg).iterdir() if d.is_dir())
+        assert len(dirs) <= 2 + 1, "guarda os últimos N + o 1º do mês"
+        assert backup._mensais(dirs) <= set(dirs)  # o 1º do mês nunca sai
+    finally:  # o banco do teste não fica esquecido no servidor
+        with b.conectar("postgres") as conn:
+            conn.autocommit = True
+            conn.execute(f'DROP DATABASE IF EXISTS "{cfg.banco["banco"]}" WITH (FORCE)')

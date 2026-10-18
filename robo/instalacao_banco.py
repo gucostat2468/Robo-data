@@ -85,11 +85,11 @@ def instalar(caminho_config: Path, superusuario: str, senha_super: str, host: st
         variaveis = "permanentes no seu usuário do Windows (setx)"
     passos.append(f"senhas nas variáveis de ambiente {VAR_APP} e {VAR_LEITURA} ({variaveis})")
 
-    # provas
-    from robo.config import carregar_config
+    # provas (só com a parte do banco: não dependem de a pasta de entrada já estar configurada)
+    import yaml
     from robo.banco import Banco
-    cfg = carregar_config(arq)
-    b = Banco(cfg.banco, cfg.base)
+    dados_banco = (yaml.safe_load(arq.read_text(encoding="utf-8")) or {}).get("banco") or {}
+    b = Banco(dados_banco, arq.parent)
     with b.conectar() as conn:
         conn.execute("SELECT 1")
     passos.append(f"conectou como {usuario_app}")
@@ -102,10 +102,14 @@ def instalar(caminho_config: Path, superusuario: str, senha_super: str, host: st
     if not recusou:
         raise RuntimeError(f"{usuario_leitura} conseguiu criar tabela: as permissões não ficaram só leitura")
     passos.append(f"{usuario_leitura} tentou criar tabela e o banco recusou (só leitura de verdade)")
-    from robo import memoria
-    s = memoria.sincronizar_postgres(cfg)
-    copiadas = {k: v for k, v in s.items() if k not in ("ok", "schema")}
-    passos.append(f"memória da empresa copiada para {s['schema']}: {len(copiadas)} tabelas, {sum(copiadas.values())} linhas")
+    try:
+        from robo import memoria
+        from robo.config import carregar_config
+        s = memoria.sincronizar_postgres(carregar_config(arq))
+        copiadas = {k: v for k, v in s.items() if k not in ("ok", "schema")}
+        passos.append(f"memória da empresa copiada para {s['schema']}: {len(copiadas)} tabelas, {sum(copiadas.values())} linhas")
+    except Exception as e:  # ex.: pasta de entrada ainda não configurada — o robô copia sozinho na 1ª hora aberto
+        passos.append(f"cópia da memória fica para quando o robô abrir (agora não deu: {e})")
     return {"ok": True, "versao_postgres": versao, "passos": passos, "config": str(arq),
             "conexao": {"host": host, "porta": int(porta), "banco": banco, "usuario_app": usuario_app,
                         "usuario_leitura": usuario_leitura, "variavel_senha_app": VAR_APP, "variavel_senha_leitura": VAR_LEITURA},
