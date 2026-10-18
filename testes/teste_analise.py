@@ -91,7 +91,9 @@ def teste_monitoramento_compara_com_cargas_anteriores():
 def teste_chave_base_agrupa_ondas():
     assert chave_base("nps_outubro.xlsx", {}) == chave_base("NPS Setembro 2026.xlsx", {}) == "nps"
     assert chave_base("vendas_2026_09.csv", {}) == "vendas"
-    assert chave_base("qualquer.xlsx", {"padrao": "pesquisa_csat_*"}) == "pesquisa_csat"
+    assert chave_base("pesquisa_csat_outubro.xlsx", {"padrao": "pesquisa_csat_*"}) == "pesquisa_csat"
+    # a mesma regra não junta pesquisas diferentes (achado da auditoria: alunos e professores viravam 'nps')
+    assert chave_base("nps_pesquisa_alunos.xlsx", {"padrao": "nps_*"}) != chave_base("nps_pesquisa_professores.xlsx", {"padrao": "nps_*"})
 
 
 def _salvar_xlsx(df, caminho):

@@ -475,8 +475,8 @@ def chave_base(arquivo: str, regra: dict) -> str:
     destino = (regra or {}).get("destino") or {}
     if destino.get("tabela"):
         return normalizar_nome_coluna(destino["tabela"])
-    if regra and regra.get("padrao"):
-        return normalizar_nome_coluna(re.sub(r"[*?\[\]]", "", Path(regra["padrao"]).stem)) or "base"
+    # o nome do arquivo sem mês/ano/versão já agrupa as ondas (nps_setembro, nps_outubro → nps). Usar o padrão da
+    # regra ('nps_*' → 'nps') juntava pesquisas DIFERENTES (alunos e professores) e escondia a mais antiga.
     partes = [p for p in normalizar_nome_coluna(Path(arquivo).stem).split("_")
               if p and not p.isdigit() and p not in MESES and not re.fullmatch(r"v\d+|\d{4}|t\d|s\d", p)]
     return "_".join(partes) or normalizar_nome_coluna(Path(arquivo).stem)

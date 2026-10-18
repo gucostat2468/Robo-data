@@ -587,7 +587,7 @@ def checar_pdca(cfg, agora: datetime | None = None) -> dict:
         desde = str(h["atualizado_em"])
         base = _base_do_handover(h)
         sucesso_depois = [x for x in hist if x.get("status") == "sucesso" and _base(x.get("arquivo", "")) == base
-                          and str(x.get("data_hora", "")).replace(" ", "T") > desde] if base else []
+                          and str(x.get("data_hora", "")).replace(" ", "T") >= desde] if base else []  # >=: o mesmo segundo conta
         prazo = datetime.fromisoformat(desde) + timedelta(days=DIAS_SEM_VOLTAR) <= agora
         if base:
             # erro de uma base: só uma carga aprovada DEPOIS da correção prova que não volta (tempo sozinho não prova:
