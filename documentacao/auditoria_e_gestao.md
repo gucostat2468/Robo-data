@@ -189,7 +189,9 @@ As métricas estavam infladas e foram corrigidas:
 | N7 | Correção do chat com "_" no nome da coluna era cortada ("nota_nps" virava "nota") | teste da correção para a empresa | ✅ |
 | N8 | O aviso "usei a correção aprovada" ficava escondido numa seção recolhida | percurso no navegador | ✅ |
 
-Os dois erros de sistema da demonstração (N2 e N3) continuam **abertos para você fechar** em Conhecimento → Erros de sistema: quem marca como resolvido é o dono.
+| N9 | **Primeiro dia com PostgreSQL:** backup e cópia da memória rodavam antes de a 1ª planilha criar o banco e viravam erro | demonstração zerada | ✅ |
+
+N2, N3 e N9 foram **registrados sozinhos** em Conhecimento → Erros de sistema antes de qualquer pessoa perceber. É a prova de que o registro permanente funciona. Na rodada final, com a demonstração zerada e o PostgreSQL ligado, o resultado foi: 56 passos no navegador, 0 erros na tela, 0 erros de sistema e 0 linhas de ERRO no log.
 
 ---
 

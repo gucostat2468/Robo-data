@@ -64,6 +64,13 @@ def fazer_backup(cfg) -> dict:
         from robo.banco import Banco
         b = Banco(cfg.banco, cfg.base)
         p = b._parametros()
+        from robo.banco import ErroBancoNaoExiste
+        try:
+            with b.conectar():
+                pass
+        except ErroBancoNaoExiste:  # 1º dia, antes da 1ª carga: não é falha, só não há o que copiar ainda
+            return {"ok": False, "pulado": True, "motivo": f"O banco '{p['dbname']}' ainda não foi criado (nenhuma "
+                                                          "planilha carregada): nada a copiar ainda."}
         destino.mkdir(parents=True, exist_ok=True)
         pg_dump = localizar_pg_dump()
         if pg_dump:
@@ -128,6 +135,8 @@ def rotina(cfg) -> dict | None:
     if u and u.get("ok") and u.get("data_hora") and datetime.now() - datetime.strptime(u["data_hora"], "%Y-%m-%d %H:%M:%S") < timedelta(hours=float(c["intervalo_horas"])):
         return None
     r = fazer_backup(cfg)
+    if r.get("pulado"):
+        return r
     try:
         from robo.canal import Canal
         texto = (f"Backup do PostgreSQL feito ({r['metodo']}, {r['tamanho_mb']} MB, {r['segundos']} s). Guardo os últimos "

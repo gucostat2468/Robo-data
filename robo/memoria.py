@@ -502,6 +502,7 @@ def sincronizar_postgres(cfg) -> dict:
     tb = licoes._tb(cfg)
     erros._tb(cfg)
     copiados = {}
+    b.criar_banco_se_preciso()  # 1º dia: a cópia pode rodar antes da 1ª carga criar o banco
     with b.conectar() as conn:
         with conn.transaction():
             conn.execute(sql.SQL("CREATE SCHEMA IF NOT EXISTS {}").format(sql.Identifier(schema)))

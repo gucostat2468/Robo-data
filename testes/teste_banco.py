@@ -329,3 +329,15 @@ def teste_ti_no_computador_novo_nao_acusa_banco_ainda_nao_criado(banco_cfg, cfg_
     from robo import ti
     cfg = cfg_factory(banco={**banco_cfg, "banco": "robo_ainda_nao_existe_x"})
     assert ti.chk_cloud(cfg) == []
+
+
+def teste_primeiro_dia_rotinas_antes_da_primeira_carga(cfg_factory, banco_cfg):
+    """Achado na demonstração zerada: ao abrir, backup e cópia da memória rodavam ANTES de a 1ª planilha criar o banco
+    e viravam erro de sistema. Agora: backup diz que não há o que copiar (sem erro); a cópia cria o banco e copia."""
+    from robo import backup, erros, memoria
+    cfg = cfg_factory([], banco=banco_cfg)
+    r = backup.fazer_backup(cfg)
+    assert r.get("pulado") and "ainda não foi criado" in r["motivo"]
+    s = memoria.sincronizar_postgres(cfg)
+    assert s["ok"] and _q(banco_cfg, "SELECT 1")[0][0] == 1
+    assert erros.listar(cfg) == []

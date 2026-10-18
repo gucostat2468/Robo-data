@@ -82,6 +82,6 @@ Legenda: ✅ feito e testado · 🟡 feito em parte · ⏳ pendente
 | 76 | Treino que mede evolução de verdade | ✅ | laboratório com 4 níveis (`robo/laboratorio.py`); Gestão → Laboratório (termômetro): nível 4 subiu de 50% para 100% quando o código aprendeu |
 | 77 | Regra aprendida mais completa | ✅ | correção de valor ("Sp." → "SP") e desativação automática da regra que não resolveu (`robo/aprendizado.py`) |
 | 78 | Correção minha no chat valendo para todos | ✅ | vira proposta; aprovada, todo cálculo da empresa usa e avisa; o 1º cálculo comprova |
-| 79 | Fechar os itens abertos da auditoria | ✅ | os 6, mais 8 achados novos (N1–N8 em `documentacao/auditoria_e_gestao.md`) |
+| 79 | Fechar os itens abertos da auditoria | ✅ | os 6, mais 9 achados novos (N1–N9 em `documentacao/auditoria_e_gestao.md`) |
 | 80 | Alerta quando alguém piora | ✅ | queda de 5 pontos ou mais → mão levantada na reunião do andar, com nomes e números |
 | 38 | IA opcional sem fingir | 🟡 | `robo/ia.py`: só modelo local, desligado; ainda não usado nas respostas |
