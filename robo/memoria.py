@@ -127,10 +127,16 @@ def experiencia(cfg, funcionario: str, tipo: str, resumo: str, origem: str, refe
                   "VALUES (?,?,?,?,?,?,?,?)", (funcionario, _agora(), tipo, resumo[:500], detalhe[:4000], origem, referencia, andar))
 
 
-def handover(cfg, erro: str, base: str = "", detectado_por: str = "", exemplo: str = "", tb: Trabalho | None = None) -> str:
-    """Erro → handover da área (um por tipo de erro e base; repetição soma recorrência). Devolve o id."""
+def handover(cfg, erro: str, base: str = "", detectado_por: str = "", exemplo: str = "", tb: Trabalho | None = None,
+             responsavel: str | None = None) -> str:
+    """Erro → handover da área (um por tipo de erro e base; repetição soma recorrência). Devolve o id.
+    responsavel: quando quem registra SABE quem cuida (ex.: o treino sabe a área dona da ferramenta); senão, a categoria
+    do erro decide."""
     tb = tb or Trabalho(cfg)
     andar, resp, causa, regra, verificar = categorizar(erro)
+    if responsavel:
+        resp = responsavel
+        andar = (organizacao.por_id(cfg).get(responsavel) or {}).get("andar", andar)
     chave = _chave(erro, base)
     agora = _agora()
     with tb.tx() as c:

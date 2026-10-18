@@ -341,3 +341,18 @@ def teste_primeiro_dia_rotinas_antes_da_primeira_carga(cfg_factory, banco_cfg):
     s = memoria.sincronizar_postgres(cfg)
     assert s["ok"] and _q(banco_cfg, "SELECT 1")[0][0] == 1
     assert erros.listar(cfg) == []
+
+
+def teste_treino_de_sql_nos_5_niveis_no_postgres(cfg_factory, banco_cfg):
+    """Competência de SQL: a tabela sintética entra no schema 'treino', o SQL roda SOMENTE LEITURA e bate com a verdade
+    (inclusive filtro com apóstrofo no nível 4); a tabela sai depois (é refeita pela semente)."""
+    from robo import treino
+    cfg = cfg_factory([], banco=banco_cfg)
+    cfg.criar_pastas()
+    assert "sql" in treino.competencias_de("dba", cfg)
+    for nivel in range(1, 6):
+        caso = treino.criar_caso(cfg, "sql", nivel, semente=300 + nivel)
+        assert caso["estado"] == "validado", caso["revisao"]
+        r = treino.tentar(cfg, "dba", "sql", caso, "T")
+        assert r["acertou"], (nivel, r["detalhe"])
+    assert _q(banco_cfg, "SELECT count(*) FROM information_schema.tables WHERE table_schema='treino'")[0][0] == 0

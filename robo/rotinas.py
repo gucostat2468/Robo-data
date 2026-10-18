@@ -23,9 +23,10 @@ from robo.trabalho import Trabalho, _agora
 ROTINAS = {
     "ronda_ti": ("coord_devops", "Ronda de TI: disco, pastas, dependências, segurança e logs", 0.5),
     "estrategia": ("ger_operacoes", "Backlog da sprint, avaliação técnica e treinamento (a cada 15 dias)", 24 * 15),
-    "backup": ("dba", "Backup do PostgreSQL (guarda os 7 últimos)", 24),
+    "backup": ("dba", "Backup do SQLite (memória da empresa) e do PostgreSQL — o 1º de cada mês fica para sempre", 24),
     "memoria_pg": ("dba", "Cópia da memória de todos os funcionários para o PostgreSQL", 1),
     "pdca": ("ger_operacoes", "Etapa C do PDCA: o que foi corrigido e não voltou vira boa prática", 1),
+    "treino": ("casos_planejamento", "Treino contínuo: cada funcionário recebe um caso com gabarito no seu nível; erro vira lição", 0.1),
     "licoes": ("rh_td", "Caderno de lições: colhe o que a empresa aprendeu, cada pessoa estuda, é testada e comprova", 1),
     "estudo": ("canal_helena", "Rodada de estudo de todos os funcionários (2x por semana)", 84),
     "reuniao": ("ger_operacoes", "Reunião semanal da liderança, andar por andar", 24 * 7),

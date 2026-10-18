@@ -37,6 +37,8 @@ PAGINAS = [
      "andar": 4, "apis": ["/api/gestao"]},
     {"id": "chat", "titulo": "Chat da empresa", "para_que": "Conversar com qualquer funcionário, com filtros", "andar": 4,
      "apis": ["/api/funcionarios"]},
+    {"id": "treino", "titulo": "Treino contínuo", "para_que": "Todos treinando em casos com gabarito, no nível de cada um",
+     "andar": 4, "apis": ["/api/treino"]},
     {"id": "solicitacoes", "titulo": "Solicitações", "para_que": "Pedidos, planos, aprovações e entregas", "andar": 4,
      "apis": ["/api/solicitacoes"]},
     {"id": "conhecimento", "titulo": "Conhecimento", "para_que": "Caderno de lições de cada um e erros de sistema", "andar": 4,

@@ -16,14 +16,16 @@ import numpy as np
 import pandas as pd
 
 SEMENTE = 42
-IGNORAR_PREFIXOS = ("id_", "_", "cod", "cep", "ano", "mes", "dia")
+# Colunas que são número mas não são medida: código, CEP e partes de data. Compara o 1º TERMO do nome, não o começo
+# do texto — antes 'dias_entrega', 'anos_de_casa' e 'mesas' ficavam de fora (achado do treino contínuo, nível 4).
+IGNORAR_TERMOS = {"id", "cod", "codigo", "cep", "ano", "mes", "dia", "semana", "trimestre"}
 
 
 def _numericas(df: pd.DataFrame, excluir: list[str] | None = None) -> list[str]:
     excluir = set(excluir or [])
     return [c for c in df.columns if c not in excluir and pd.api.types.is_numeric_dtype(df[c])
-            and not pd.api.types.is_bool_dtype(df[c]) and not str(c).lower().startswith(IGNORAR_PREFIXOS)
-            and str(c).lower() != "id" and not str(c).lower().endswith("_id")
+            and not pd.api.types.is_bool_dtype(df[c]) and not str(c).startswith("_")
+            and str(c).lower().split("_")[0] not in IGNORAR_TERMOS and not str(c).lower().endswith("_id")
             and df[c].nunique(dropna=True) > 2]
 
 

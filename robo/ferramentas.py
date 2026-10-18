@@ -81,7 +81,9 @@ def _pasta_artefatos(cfg, ref: str) -> Path:
 
 
 # ----------------------------------------------------------------------------- ferramentas
-def f_conhecimento(cfg, pergunta: str = "", quem: str | None = None, **_) -> dict:
+def f_conhecimento(cfg, pergunta: str = "", quem: str | None = None, registrar_uso: bool = True, **_) -> dict:
+    """registrar_uso=False: prova de recuperação do treino — achar a lição não é o mesmo que usá-la no trabalho, então
+    não conta como 'aplicada' no caderno."""
     from robo import canal
     t = canal.normalizar(pergunta)
     pont = [(canal._pontuar(t, v["chaves"]), i) for i, v in enumerate(canal.CONHECIMENTO)]
@@ -89,7 +91,8 @@ def f_conhecimento(cfg, pergunta: str = "", quem: str | None = None, **_) -> dic
     pontos_md, secao = canal._buscar_markdown(cfg, t)
     if secao and pontos_md >= 3 and pontos_md > melhor[0]:
         from robo import licoes
-        licoes.registrar_uso_por_origem(cfg, "manual", f"{Path(secao['arquivo']).name}#{secao['titulo']}", quem, pergunta)
+        if registrar_uso:
+            licoes.registrar_uso_por_origem(cfg, "manual", f"{Path(secao['arquivo']).name}#{secao['titulo']}", quem, pergunta)
         corpo = secao["corpo"] if len(secao["corpo"]) <= 1500 else secao["corpo"][:1500].rsplit(" ", 1)[0] + "…"
         return resultado(True, "conhecimento", f"{secao['titulo']}: {corpo}", {"fonte": secao["arquivo"]},
                          evidencia=f"manual {secao['arquivo']}, seção “{secao['titulo']}”")
@@ -107,7 +110,8 @@ def f_conhecimento(cfg, pergunta: str = "", quem: str | None = None, **_) -> dic
     achadas = licoes.buscar(cfg, pergunta, quem) or licoes.buscar(cfg, pergunta)
     if achadas:
         l = achadas[0]
-        licoes.registrar_uso(cfg, l["id"], quem, pergunta)  # usar a lição numa resposta é a prova de 'aplicada' 
+        if registrar_uso:
+            licoes.registrar_uso(cfg, l["id"], quem, pergunta)  # usar a lição numa resposta é a prova de 'aplicada' 
         corpo = l["conteudo"] if len(l["conteudo"]) <= 1500 else l["conteudo"][:1500].rsplit(" ", 1)[0] + "…"
         return resultado(True, "conhecimento", f"{l['titulo']}\n\n{corpo}", {"fonte": l["id"], "versao": l["versao"]},
                          evidencia=f"caderno de lições {l['id']} (v{l['versao']}, origem {l['origem_tipo']})")
@@ -161,8 +165,17 @@ def f_calcular(cfg, pergunta: str = "", arquivo: str | None = None, base: str | 
     calculou = "\n" in r["texto"] or " — Base " in r["texto"]
     if not calculou or not r.get("calc"):
         return resultado(calculou, "calculo" if calculou else "limitacao", r["texto"], {"autor": r["autor"], "pergunta": texto},
-                         evidencia=origem)
+                         evidencia=origem)  # sem 'calculo' nos dados: não houve conta
     from robo import conferencia
+    calc = r["calc"]
+    col = (calc["metricas"] or [None])[0]
+    try:  # os números que a calculadora deu, por grupo (para quem confere: treino, revisão, auditoria)
+        valores = conferencia.valores_pandas(calc["op"], calc["dados"], col, list(calc["por"] or []),
+                                             calc.get("escala_csat") or 5)
+    except Exception:
+        valores = {}
+    interpretado = {"op": calc["op"], "metricas": calc["metricas"], "por": calc["por"], "filtros": calc["filtros"],
+                    "valores": valores}
     conf = conferencia.conferir(cfg, r["calc"])
     try:  # cada conferência fica registrada: é o indicador de confiabilidade da empresa
         from robo.trabalho import Trabalho
@@ -180,7 +193,7 @@ def f_calcular(cfg, pergunta: str = "", arquivo: str | None = None, base: str | 
                              r["calc"]["base"], "dba", texto)
         except Exception:
             pass
-    return resultado(True, natureza, _organizar_calculo(r, conf), {"autor": r["autor"], "pergunta": texto,
+    return resultado(True, natureza, _organizar_calculo(r, conf), {"autor": r["autor"], "pergunta": texto, "calculo": interpretado,
                      "conferencia": conf["status"], "sql": conf["sql"]}, evidencia=origem)
 
 

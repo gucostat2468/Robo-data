@@ -171,6 +171,46 @@ EQUIPE = [
     _p("rh_estagiaria", "Bianca", "Estagiária de RH", "estagiario", 4, "Pessoas e Cultura", "rh_desempenho", "#F9A8D4",
        ["Acompanha os indicadores de desempenho em modo observação"], ["Relato correto"], [FONTES["oxygen"]],
        ["Não altera nem decide nada"], ["desempenho"]),
+    # ------------------------------------------------------------------ Sala de Casos (4º andar, responde ao dono)
+    # Quem prepara o trabalho de treino de TODA a empresa precisa saber mais do que quem vai fazê-lo: cada designer só
+    # gera casos da competência em que passou no exame dos 5 níveis (inclusive o desafio), e nada vai para ninguém sem
+    # a revisão independente. Ficam fora dos andares que avaliam para não avaliar o próprio chefe.
+    _p("head_casos", "Otávio", "Head da Sala de Casos — treino contínuo da empresa", "head", 4, "Treinamento e Avaliação", "dono",
+       "#0E7490", ["Responde pelo catálogo de competências e níveis (o que cada cargo precisa saber fazer)",
+                   "Certifica os designers: exame com um caso de cada nível, revisado pela revisora",
+                   "Suspende a certificação de quem teve 2 casos reprovados nos últimos 10"],
+       ["100% dos designers certificados na versão atual de cada gerador", "Nenhum caso sem revisão chegou a alguém"],
+       [FONTES["ccl_702010"], "Avaliação por evidência: gabarito conhecido e conferido por outro caminho"],
+       ["Não corrige tentativa de ninguém à mão: a correção é objetiva, pelo gabarito",
+        "Não aprova o caso de um designer (quem revisa é a revisora)"], []),
+    _p("casos_engenharia", "Lívia", "Designer de Casos — Engenharia de Dados", "especialista", 4, "Treinamento e Avaliação",
+       "head_casos", "#0891B2", ["Gera os casos de limpeza de planilha, leitura de histórico e SQL, com a sujeira de cada nível",
+                                 "Calcula o gabarito a partir dos dados limpos ANTES de sujá-los"],
+       ["Casos aprovados na revisão", "Casos reprodutíveis pela semente"], ["Geração de dados com resposta conhecida"],
+       ["Não revisa os próprios casos"], []),
+    _p("casos_analytics", "Murilo", "Designer de Casos — Analytics e Ciência de Dados", "especialista", 4,
+       "Treinamento e Avaliação", "head_casos", "#06B6D4",
+       ["Gera os casos de cálculo, NPS, anomalias, segmentação e drivers", "Planta o que precisa ser achado (grupos, outliers, driver)"],
+       ["Casos aprovados na revisão", "Gabarito sem ambiguidade (folga mínima entre a resposta certa e a 2ª)"],
+       ["Estatística aplicada", "Dados sintéticos com estrutura plantada"], ["Não revisa os próprios casos"], []),
+    _p("casos_governanca", "Raquel", "Designer de Casos — Governança, Pessoas e Conhecimento", "especialista", 4,
+       "Treinamento e Avaliação", "head_casos", "#0D9488",
+       ["Gera os casos de LGPD (com iscas), desempenho de RH, resumo executivo e busca no conhecimento"],
+       ["Casos aprovados na revisão", "Toda isca comprovadamente não é dado pessoal"], ["LGPD", "Política de desempenho"],
+       ["Não revisa os próprios casos"], []),
+    _p("casos_ti", "Augusto", "Designer de Casos — TI e Segurança", "especialista", 4, "Treinamento e Avaliação", "head_casos",
+       "#155E75", ["Monta computadores de teste com problemas plantados para a ronda de TI"],
+       ["Casos aprovados na revisão", "Nível desafio testa também o que NÃO existe (alarme falso)"], ["SRE", "Segurança"],
+       ["Não mexe no computador de produção"], []),
+    _p("casos_revisor", "Valéria", "Revisora Independente de Casos", "especialista", 4, "Treinamento e Avaliação", "head_casos",
+       "#164E63", ["Revisa CADA caso antes de ir para alguém: refaz pela semente, refaz o gabarito por outro caminho e confirma a sujeira",
+                   "Reprova e devolve com o motivo; reprovação conta contra o designer"],
+       ["Zero caso com gabarito errado entregue"], ["Dupla checagem independente (four-eyes)"], ["Não gera casos"], []),
+    _p("casos_planejamento", "Yasmin", "Planejadora de Treino", "senior", 4, "Treinamento e Avaliação", "head_casos", "#0F766E",
+       ["Distribui o trabalho: quem está há mais tempo sem treinar primeiro, na competência mais antiga, no nível da pessoa",
+        "Aplica a regra de nível: 4 de 5 certas sobe; 2 ou menos desce — sempre com as tentativas como prova"],
+       ["Todos os elegíveis treinando toda semana", "Toda mudança de nível com evidência"], ["Aprendizagem adaptativa"],
+       ["Não muda nível na mão"], []),
 ]
 POR_ID = {p["id"]: p for p in EQUIPE}
 
@@ -353,6 +393,8 @@ def provas() -> dict:
     r.update(ciencia.provas())
     from robo import bibliotecas
     r.update(bibliotecas.provas())
+    from robo import treino
+    r.update(treino.provas())
     emails = pd.Series(["a@b.com", "c@d.com.br", "x@y.org"] * 5)
     r["rh_rs"] = [("Reconhece demanda de e-mail para contratar", (contratacao.reconhecer(emails, "contato") or {}).get("habilidade") is not None),
                   ("Não contrata para coluna de nota", contratacao.reconhecer(pd.Series([1, 2, 3] * 5), "nota") is None)]

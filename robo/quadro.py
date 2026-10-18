@@ -383,7 +383,21 @@ def conf_compatibilidade_excel(c: Contexto) -> list[str]:
 # =============================================================================== 4º andar · Governança e canal
 RE_EMAIL = re.compile(r"^[^@\s]+@[^@\s]+\.[a-z]{2,}$", re.IGNORECASE)
 RE_CPF = re.compile(r"^\d{3}\.?\d{3}\.?\d{3}-?\d{2}$")
-RE_TEL = re.compile(r"^\(?\d{2}\)?\s?9?\d{4}-?\d{4}$")
+RE_TEL = re.compile(r"^(\+?55\s?)?\(?\d{2}\)?\s?9?\d{4}[-\s]?\d{4}$")  # com ou sem +55 (achado do treino)
+RE_EMAIL_NO_TEXTO = re.compile(r"[^@\s]+@[^@\s]+\.[a-z]{2,}", re.IGNORECASE)
+
+
+def cpf_valido(texto: str) -> bool:
+    """CPF de verdade passa no dígito verificador; número de pedido com a mesma cara não passa (achado do treino)."""
+    d = re.sub(r"\D", "", str(texto))
+    if len(d) != 11 or len(set(d)) == 1:
+        return False
+    n = [int(x) for x in d]
+    for k in (9, 10):
+        v = (sum(a * b for a, b in zip(n[:k], range(k + 1, 1, -1))) * 10) % 11
+        if (0 if v == 10 else v) != n[k]:
+            return False
+    return True
 
 
 def conf_dados_pessoais(c: Contexto) -> list[str]:
@@ -396,8 +410,12 @@ def conf_dados_pessoais(c: Contexto) -> list[str]:
             amostra = df[col].dropna().astype(str).str.strip().head(200)
             if amostra.empty:
                 continue
-            for tipo, rx in (("e-mail", RE_EMAIL), ("CPF", RE_CPF), ("telefone", RE_TEL)):
-                if amostra.str.match(rx).mean() >= 0.6:
+            testes = (("e-mail", lambda s: s.str.match(RE_EMAIL)),
+                      ("CPF", lambda s: s.str.match(RE_CPF) & s.map(cpf_valido)),
+                      ("telefone", lambda s: s.str.match(RE_TEL)),
+                      ("e-mail dentro do texto", lambda s: s.str.contains(RE_EMAIL_NO_TEXTO)))
+            for tipo, teste in testes:
+                if teste(amostra).mean() >= 0.6:
                     achados.append(f"[{nome}.{col}] parece {tipo} sem anonimização — confirme se pode ser publicado "
                                    f"(habilidade 'anonimizar' resolve)")
                     break

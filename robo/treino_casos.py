@@ -1,0 +1,1113 @@
+"""Catálogo de casos de treino: uma COMPETÊNCIA por ferramenta de contrato que dá para corrigir com resposta conhecida.
+
+Cada competência tem 5 níveis e quatro partes, todas código de verdade:
+  gerar(nivel, semente, pasta, cfg)  → o caso: dados sintéticos (arquivo ou parâmetros) + GABARITO calculado pelo gerador,
+                                       que conhece a verdade porque criou os dados limpos antes de sujá-los;
+  executar(cfg, sandbox, pid, caso)  → o funcionário usa a ferramenta REAL do contrato dele (ferramentas.executar);
+  corrigir(caso, resposta)           → (acertou, nota 0–1, tipo_erro, detalhe) — comparação objetiva com o gabarito;
+  conferir(caso, cfg)                → conferência INDEPENDENTE do revisor da Sala de Casos: refaz o gabarito por outro
+                                       caminho (laço em Python puro em vez de pandas, validadores próprios) e confirma
+                                       que a sujeira do nível foi mesmo plantada. Caso com problema não vai para ninguém.
+
+Os mesmos casos servem a todos que estão no mesmo nível: dá para comparar pessoas de forma justa e, no futuro, usar
+os registros em Machine Learning (semente + versão do gerador reproduzem o caso exatamente).
+"""
+
+from __future__ import annotations
+
+import csv
+import hashlib
+import json
+import math
+import re
+from dataclasses import dataclass, field
+from datetime import datetime, timedelta
+from pathlib import Path
+from typing import Callable
+
+import numpy as np
+import pandas as pd
+
+from robo.limpeza import normalizar_nome_coluna, sem_acento
+
+NIVEIS = {1: "básico", 2: "intermediário", 3: "avançado", 4: "difícil", 5: "desafio"}
+
+
+@dataclass
+class Competencia:
+    id: str
+    nome: str
+    ferramenta: str
+    designer: str
+    versao: str
+    niveis: dict
+    gerar: Callable
+    executar: Callable
+    corrigir: Callable
+    conferir: Callable
+    requer_banco: bool = False
+    usa_conhecimento_real: bool = False
+    descricao: str = ""
+    extra: dict = field(default_factory=dict)
+
+
+# =============================================================================== utilidades
+def _rng(semente: int, nivel: int, sal: str) -> np.random.Generator:
+    h = int(hashlib.sha256(f"{sal}|{semente}|{nivel}".encode()).hexdigest()[:12], 16)
+    return np.random.default_rng(h)
+
+
+def conteudo_hash(caminho: Path | None, extra: dict) -> str:
+    """Hash do CONTEÚDO (valores das células), não dos bytes: o .xlsx guarda a hora em que foi salvo."""
+    h = hashlib.sha256(json.dumps(extra, sort_keys=True, ensure_ascii=False, default=str).encode())
+    if caminho and Path(caminho).exists():
+        p = Path(caminho)
+        if p.suffix.lower() in (".xlsx", ".xlsm"):
+            from openpyxl import load_workbook
+            wb = load_workbook(p, read_only=True, data_only=False)
+            for ws in wb.worksheets:
+                h.update(ws.title.encode())
+                for linha in ws.iter_rows(values_only=True):
+                    h.update(repr(linha).encode())
+            wb.close()
+        else:
+            h.update(p.read_bytes())
+    return h.hexdigest()
+
+
+def _xlsx(caminho: Path, cabecalho: list, linhas: list, titulo: str | None = None) -> Path:
+    from openpyxl import Workbook
+    wb = Workbook()
+    ws = wb.active
+    if titulo:
+        ws.append([titulo])
+        ws.append([])
+    ws.append(cabecalho)
+    for l in linhas:
+        ws.append(l)
+    caminho.parent.mkdir(parents=True, exist_ok=True)
+    wb.save(caminho)
+    return caminho
+
+
+def _usar(ferramenta: str, cfg, pid: str, **params) -> dict:
+    from robo import ferramentas
+    return ferramentas.executar(ferramenta, cfg, quem=pid, **params)
+
+
+def _fechado(a: float, b: float, tol: float = 1e-6) -> bool:
+    return a is not None and b is not None and not (isinstance(a, float) and math.isnan(a)) and \
+        math.isclose(float(a), float(b), rel_tol=tol, abs_tol=tol)
+
+
+def _excecao(resposta: dict):
+    if resposta.get("excecao"):
+        return (False, 0.0, "excecao_no_codigo", f"a ferramenta quebrou: {resposta['texto'][:300]}")
+    return None
+
+
+# =============================================================================== 1. limpeza (diagnosticar_planilha)
+def _g_limpeza(nivel, semente, pasta, cfg):
+    from robo import laboratorio
+    from openpyxl import load_workbook
+    area = laboratorio.AREAS[semente % len(laboratorio.AREAS)]
+    caso = laboratorio.aplicar_nivel(laboratorio.gerar(area, semente), min(nivel, 4), semente)
+    arq = pasta / f"treino_{area}_{semente}.xlsx"
+    laboratorio.escrever_sujo(caso, arq)
+    rng = _rng(semente, nivel, "limpeza")
+    defeito = nivel == 5 or (nivel >= 2 and rng.random() < 0.3)
+    celulas = []
+    if defeito:  # fórmula quebrada no meio dos dados: a planilha TEM que ser barrada
+        wb = load_workbook(arq)
+        ws = wb.active
+        cab = next(i for i, r in enumerate(ws.iter_rows(values_only=True), 1) if r and r[0] and str(r[0]).strip().upper() == "ID")
+        alvo_col = ws.max_column if ws.cell(cab, ws.max_column).value else ws.max_column - 1
+        for k in rng.choice(np.arange(cab + 2, cab + 2 + min(40, caso["n"] - 2)), 2, replace=False):
+            ws.cell(int(k), alvo_col, "#REF!")
+            celulas.append(int(k))
+        wb.save(arq)
+    return {"arquivo": str(arq), "parametros": {"area": area, "nivel_sujeira": min(nivel, 4), "defeito": defeito},
+            "gabarito": {"aprovaria": not defeito, "linhas": caso["n"], "celulas_ref": celulas},
+            "resumo": f"planilha de {area} com sujeira nível {min(nivel, 4)}" + (" e fórmula quebrada (#REF!)" if defeito else "")}
+
+
+def _x_limpeza(cfg, sb, pid, caso):
+    return _usar("diagnosticar_planilha", sb, pid, arquivo=caso["arquivo"])
+
+
+def _c_limpeza(caso, r):
+    if (e := _excecao(r)):
+        return e
+    g, d = caso["gabarito"], r.get("dados") or {}
+    if g["aprovaria"] and not d.get("aprovaria"):
+        return (False, 0.0, "barrou_planilha_boa", "barrou uma planilha que deveria passar: " + "; ".join((d.get("erros") or [])[:2]))
+    if not g["aprovaria"]:
+        achou = any("fórmula" in str(x).lower() or "#ref" in str(x).lower() for x in d.get("erros") or [])
+        return (True, 1.0, "", "barrou a fórmula quebrada") if not d.get("aprovaria") and achou else \
+            (False, 0.0, "aprovou_planilha_com_defeito", "deixou passar célula #REF!")
+    if d.get("linhas_saida") != g["linhas"]:
+        return (False, 0.5, "linhas_erradas", f"{d.get('linhas_saida')} linha(s) na saída; o certo é {g['linhas']} "
+                                               "(Total, subtotal, rodapé ou duplicata mal tratados)")
+    return (True, 1.0, "", f"{g['linhas']} linhas certas, sem falso alarme")
+
+
+def _v_limpeza(caso, cfg):
+    """Revisor: relê o arquivo cru (openpyxl, sem o pipeline) e confirma a verdade e a sujeira plantada."""
+    from openpyxl import load_workbook
+    problemas = []
+    wb = load_workbook(caso["arquivo"], read_only=True)
+    linhas = list(wb.active.iter_rows(values_only=True))
+    wb.close()
+    ids = set()
+    for l in linhas:
+        if l and isinstance(l[0], int) and 10_000 <= l[0] < 20_000:
+            ids.add(l[0])
+    if len(ids) != caso["gabarito"]["linhas"]:
+        problemas.append(f"o arquivo tem {len(ids)} IDs distintos; o gabarito diz {caso['gabarito']['linhas']}")
+    texto = " ".join(str(c) for l in linhas for c in (l or ()) if isinstance(c, str))
+    if "Total" not in texto:
+        problemas.append("linha de Total não foi plantada")
+    nivel = caso["parametros"]["nivel_sujeira"]
+    if nivel >= 2 and "Subtotal" not in texto:
+        problemas.append("nível ≥ 2 sem subtotal plantado")
+    if nivel >= 3 and "Gerado em" not in texto:
+        problemas.append("nível ≥ 3 sem rodapé de sistema")
+    refs = sum(1 for l in linhas for c in (l or ()) if c == "#REF!")
+    if caso["parametros"]["defeito"] != bool(refs):
+        problemas.append(f"defeito plantado={caso['parametros']['defeito']} mas o arquivo tem {refs} #REF!")
+    return problemas
+
+
+# =============================================================================== 2. cálculo (calcular)
+_SEGUNDA = {"varejo": "Canal de Venda", "educacao_nps": "Modalidade", "financeiro": "Conta Contábil"}
+
+
+def _g_calculo(nivel, semente, pasta, cfg):
+    from robo import laboratorio
+    area = laboratorio.AREAS[(semente // 7) % len(laboratorio.AREAS)]
+    caso = laboratorio.aplicar_nivel(laboratorio.gerar(area, semente), min(nivel, 4), semente)
+    arq = pasta / f"treino_calc_{area}_{semente}.xlsx"
+    laboratorio.escrever_sujo(caso, arq)
+    verdade = laboratorio.verdade(caso)
+    seg, met = normalizar_nome_coluna(caso["segmento"]), normalizar_nome_coluna(caso["metrica"])
+    op = caso["op"]
+    nome_op = {"nps": "nps", "media": "média", "soma": "soma", "mediana": "mediana"}
+    rng = _rng(semente, nivel, "calculo")
+    por, filtros = [seg], []
+    if nivel == 2:
+        valor = str(rng.choice(sorted(verdade[seg].dropna().unique())))
+        por, filtros = [], [(seg, "=", valor)]
+    elif nivel == 3 and op != "nps":
+        op = "mediana"
+    elif nivel == 5 and area in _SEGUNDA:
+        por = [seg, normalizar_nome_coluna(_SEGUNDA[area])]
+    pergunta = (f"{nome_op[op]} de {met}" if op != "nps" else "nps") + (f" por {' e '.join(por)}" if por else "") + \
+        "".join(f" onde {c} = {v}" for c, s, v in filtros)
+    dados = verdade
+    for c, s, v in filtros:
+        dados = dados[dados[c].astype(str) == v]
+    from robo import conferencia
+    esperado = conferencia.valores_pandas(op, dados, met, por)
+    return {"arquivo": str(arq), "parametros": {"area": area, "pergunta": pergunta, "op": op, "por": por, "filtros": filtros,
+                                                "metrica": met, "nivel_sujeira": min(nivel, 4)},
+            "gabarito": {"valores": {k: (None if isinstance(v, float) and math.isnan(v) else v) for k, v in esperado.items()}},
+            "resumo": f"“{pergunta}” numa planilha de {area} com sujeira nível {min(nivel, 4)}"}
+
+
+def _x_calculo(cfg, sb, pid, caso):
+    return _usar("calcular", sb, pid, pergunta=caso["parametros"]["pergunta"], arquivo=caso["arquivo"])
+
+
+def _c_calculo(caso, r):
+    if (e := _excecao(r)):
+        return e
+    calc = (r.get("dados") or {}).get("calculo")
+    if not calc:
+        return (False, 0.0, "nao_entendeu_o_pedido", r.get("texto", "")[:200])
+    p = caso["parametros"]
+    if calc["op"] != p["op"]:
+        return (False, 0.0, "operacao_errada", f"fez {calc['op']}; o pedido era {p['op']}")
+    g, obt = caso["gabarito"]["valores"], calc.get("valores") or {}
+    erradas = [k for k in g if g[k] is not None and not _fechado(obt.get(k), g[k], 1e-6)]
+    sobrando = [k for k in obt if k not in g]
+    if erradas or sobrando:
+        nota = 1 - len(erradas) / max(1, len(g))
+        det = "; ".join(f"{k}: deu {obt.get(k)}, certo {g[k]}" for k in erradas[:3]) + \
+            (f"; grupos que não existem: {sobrando[:3]}" if sobrando else "")
+        return (False, round(max(0.0, nota), 2), "numero_errado", det)
+    return (True, 1.0, "", f"{len(g)} valor(es) certos")
+
+
+def _v_calculo(caso, cfg):
+    """Revisor: refaz a conta num laço em Python puro (outro caminho que não o pandas) a partir da verdade."""
+    from robo import laboratorio
+    p = caso["parametros"]
+    semente = caso["semente"]
+    base = laboratorio.aplicar_nivel(laboratorio.gerar(p["area"], semente), p["nivel_sujeira"], semente)
+    rot = {normalizar_nome_coluna(k): list(v) for k, v in base["rotulos"].items()}
+    grupos: dict = {}
+    for i in range(base["n"]):
+        if any(str(rot[c][i]) != v for c, s, v in p["filtros"]):
+            continue
+        x = rot[p["metrica"]][i]
+        if x is None or (isinstance(x, float) and math.isnan(x)):
+            continue
+        chave = " / ".join(str(rot[c][i]) for c in p["por"]) if p["por"] else "(total)"
+        grupos.setdefault(chave, []).append(float(x))
+    problemas = []
+    for chave, xs in grupos.items():
+        if p["op"] == "soma":
+            v = math.fsum(xs)
+        elif p["op"] == "media":
+            v = math.fsum(xs) / len(xs)
+        elif p["op"] == "mediana":
+            s = sorted(xs)
+            v = s[len(s) // 2] if len(s) % 2 else (s[len(s) // 2 - 1] + s[len(s) // 2]) / 2
+        else:  # nps: só notas inteiras de 0 a 10
+            ok = [x for x in xs if float(x).is_integer() and 0 <= x <= 10]
+            v = 100 * (sum(x >= 9 for x in ok) - sum(x <= 6 for x in ok)) / len(ok) if ok else float("nan")
+        g = caso["gabarito"]["valores"].get(chave)
+        if g is None or not _fechado(v, g, 1e-9):
+            problemas.append(f"{chave}: gabarito {g}, conta independente {v}")
+    if set(grupos) != set(caso["gabarito"]["valores"]):
+        problemas.append("grupos do gabarito diferentes dos da conta independente")
+    return problemas
+
+
+# =============================================================================== 3. indicadores (perfil_indicadores)
+def _g_indicadores(nivel, semente, pasta, cfg):
+    from robo import laboratorio
+    caso = laboratorio.aplicar_nivel(laboratorio.gerar("educacao_nps", semente), min(nivel, 4), semente)
+    rng = _rng(semente, nivel, "indicadores")
+    nota = caso["rotulos"]["Nota NPS"] = np.array(caso["rotulos"]["Nota NPS"], dtype=object)
+    codigos = []
+    if nivel >= 3:  # "99 = não sabe": não é nota, tem que ficar fora do NPS
+        livres = [i for i in range(caso["n"]) if nota[i] is not None]
+        for i in rng.choice(livres, max(3, caso["n"] // 25), replace=False):
+            nota[int(i)] = 99
+            codigos.append(int(i))
+    arq = pasta / f"treino_nps_{semente}.xlsx"
+    laboratorio.escrever_sujo(caso, arq)
+    validas = [int(x) for x in nota if x is not None and 0 <= int(x) <= 10]
+    nps = 100 * (sum(x >= 9 for x in validas) - sum(x <= 6 for x in validas)) / len(validas)
+    return {"arquivo": str(arq), "parametros": {"nivel_sujeira": min(nivel, 4), "codigos_99": codigos},
+            "gabarito": {"nps": nps, "n": len(validas)},
+            "resumo": f"pesquisa NPS com sujeira nível {min(nivel, 4)}" + (f" e {len(codigos)} código(s) 99" if codigos else "")}
+
+
+def _x_indicadores(cfg, sb, pid, caso):
+    return _usar("perfil_indicadores", sb, pid, arquivo=caso["arquivo"])
+
+
+def _c_indicadores(caso, r):
+    if (e := _excecao(r)):
+        return e
+    g = caso["gabarito"]
+    linhas = [l for tab in (r.get("dados") or {}).values() if isinstance(tab, dict) for l in tab.get("indicadores") or []]
+    geral = next((l for l in linhas if l.get("indicador") == "NPS" and l.get("segmento") == "Total"), None)
+    if not geral:
+        return (False, 0.0, "nao_achou_o_indicador", "não reconheceu a coluna de NPS")
+    if int(geral.get("n") or 0) != g["n"]:
+        return (False, 0.3, "base_errada", f"n={geral.get('n')}; o certo é {g['n']} (códigos 99 e vazios ficam fora)")
+    if abs(float(geral["valor"]) - g["nps"]) > 0.051:
+        return (False, 0.5, "numero_errado", f"NPS {geral['valor']}; o certo é {g['nps']:.1f}")
+    return (True, 1.0, "", f"NPS {geral['valor']} com n={g['n']}")
+
+
+def _v_indicadores(caso, cfg):
+    from openpyxl import load_workbook
+    wb = load_workbook(caso["arquivo"], read_only=True)
+    linhas = list(wb.active.iter_rows(values_only=True))
+    wb.close()
+    cab_i = next(i for i, l in enumerate(linhas) if l and l[0] and str(l[0]).strip().upper() == "ID")
+    cab = [str(c or "").strip().lower() for c in linhas[cab_i]]
+    j = cab.index("nota nps")
+    vistos, notas = set(), []
+    for l in linhas[cab_i + 1:]:
+        if not l or not isinstance(l[0], int) or l[0] in vistos:
+            continue
+        vistos.add(l[0])
+        v = l[j]
+        try:
+            x = float(str(v).replace(",", "")) if v not in (None, "-", "N/A", "") else None
+        except ValueError:
+            x = None
+        if x is not None and x.is_integer() and 0 <= x <= 10:
+            notas.append(x)
+    problemas = []
+    if len(notas) != caso["gabarito"]["n"]:
+        problemas.append(f"releitura achou {len(notas)} notas válidas; gabarito diz {caso['gabarito']['n']}")
+    elif notas:
+        nps = 100 * (sum(x >= 9 for x in notas) - sum(x <= 6 for x in notas)) / len(notas)
+        if abs(nps - caso["gabarito"]["nps"]) > 1e-6:
+            problemas.append(f"NPS relido {nps}; gabarito {caso['gabarito']['nps']}")
+    return problemas
+
+
+# =============================================================================== 4. LGPD (dados_pessoais)
+def _cpf(rng, valido=True) -> str:
+    n = [int(x) for x in rng.integers(0, 10, 9)]
+    for k in (10, 11):
+        d = (sum(v * w for v, w in zip(n, range(k, 1, -1))) * 10) % 11
+        n.append(0 if d == 10 else d)
+    if not valido:
+        n[-1] = (n[-1] + 1 + int(rng.integers(0, 8))) % 10
+    return "".join(map(str, n))
+
+
+def cpf_valido(c: str) -> bool:
+    c = re.sub(r"\D", "", str(c))
+    if len(c) != 11 or len(set(c)) == 1:
+        return False
+    n = [int(x) for x in c]
+    for k in (9, 10):
+        d = (sum(v * w for v, w in zip(n[:k], range(k + 1, 1, -1))) * 10) % 11
+        if (0 if d == 10 else d) != n[k]:
+            return False
+    return True
+
+
+NOMES = ["ana", "bruno", "carla", "diego", "elisa", "fabio", "gabi", "hugo", "iris", "joao", "katia", "luis"]
+SOBRENOMES = ["silva", "souza", "lima", "costa", "rocha", "alves", "melo", "dias"]
+
+
+def _g_lgpd(nivel, semente, pasta, cfg):
+    rng = _rng(semente, nivel, "lgpd")
+    n = 120
+    cpfs = [_cpf(rng) for _ in range(n)]
+    emails = [f"{rng.choice(NOMES)}.{rng.choice(SOBRENOMES)}{int(rng.integers(1, 99))}@{rng.choice(['gmail.com', 'empresa.com.br', 'outlook.com'])}"
+              for _ in range(n)]
+    tels = [f"({int(rng.integers(11, 99))}) 9{int(rng.integers(1000, 9999))}-{int(rng.integers(1000, 9999))}" for _ in range(n)]
+    nomes_col = {1: ("email", "cpf", "telefone"), 2: ("contato", "documento", "fone_cliente")}.get(nivel, ("campo_a", "campo_b", "campo_c"))
+    if nivel >= 3:  # formatos crus: CPF só com dígitos, telefone com +55
+        cpfs_txt = cpfs
+        tels = [f"+55 {t}" for t in tels]
+    else:
+        cpfs_txt = [f"{c[:3]}.{c[3:6]}.{c[6:9]}-{c[9:]}" for c in cpfs]
+    colunas = {"id": list(range(1, n + 1)), "valor_compra": [round(float(x), 2) for x in rng.lognormal(5, .5, n)],
+               "codigo_produto": [f"PRD-{int(x):05d}" for x in rng.integers(0, 99999, n)],
+               nomes_col[0]: emails, nomes_col[1]: cpfs_txt, nomes_col[2]: tels}
+    pessoais = list(nomes_col)
+    iscas = []
+    if nivel >= 4:  # isca: número de pedido COM a cara de CPF, mas dígito verificador inválido — não é dado pessoal
+        colunas["numero_pedido"] = [(lambda c: f"{c[:3]}.{c[3:6]}.{c[6:9]}-{c[9:]}")(_cpf(rng, valido=False)) for _ in range(n)]
+        iscas.append("numero_pedido")
+    if nivel >= 5:  # e-mail escondido no meio do texto livre: também é dado pessoal
+        colunas["observacao"] = [f"cliente pediu retorno em {e}" if rng.random() < 0.8 else "sem observação" for e in emails]
+        pessoais.append("observacao")
+    cab = list(colunas)
+    linhas = [[colunas[c][i] for c in cab] for i in range(n)]
+    arq = _xlsx(pasta / f"treino_lgpd_{semente}.xlsx", cab, linhas)
+    return {"arquivo": str(arq), "parametros": {"colunas_pessoais": pessoais, "iscas": iscas},
+            "gabarito": {"pessoais": sorted(normalizar_nome_coluna(c) for c in pessoais)},
+            "resumo": f"cadastro com {len(pessoais)} coluna(s) de dado pessoal" + (f" e {len(iscas)} isca(s)" if iscas else "")}
+
+
+def _x_lgpd(cfg, sb, pid, caso):
+    return _usar("dados_pessoais", sb, pid, arquivo=caso["arquivo"])
+
+
+def _c_lgpd(caso, r):
+    if (e := _excecao(r)):
+        return e
+    achados = (r.get("dados") or {}).get("achados") or []
+    obtidas = sorted({m.group(1) for a in achados for m in [re.search(r"\.([^\].]+)\] parece", a)] if m})
+    certas = caso["gabarito"]["pessoais"]
+    faltou, sobrou = sorted(set(certas) - set(obtidas)), sorted(set(obtidas) - set(certas))
+    if faltou or sobrou:
+        tipo = "deixou_dado_pessoal_passar" if faltou else "falso_alarme"
+        nota = len(set(certas) & set(obtidas)) / max(1, len(set(certas) | set(obtidas)))
+        return (False, round(nota, 2), tipo, (f"não apontou {faltou}" if faltou else "") + ("; " if faltou and sobrou else "")
+                + (f"apontou sem ser dado pessoal: {sobrou}" if sobrou else ""))
+    return (True, 1.0, "", f"apontou exatamente {certas}")
+
+
+def _v_lgpd(caso, cfg):
+    from openpyxl import load_workbook
+    wb = load_workbook(caso["arquivo"], read_only=True)
+    linhas = list(wb.active.iter_rows(values_only=True))
+    wb.close()
+    cab = [str(c) for c in linhas[0]]
+    col = {c: [l[i] for l in linhas[1:]] for i, c in enumerate(cab)}
+    problemas = []
+    for c in caso["parametros"]["colunas_pessoais"]:
+        vals = [str(v) for v in col.get(c, [])]
+        tem = sum(bool(re.search(r"[\w.]+@[\w.]+\.\w{2,}", v)) or cpf_valido(v) or
+                  len(re.sub(r"\D", "", v)) in (10, 11, 12, 13) and "(" in v for v in vals)
+        if tem < 0.6 * len(vals):
+            problemas.append(f"coluna {c} deveria ter dado pessoal em ≥60% das linhas (tem {tem}/{len(vals)})")
+    for c in caso["parametros"]["iscas"]:
+        if any(cpf_valido(v) for v in col.get(c, [])):
+            problemas.append(f"isca {c} tem CPF válido (deveria ser só parecido)")
+    return problemas
+
+
+# =============================================================================== 5. anomalias
+def _tukey(xs: list[float]) -> tuple[float, float]:
+    s = sorted(xs)
+
+    def q(p):  # quantil linear (mesmo método padrão do pandas), calculado à mão
+        pos = (len(s) - 1) * p
+        lo = int(math.floor(pos))
+        return s[lo] + (s[min(lo + 1, len(s) - 1)] - s[lo]) * (pos - lo)
+    q1, q3 = q(.25), q(.75)
+    return q1 - 3 * (q3 - q1), q3 + 3 * (q3 - q1)
+
+
+def _g_anomalias(nivel, semente, pasta, cfg):
+    rng = _rng(semente, nivel, "anomalias")
+    n = 240
+    ncols = 1 if nivel == 1 else 2 if nivel <= 3 else 3
+    colunas = {"id": list(range(1, n + 1))}
+    nomes = ["tempo_atendimento", "valor_pedido", "dias_entrega"][:ncols]
+    for c in nomes:
+        base = rng.lognormal(3, 0.35, n) if nivel >= 3 else rng.normal(100, 10, n)
+        k = 1 if nivel == 1 else int(rng.integers(2, 4))
+        idx = rng.choice(n, k, replace=False)
+        for j, i in enumerate(idx):
+            sinal = -1 if (nivel >= 5 and j % 2) else 1
+            base[i] = float(np.median(base)) + sinal * 40 * float(np.std(base))
+        colunas[c] = [round(float(x), 2) for x in base]
+    verdade = {}
+    for c in nomes:
+        lo, hi = _tukey(colunas[c])
+        verdade[c] = sum(1 for x in colunas[c] if x < lo or x > hi)
+    escrito = {k: list(v) for k, v in colunas.items()}
+    if nivel >= 4:  # ruído de texto: vazios escritos como "N/A" e números em formato brasileiro
+        for c in nomes:
+            for i in rng.choice(n, 6, replace=False):
+                escrito[c][int(i)] = "N/A"
+                colunas[c][int(i)] = None
+            escrito[c] = [f"{v:.2f}".replace(".", ",") if isinstance(v, float) else v for v in escrito[c]]
+        for c in nomes:  # verdade recalculada sem os vazios
+            xs = [x for x in colunas[c] if x is not None]
+            lo, hi = _tukey(xs)
+            verdade[c] = sum(1 for x in xs if x < lo or x > hi)
+    cab = list(escrito)
+    arq = _xlsx(pasta / f"treino_anomalias_{semente}.xlsx", cab, [[escrito[c][i] for c in cab] for i in range(n)])
+    return {"arquivo": str(arq), "parametros": {"colunas": nomes},
+            "gabarito": {"por_coluna": {c: v for c, v in verdade.items() if v}},
+            "resumo": f"{ncols} coluna(s) numérica(s) com {sum(verdade.values())} valor(es) fora da faixa de Tukey (3×IQR)"}
+
+
+def _x_anomalias(cfg, sb, pid, caso):
+    return _usar("anomalias", sb, pid, arquivo=caso["arquivo"])
+
+
+def _c_anomalias(caso, r):
+    if (e := _excecao(r)):
+        return e
+    achados = ((r.get("dados") or {}).get("anomalias") or {}).get("achados") or []
+    obt = {a["coluna"]: a["quantidade"] for a in achados if a["coluna"] in caso["parametros"]["colunas"]}
+    g = caso["gabarito"]["por_coluna"]
+    if obt != g:
+        return (False, 0.0, "anomalia_nao_achada" if sum(obt.values()) < sum(g.values()) else "falso_alarme",
+                f"achou {obt}; o certo é {g}")
+    return (True, 1.0, "", f"achou {sum(g.values())} anomalia(s) certas")
+
+
+def _v_anomalias(caso, cfg):
+    if not caso["gabarito"]["por_coluna"]:
+        return ["caso sem nenhuma anomalia: não treina nada"]
+    return []
+
+
+# =============================================================================== 6. segmentação
+def _g_segmentacao(nivel, semente, pasta, cfg):
+    rng = _rng(semente, nivel, "segmentacao")
+    k = {1: 2, 2: 3, 3: 3, 4: 4, 5: 4}[nivel]
+    dims = ["renda_mensal", "idade", "gasto_mensal", "visitas_mes"][: (2 if nivel <= 2 else 3)]
+    sep = {1: 9.0, 2: 8.0, 3: 7.0, 4: 7.0, 5: 6.5}[nivel]
+    # centros equidistantes (polígono regular / tetraedro): nenhum par de grupos mais perto que outro — gabarito sem
+    # ambiguidade (antes, dois centros sorteados perto um do outro faziam '3 grupos' parecer 2)
+    if len(dims) == 2:
+        ang = rng.uniform(0, 2 * np.pi) + np.arange(k) * 2 * np.pi / k
+        centros = np.c_[np.cos(ang), np.sin(ang)] * sep / (2 * np.sin(np.pi / k))
+    else:
+        base = np.array([[1, 1, 1], [1, -1, -1], [-1, 1, -1], [-1, -1, 1]], dtype=float)[:k]
+        rot, _ = np.linalg.qr(rng.normal(0, 1, (3, 3)))
+        centros = base @ rot * sep / (2 * np.sqrt(2))
+    n_por = 90
+    X = np.vstack([rng.normal(centros[g], 1.0, (n_por, len(dims))) for g in range(k)])
+    rotulos = np.repeat(np.arange(k), n_por)
+    escalas = {"renda_mensal": (3000, 400), "idade": (40, 3), "gasto_mensal": (800, 90), "visitas_mes": (6, 0.8)}
+    colunas = {"id": list(range(1, len(X) + 1))}
+    for j, d in enumerate(dims):
+        m, s = escalas[d]
+        colunas[d] = [round(float(m + s * x), 2) for x in X[:, j]]
+    if nivel >= 3:  # coluna sem estrutura nenhuma (ruído): não pode inventar grupo a mais por causa dela
+        colunas["nota_aleatoria"] = [round(float(x), 2) for x in rng.normal(5, 0.05, len(X))]
+    cab = list(colunas)
+    arq = _xlsx(pasta / f"treino_seg_{semente}.xlsx", cab, [[colunas[c][i] for c in cab] for i in range(len(X))])
+    return {"arquivo": str(arq), "parametros": {"dims": dims, "rotulos": rotulos.tolist()},
+            "gabarito": {"k": k}, "resumo": f"{len(X)} clientes em {k} perfis plantados ({', '.join(dims)})"}
+
+
+def _x_segmentacao(cfg, sb, pid, caso):
+    return _usar("segmentacao", sb, pid, arquivo=caso["arquivo"])
+
+
+def _c_segmentacao(caso, r):
+    if (e := _excecao(r)):
+        return e
+    sg = (r.get("dados") or {}).get("segmentos") or {}
+    if not sg.get("ok"):
+        return (False, 0.0, "nao_segmentou", r.get("texto", "")[:200])
+    if sg["k"] != caso["gabarito"]["k"]:
+        return (False, 0.0, "grupos_errados", f"achou {sg['k']} grupo(s); foram plantados {caso['gabarito']['k']}")
+    return (True, 1.0, "", f"{sg['k']} grupos, silhueta {sg.get('silhueta', 0):.2f}")
+
+
+def _v_segmentacao(caso, cfg):
+    """Revisor: silhueta dos rótulos VERDADEIROS (conta própria) — grupo mal definido não serve de gabarito."""
+    from openpyxl import load_workbook
+    wb = load_workbook(caso["arquivo"], read_only=True)
+    linhas = list(wb.active.iter_rows(values_only=True))
+    wb.close()
+    cab = list(linhas[0])
+    idx = [cab.index(d) for d in caso["parametros"]["dims"]]
+    X = np.array([[float(l[i]) for i in idx] for l in linhas[1:]])
+    X = (X - X.mean(0)) / X.std(0)
+    rot = np.array(caso["parametros"]["rotulos"])
+    D = np.sqrt(((X[:, None, :] - X[None]) ** 2).sum(-1))
+    s = []
+    for i in range(len(X)):
+        a = D[i, rot == rot[i]].sum() / max(1, (rot == rot[i]).sum() - 1)
+        b = min(D[i, rot == j].mean() for j in set(rot.tolist()) if j != rot[i])
+        s.append((b - a) / max(a, b))
+    sil = float(np.mean(s))
+    return [] if sil >= 0.5 else [f"grupos plantados mal separados (silhueta {sil:.2f} < 0,50)"]
+
+
+# =============================================================================== 7. drivers
+ATRIBUTOS = ["nota_atendimento", "nota_preco", "nota_entrega", "nota_app", "nota_variedade"]
+
+
+def _g_drivers(nivel, semente, pasta, cfg):
+    rng = _rng(semente, nivel, "drivers")
+    n = 320
+    attrs = ATRIBUTOS[: (3 if nivel <= 2 else 5)]
+    driver = str(rng.choice(attrs))
+    Z = {a: rng.normal(0, 1, n) for a in attrs}
+    if nivel >= 4:  # distrator parecido com o driver (correlação ~0,6): só olhar um par engana
+        outro = next(a for a in attrs if a != driver)
+        Z[outro] = 0.6 * Z[driver] + 0.8 * rng.normal(0, 1, n)
+    ruido = {1: 0.4, 2: 0.6, 3: 0.8, 4: 0.9, 5: 1.0}[nivel]
+    latente = 0.9 * Z[driver] + ruido * rng.normal(0, 1, n)
+    colunas = {"id": list(range(1, n + 1))}
+    for a in attrs:
+        colunas[a] = [round(float(np.clip(7 + 1.5 * x, 0, 10)), 1) for x in Z[a]]
+    colunas["nota_nps"] = [int(np.clip(round(7 + 2 * x), 0, 10)) for x in latente]
+    if nivel >= 5:
+        for i in rng.choice(n, 15, replace=False):
+            colunas[attrs[int(i) % len(attrs)]][int(i)] = None
+    cab = list(colunas)
+    arq = _xlsx(pasta / f"treino_drivers_{semente}.xlsx", cab, [[colunas[c][i] for c in cab] for i in range(n)])
+    return {"arquivo": str(arq), "parametros": {"atributos": attrs}, "gabarito": {"driver": driver},
+            "resumo": f"pesquisa com {len(attrs)} atributos; o que move o NPS foi plantado"}
+
+
+def _x_drivers(cfg, sb, pid, caso):
+    return _usar("drivers", sb, pid, arquivo=caso["arquivo"])
+
+
+def _c_drivers(caso, r):
+    if (e := _excecao(r)):
+        return e
+    dr = (r.get("dados") or {}).get("drivers") or {}
+    if not dr.get("ok"):
+        return (False, 0.0, "nao_rodou", r.get("texto", "")[:200])
+    topo = dr["drivers"][0]["atributo"]
+    return (True, 1.0, "", f"1º driver: {topo}") if topo == caso["gabarito"]["driver"] else \
+        (False, 0.0, "driver_errado", f"apontou {topo}; o plantado é {caso['gabarito']['driver']}")
+
+
+def _v_drivers(caso, cfg):
+    from openpyxl import load_workbook
+    wb = load_workbook(caso["arquivo"], read_only=True)
+    linhas = list(wb.active.iter_rows(values_only=True))
+    wb.close()
+    cab = list(linhas[0])
+    df = pd.DataFrame(linhas[1:], columns=cab).apply(pd.to_numeric, errors="coerce").dropna()
+    cor = {a: abs(float(np.corrcoef(df[a], df["nota_nps"])[0, 1])) for a in caso["parametros"]["atributos"]}
+    ordem = sorted(cor, key=lambda a: -cor[a])
+    if ordem[0] != caso["gabarito"]["driver"]:
+        return [f"na conta independente o mais correlacionado é {ordem[0]}, não o plantado"]
+    if cor[ordem[0]] - cor[ordem[1]] < 0.05:
+        return ["driver plantado sem folga sobre o 2º (diferença de correlação < 0,05): gabarito ambíguo"]
+    return []
+
+
+# =============================================================================== 8. conhecimento (todos)
+def _palavras(t: str) -> list[str]:
+    return [w for w in re.findall(r"[\wÀ-ÿ]+", t) if len(w) >= 3]
+
+
+def _g_conhecimento(nivel, semente, pasta, cfg):
+    from robo import licoes
+    with licoes._tb(cfg).tx() as c:
+        # lições geradas pelo próprio treino são quase iguais entre si (mesmo erro, nível 4 e 5): gabarito ambíguo
+        cand = [dict(r) for r in c.execute("SELECT id, titulo, pergunta, origem_tipo, origem_ref FROM licoes "
+                                           "WHERE arquivada=0 AND length(pergunta) >= 12 AND origem_tipo <> 'treino' ORDER BY id")]
+    if not cand:
+        raise ValueError("a empresa ainda não tem lições com pergunta: nada para perguntar")
+    rng = _rng(semente, nivel, "conhecimento")
+    l = cand[int(rng.integers(0, len(cand)))]
+    p = l["pergunta"]
+    ws = _palavras(p)
+    if nivel == 2:
+        p = " ".join(sem_acento(w).lower() for w in rng.permutation(ws))
+    elif nivel >= 3:
+        # fica com as palavras MAIS raras no caderno (as que identificam o assunto), embaralhadas: a pergunta continua
+        # tendo resposta; o difícil é achar com menos palavras (e, nos níveis 4 e 5, com erro de digitação)
+        freq = {}
+        for x in cand:
+            for w in set(sem_acento(x["pergunta"] + " " + x["titulo"]).lower().split()):
+                freq[w] = freq.get(w, 0) + 1
+        k = max(2, int(len(ws) * (0.6 if nivel == 3 else 0.5)))
+        raras = sorted(dict.fromkeys(sem_acento(w).lower() for w in ws), key=lambda w: (freq.get(w, 0), w))[:k]
+        p = " ".join(rng.permutation(raras))
+        sem_erro = p
+        if nivel >= 4:  # erro de digitação numa palavra
+            w = list(p)
+            pos = int(rng.integers(1, max(2, len(w) - 1)))
+            if w[pos].isalpha() and w[pos - 1].isalpha():
+                w[pos], w[pos - 1] = w[pos - 1], w[pos]
+            p = "".join(w)
+    return {"arquivo": None, "parametros": {"pergunta": p, "pergunta_original": l["pergunta"], "licao": l["id"],
+                                            "pergunta_sem_erro": locals().get("sem_erro", p),
+                                            "titulo": l["titulo"], "origem": f"{l['origem_tipo']}:{l['origem_ref']}"},
+            "gabarito": {"licao": l["id"], "titulo": l["titulo"]},
+            "resumo": f"achar a lição “{l['titulo'][:60]}” pela pergunta “{p[:60]}”"}
+
+
+def _x_conhecimento(cfg, sb, pid, caso):
+    return _usar("conhecimento", cfg, pid, pergunta=caso["parametros"]["pergunta"], registrar_uso=False)
+
+
+def _c_conhecimento(caso, r):
+    if (e := _excecao(r)):
+        return e
+    if not r.get("ok"):
+        return (False, 0.0, "nao_encontrou", "não achou nada no conhecimento")
+    fonte = str((r.get("dados") or {}).get("fonte") or "")
+    if fonte.split(".v")[0] == caso["gabarito"]["licao"].split(".v")[0]:
+        return (True, 1.0, "", f"achou a lição certa ({fonte})")
+    origem = caso["parametros"]["origem"]
+    if origem.startswith("manual:") and "#" in origem:  # a mesma seção do manual, respondida direto do .md
+        arquivo, secao = origem.split(":", 1)[1].split("#", 1)
+        if Path(fonte).name == arquivo and r.get("texto", "").startswith(f"{secao}:"):
+            return (True, 1.0, "", f"achou a seção certa do manual ({arquivo} › {secao})")
+    return (False, 0.0, "achou_outra_coisa", f"respondeu com {fonte or r.get('evidencia', '')[:80]}")
+
+
+def _v_conhecimento(caso, cfg):
+    """Revisor: a pergunta ORIGINAL tem que achar a lição em 1º lugar no índice — senão o gabarito não é justo."""
+    from robo import licoes
+    alvo = caso["gabarito"]["licao"].split(".v")[0]
+    problemas = []
+    for chave, rotulo in (("pergunta_original", "a pergunta original"), ("pergunta_sem_erro", "a pergunta do nível (sem o erro de digitação)")):
+        achadas = [l["id"].split(".v")[0] for l in (licoes.buscar(cfg, caso["parametros"].get(chave) or "") or [])[:1]]
+        if alvo not in achadas:
+            problemas.append(f"{rotulo} não acha esta lição em 1º lugar no índice: caso injusto")
+    return problemas
+
+
+# =============================================================================== 9. histórico (todos)
+def _g_historico(nivel, semente, pasta, cfg):
+    from robo import historico
+    rng = _rng(semente, nivel, "historico")
+    logs = pasta / "logs"
+    logs.mkdir(parents=True, exist_ok=True)
+    n = {1: 15, 2: 200, 3: 200, 4: 3000, 5: 400}[nivel]
+    status = ["sucesso", "reprovado", "adiado"]
+    t0 = datetime(2026, 1, 1, 8, 0)
+    registros = []
+    for i in range(n):
+        nome = f"base_{int(rng.integers(1, 50)):02d}.xlsx" if nivel < 5 else f"base;{i}'\"x.xlsx"
+        registros.append({"data_hora": (t0 + timedelta(minutes=7 * i)).strftime("%Y-%m-%d %H:%M:%S"), "arquivo": nome,
+                          "status": str(rng.choice(status, p=[0.7, 0.25, 0.05])), "linhas_entrada": int(rng.integers(10, 900)),
+                          "linhas_saida": 0, "erros": 0, "avisos": 0, "duracao_seg": 1.0, "saidas": "", "id": f"exec_{i}"})
+    pendentes = registros[-3:] if nivel in (3, 5) else []
+    historico._gravar_linhas(logs, registros[: len(registros) - len(pendentes)])
+    if pendentes:  # o CSV estava aberto no Excel: as últimas ficaram na fila de pendentes
+        (logs / "historico_pendente.jsonl").write_text("\n".join(json.dumps(p, ensure_ascii=False) for p in pendentes) + "\n",
+                                                        encoding="utf-8")
+    ultimos = [[r["arquivo"], r["status"]] for r in reversed(registros)][:10]
+    return {"arquivo": None, "parametros": {"logs": str(logs), "n": n, "pendentes": len(pendentes)},
+            "gabarito": {"ultimos": ultimos}, "resumo": f"histórico com {n} execução(ões)" +
+            (f", {len(pendentes)} esperando o CSV ser fechado" if pendentes else "")}
+
+
+def _x_historico(cfg, sb, pid, caso):
+    from robo.config import Config
+    import copy
+    dados = copy.deepcopy(sb.dados)
+    dados["pastas"]["logs"] = caso["parametros"]["logs"]
+    return _usar("historico", Config(dados, sb.base), pid, limite=10)
+
+
+def _c_historico(caso, r):
+    if (e := _excecao(r)):
+        return e
+    obt = [[x.get("arquivo"), x.get("status")] for x in (r.get("dados") or {}).get("execucoes") or []]
+    g = caso["gabarito"]["ultimos"]
+    if obt != g:
+        dif = next((i for i, (a, b) in enumerate(zip(obt, g)) if a != b), min(len(obt), len(g)))
+        return (False, round(dif / len(g), 2), "historico_errado", f"a partir da posição {dif + 1}: {obt[dif:dif + 1]} ≠ {g[dif:dif + 1]}")
+    return (True, 1.0, "", "as 10 últimas execuções certas e na ordem")
+
+
+def _v_historico(caso, cfg):
+    p = Path(caso["parametros"]["logs"]) / "historico_processamentos.csv"
+    with open(p, encoding="utf-8-sig", newline="") as f:
+        n = sum(1 for _ in csv.DictReader(f, delimiter=";"))
+    esperado = caso["parametros"]["n"] - caso["parametros"]["pendentes"]
+    return [] if n == esperado else [f"CSV gravado com {n} linha(s); deveria ter {esperado}"]
+
+
+# =============================================================================== 10. ronda de TI
+_PLANTIOS_TI = {
+    "sem_senha_painel": ("sec_senior", "sem senha"),
+    "senha_banco_no_config": ("sec_senior", "senha do PostgreSQL gravada"),
+    "erros_no_log": ("dev_junior", "erro(s) de programa no log"),
+    "codigo_novo": ("sec_senior", "código de habilidade novo/alterado"),
+}
+
+
+def _g_ronda_ti(nivel, semente, pasta, cfg):
+    rng = _rng(semente, nivel, "ronda")
+    ordem = list(_PLANTIOS_TI)
+    if nivel <= 4:
+        plantados = ordem[:nivel]
+    else:  # desafio: só alguns problemas, sorteados — achar o que NÃO existe também conta
+        plantados = [p for p in ordem if rng.random() < 0.5] or [ordem[int(rng.integers(0, 4))]]
+    return {"arquivo": None, "parametros": {"plantados": plantados, "pasta": str(pasta)},
+            "gabarito": {"problemas": {p: (p in plantados) for p in ordem}},
+            "resumo": f"computador com {len(plantados)} problema(s) plantado(s): {', '.join(plantados)}"}
+
+
+def _x_ronda_ti(cfg, sb, pid, caso):
+    import copy
+    from robo.config import Config
+    from robo import ti
+    p = caso["parametros"]
+    pasta = Path(sb.dados["pastas"]["logs"]).parent / "ti_sandbox"  # computador de teste NOVO a cada tentativa
+    dados = copy.deepcopy(sb.dados)
+    dados["pastas"] = {k: str(pasta / k) for k in ("entrada", "logs", "agentes", "habilidades")}
+    dados.setdefault("painel", {})["senha_hash"] = "" if "sem_senha_painel" in p["plantados"] else "pbkdf2$treino"
+    dados["banco"] = {**(dados.get("banco") or {}), "habilitado": False,
+                      "senha": "senha123" if "senha_banco_no_config" in p["plantados"] else ""}
+    c = Config(dados, sb.base)
+    c.criar_pastas()
+    Path(c.habilidades).mkdir(parents=True, exist_ok=True)
+    ti.ronda(c, anunciar=False)  # 1ª ronda: fotografa o estado (o "antes")
+    if "erros_no_log" in p["plantados"]:
+        agora = datetime.now().strftime("%d/%m/%Y %H:%M")
+        limite = int(ti._c(c)["erros_log_alerta"])
+        (Path(c.logs) / "robo.log").write_text("".join(f"{agora}:00 | ERROR | robo | falha {i}\n" for i in range(limite + 2)),
+                                               encoding="utf-8")
+    if "codigo_novo" in p["plantados"]:
+        (Path(c.habilidades) / "habilidade_nova.py").write_text("# código que apareceu sem aviso\n", encoding="utf-8")
+    return _usar("ronda_ti", c, pid)
+
+
+def _c_ronda_ti(caso, r):
+    if (e := _excecao(r)):
+        return e
+    itens = {i["id"]: " ".join(i.get("achados") or []) for i in (r.get("dados") or {}).get("itens") or []}
+    erros = []
+    for plantio, esperado in caso["gabarito"]["problemas"].items():
+        quem, trecho = _PLANTIOS_TI[plantio]
+        achou = trecho in itens.get(quem, "")
+        if achou != esperado:
+            erros.append(f"{plantio}: {'não detectou' if esperado else 'alarme falso'}")
+    if erros:
+        return (False, round(1 - len(erros) / 4, 2), "problema_nao_detectado" if any("não detectou" in e for e in erros)
+                else "falso_alarme", "; ".join(erros))
+    return (True, 1.0, "", f"detectou exatamente {sum(caso['gabarito']['problemas'].values())} problema(s)")
+
+
+def _v_ronda_ti(caso, cfg):
+    return [] if all(p in _PLANTIOS_TI for p in caso["parametros"]["plantados"]) else ["plantio desconhecido"]
+
+
+# =============================================================================== 11. resumo executivo
+_RE_NUM = re.compile(r"\d+(?:[.,]\d+)*")
+
+
+def _g_resumo(nivel, semente, pasta, cfg):
+    rng = _rng(semente, nivel, "resumo")
+    k = {1: 2, 2: 3, 3: 4, 4: 5, 5: 8}[nivel]
+    temas = ["NPS da pesquisa de alunos", "Vendas por região", "Clima dos colaboradores", "Contas a receber",
+             "Campanhas digitais", "Entregas", "Atendimento", "Retenção"]
+    partes = []
+    for i in range(k):
+        v = round(float(rng.uniform(-50, 95)), 1)
+        n = int(rng.integers(40, 3000))
+        falhou = nivel >= 3 and i == k - 1
+        partes.append({"titulo": temas[i], "natureza": "limitacao" if falhou else "calculo",
+                       "evidencia": f"base_{i}.xlsx", "texto": ("Não foi feito: faltou a coluna de data." if falhou else
+                                                              f"Resultado {str(v).replace('.', ',')} com base de {n} respostas.")})
+    if nivel >= 4:
+        partes.append({"titulo": "Etapa sem resultado", "natureza": "limitacao", "texto": ""})  # sem texto: não entra
+    return {"arquivo": None, "parametros": {"partes": partes},
+            "gabarito": {"titulos": [p["titulo"] for p in partes if p["texto"]],
+                         "numeros": sorted({x for p in partes for x in _RE_NUM.findall(p["texto"])})},
+            "resumo": f"resumir {sum(1 for p in partes if p['texto'])} resultado(s) sem inventar número"}
+
+
+def _x_resumo(cfg, sb, pid, caso):
+    return _usar("resumo_executivo", sb, pid, titulo="Resumo de treino", partes=caso["parametros"]["partes"], ref="treino")
+
+
+def _c_resumo(caso, r):
+    if (e := _excecao(r)):
+        return e
+    arts = r.get("artefatos") or []
+    if not r.get("ok") or not arts or not Path(arts[0]).exists():
+        return (False, 0.0, "nao_gerou", r.get("texto", "")[:200])
+    md = Path(arts[0]).read_text(encoding="utf-8")
+    corpo = "\n".join(l for l in md.splitlines() if not l.startswith("Gerado em"))
+    faltam = [t for t in caso["gabarito"]["titulos"] if f"## {t}" not in md]
+    permitidos = set(caso["gabarito"]["numeros"]) | {re.sub(r"\D", "", t) for t in caso["gabarito"]["titulos"]}
+    inventados = sorted({x for x in _RE_NUM.findall(corpo) if x not in permitidos and not re.fullmatch(r"\d", x)} -
+                        {x for x in _RE_NUM.findall(" ".join(p.get("evidencia", "") for p in caso["parametros"]["partes"]))})
+    if faltam or inventados:
+        return (False, 0.0, "numero_inventado" if inventados else "parte_omitida",
+                (f"faltou: {faltam}" if faltam else "") + (f" número(s) que não estavam nas etapas: {inventados[:5]}" if inventados else ""))
+    return (True, 1.0, "", f"{len(caso['gabarito']['titulos'])} seção(ões), nenhum número inventado")
+
+
+def _v_resumo(caso, cfg):
+    return [] if caso["gabarito"]["titulos"] else ["caso sem nenhuma parte com resultado"]
+
+
+# =============================================================================== 12. desempenho (RH)
+def _situacao_independente(a: int, e: int, minima: float) -> str:
+    from robo.memoria import MINIMO_EVENTOS
+    n = a + e
+    if n < MINIMO_EVENTOS:
+        return "sem_dados" if not n else ("atencao" if e else "ok")
+    t = 100 * a / n
+    if t < minima:
+        return "insuficiente"
+    return "atencao" if t < max(90, minima + 5) else "ok"
+
+
+def _g_desempenho(nivel, semente, pasta, cfg):
+    from robo import organizacao
+    from robo.lideranca import EXIGENCIA
+    from robo.memoria import TAXA_MINIMA
+    rng = _rng(semente, nivel, "desempenho")
+    gente = [p["id"] for p in organizacao.lista(None, com_contratados=False)]
+    k = {1: 4, 2: 12, 3: 12, 4: 15, 5: 18}[nivel]
+    escolhidos = list(rng.choice([g for g in gente if g != "esp_pandas"], k, replace=False))
+    if nivel >= 5:
+        escolhidos[0] = "esp_pandas"  # guilda Python: exigência de 90% (sem repetir a pessoa na lista)
+    agora = datetime.now()
+    eventos, gab = [], {}
+    for pid in escolhidos:
+        a, e = int(rng.integers(0, 15)), int(rng.integers(0, 6))
+        if nivel >= 5 and pid == "esp_pandas":
+            a, e = 18, 2  # exatamente 90%
+        for t, q in (("acerto", a), ("erro", e)):
+            for _ in range(q):
+                eventos.append((pid, (agora - timedelta(hours=float(rng.uniform(1, 150)))).isoformat(timespec="seconds"), t))
+        if nivel >= 3:  # fora da janela de 7 dias: não conta
+            eventos += [(pid, (agora - timedelta(days=float(rng.uniform(8, 20)))).isoformat(timespec="seconds"), "erro")] * 2
+        if nivel >= 4:  # outros tipos não entram na taxa
+            eventos += [(pid, (agora - timedelta(hours=5)).isoformat(timespec="seconds"), t) for t in ("treinamento", "colaboracao", "aprendizado")]
+        minima = EXIGENCIA.get(pid, TAXA_MINIMA)
+        gab[pid] = {"acertos": a, "erros": e, "taxa": round(100 * a / (a + e), 1) if a + e else None,
+                    "situacao": _situacao_independente(a, e, minima)}
+    logs = pasta / "logs"
+    from robo.trabalho import Trabalho
+    with Trabalho(arquivo=logs / "trabalho.db").tx() as c:
+        c.executemany("INSERT INTO experiencias (funcionario, data_hora, tipo, resumo, origem) VALUES (?,?,?,'treino','treino')",
+                      eventos)
+    return {"arquivo": None, "parametros": {"logs": str(logs), "pessoas": escolhidos},
+            "gabarito": {"por_pessoa": {p: g for p, g in gab.items() if g["acertos"] + g["erros"]}},
+            "resumo": f"semana sintética de {k} pessoa(s)" + (" com eventos fora da janela" if nivel >= 3 else "")}
+
+
+def _x_desempenho(cfg, sb, pid, caso):
+    import copy
+    from robo.config import Config
+    dados = copy.deepcopy(sb.dados)
+    dados["pastas"]["logs"] = caso["parametros"]["logs"]
+    return _usar("desempenho", Config(dados, sb.base), pid)
+
+
+def _c_desempenho(caso, r):
+    if (e := _excecao(r)):
+        return e
+    obt = {x["id"]: x for x in (r.get("dados") or {}).get("desempenho") or []}
+    erros = []
+    for pid, g in caso["gabarito"]["por_pessoa"].items():
+        o = obt.get(pid)
+        if not o:
+            erros.append(f"{pid} sumiu do relatório")
+        elif (o["acertos"], o["erros"], o["taxa"], o["situacao"]) != (g["acertos"], g["erros"], g["taxa"], g["situacao"]):
+            erros.append(f"{pid}: deu {o['acertos']}/{o['erros']} {o['taxa']}% {o['situacao']}; certo {g['acertos']}/"
+                         f"{g['erros']} {g['taxa']}% {g['situacao']}")
+    if erros:
+        return (False, round(1 - len(erros) / max(1, len(caso["gabarito"]["por_pessoa"])), 2), "conta_de_pessoas_errada",
+                "; ".join(erros[:3]))
+    return (True, 1.0, "", f"{len(caso['gabarito']['por_pessoa'])} pessoa(s) com taxa e situação certas")
+
+
+def _v_desempenho(caso, cfg):
+    """Revisor: reconta direto no banco sintético, por pessoa, só acerto/erro dentro dos 7 dias."""
+    import sqlite3
+    c = sqlite3.connect(Path(caso["parametros"]["logs"]) / "trabalho.db")
+    desde = (datetime.now() - timedelta(days=7)).isoformat(timespec="seconds")
+    contas = {}
+    for f, t, n in c.execute("SELECT funcionario, tipo, COUNT(*) FROM experiencias WHERE data_hora>=? AND tipo IN "
+                             "('acerto','erro') GROUP BY 1, 2", (desde,)):
+        contas.setdefault(f, {"acerto": 0, "erro": 0})[t] = n
+    c.close()
+    problemas = []
+    if len(set(caso["parametros"]["pessoas"])) != len(caso["parametros"]["pessoas"]):
+        problemas.append("pessoa repetida na semana sintética")
+    for pid, g in caso["gabarito"]["por_pessoa"].items():
+        x = contas.get(pid, {"acerto": 0, "erro": 0})
+        if (x["acerto"], x["erro"]) != (g["acertos"], g["erros"]):
+            problemas.append(f"{pid}: banco tem {x['acerto']}/{x['erro']}, gabarito diz {g['acertos']}/{g['erros']}")
+    return problemas
+
+
+# =============================================================================== 13. SQL (consulta_sql) — só com PostgreSQL
+def _g_sql(nivel, semente, pasta, cfg):
+    from robo import conferencia, laboratorio
+    area = laboratorio.AREAS[(semente // 3) % len(laboratorio.AREAS)]
+    caso = laboratorio.gerar(area, semente)
+    df = laboratorio.verdade(caso)
+    seg, met = normalizar_nome_coluna(caso["segmento"]), normalizar_nome_coluna(caso["metrica"])
+    op = caso["op"] if caso["op"] != "nps" else "media"
+    rng = _rng(semente, nivel, "sql")
+    por, filtros = [seg], []
+    if nivel == 2:
+        por, filtros = [], [(seg, "=", str(rng.choice(sorted(df[seg].unique()))))]
+    elif nivel == 3:
+        op = "contagem"
+    elif nivel == 4:  # valor com apóstrofo: o SQL precisa escapar direito
+        df[seg] = df[seg].astype(str) + np.where(np.arange(len(df)) % 2, " d'Oeste", "")
+        filtros = [(seg, "=", str(df[seg].iloc[1]))]
+        por = []
+    elif nivel == 5 and area in _SEGUNDA:
+        por = [seg, normalizar_nome_coluna(_SEGUNDA[area])]
+    dados = df
+    for c, s, v in filtros:
+        dados = dados[dados[c].astype(str) == v]
+    esperado = conferencia.valores_pandas(op, dados, met, por)
+    tabela = f"treino_{area}_{semente}_{nivel}"
+    arq = pasta / f"{tabela}.csv"
+    df.to_csv(arq, index=False)
+    return {"arquivo": str(arq), "parametros": {"tabela": tabela, "op": op, "metrica": met, "por": por, "filtros": filtros},
+            "gabarito": {"valores": esperado}, "resumo": f"{op} de {met} em SQL" + (f" por {', '.join(por)}" if por else "")
+            + (" com filtro" if filtros else "")}
+
+
+def _x_sql(cfg, sb, pid, caso):
+    from robo import conferencia
+    from robo.banco import Banco, tipo_pg
+    p = caso["parametros"]
+    df = pd.read_csv(caso["arquivo"])
+    b = Banco(cfg.banco, cfg.base)
+    b.criar_banco_se_preciso()
+    tipos = {c: tipo_pg(df[c]) for c in df.columns}
+    with b.conectar() as conn:
+        with conn.transaction():
+            conn.execute("CREATE SCHEMA IF NOT EXISTS treino")
+            tipos = b._garantir_tabela(conn, "treino", p["tabela"], tipos)
+            b._copiar(conn, "treino", p["tabela"], df, tipos)
+    try:
+        consulta = conferencia.montar_sql(p["op"], p["metrica"], p["por"], p["filtros"], f'"treino"."{p["tabela"]}"', None)
+        return _usar("consulta_sql", cfg, pid, sql=consulta)
+    finally:
+        with b.conectar() as conn:  # a tabela sintética é refeita pela semente: não precisa ocupar o banco
+            conn.execute(f'DROP TABLE IF EXISTS "treino"."{p["tabela"]}"')
+
+
+def _c_sql(caso, r):
+    from robo import conferencia
+    if (e := _excecao(r)):
+        return e
+    if not r.get("ok"):
+        return (False, 0.0, "sql_recusado", r.get("texto", "")[:200])
+    d = r.get("dados") or {}
+    cols, linhas = d.get("colunas") or [], d.get("linhas") or []
+    i = cols.index("valor") if "valor" in cols else None
+    if i is None:
+        return (False, 0.0, "resultado_sem_valor", f"colunas: {cols}")
+    obt = {}
+    for l in linhas:
+        chave = conferencia._chave(tuple(l[:i])) if i > 1 else (conferencia._chave(l[0]) if i == 1 else "(total)")
+        obt[chave] = float(l[i]) if l[i] not in (None, "None") else None
+    g = caso["gabarito"]["valores"]
+    erradas = [k for k in g if not _fechado(obt.get(k), g[k], 1e-6)]
+    if erradas or set(obt) != set(g):
+        return (False, round(1 - len(erradas) / max(1, len(g)), 2), "sql_numero_errado",
+                "; ".join(f"{k}: deu {obt.get(k)}, certo {g[k]}" for k in erradas[:3]) or f"grupos {sorted(obt)[:3]}")
+    return (True, 1.0, "", f"{len(g)} valor(es) certos no PostgreSQL")
+
+
+def _v_sql(caso, cfg):
+    df = pd.read_csv(caso["arquivo"])
+    return [] if len(df) else ["tabela vazia"]
+
+
+# =============================================================================== catálogo
+CATALOGO: dict[str, Competencia] = {c.id: c for c in [
+    Competencia("limpeza", "Limpar e barrar planilha", "diagnosticar_planilha", "casos_engenharia", "limpeza-1",
+                {1: "título, R$, data em texto, duplicata, Total", 2: "+ nulos '-'/'N/A', subtotal, espaços; às vezes #REF!",
+                 3: "+ número americano, datas misturadas, coluna vazia, rodapé", 4: "+ SAP '1.234,56-', '−' de PDF, 'R$ 1,2 mil'",
+                 5: "nível 4 + fórmula quebrada que TEM que barrar"},
+                _g_limpeza, _x_limpeza, _c_limpeza, _v_limpeza, descricao="O pipeline real em diagnóstico: contar as linhas certas e barrar defeito."),
+    Competencia("calculo", "Calcular o pedido", "calcular", "casos_analytics", "calculo-1",
+                {1: "uma conta por segmento", 2: "conta com filtro", 3: "mediana por segmento", 4: "conta na sujeira nível 4",
+                 5: "conta por dois segmentos"}, _g_calculo, _x_calculo, _c_calculo, _v_calculo,
+                descricao="Entender o pedido em português e acertar o número de cada grupo."),
+    Competencia("indicadores", "NPS com a base certa", "perfil_indicadores", "casos_analytics", "indicadores-2",
+                {1: "NPS limpo", 2: "+ vazios", 3: "+ código 99 (não sabe)", 4: "+ sujeira de sistema", 5: "tudo junto"},
+                _g_indicadores, _x_indicadores, _c_indicadores, _v_indicadores, descricao="NPS e base (n) certos."),
+    Competencia("lgpd", "Achar dado pessoal", "dados_pessoais", "casos_governanca", "lgpd-1",
+                {1: "colunas com nome óbvio", 2: "nomes neutros", 3: "formatos crus (+55, só dígitos)",
+                 4: "+ isca com cara de CPF (dígito inválido)", 5: "+ e-mail escondido em texto livre"},
+                _g_lgpd, _x_lgpd, _c_lgpd, _v_lgpd, descricao="Apontar exatamente as colunas com dado pessoal (nem mais, nem menos)."),
+    Competencia("anomalias", "Achar anomalias", "anomalias", "casos_analytics", "anomalias-1",
+                {1: "1 valor absurdo", 2: "vários em 2 colunas", 3: "distribuição assimétrica", 4: "+ 'N/A' e vírgula decimal",
+                 5: "+ anomalias para baixo"}, _g_anomalias, _x_anomalias, _c_anomalias, _v_anomalias,
+                descricao="Regra de Tukey (3×IQR): quantas fora da faixa em cada coluna."),
+    Competencia("segmentacao", "Achar os perfis", "segmentacao", "casos_analytics", "segmentacao-2",
+                {1: "2 perfis", 2: "3 perfis", 3: "3 perfis + coluna de ruído", 4: "4 perfis", 5: "4 perfis mais próximos"},
+                _g_segmentacao, _x_segmentacao, _c_segmentacao, _v_segmentacao, descricao="Número certo de grupos plantados."),
+    Competencia("drivers", "Achar o que move o NPS", "drivers", "casos_analytics", "drivers-1",
+                {1: "3 atributos, pouco ruído", 2: "mais ruído", 3: "5 atributos", 4: "+ distrator correlacionado",
+                 5: "+ vazios"}, _g_drivers, _x_drivers, _c_drivers, _v_drivers, descricao="O 1º driver é o plantado."),
+    Competencia("conhecimento", "Achar o conhecimento certo", "conhecimento", "casos_governanca", "conhecimento-3",
+                {1: "pergunta exata", 2: "palavras embaralhadas, sem acento", 3: "só 60% das palavras",
+                 4: "+ erro de digitação", 5: "metade das palavras + erro"},
+                _g_conhecimento, _x_conhecimento, _c_conhecimento, _v_conhecimento, usa_conhecimento_real=True,
+                descricao="Recuperar a lição certa do caderno da empresa (não conta como 'aplicada')."),
+    Competencia("historico", "Ler o histórico", "historico", "casos_engenharia", "historico-1",
+                {1: "15 execuções", 2: "200 execuções", 3: "+ linhas esperando o CSV fechar", 4: "3.000 execuções",
+                 5: "nomes com ';' e aspas + pendentes"}, _g_historico, _x_historico, _c_historico, _v_historico,
+                descricao="As 10 últimas execuções, na ordem certa."),
+    Competencia("ronda_ti", "Ronda de TI", "ronda_ti", "casos_ti", "ronda-1",
+                {1: "painel sem senha", 2: "+ senha do banco no config", 3: "+ erros no log", 4: "+ código novo sem aviso",
+                 5: "problemas sorteados (achar também o que NÃO existe)"}, _g_ronda_ti, _x_ronda_ti, _c_ronda_ti, _v_ronda_ti,
+                descricao="Detectar exatamente os problemas plantados no computador de teste."),
+    Competencia("resumo_executivo", "Resumo sem inventar", "resumo_executivo", "casos_governanca", "resumo-1",
+                {1: "2 resultados", 2: "3 resultados", 3: "+ uma etapa que falhou", 4: "+ etapa vazia", 5: "8 resultados"},
+                _g_resumo, _x_resumo, _c_resumo, _v_resumo, descricao="Todas as partes, nenhum número que não veio das etapas."),
+    Competencia("desempenho", "Conta de desempenho (RH)", "desempenho", "casos_governanca", "desempenho-2",
+                {1: "4 pessoas", 2: "12 pessoas", 3: "+ eventos fora da janela de 7 dias", 4: "+ tipos que não contam",
+                 5: "+ exigência de 90% no limite"}, _g_desempenho, _x_desempenho, _c_desempenho, _v_desempenho,
+                descricao="Taxa e situação de cada pessoa pela regra da política de RH."),
+    Competencia("sql", "Mesma conta em SQL", "consulta_sql", "casos_engenharia", "sql-1",
+                {1: "conta por segmento", 2: "com filtro", 3: "contagem", 4: "filtro com apóstrofo (d'Oeste)",
+                 5: "dois segmentos"}, _g_sql, _x_sql, _c_sql, _v_sql, requer_banco=True,
+                descricao="O SQL gerado roda no PostgreSQL (somente leitura) e bate com a verdade."),
+]}

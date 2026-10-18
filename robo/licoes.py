@@ -172,6 +172,8 @@ def _publico(cfg, andar: int | None, responsavel: str | None, publico: str, gent
     if publico == "lideranca":
         return [p["id"] for p in gente if p["id"] in organizacao.LIDERES or organizacao.nivel_de(p["id"], p) in
                 ("gerente", "coordenador", "head", "diretor")]
+    if publico == "pessoa":  # lição de um erro de uma pessoa (treino): vai só para ela
+        return [responsavel] if responsavel else []
     if publico == "todos" or not andar:
         return [p["id"] for p in gente]
     ids = [p["id"] for p in gente if p["andar"] == andar]
@@ -200,6 +202,20 @@ def criar(cfg, origem_tipo: str, origem_ref: str, titulo: str, conteudo: str, pe
                       (lid, pid, "atribuida", _agora()))
         _registrar(c, "licao_atribuida", lid, autor, {"para": alvos})
     return lid
+
+
+def atribuir(cfg, origem_tipo: str, origem_ref: str, pid: str, autor: str = "robo") -> bool:
+    """Atribui uma lição que já existe a mais uma pessoa (ex.: outra pessoa errou a mesma coisa no treino)."""
+    tb = _tb(cfg)
+    with tb.tx() as c:
+        l = c.execute("SELECT id FROM licoes WHERE origem_tipo=? AND origem_ref=? AND arquivada=0 ORDER BY versao DESC LIMIT 1",
+                      (origem_tipo, origem_ref)).fetchone()
+        if not l or c.execute("SELECT 1 FROM licoes_funcionario WHERE licao_id=? AND funcionario=?", (l["id"], pid)).fetchone():
+            return False
+        c.execute("INSERT INTO licoes_funcionario (licao_id, funcionario, estado, atribuida_em) VALUES (?,?,?,?)",
+                  (l["id"], pid, "atribuida", _agora()))
+        _registrar(c, "licao_atribuida", l["id"], autor, {"para": [pid]})
+    return True
 
 
 def nova_versao(cfg, licao_id: str, conteudo: str, motivo: str, quem: str = "dono", _origem: str = "") -> str:
@@ -408,6 +424,18 @@ def _evidencia_pratica(cfg, licao: dict, pid: str, ctx: dict) -> tuple[bool, str
         falhou = any(_etapa_base(x["etapa"]) == etapa and not x["ok"] for x in r.get("resultados", []))
         return (not falhou, f"caso {area}/{semente} nível {nivel} refeito ({_agora()[:16]}): "
                             f"{'passou' if not falhou else 'ainda falha'}")
+    if tipo == "treino":  # erro no treino: só conta quando a pessoa acerta a mesma competência no mesmo nível ou acima
+        comp, nivel = ref.split(":")[0], int(ref.split(":")[1])
+        with _tb(cfg).tx() as c:
+            desde = c.execute("SELECT atribuida_em FROM licoes_funcionario WHERE licao_id=? AND funcionario=?",
+                              (licao["id"], pid)).fetchone()
+            t = c.execute("SELECT id, caso_id, nivel FROM treino_tentativas WHERE funcionario=? AND competencia=? AND nivel>=? "
+                          "AND acertou=1 AND data_hora>=? ORDER BY id LIMIT 1",
+                          (pid, comp, nivel, desde["atribuida_em"] if desde else "")).fetchone() \
+                if c.execute("SELECT 1 FROM sqlite_master WHERE name='treino_tentativas'").fetchone() else None
+        if t:
+            return True, f"acertou {comp} no nível {t['nivel']} depois da lição (tentativa T{t['id']}, caso {t['caso_id']})"
+        return False, f"ainda não acertou {comp} no nível {nivel} depois da lição"
     if tipo == "regra":  # regra aprendida: só conta com o arquivo passando depois dela
         with _tb(cfg).tx() as c:
             p = c.execute("SELECT estado, prova FROM propostas_regra WHERE id=?", (ref,)).fetchone()

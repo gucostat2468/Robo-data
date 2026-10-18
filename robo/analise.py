@@ -146,7 +146,12 @@ def detectar_indicadores(df: pd.DataFrame, papeis: dict, forcados: dict) -> dict
                 continue
             if re.search(padrao, sem_acento(col)):
                 v = df[col].dropna()
-                if len(v) and (v == v.round()).all() and faixa_ok(*_escala(v)):
+                # a grande maioria (≥ 80%) inteiros dentro da escala: códigos como 99 = 'não sabe' existem em pesquisa
+                # de verdade e saem da conta (mesma regra da calculadora; antes um único 99 escondia o NPS inteiro —
+                # achado do treino contínuo, competência "NPS com a base certa", nível 3)
+                inteiros = v[v == v.round()]
+                dentro = inteiros[[faixa_ok(x, x) for x in inteiros]] if len(inteiros) else inteiros
+                if len(v) and len(dentro) / len(v) >= 0.8 and faixa_ok(*_escala(dentro)):
                     achados[tipo] = col
                     break
     return achados

@@ -2,7 +2,7 @@
 // Usa as funções do painel.js e do atendimento.js. Nada aqui inventa dado: tudo vem da API.
 
 const ESTADO_LICAO = { atribuida: ["Atribuída", ""], estudada: ["Estudada", "info"], avaliada: ["Avaliada", "alerta"], aplicada: ["Aplicada", "sucesso"] };
-const ORIGEM_LICAO = { handover: "Erro (handover)", boa_pratica: "Boa prática (PDCA)", laboratorio: "Laboratório", correcao: "Correção do dono",
+const ORIGEM_LICAO = { treino: "Treino contínuo", regra: "Regra aprendida", handover: "Erro (handover)", boa_pratica: "Boa prática (PDCA)", laboratorio: "Laboratório", correcao: "Correção do dono",
   manual: "Manual", dono: "Lição do dono" };
 const etiquetaLicao = (e) => { const [t, c] = ESTADO_LICAO[e] || [e, ""]; return `<span class="etiqueta ${c}">${esc(t)}</span>`; };
 Object.assign(E, { conhecimento: null, errosSistema: null, buscaLicao: "", achadasLicao: null, aprendizado: null });

@@ -197,6 +197,17 @@ class ControleRobo:
                 finally:
                     self._lab_rodando = False
             threading.Thread(target=_lab, name="robo-laboratorio", daemon=True).start()
+        # treino contínuo: todos os funcionários trabalhando em casos com gabarito, no nível de cada um (robo/treino.py)
+        if agora - getattr(self, "_ultimo_treino", 0) >= 30 and not getattr(self, "_treino_rodando", False):
+            self._ultimo_treino, self._treino_rodando = agora, True
+
+            def _treino():
+                from robo import treino
+                try:
+                    rotinas.executar(cfg, "treino", lambda: treino.rotina(cfg))
+                finally:
+                    self._treino_rodando = False
+            threading.Thread(target=_treino, name="robo-treino", daemon=True).start()
         from robo.ti import _c as cfg_ti
         if agora - getattr(self, "_ultima_ronda_ti", 0) >= 60 * float(cfg_ti(cfg)["intervalo_minutos"]):
             self._ultima_ronda_ti = agora

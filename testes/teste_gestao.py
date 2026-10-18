@@ -37,7 +37,7 @@ def teste_visao_tem_todas_as_paginas_andares_e_funcoes(cfg_factory):
     cfg = cfg_factory()
     ferramentas.executar("laboratorio", cfg, quem="head_engenharia")
     v = gestao.visao(cfg)
-    assert len(v["paginas"]) == 21 and [a["andar"] for a in v["andares"]] == [1, 2, 3, 4, 5]
+    assert len(v["paginas"]) == 22 and [a["andar"] for a in v["andares"]] == [1, 2, 3, 4, 5]
     assert {f["id"] for f in v["funcoes"]} == set(ferramentas.REGISTRO)
     lab = next(f for f in v["funcoes"] if f["id"] == "laboratorio")
     assert lab["usos"] == 1 and lab["pct_ok"] == 100  # o uso de cada ferramenta é registrado

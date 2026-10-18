@@ -1220,6 +1220,21 @@ class Api:
         except ValueError as e:
             raise ErroApi(str(e))
 
+    def treino(self, _q) -> dict:
+        from robo import treino
+        return treino.painel(self.cfg)
+
+    def treino_pessoa(self, q) -> dict:
+        from robo import treino
+        return treino.pessoa(self.cfg, q.get("id", [""])[0])
+
+    def treino_rodar(self, b) -> dict:
+        """Uma rodada agora (o robô já roda sozinho a cada poucos minutos)."""
+        from robo import treino
+        quantos = max(1, min(30, int(b.get("quantos") or 6)))
+        r = treino.rodada(self.cfg, quantos)
+        return {k: r.get(k) for k in ("ok", "motivo", "rodada", "tentativas", "acertos", "sem_caso")}
+
     def erros_sistema(self, _q) -> dict:
         from robo import erros
         return {"erros": erros.listar(self.cfg)}
@@ -1243,7 +1258,7 @@ ROTAS_GET = {
     "/api/reuniao/sala": Api.sala_ver, "/api/reuniao/salas": Api.salas,
     "/api/conhecimento": Api.conhecimento, "/api/conhecimento/caderno": Api.conhecimento_caderno,
     "/api/conhecimento/licao": Api.conhecimento_licao, "/api/conhecimento/buscar": Api.conhecimento_buscar,
-    "/api/erros": Api.erros_sistema, "/api/gestao": Api.gestao, "/api/aprendizado": Api.aprendizado,
+    "/api/erros": Api.erros_sistema, "/api/gestao": Api.gestao, "/api/treino": Api.treino, "/api/treino/pessoa": Api.treino_pessoa, "/api/aprendizado": Api.aprendizado,
 }
 ROTAS_POST = {
     "/api/robo/ligar": Api.ligar, "/api/robo/pausar": Api.pausar, "/api/robo/processar-agora": Api.processar_agora,
@@ -1266,7 +1281,7 @@ ROTAS_POST = {
     "/api/memoria/exportar": Api.memoria_exportar, "/api/memoria/sincronizar": Api.memoria_sincronizar,
     "/api/conhecimento/rodar": Api.conhecimento_rodar, "/api/conhecimento/criar": Api.conhecimento_criar,
     "/api/conhecimento/versao": Api.conhecimento_versao, "/api/conhecimento/arquivar": Api.conhecimento_arquivar,
-    "/api/erros/resolver": Api.erros_resolver, "/api/aprendizado/decidir": Api.aprendizado_decidir, "/api/aprendizado/desativar": Api.aprendizado_desativar,
+    "/api/erros/resolver": Api.erros_resolver, "/api/aprendizado/decidir": Api.aprendizado_decidir, "/api/treino/rodar": Api.treino_rodar, "/api/aprendizado/desativar": Api.aprendizado_desativar,
 }
 ROTAS_UPLOAD = {"/api/testar": Api.testar, "/api/enviar": Api.enviar, "/api/conversa/anexar": Api.anexar}
 
