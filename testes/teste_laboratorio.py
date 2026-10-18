@@ -199,3 +199,27 @@ def teste_nivel_fica_gravado_e_termometro_mostra_a_linha_do_tempo(cfg):
     assert termo[1]["rodadas"] == 1 and termo[4]["rodadas"] == 2 and len(termo[4]["linha_do_tempo"]) == 2
     assert termo[2]["taxa"] is None and termo[4]["taxa"] is not None
     assert "por_nivel" in laboratorio.resumo(cfg)
+
+
+def teste_quem_piorou_5_pontos_levanta_a_mao_na_reuniao(cfg):
+    """Alerta de regressão: 10/10 acertos há 3–4 semanas e 5/10 nas 2 últimas → a mão sobe sozinha, com os números.
+    Quem está estável não entra no alerta."""
+    import sqlite3
+    from datetime import datetime, timedelta
+    from robo.trabalho import Trabalho
+    Trabalho(cfg)  # cria o banco
+    agora = datetime.now()
+    linhas = [("limpeza", (agora - timedelta(days=24)).isoformat(timespec="seconds"), "acerto")] * 10 + \
+             [("limpeza", (agora - timedelta(days=3)).isoformat(timespec="seconds"), t) for t in ["acerto", "erro"] * 5] + \
+             [("validacao", (agora - timedelta(days=d)).isoformat(timespec="seconds"), "acerto") for d in (3, 24)] * 6
+    c = sqlite3.connect(cfg.logs / "trabalho.db")
+    c.executemany("INSERT INTO experiencias (funcionario, data_hora, tipo, resumo, origem) VALUES (?,?,?,'t','pipeline')", linhas)
+    c.commit()
+    c.close()
+    maos = {m["id"]: m for m in sala.abrir(cfg, 1)["maos"]}
+    coord = maos["coord_engenharia"]  # a limpeza não está na reunião da liderança: a coordenação leva o alerta
+    assert "1 pessoa(s) do andar com acerto em queda" in coord["motivo"]
+    nome_limpeza = organizacao.por_id(cfg)["limpeza"]["nome"]
+    assert f"{nome_limpeza} (" in coord["fala"] and "-50,0 pontos" in coord["fala"]
+    nome_validacao = organizacao.por_id(cfg)["validacao"]["nome"]
+    assert nome_validacao not in coord["fala"]  # estável não entra no alerta

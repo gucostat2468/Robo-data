@@ -79,4 +79,9 @@ Legenda: ✅ feito e testado · 🟡 feito em parte · ⏳ pendente
 | 73 | Tudo registrado? | ✅ | nada se apaga (gatilhos), histórico de cada erro, cadeia com âncora, espelho completo no PostgreSQL |
 | 74 | Auditoria completa e correção de cada detalhe | ✅ | 4 revisões independentes + operação no navegador: 46+ achados, corrigidos com teste de regressão; abertos listados |
 | 75 | Visão de gestão de cada página, andar e função | ✅ | página Gestão do projeto (ao vivo) + `documentacao/auditoria_e_gestao.md` |
+| 76 | Treino que mede evolução de verdade | ✅ | laboratório com 4 níveis (`robo/laboratorio.py`); Gestão → Laboratório (termômetro): nível 4 subiu de 50% para 100% quando o código aprendeu |
+| 77 | Regra aprendida mais completa | ✅ | correção de valor ("Sp." → "SP") e desativação automática da regra que não resolveu (`robo/aprendizado.py`) |
+| 78 | Correção minha no chat valendo para todos | ✅ | vira proposta; aprovada, todo cálculo da empresa usa e avisa; o 1º cálculo comprova |
+| 79 | Fechar os itens abertos da auditoria | ✅ | os 6, mais 8 achados novos (N1–N8 em `documentacao/auditoria_e_gestao.md`) |
+| 80 | Alerta quando alguém piora | ✅ | queda de 5 pontos ou mais → mão levantada na reunião do andar, com nomes e números |
 | 38 | IA opcional sem fingir | 🟡 | `robo/ia.py`: só modelo local, desligado; ainda não usado nas respostas |

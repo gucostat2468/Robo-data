@@ -137,7 +137,7 @@ def abrir(cfg, andar: int) -> dict:
 
 
 # ------------------------------------------------------------------ mão levantada (com motivo real)
-def _motivo(cfg, pid: str, andar: int) -> tuple[str, str] | None:
+def _motivo(cfg, pid: str, andar: int, evolucao: dict | None = None) -> tuple[str, str] | None:
     """Por que esta pessoa tem algo a dizer agora (só dado gravado). Devolve (motivo curto, fala completa)."""
     from robo import auditoria, memoria
     if pid in lideranca.EQUIPE and pid.startswith("dir_"):
@@ -154,11 +154,31 @@ def _motivo(cfg, pid: str, andar: int) -> tuple[str, str] | None:
                     "\n".join(f"• {x}" for x in ult["achados"][:5]))
     if organizacao.nivel_de(pid, organizacao.por_id(cfg).get(pid, {})) == "coordenador":
         abertos = memoria.handovers(cfg, andar, abertos=True, limite=50)
+        # alerta de regressão da equipe: quem não está na reunião tem a queda levada pela coordenação
+        piorando = sorted((e for e in (evolucao or {}).values() if e["andar"] == andar and e["tendencia"] == "piorando"
+                           and e["id"] != pid), key=lambda e: e["delta_pp"])
+        motivos, falas = [], []
         if abertos:
-            return (f"{len(abertos)} handover(s) aberto(s) no andar",
-                    "Pedi a palavra porque o andar tem erro ainda não resolvido:\n" +
-                    "\n".join(f"• {h['id']} ({h['recorrencias']}x): {h['erro'][:140]} → {h['regra'][:140]} "
-                              f"(responsável: {h['responsavel']})" for h in abertos[:5]))
+            motivos.append(f"{len(abertos)} handover(s) aberto(s) no andar")
+            falas.append("O andar tem erro ainda não resolvido:\n" + "\n".join(
+                f"• {h['id']} ({h['recorrencias']}x): {h['erro'][:140]} → {h['regra'][:140]} "
+                f"(responsável: {h['responsavel']})" for h in abertos[:5]))
+        if piorando:
+            motivos.append(f"{len(piorando)} pessoa(s) do andar com acerto em queda")
+            falas.append("Gente da equipe com a taxa de acerto caindo 5 pontos ou mais (2 últimas semanas × anteriores):\n" +
+                         "\n".join(f"• {e['nome']} ({e['papel']}): {e['delta_pp']:+.1f} pontos".replace(".", ",")
+                                    for e in piorando[:5]) +
+                         "\nVou revisar os erros recentes de cada um no caderno de lições e montar o plano de estudo.")
+        if motivos:
+            return " · ".join(motivos), "Pedi a palavra. " + "\n\n".join(falas)
+    ev = (evolucao or {}).get(pid)
+    if ev and ev["tendencia"] == "piorando":  # alerta de regressão: caiu 5 pontos ou mais (com base mínima de eventos)
+        taxas = [t for t in ev["taxas_semana"] if t is not None]
+        return (f"acerto caiu {abs(ev['delta_pp']):.1f} pontos".replace(".", ","),
+                f"Pedi a palavra para avisar que piorei: minha taxa de acerto nas 2 últimas semanas está "
+                f"{abs(ev['delta_pp']):.1f} pontos abaixo das semanas anteriores".replace(".", ",") +
+                (f" (semanas: {' → '.join(f'{t:.0f}%' for t in taxas[-4:])})" if taxas else "") +
+                ". Vou revisar meus erros recentes no caderno de lições e peço ajuda da coordenação.")
     d = next((x for x in memoria.desempenho(cfg) if x["id"] == pid), None)
     if d and d.get("situacao") == "insuficiente":
         return ("desempenho abaixo da exigência", f"Pedi a palavra para ser transparente: minha taxa de acerto está em "
@@ -171,10 +191,15 @@ def levantar_maos(cfg, cid: str) -> list[dict]:
     ctx = conv["contexto"]
     fila = list(ctx.get("maos") or [])
     ja = {m["id"] for m in fila} | set(ctx.get("maos_atendidas") or [])
+    try:  # uma vez por rodada (é a mesma série da Gestão → Evolução por funcionário)
+        from robo import gestao
+        evol = {e["id"]: e for e in gestao.evolucao(cfg)}
+    except Exception:
+        evol = {}
     for pid in ctx["participantes"]:
         if pid in ja:
             continue
-        m = _motivo(cfg, pid, int(ctx.get("andar") or 0))
+        m = _motivo(cfg, pid, int(ctx.get("andar") or 0), evol)
         if m:
             fila.append({"id": pid, "motivo": m[0], "fala": m[1], "desde": _agora()})
             _evento(tb, cid, pid, "mao_levantada", {"motivo": m[0]})

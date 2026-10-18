@@ -165,16 +165,31 @@ As métricas estavam infladas e foram corrigidas:
 | T7 | Página da sala sumia (nome repetido entre arquivos); recap gravado no lugar da reunião semanal; 401 antes do login | ✅ |
 | T8 | TI dava vermelho na primeira abertura (banco ainda não criado) | ✅ |
 
-### Ainda abertos (honesto)
+### Os 6 que estavam abertos — todos fechados, cada um com teste que reproduz o defeito
 
-| Item | Risco | Próximo passo |
+| Item | Como foi resolvido | Situação |
 |---|---|---|
-| "Processar agora" depois de recarregar a config pode ter dois monitores | baixo | trava única do monitor |
-| Cancelar uma tarefa não interrompe a etapa que já está rodando | baixo | checar o cancelamento entre etapas |
-| Dois envios simultâneos com o mesmo nome podem se sobrescrever | baixo | mover com nome reservado |
-| Coluna que mistura "1.500" e "1.5" | baixo | avisar quando houver os dois formatos |
-| Escala do CSAT deduzida pelo maior valor | médio | declarar a escala na regra |
-| 15 funções e 11 módulos sem teste **direto** (vários são testados indiretamente) | médio | criar testes diretos |
+| "Processar agora" depois de recarregar a config podia ter dois monitores | trava única **por pasta de entrada**, compartilhada por todos os monitores | ✅ |
+| Cancelar uma tarefa não parava as etapas seguintes | o laço relê o estado antes de cada etapa e antes da revisão | ✅ |
+| Dois envios simultâneos com o mesmo nome se sobrescreviam | publicação atômica com `os.link`, que falha em vez de sobrescrever | ✅ |
+| Coluna que mistura "1.500" e "1.5" passava calada | aviso no relatório com exemplos dos dois lados e a leitura usada | ✅ |
+| Escala do CSAT deduzida pelo maior valor | `escala_csat` na regra; sem ela, deduzida **uma vez** pela coluna inteira e a resposta diz que deduziu | ✅ |
+| 15 funções e 10 módulos sem teste direto | `testes/teste_ferramentas_diretas.py` e `testes/teste_modulos_diretos.py` | ✅ |
+
+### Achados novos desta rodada (encontrados pelo próprio sistema, pelo laboratório ou ao fechar os itens)
+
+| # | Problema | Como apareceu | Situação |
+|---|---|---|---|
+| N1 | **CSAT de segmento inflado:** a escala era deduzida dentro de cada grupo (pesquisa 1–7, grupo com nota máxima 5 lido como 1–5) | ao centralizar a escala | ✅ |
+| N2 | **Rotina de lições quebrava todo dia:** etapa do laboratório com ":" no nome ("Limpar: tirar Total…") | registrada sozinha em erros de sistema | ✅ |
+| N3 | **Cópia para o PostgreSQL falhava** quando a tabela de lá era de uma versão anterior (coluna nova) | registrada sozinha em erros de sistema | ✅ |
+| N4 | Rodapé de relatório ("Gerado em… por…") virava linha de dado | laboratório nível 3 | ✅ |
+| N5 | Números no formato SAP ("1.234,56-"), sinal "−" de PDF e "R$ 1,2 mil" não eram lidos | laboratório nível 4 | ✅ |
+| N6 | Duas rodadas do laboratório no mesmo segundo se misturavam | teste do termômetro | ✅ |
+| N7 | Correção do chat com "_" no nome da coluna era cortada ("nota_nps" virava "nota") | teste da correção para a empresa | ✅ |
+| N8 | O aviso "usei a correção aprovada" ficava escondido numa seção recolhida | percurso no navegador | ✅ |
+
+Os dois erros de sistema da demonstração (N2 e N3) continuam **abertos para você fechar** em Conhecimento → Erros de sistema: quem marca como resolvido é o dono.
 
 ---
 
@@ -220,7 +235,8 @@ Fotografia na demonstração recém-aberta: 1 dia de histórico, 78 funcionário
 
 Como ler:
 - **"Lições comprovadas 0%" é a verdade de uma empresa com um dia de vida.** As lições já foram estudadas e avaliadas, mas nenhuma tem prova prática ainda. A régua antiga mostraria cerca de 97%.
-- **"Acerto 100%" mostra o limite do termômetro.** O treino atual raramente falha, então ainda não separa quem sabe de quem não sabe (ver o item 7, "laboratório com dificuldade crescente").
+- **"Acerto 100%" mostrava o limite do termômetro.** Resolvido com o laboratório de 4 níveis (Gestão → Laboratório): o nível 4 começou em 50% e subiu para 100% quando o código aprendeu os formatos que faltavam.
+- **Depois do ciclo de lições corrigido (N2):** 178 lições do laboratório e 19 de regra passaram a "aplicada" com prova.
 
 ## 6. Visão de gestão — cada função
 
@@ -239,7 +255,7 @@ São 26 funções (ferramentas). Cada uso fica registrado com quem usou, se deu 
 | Raio-X da empresa | diretoria de operações | baixo | ✅ |
 | Resumo executivo | relator | médio | ✅ |
 | Publicar planilha | recepção | **alto** (exige aprovação) | ✅ |
-| Histórico, Perfil e indicadores, Dados pessoais, Ronda de TI, Reunião ao vivo, Ideias, Segmentação, Anomalias, Scorecard, Auditoria, Recrutamento, Desenvolvimento, People analytics, Estratégia Python, Organização | vários | baixo | ⚠ só teste indireto |
+| Histórico, Perfil e indicadores, Dados pessoais, Ronda de TI, Reunião ao vivo, Ideias, Segmentação, Anomalias, Scorecard, Auditoria, Recrutamento, Desenvolvimento, People analytics, Estratégia Python, Organização | vários | baixo | ✅ (`teste_ferramentas_diretas.py`) |
 
 Na fotografia: Calcular 2 usos, 100% ok; Scorecard 1, 100%; Laboratório 1, 100%.
 
@@ -249,22 +265,18 @@ Na fotografia: Calcular 2 usos, 100% ok; Scorecard 1, 100%; Laboratório 1, 100%
 
 ### Curto prazo (mais real e menos erro)
 
-1. **Testes diretos** para as 15 funções e os 11 módulos sem teste direto.
-2. **Laboratório com dificuldade crescente.** Incluir casos que hoje falham (treinamento difícil). Só assim "acerto 100%" vira um termômetro que mede evolução quando o código melhora.
-3. **Mais tipos de regra aprendida:**
-   - tipo de coluna;
-   - faixa;
-   - mapeamento de valores ("Sp." → "SP", com sua aprovação);
-   - desativar sozinha a regra que "não resolveu".
-4. **Correções que você faz no chat valendo para a empresa inteira,** com sua aprovação. Hoje valem só naquela conversa.
+1. ✅ **Testes diretos** para as 15 funções e os módulos sem teste direto.
+2. ✅ **Laboratório com 4 níveis de dificuldade** e termômetro na Gestão.
+3. ✅ **Correção de valor** ("Sp." → "SP") e **desativação automática** da regra que não resolveu. Faixa e tipo de coluna **não** viram regra aprendida, de propósito: ali a reprovação protege o dado (nota 99 no NPS não pode "passar").
+4. ✅ **Correções do chat valendo para a empresa inteira,** com sua aprovação e prova.
 5. **Usuário do PostgreSQL só leitura** (`banco.usuario_leitura`) para as consultas livres. Já está suportado: falta criar o usuário no seu servidor.
-6. Fechar os 6 itens da tabela "Ainda abertos".
+6. ✅ Os 6 itens abertos.
 
 ### Médio prazo (mais robusto)
 
 7. **Fotografia semanal** de desempenho por pessoa (tabela própria), para comparar trimestres.
 8. **Teste real no seu Windows** (OneDrive, Excel aberto, antivírus) e **teste de volume** (300 mil linhas).
-9. **Alertas de regressão:** se a taxa de alguém cair 5 pontos ou mais, a mão sobe sozinha na reunião do andar.
+9. ✅ **Alertas de regressão:** quem cai 5 pontos ou mais aparece na reunião do andar. A coordenação levanta a mão com os nomes e os números (a equipe não está na reunião da liderança); se o líder piorar, ele mesmo levanta.
 
 ### Expansão
 
