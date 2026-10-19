@@ -1,0 +1,1009 @@
+{
+  "_sobre": {
+    "descricao": "Catálogo legível por máquina da engenharia reversa do Power BI, baseado só em documentação oficial da Microsoft (out/2026). Documento humano: documentacao/powerbi_engenharia_reversa.md",
+    "nao_verificado": "O valor 'nao_verificado' marca o que a documentação lida não confirmou.",
+    "gerado_em": "2026-10-19"
+  },
+  "tema_padrao": {
+    "name": "Custom Theme (exemplo oficial; coincide com a paleta padrão clássica)",
+    "aviso": "A Microsoft não publica o JSON do tema base Fluent 2 (padrão de novos relatórios). Estas cores vêm do exemplo oficial de tema personalizado; a página de colunas usa #118DFF como azul padrão e #D64550 como 'Theme color 8'.",
+    "temas_base": [
+      "Fluent 2",
+      "Classic 2026",
+      "Classic 2018"
+    ],
+    "exemplo_nome_tema_base_pbir": "CY24SU06",
+    "temas_embutidos": [
+      "Reset to default",
+      "Bloom",
+      "Dark",
+      "Divergent",
+      "Frontier",
+      "Innovate",
+      "Soft dark",
+      "Tidal",
+      "Copilot default"
+    ],
+    "paletas_painel_tema": [
+      "Versa",
+      "Sunset",
+      "Accessible Default",
+      "Electric"
+    ],
+    "dataColors": [
+      "#118DFF",
+      "#12239E",
+      "#E66C37",
+      "#6B007B",
+      "#E044A7",
+      "#744EC2",
+      "#D9B300",
+      "#D64550",
+      "#197278",
+      "#1AAB40"
+    ],
+    "good": "#1AAB40",
+    "neutral": "#D9B300",
+    "bad": "#D64554",
+    "maximum": "#118DFF",
+    "center": "#D9B300",
+    "minimum": "#DEEFFF",
+    "null": "#FF7F48",
+    "foreground": "#252423",
+    "secondLevelElements": "#605E5C",
+    "thirdLevelElements": "#F3F2F1",
+    "fourthLevelElements": "#B3B0AD",
+    "background": "#FFFFFF",
+    "secondaryBackground": "#C8C6C4",
+    "tableAccent": "#118DFF",
+    "fonte": {
+      "label": {
+        "fontFace": "Segoe UI",
+        "fontSize": 10,
+        "color": "#252423"
+      },
+      "title": {
+        "fontFace": "DIN",
+        "fontSize": 12,
+        "color": "#252423"
+      },
+      "largeTitle": {
+        "fontSize": 14
+      },
+      "header": {
+        "fontFace": "Segoe UI Semibold",
+        "fontSize": 12,
+        "color": "#252423"
+      },
+      "callout": {
+        "fontFace": "DIN",
+        "fontSize": 45,
+        "color": "#252423"
+      },
+      "smallLabel": {
+        "fontSize": 9
+      },
+      "lightLabel": {
+        "color": "#605E5C"
+      },
+      "boldLabel": {
+        "fontFace": "Segoe UI Bold"
+      },
+      "pilha_css_sugerida": "DIN, \"DIN Alternate\", \"DIN Next\", \"Segoe UI\", Tahoma, Arial, sans-serif"
+    },
+    "tela": {
+      "tipo_padrao": "16:9",
+      "tamanhos_16x9": [
+        "1280x720",
+        "1920x1080",
+        "2560x1440",
+        "3840x2160"
+      ],
+      "fluent2_paginas_novas": "1920x1080",
+      "exibicao_padrao": "Fit to page"
+    },
+    "doc_url": [
+      "https://learn.microsoft.com/en-us/power-bi/create-reports/report-themes-create-custom",
+      "https://learn.microsoft.com/en-us/power-bi/create-reports/desktop-report-themes",
+      "https://learn.microsoft.com/en-us/power-bi/create-reports/power-bi-reports-visual-defaults",
+      "https://learn.microsoft.com/en-us/power-bi/visuals/power-bi-visualization-column-charts",
+      "https://learn.microsoft.com/en-us/power-bi/create-reports/power-bi-report-display-settings",
+      "https://github.com/microsoft/powerbi-desktop-samples/tree/main/Report%20Theme%20JSON%20Schema"
+    ]
+  },
+  "visuais": [
+    {
+      "id": "coluna_empilhada",
+      "nome_pt": "Gráfico de colunas empilhadas",
+      "nome_en": "Stacked column chart",
+      "campos": [
+        "X-axis",
+        "Y-axis",
+        "Legend",
+        "Small multiples",
+        "Tooltips"
+      ],
+      "pergunta": "Quanto vale cada categoria e como o total se compõe?",
+      "nao_usar": "Muitas séries empilhadas; várias medidas no Y não aceitam Legenda; eixo hierárquico em small multiples não é suportado.",
+      "doc_url": "https://learn.microsoft.com/en-us/power-bi/visuals/power-bi-visualization-column-charts"
+    },
+    {
+      "id": "coluna_agrupada",
+      "nome_pt": "Gráfico de colunas agrupadas",
+      "nome_en": "Clustered column chart",
+      "campos": [
+        "X-axis",
+        "Y-axis",
+        "Legend",
+        "Small multiples",
+        "Tooltips"
+      ],
+      "pergunta": "Comparar séries lado a lado por categoria ou período.",
+      "nao_usar": "Muitas categorias e séries ao mesmo tempo (boa prática).",
+      "doc_url": "https://learn.microsoft.com/en-us/power-bi/visuals/power-bi-visualization-column-charts"
+    },
+    {
+      "id": "coluna_100",
+      "nome_pt": "Gráfico de colunas 100% empilhadas",
+      "nome_en": "100% Stacked column chart",
+      "campos": [
+        "X-axis",
+        "Y-axis",
+        "Legend",
+        "Small multiples",
+        "Tooltips"
+      ],
+      "pergunta": "Qual a proporção de cada parte dentro de cada categoria?",
+      "nao_usar": "Quando o valor absoluto importa.",
+      "doc_url": "https://learn.microsoft.com/en-us/power-bi/visuals/power-bi-visualization-column-charts"
+    },
+    {
+      "id": "barra_empilhada",
+      "nome_pt": "Gráfico de barras empilhadas",
+      "nome_en": "Stacked bar chart",
+      "campos": [
+        "X-axis",
+        "Y-axis",
+        "Legend",
+        "Small multiples",
+        "Tooltips"
+      ],
+      "pergunta": "Ranking/composição com rótulos longos.",
+      "nao_usar": "Séries temporais (prefira colunas ou linha).",
+      "doc_url": "https://learn.microsoft.com/en-us/power-bi/visuals/power-bi-visualizations-overview",
+      "observacao": "Caixas iguais às colunas, na horizontal; papel exato dos eixos nao_verificado."
+    },
+    {
+      "id": "barra_agrupada",
+      "nome_pt": "Gráfico de barras agrupadas",
+      "nome_en": "Clustered bar chart",
+      "campos": [
+        "X-axis",
+        "Y-axis",
+        "Legend",
+        "Small multiples",
+        "Tooltips"
+      ],
+      "pergunta": "Comparar categorias de nome comprido.",
+      "nao_usar": "Séries temporais.",
+      "doc_url": "https://learn.microsoft.com/en-us/power-bi/visuals/power-bi-visualizations-overview",
+      "observacao": "Caixas: nao_verificado em página própria."
+    },
+    {
+      "id": "barra_100",
+      "nome_pt": "Gráfico de barras 100% empilhadas",
+      "nome_en": "100% Stacked bar chart",
+      "campos": [
+        "X-axis",
+        "Y-axis",
+        "Legend",
+        "Small multiples",
+        "Tooltips"
+      ],
+      "pergunta": "Proporção por categoria com rótulos longos.",
+      "nao_usar": "Quando o valor absoluto importa.",
+      "doc_url": "https://learn.microsoft.com/en-us/power-bi/visuals/power-bi-visualizations-overview",
+      "observacao": "Caixas: nao_verificado em página própria."
+    },
+    {
+      "id": "linha",
+      "nome_pt": "Gráfico de linhas",
+      "nome_en": "Line chart",
+      "campos": [
+        "X-axis",
+        "Y-axis",
+        "Secondary y-axis",
+        "Legend",
+        "Small multiples",
+        "Tooltips"
+      ],
+      "pergunta": "Como o número evoluiu no tempo? Há sazonalidade?",
+      "nao_usar": "Eixo sem ordem natural; previsão/anomalias exigem série única e eixo contínuo; várias medidas no Y não aceitam Legenda.",
+      "doc_url": "https://learn.microsoft.com/en-us/power-bi/visuals/power-bi-line-chart"
+    },
+    {
+      "id": "area",
+      "nome_pt": "Gráfico de área",
+      "nome_en": "Area chart",
+      "campos": [
+        "X-axis",
+        "Y-axis",
+        "Legend",
+        "Small multiples",
+        "Tooltips"
+      ],
+      "pergunta": "Volume ao longo do tempo.",
+      "nao_usar": "Mais de 3 séries sobrepostas; clicar na área não filtra outros visuais.",
+      "doc_url": "https://learn.microsoft.com/en-us/power-bi/visuals/power-bi-visualization-basic-area-chart"
+    },
+    {
+      "id": "area_empilhada",
+      "nome_pt": "Gráfico de área empilhada",
+      "nome_en": "Stacked area chart",
+      "campos": [
+        "X-axis",
+        "Y-axis",
+        "Legend",
+        "Small multiples",
+        "Tooltips"
+      ],
+      "pergunta": "Contribuição de cada parte para o total acumulado no tempo.",
+      "nao_usar": "Comparar séries do meio da pilha.",
+      "doc_url": "https://learn.microsoft.com/en-us/power-bi/visuals/power-bi-line-chart"
+    },
+    {
+      "id": "area_100",
+      "nome_pt": "Gráfico de área 100% empilhada",
+      "nome_en": "100% stacked area chart",
+      "campos": [
+        "X-axis",
+        "Y-axis",
+        "Legend",
+        "Small multiples",
+        "Tooltips"
+      ],
+      "pergunta": "Evolução da proporção de cada parte.",
+      "nao_usar": "Quando o volume absoluto importa.",
+      "doc_url": "https://learn.microsoft.com/en-us/power-bi/visuals/power-bi-line-chart"
+    },
+    {
+      "id": "linha_coluna_agrupada",
+      "nome_pt": "Gráfico de linhas e colunas agrupadas",
+      "nome_en": "Line and clustered column chart",
+      "campos": [
+        "X-axis",
+        "Column y-axis",
+        "Line y-axis",
+        "Tooltips"
+      ],
+      "pergunta": "Realizado (colunas) versus meta ou % (linha), com até dois eixos Y.",
+      "nao_usar": "Medidas sem relação; o eixo secundário aparece/some sozinho.",
+      "doc_url": "https://learn.microsoft.com/en-us/power-bi/visuals/power-bi-visualization-combo-chart",
+      "observacao": "Caixa de legenda das colunas: nome nao_verificado."
+    },
+    {
+      "id": "linha_coluna_empilhada",
+      "nome_pt": "Gráfico de linhas e colunas empilhadas",
+      "nome_en": "Line and stacked column chart",
+      "campos": [
+        "X-axis",
+        "Column y-axis",
+        "Line y-axis",
+        "Tooltips"
+      ],
+      "pergunta": "Composição (colunas) + indicador (linha) no mesmo eixo X.",
+      "nao_usar": "Medidas sem relação.",
+      "doc_url": "https://learn.microsoft.com/en-us/power-bi/visuals/power-bi-visualization-combo-chart"
+    },
+    {
+      "id": "faixa",
+      "nome_pt": "Gráfico de faixa",
+      "nome_en": "Ribbon chart",
+      "campos": [
+        "X-axis",
+        "Legend",
+        "Y-axis"
+      ],
+      "pergunta": "Quem lidera em cada período e como o ranking mudou?",
+      "nao_usar": "Quando o valor exato importa (não tem rótulos no eixo Y).",
+      "doc_url": "https://learn.microsoft.com/en-us/power-bi/visuals/desktop-ribbon-charts"
+    },
+    {
+      "id": "cascata",
+      "nome_pt": "Gráfico de cascata",
+      "nome_en": "Waterfall chart",
+      "campos": [
+        "Category",
+        "Breakdown",
+        "Y-axis",
+        "Tooltips"
+      ],
+      "pergunta": "Como saí do valor inicial ao final; quais aumentos e quedas explicam?",
+      "nao_usar": "Categorias sem soma lógica; cores vêm de good/bad/neutral do tema.",
+      "doc_url": "https://learn.microsoft.com/en-us/power-bi/visuals/power-bi-visualization-waterfall-charts"
+    },
+    {
+      "id": "funil",
+      "nome_pt": "Gráfico de funil",
+      "nome_en": "Funnel chart",
+      "campos": [
+        "Category",
+        "Values",
+        "Tooltips"
+      ],
+      "pergunta": "Onde perco pessoas num processo sequencial?",
+      "nao_usar": "Etapas não sequenciais; menos de 4 estágios.",
+      "doc_url": "https://learn.microsoft.com/en-us/power-bi/visuals/power-bi-visualization-funnel-charts"
+    },
+    {
+      "id": "dispersao",
+      "nome_pt": "Gráfico de dispersão / bolhas / dot plot",
+      "nome_en": "Scatter chart",
+      "campos": [
+        "Values",
+        "X Axis",
+        "Y Axis",
+        "Legend",
+        "Size",
+        "Tooltips"
+      ],
+      "pergunta": "Duas medidas andam juntas? Há grupos e pontos fora da curva?",
+      "nao_usar": "Mais de 10.000 pontos; sem campo único em Values aparece um ponto só.",
+      "doc_url": "https://learn.microsoft.com/en-us/power-bi/visuals/power-bi-visualization-scatter",
+      "observacao": "Play axis: nao_verificado na página atual."
+    },
+    {
+      "id": "pizza",
+      "nome_pt": "Gráfico de pizza",
+      "nome_en": "Pie chart",
+      "campos": [
+        "Legend",
+        "Values",
+        "Tooltips"
+      ],
+      "pergunta": "Qual a fatia de cada parte no total?",
+      "nao_usar": "Mais de 3–6 fatias; formatação condicional não é oficialmente suportada.",
+      "doc_url": "https://learn.microsoft.com/en-us/power-bi/visuals/power-bi-visualization-pie-donut-chart"
+    },
+    {
+      "id": "rosca",
+      "nome_pt": "Gráfico de rosca",
+      "nome_en": "Donut chart",
+      "campos": [
+        "Legend",
+        "Values",
+        "Tooltips"
+      ],
+      "pergunta": "Parte do todo com o total no centro (Valor central).",
+      "nao_usar": "Mais de 3–6 fatias.",
+      "doc_url": "https://learn.microsoft.com/en-us/power-bi/visuals/power-bi-visualization-pie-donut-chart"
+    },
+    {
+      "id": "treemap",
+      "nome_pt": "Treemap (mapa de árvore)",
+      "nome_en": "Treemap",
+      "campos": [
+        "Category",
+        "Details",
+        "Values",
+        "Tooltips"
+      ],
+      "pergunta": "Quem são os maiores contribuintes numa hierarquia grande?",
+      "nao_usar": "Comparar valores parecidos; Saturação de cor e Detalhes não convivem.",
+      "doc_url": "https://learn.microsoft.com/en-us/power-bi/visuals/power-bi-visualization-treemaps"
+    },
+    {
+      "id": "mapa",
+      "nome_pt": "Mapa (bolhas, Bing)",
+      "nome_en": "Map",
+      "campos": [
+        "Location",
+        "Legend",
+        "Latitude",
+        "Longitude",
+        "Size",
+        "Tooltips"
+      ],
+      "pergunta": "Onde estão as coisas e quanto vale cada lugar?",
+      "nao_usar": "Descontinuação agendada do Bing Maps: migrar para Azure Maps.",
+      "doc_url": "https://learn.microsoft.com/en-us/power-bi/visuals/power-bi-map-tips-and-tricks"
+    },
+    {
+      "id": "mapa_coropletico",
+      "nome_pt": "Mapa coroplético (mapa preenchido)",
+      "nome_en": "Filled map",
+      "campos": [
+        "Location",
+        "Legend",
+        "Latitude",
+        "Longitude",
+        "Tooltips"
+      ],
+      "pergunta": "Como o indicador varia por região?",
+      "nao_usar": "Descontinuação agendada do Bing; nomes de lugar ambíguos sem coluna extra.",
+      "doc_url": "https://learn.microsoft.com/en-us/power-bi/visuals/power-bi-visualization-filled-maps-choropleths"
+    },
+    {
+      "id": "mapa_formas",
+      "nome_pt": "Mapa de formas (prévia)",
+      "nome_en": "Shape map",
+      "campos": [
+        "Location",
+        "Color saturation",
+        "Legend"
+      ],
+      "pergunta": "Comparar regiões por cor, inclusive mapas próprios TopoJSON/GeoJSON (tem Brasil por estado).",
+      "nao_usar": "Mais de 1.500 pontos; Legenda exige Saturação de cor.",
+      "doc_url": "https://learn.microsoft.com/en-us/power-bi/visuals/power-bi-shape-map"
+    },
+    {
+      "id": "azure_maps",
+      "nome_pt": "Azure Maps",
+      "nome_en": "Azure Maps",
+      "campos": [
+        "Location",
+        "Latitude",
+        "Longitude",
+        "Legend",
+        "Size",
+        "Tooltips"
+      ],
+      "pergunta": "Mapa empresarial com camadas (bolha, 3D, calor, marcador, caminho).",
+      "nao_usar": "China/Coreia/nuvem de governo; mais de 30.000 pontos; exige admin habilitar; não sai em exportação/assinatura.",
+      "doc_url": "https://learn.microsoft.com/en-us/azure/azure-maps/power-bi-visual-get-started"
+    },
+    {
+      "id": "arcgis",
+      "nome_pt": "ArcGIS for Power BI",
+      "nome_en": "ArcGIS for Power BI",
+      "campos": [
+        "nao_verificado"
+      ],
+      "pergunta": "Análise espacial avançada (Esri).",
+      "nao_usar": "Assinaturas não suportam.",
+      "doc_url": "https://learn.microsoft.com/en-us/power-bi/visuals/power-bi-map-visualizations-overview"
+    },
+    {
+      "id": "medidor",
+      "nome_pt": "Medidor (gauge)",
+      "nome_en": "Gauge",
+      "campos": [
+        "Value",
+        "Minimum value",
+        "Maximum value",
+        "Target value",
+        "Tooltips"
+      ],
+      "pergunta": "Saúde de um único número frente à meta.",
+      "nao_usar": "Comparar vários itens; sem mínimo/máximo usa 0 e o dobro do valor.",
+      "doc_url": "https://learn.microsoft.com/en-us/power-bi/visuals/power-bi-visualization-radial-gauge-charts"
+    },
+    {
+      "id": "cartao",
+      "nome_pt": "Cartão (novo, padrão desde nov/2025)",
+      "nome_en": "Card",
+      "campos": [
+        "Values",
+        "Categories"
+      ],
+      "pergunta": "Qual é o número principal e como ele está contra a referência?",
+      "nao_usar": "Quando é preciso ver tendência sem imagem/referência; Display units Auto abrevia (12K).",
+      "doc_url": "https://learn.microsoft.com/en-us/power-bi/visuals/power-bi-visualization-card"
+    },
+    {
+      "id": "cartao_legado",
+      "nome_pt": "Cartão (legado)",
+      "nome_en": "Card (legacy)",
+      "campos": [
+        "nao_verificado"
+      ],
+      "pergunta": "Número único em relatórios antigos.",
+      "nao_usar": "Relatórios novos (use o Cartão novo). Acesso: Restaurar visuais padrão.",
+      "doc_url": "https://learn.microsoft.com/en-us/power-bi/visuals/power-bi-visualization-card"
+    },
+    {
+      "id": "multicartao_legado",
+      "nome_pt": "Cartão de várias linhas / multicartão (legado)",
+      "nome_en": "Multi-row card (legacy)",
+      "campos": [
+        "nao_verificado"
+      ],
+      "pergunta": "Vários números em relatórios antigos.",
+      "nao_usar": "Relatórios novos (use o Cartão novo).",
+      "doc_url": "https://learn.microsoft.com/en-us/power-bi/visuals/power-bi-visualization-card"
+    },
+    {
+      "id": "kpi",
+      "nome_pt": "KPI",
+      "nome_en": "KPI",
+      "campos": [
+        "Value",
+        "Trend axis",
+        "Target"
+      ],
+      "pergunta": "Estou à frente ou atrás da meta? Quanto falta?",
+      "nao_usar": "Sem meta no modelo; não tem ordenação depois de convertido.",
+      "doc_url": "https://learn.microsoft.com/en-us/power-bi/visuals/power-bi-visualization-kpi"
+    },
+    {
+      "id": "metas",
+      "nome_pt": "Metas / Métricas (scorecard)",
+      "nome_en": "Goals / Metrics visual",
+      "campos": [
+        "nao_verificado"
+      ],
+      "pergunta": "Acompanhar métricas e scorecards com status.",
+      "nao_usar": "nao_verificado",
+      "doc_url": "https://learn.microsoft.com/en-us/power-bi/visuals/power-bi-visualizations-overview"
+    },
+    {
+      "id": "segmentacao",
+      "nome_pt": "Segmentação",
+      "nome_en": "Slicer",
+      "campos": [
+        "Field"
+      ],
+      "pergunta": "Filtro mais usado sempre visível (lista, bloco, suspensa, data relativa).",
+      "nao_usar": "Filtros raros/complexos (use o painel Filtros).",
+      "doc_url": "https://learn.microsoft.com/en-us/power-bi/visuals/power-bi-visualization-slicers",
+      "observacao": "Nome da caixa 'Field' nao_verificado na página lida."
+    },
+    {
+      "id": "segmentacao_botoes",
+      "nome_pt": "Segmentação de botões",
+      "nome_en": "Button slicer",
+      "campos": [
+        "nao_verificado"
+      ],
+      "pergunta": "Filtro visual com poucas opções, imagens e ícones.",
+      "nao_usar": "Muitos valores; não suporta hierarquia.",
+      "doc_url": "https://learn.microsoft.com/en-us/power-bi/visuals/power-bi-visualization-slicers"
+    },
+    {
+      "id": "segmentacao_lista",
+      "nome_pt": "Segmentação de lista",
+      "nome_en": "List slicer",
+      "campos": [
+        "nao_verificado"
+      ],
+      "pergunta": "Lista/suspensa com busca, hierarquia, imagens.",
+      "nao_usar": "nao_verificado",
+      "doc_url": "https://learn.microsoft.com/en-us/power-bi/visuals/power-bi-visualization-slicers"
+    },
+    {
+      "id": "segmentacao_entrada",
+      "nome_pt": "Segmentação de entrada",
+      "nome_en": "Input slicer",
+      "campos": [
+        "nao_verificado"
+      ],
+      "pergunta": "Filtrar digitando texto/número com operador.",
+      "nao_usar": "Colar listas em lote (não suporta Paste).",
+      "doc_url": "https://learn.microsoft.com/en-us/power-bi/visuals/power-bi-visualization-slicers"
+    },
+    {
+      "id": "tabela",
+      "nome_pt": "Tabela",
+      "nome_en": "Table",
+      "campos": [
+        "Columns"
+      ],
+      "pergunta": "Valores exatos linha a linha, com totais.",
+      "nao_usar": "Quando o público precisa ver padrão/tendência.",
+      "doc_url": "https://learn.microsoft.com/en-us/power-bi/visuals/power-bi-visualization-tables"
+    },
+    {
+      "id": "matriz",
+      "nome_pt": "Matriz",
+      "nome_en": "Matrix",
+      "campos": [
+        "Rows",
+        "Columns",
+        "Values"
+      ],
+      "pergunta": "Tabela dinâmica com subtotais e drill (+/-).",
+      "nao_usar": "Poucos dados que caberiam num gráfico.",
+      "doc_url": "https://learn.microsoft.com/en-us/power-bi/visuals/power-bi-visualization-matrix-visual"
+    },
+    {
+      "id": "arvore_decomposicao",
+      "nome_pt": "Árvore de decomposição",
+      "nome_en": "Decomposition tree",
+      "campos": [
+        "Analyze",
+        "Explain by",
+        "Tooltips"
+      ],
+      "pergunta": "Por que este número está assim? Por onde ele se decompõe?",
+      "nao_usar": "Mais de 50 níveis/5.000 pontos; SSAS on-premises; divisões de IA não funcionam em Publicar na Web.",
+      "doc_url": "https://learn.microsoft.com/en-us/power-bi/visuals/power-bi-visualization-decomposition-tree"
+    },
+    {
+      "id": "principais_influenciadores",
+      "nome_pt": "Principais influenciadores",
+      "nome_en": "Key influencers",
+      "campos": [
+        "Analyze",
+        "Explain by",
+        "Expand by"
+      ],
+      "pergunta": "O que faz a nota/churn/NPS ser baixo?",
+      "nao_usar": "DirectQuery; conexão ao vivo AAS/SSAS; Publicar na Web; poucos dados (~100 observações).",
+      "doc_url": "https://learn.microsoft.com/en-us/power-bi/visuals/power-bi-visualization-influencers"
+    },
+    {
+      "id": "narrativa",
+      "nome_pt": "Narrativa (narrativa inteligente)",
+      "nome_en": "Narrative / Smart narrative",
+      "campos": [],
+      "pergunta": "Resumo em texto da página ou do visual (modo Copilot ou Personalizado).",
+      "nao_usar": "Tabelas, matrizes, R/Python, visuais personalizados; não fixa em dashboard.",
+      "doc_url": "https://learn.microsoft.com/en-us/power-bi/visuals/power-bi-visualization-smart-narrative"
+    },
+    {
+      "id": "qna",
+      "nome_pt": "P e R",
+      "nome_en": "Q&A",
+      "campos": [],
+      "pergunta": "Perguntar em linguagem natural e receber um gráfico.",
+      "nao_usar": "Em descontinuação (dez/2026 ou fev/2027 conforme a página); use Copilot.",
+      "doc_url": "https://learn.microsoft.com/en-us/power-bi/visuals/power-bi-visualization-q-and-a"
+    },
+    {
+      "id": "relatorio_paginado",
+      "nome_pt": "Relatório paginado",
+      "nome_en": "Paginated report visual",
+      "campos": [
+        "Parameters"
+      ],
+      "pergunta": "Embutir relatório pixel perfeito e exportar até 1.000.000 de linhas.",
+      "nao_usar": "Sem capacidade Premium/F64; assinaturas/exportação não suportadas.",
+      "doc_url": "https://learn.microsoft.com/en-us/power-bi/visuals/paginated-report-visual"
+    },
+    {
+      "id": "power_apps",
+      "nome_pt": "Power Apps",
+      "nome_en": "Power Apps for Power BI",
+      "campos": [
+        "nao_verificado"
+      ],
+      "pergunta": "Aplicativo embutido que recebe o filtro do relatório.",
+      "nao_usar": "Ver limitações do Power Apps.",
+      "doc_url": "https://learn.microsoft.com/en-us/power-bi/visuals/power-bi-visualization-powerapp"
+    },
+    {
+      "id": "power_automate",
+      "nome_pt": "Power Automate",
+      "nome_en": "Power Automate for Power BI",
+      "campos": [
+        "Power Automate Data"
+      ],
+      "pergunta": "Botão que dispara um fluxo com os dados filtrados.",
+      "nao_usar": "Mais de 1.000 registros; Publicar na Web; embedded; exportação.",
+      "doc_url": "https://learn.microsoft.com/en-us/power-bi/create-reports/power-bi-automate-visual"
+    },
+    {
+      "id": "visual_r",
+      "nome_pt": "Visual R",
+      "nome_en": "R visual",
+      "campos": [
+        "Values"
+      ],
+      "pergunta": "Gráfico estatístico sob medida em R.",
+      "nao_usar": "Mais de 150.000 linhas; precisa ser origem de filtro cruzado (não é).",
+      "doc_url": "https://learn.microsoft.com/en-us/power-bi/create-reports/desktop-r-visuals"
+    },
+    {
+      "id": "visual_python",
+      "nome_pt": "Visual Python",
+      "nome_en": "Python visual",
+      "campos": [
+        "Values"
+      ],
+      "pergunta": "Gráfico estatístico sob medida em Python.",
+      "nao_usar": "Mesmas limitações do visual R (inferido; página do Python não lida).",
+      "doc_url": "https://learn.microsoft.com/en-us/power-bi/create-reports/desktop-r-visuals"
+    },
+    {
+      "id": "gantt",
+      "nome_pt": "Gantt (prévia)",
+      "nome_en": "Gantt visual",
+      "campos": [
+        "nao_verificado"
+      ],
+      "pergunta": "Duração e progresso de tarefas no tempo.",
+      "nao_usar": "nao_verificado",
+      "doc_url": "https://learn.microsoft.com/en-us/power-bi/visuals/power-bi-visualizations-overview"
+    },
+    {
+      "id": "imagem",
+      "nome_pt": "Imagem",
+      "nome_en": "Image",
+      "campos": [],
+      "pergunta": "Logo ou imagem dinâmica (URL, OneLake, campo).",
+      "nao_usar": "-",
+      "doc_url": "https://learn.microsoft.com/en-us/power-bi/visuals/power-bi-visualizations-overview"
+    },
+    {
+      "id": "texto_formas",
+      "nome_pt": "Caixa de texto e formas",
+      "nome_en": "Text box and shapes",
+      "campos": [],
+      "pergunta": "Títulos, explicações, retângulos e setas.",
+      "nao_usar": "-",
+      "doc_url": "https://learn.microsoft.com/en-us/power-bi/visuals/power-bi-visualizations-overview"
+    },
+    {
+      "id": "botoes_navegadores",
+      "nome_pt": "Botões e navegadores",
+      "nome_en": "Buttons and navigators",
+      "campos": [],
+      "pergunta": "Navegar entre páginas/indicadores, drill-through, URL, aplicar/limpar segmentações.",
+      "nao_usar": "-",
+      "doc_url": "https://learn.microsoft.com/en-us/power-bi/create-reports/desktop-buttons"
+    }
+  ],
+  "interacoes": [
+    {
+      "id": "filtro_cruzado",
+      "nome_pt": "Filtro cruzado",
+      "descricao": "Clicar num ponto esconde, nos outros visuais, o que não tem relação. Linha, dispersão e mapa só aceitam filtro (não realce). Ctrl+clique seleciona vários.",
+      "doc_url": "https://learn.microsoft.com/en-us/power-bi/create-reports/service-reports-visual-interactions"
+    },
+    {
+      "id": "realce_cruzado",
+      "nome_pt": "Realce cruzado",
+      "descricao": "Clicar num ponto mantém tudo nos outros visuais e esmaece o que não tem relação (padrão em colunas/barras/pizza).",
+      "doc_url": "https://learn.microsoft.com/en-us/power-bi/visuals/power-bi-visualization-column-charts"
+    },
+    {
+      "id": "editar_interacoes",
+      "nome_pt": "Editar interações",
+      "descricao": "Formatar > Editar interações; ícones Filtrar / Realçar / Nenhum em cada visual de destino; salvo no relatório.",
+      "doc_url": "https://learn.microsoft.com/en-us/power-bi/create-reports/service-reports-visual-interactions"
+    },
+    {
+      "id": "drill_down_up",
+      "nome_pt": "Drill down / up / próximo nível / expandir",
+      "descricao": "Com hierarquia no eixo: Drill up, Ativar drill down (clicar num ponto), Ir para o próximo nível, Expandir tudo um nível abaixo. Por padrão não filtra outros visuais (Formatar > Aplicar filtros de drill down a > Página inteira).",
+      "doc_url": "https://learn.microsoft.com/en-us/power-bi/visuals/power-bi-visualization-column-charts"
+    },
+    {
+      "id": "drill_through",
+      "nome_pt": "Drill-through (detalhamento)",
+      "descricao": "Campo na caixa Drill-through da página de destino; botão Voltar automático; botão direito > Drill-through ou botão com ação Drill-through.",
+      "doc_url": "https://learn.microsoft.com/en-us/power-bi/create-reports/desktop-drillthrough"
+    },
+    {
+      "id": "drill_through_entre_relatorios",
+      "nome_pt": "Drill-through entre relatórios",
+      "descricao": "Só no Service, mesmo workspace, campos com mesmo nome e tipo, habilitar no relatório de destino.",
+      "doc_url": "https://learn.microsoft.com/en-us/power-bi/create-reports/desktop-drillthrough"
+    },
+    {
+      "id": "dica_pagina",
+      "nome_pt": "Dica de ferramenta de página de relatório",
+      "descricao": "Página com tipo Dica de ferramenta e campos de dica; aparece ao passar o mouse; não interativa; não funciona em dashboards.",
+      "doc_url": "https://learn.microsoft.com/en-us/power-bi/create-reports/desktop-tooltips"
+    },
+    {
+      "id": "indicadores",
+      "nome_pt": "Indicadores (bookmarks)",
+      "descricao": "Guarda página, filtros, segmentações, seleção, ordenação, drill, visibilidade e spotlight; opções Dados/Exibição/Página atual/Visuais selecionados; grupos; modo apresentação; pessoais no Service.",
+      "doc_url": "https://learn.microsoft.com/en-us/power-bi/create-reports/desktop-bookmarks"
+    },
+    {
+      "id": "painel_selecao",
+      "nome_pt": "Painel Seleção",
+      "descricao": "Mostrar/ocultar objetos (salvo nos indicadores) e Ordem de tabulação.",
+      "doc_url": "https://learn.microsoft.com/en-us/power-bi/create-reports/desktop-bookmarks"
+    },
+    {
+      "id": "botoes",
+      "nome_pt": "Botões",
+      "descricao": "Ações: Voltar, Indicador, Drill-through, Navegação de página, Navegação de indicador, P e R, URL, Aplicar/Limpar todas as segmentações; estados Padrão/Passar mouse/Pressionar/Desabilitado/Carregando; Ctrl+clique no Desktop.",
+      "doc_url": "https://learn.microsoft.com/en-us/power-bi/create-reports/desktop-buttons"
+    },
+    {
+      "id": "navegador_paginas",
+      "nome_pt": "Navegador de páginas",
+      "descricao": "Inserir > Botões > Navegador > Navegador de páginas; sincroniza nomes, ordem e página atual.",
+      "doc_url": "https://learn.microsoft.com/en-us/power-bi/create-reports/button-navigators"
+    },
+    {
+      "id": "navegador_indicadores",
+      "nome_pt": "Navegador de indicadores",
+      "descricao": "Botões para um grupo de indicadores; Permitir desmarcar; layout horizontal/vertical/grade.",
+      "doc_url": "https://learn.microsoft.com/en-us/power-bi/create-reports/button-navigators"
+    },
+    {
+      "id": "sincronizar_segmentacoes",
+      "nome_pt": "Sincronizar segmentações",
+      "descricao": "Exibir > Sincronizar segmentações: colunas Sincronizar e Visível por página; grupos em Opções avançadas.",
+      "doc_url": "https://learn.microsoft.com/en-us/power-bi/visuals/power-bi-visualization-slicers"
+    },
+    {
+      "id": "painel_filtros",
+      "nome_pt": "Painel Filtros",
+      "descricao": "Níveis visual/página/todas as páginas/drill-through; básico, avançado, Top N, data relativa; bloquear/ocultar; persiste no Service (Redefinir para o padrão).",
+      "doc_url": "https://learn.microsoft.com/en-us/power-bi/create-reports/power-bi-report-add-filter"
+    },
+    {
+      "id": "modo_foco",
+      "nome_pt": "Modo de foco",
+      "descricao": "Ícone no cabeçalho; visual ocupa a tela mantendo o painel Filtros; Voltar ao relatório.",
+      "doc_url": "https://learn.microsoft.com/en-us/power-bi/explore-reports/end-user-report-view"
+    },
+    {
+      "id": "spotlight",
+      "nome_pt": "Spotlight",
+      "descricao": "No Service, '...' > Spotlight: os outros visuais ficam quase transparentes; salvo em indicadores.",
+      "doc_url": "https://learn.microsoft.com/en-us/power-bi/explore-reports/end-user-spotlight"
+    },
+    {
+      "id": "mostrar_como_tabela",
+      "nome_pt": "Mostrar como tabela",
+      "descricao": "Visual em cima e tabela embaixo (ou lado a lado); Desktop: Dados/Drill > Tabela visual; Alt+Shift+F11 abre tabela acessível.",
+      "doc_url": "https://learn.microsoft.com/en-us/power-bi/explore-reports/end-user-show-data"
+    },
+    {
+      "id": "ver_registros",
+      "nome_pt": "Mostrar ponto de dados como tabela (Ver registros)",
+      "descricao": "Todas as linhas por trás de um ponto; Desktop: Tabela de ponto de dados; não funciona quando o ponto é medida.",
+      "doc_url": "https://learn.microsoft.com/en-us/power-bi/explore-reports/end-user-show-data"
+    },
+    {
+      "id": "exportar_dados",
+      "nome_pt": "Exportar dados",
+      "descricao": "Desktop: .csv; Service: layout atual, resumido, subjacente; .xlsx 150.000 linhas, .csv 30.000; 1ª linha lista os filtros.",
+      "doc_url": "https://learn.microsoft.com/en-us/power-bi/visuals/power-bi-visualization-export-data"
+    },
+    {
+      "id": "ordenar_eixo",
+      "nome_pt": "Ordenar eixo",
+      "descricao": "'...' > Ordenar eixo > campo > crescente/decrescente; KPI não ordena depois de convertido.",
+      "doc_url": "https://learn.microsoft.com/en-us/power-bi/visuals/power-bi-visualization-waterfall-charts"
+    },
+    {
+      "id": "formatacao_condicional",
+      "nome_pt": "Formatação condicional",
+      "descricao": "Botão fx: Gradiente, Regras, Valor do campo (hex, rgb, nome CSS ou nome de cor do tema); tabela/matriz: fundo, fonte, barras de dados, ícones, URL.",
+      "doc_url": "https://learn.microsoft.com/en-us/power-bi/create-reports/desktop-conditional-table-formatting"
+    },
+    {
+      "id": "parametros_campo",
+      "nome_pt": "Parâmetros de campo",
+      "descricao": "Modelagem > Novo parâmetro > Campos; segmentação troca medida/dimensão do visual.",
+      "doc_url": "https://learn.microsoft.com/en-us/power-bi/create-reports/power-bi-field-parameters"
+    },
+    {
+      "id": "parametros_hipoteticos",
+      "nome_pt": "Parâmetros hipotéticos (what-if)",
+      "descricao": "Modelagem > Novo parâmetro > Intervalo numérico; gera tabela, medida e segmentação; máx. 1.000 valores.",
+      "doc_url": "https://learn.microsoft.com/en-us/power-bi/transform-model/desktop-what-if"
+    },
+    {
+      "id": "pequenos_multiplos",
+      "nome_pt": "Pequenos múltiplos",
+      "descricao": "Caixa Small multiples em barras/colunas/linha/área; grade com eixos sincronizados.",
+      "doc_url": "https://learn.microsoft.com/en-us/power-bi/visuals/power-bi-visualization-small-multiples"
+    },
+    {
+      "id": "linhas_referencia",
+      "nome_pt": "Linhas de referência (painel Análise)",
+      "descricao": "Tendência, constante X/Y, mín, máx, média, mediana, percentil, sombreamento de simetria, barras de erro, previsão (só linha), anomalias (só linha).",
+      "doc_url": "https://learn.microsoft.com/en-us/power-bi/transform-model/desktop-analytics-pane"
+    },
+    {
+      "id": "personalizar_visuais",
+      "nome_pt": "Personalizar visuais",
+      "descricao": "Leitor troca tipo, campos, legenda, agregação; salva em indicador pessoal; habilitar em Configurações de relatório.",
+      "doc_url": "https://learn.microsoft.com/en-us/power-bi/create-reports/power-bi-personalize-visuals"
+    },
+    {
+      "id": "comentarios",
+      "nome_pt": "Comentários (Service)",
+      "descricao": "Em relatório/dashboard/visual, com @menção; o 1º comentário guarda o estado de filtros.",
+      "doc_url": "https://learn.microsoft.com/en-us/power-bi/explore-reports/end-user-comment"
+    },
+    {
+      "id": "assinaturas",
+      "nome_pt": "Assinaturas (Service)",
+      "descricao": "E-mail agendado com imagem/link ou PDF/PPT; horária/diária/semanal/mensal/após atualização.",
+      "doc_url": "https://learn.microsoft.com/en-us/power-bi/collaborate-share/end-user-subscribe"
+    },
+    {
+      "id": "dashboards_blocos",
+      "nome_pt": "Dashboards (blocos fixados)",
+      "descricao": "Página única de blocos fixados de vários relatórios; não filtra; tem alertas; só no Service.",
+      "doc_url": "https://learn.microsoft.com/en-us/power-bi/create-reports/service-dashboards"
+    },
+    {
+      "id": "apps_workspaces",
+      "nome_pt": "Apps e workspaces",
+      "descricao": "App publicado a partir do workspace, com até 25 audiências; leitores não editam.",
+      "doc_url": "https://learn.microsoft.com/en-us/power-bi/collaborate-share/service-create-distribute-apps"
+    },
+    {
+      "id": "pausar_visuais",
+      "nome_pt": "Pausar visuais / predefinições de otimização",
+      "descricao": "Guia Otimizar: pausa consultas; Redução de consultas desliga filtro/realce cruzado e põe botão Aplicar.",
+      "doc_url": "https://learn.microsoft.com/en-us/power-bi/create-reports/desktop-optimize-ribbon"
+    }
+  ],
+  "fontes": [
+    "https://github.com/microsoft/json-schemas/tree/main/fabric/item/report/definition",
+    "https://github.com/microsoft/powerbi-desktop-samples/tree/main/Report%20Theme%20JSON%20Schema",
+    "https://learn.microsoft.com/en-us/analysis-services/tmdl/tmdl-overview",
+    "https://learn.microsoft.com/en-us/azure/azure-maps/power-bi-visual-get-started",
+    "https://learn.microsoft.com/en-us/power-bi/collaborate-share/end-user-subscribe",
+    "https://learn.microsoft.com/en-us/power-bi/collaborate-share/service-create-distribute-apps",
+    "https://learn.microsoft.com/en-us/power-bi/create-reports/button-navigators",
+    "https://learn.microsoft.com/en-us/power-bi/create-reports/desktop-accessibility-creating-reports",
+    "https://learn.microsoft.com/en-us/power-bi/create-reports/desktop-bookmarks",
+    "https://learn.microsoft.com/en-us/power-bi/create-reports/desktop-buttons",
+    "https://learn.microsoft.com/en-us/power-bi/create-reports/desktop-conditional-table-formatting",
+    "https://learn.microsoft.com/en-us/power-bi/create-reports/desktop-drillthrough",
+    "https://learn.microsoft.com/en-us/power-bi/create-reports/desktop-optimize-ribbon",
+    "https://learn.microsoft.com/en-us/power-bi/create-reports/desktop-performance-analyzer",
+    "https://learn.microsoft.com/en-us/power-bi/create-reports/desktop-r-visuals",
+    "https://learn.microsoft.com/en-us/power-bi/create-reports/desktop-report-themes",
+    "https://learn.microsoft.com/en-us/power-bi/create-reports/desktop-ribbon",
+    "https://learn.microsoft.com/en-us/power-bi/create-reports/desktop-tooltips",
+    "https://learn.microsoft.com/en-us/power-bi/create-reports/power-bi-automate-visual",
+    "https://learn.microsoft.com/en-us/power-bi/create-reports/power-bi-create-mobile-optimized-report-mobile-layout-view",
+    "https://learn.microsoft.com/en-us/power-bi/create-reports/power-bi-design-ribbon",
+    "https://learn.microsoft.com/en-us/power-bi/create-reports/power-bi-field-parameters",
+    "https://learn.microsoft.com/en-us/power-bi/create-reports/power-bi-personalize-visuals",
+    "https://learn.microsoft.com/en-us/power-bi/create-reports/power-bi-report-add-filter",
+    "https://learn.microsoft.com/en-us/power-bi/create-reports/power-bi-report-display-settings",
+    "https://learn.microsoft.com/en-us/power-bi/create-reports/power-bi-reports-visual-defaults",
+    "https://learn.microsoft.com/en-us/power-bi/create-reports/report-themes-create-custom",
+    "https://learn.microsoft.com/en-us/power-bi/create-reports/service-dashboards",
+    "https://learn.microsoft.com/en-us/power-bi/create-reports/service-reports-visual-interactions",
+    "https://learn.microsoft.com/en-us/power-bi/create-reports/service-the-report-editor-take-a-tour",
+    "https://learn.microsoft.com/en-us/power-bi/developer/projects/projects-dataset",
+    "https://learn.microsoft.com/en-us/power-bi/developer/projects/projects-overview",
+    "https://learn.microsoft.com/en-us/power-bi/developer/projects/projects-report",
+    "https://learn.microsoft.com/en-us/power-bi/explore-reports/end-user-comment",
+    "https://learn.microsoft.com/en-us/power-bi/explore-reports/end-user-report-view",
+    "https://learn.microsoft.com/en-us/power-bi/explore-reports/end-user-show-data",
+    "https://learn.microsoft.com/en-us/power-bi/explore-reports/end-user-spotlight",
+    "https://learn.microsoft.com/en-us/power-bi/fundamentals/desktop-getting-started",
+    "https://learn.microsoft.com/en-us/power-bi/transform-model/dax-query-view",
+    "https://learn.microsoft.com/en-us/power-bi/transform-model/desktop-analytics-pane",
+    "https://learn.microsoft.com/en-us/power-bi/transform-model/desktop-data-view",
+    "https://learn.microsoft.com/en-us/power-bi/transform-model/desktop-relationship-view",
+    "https://learn.microsoft.com/en-us/power-bi/transform-model/desktop-tmdl-view",
+    "https://learn.microsoft.com/en-us/power-bi/transform-model/desktop-what-if",
+    "https://learn.microsoft.com/en-us/power-bi/visuals/desktop-ribbon-charts",
+    "https://learn.microsoft.com/en-us/power-bi/visuals/paginated-report-visual",
+    "https://learn.microsoft.com/en-us/power-bi/visuals/power-bi-line-chart",
+    "https://learn.microsoft.com/en-us/power-bi/visuals/power-bi-map-tips-and-tricks",
+    "https://learn.microsoft.com/en-us/power-bi/visuals/power-bi-map-visualizations-overview",
+    "https://learn.microsoft.com/en-us/power-bi/visuals/power-bi-shape-map",
+    "https://learn.microsoft.com/en-us/power-bi/visuals/power-bi-visualization-basic-area-chart",
+    "https://learn.microsoft.com/en-us/power-bi/visuals/power-bi-visualization-card",
+    "https://learn.microsoft.com/en-us/power-bi/visuals/power-bi-visualization-column-charts",
+    "https://learn.microsoft.com/en-us/power-bi/visuals/power-bi-visualization-combo-chart",
+    "https://learn.microsoft.com/en-us/power-bi/visuals/power-bi-visualization-decomposition-tree",
+    "https://learn.microsoft.com/en-us/power-bi/visuals/power-bi-visualization-export-data",
+    "https://learn.microsoft.com/en-us/power-bi/visuals/power-bi-visualization-filled-maps-choropleths",
+    "https://learn.microsoft.com/en-us/power-bi/visuals/power-bi-visualization-funnel-charts",
+    "https://learn.microsoft.com/en-us/power-bi/visuals/power-bi-visualization-influencers",
+    "https://learn.microsoft.com/en-us/power-bi/visuals/power-bi-visualization-kpi",
+    "https://learn.microsoft.com/en-us/power-bi/visuals/power-bi-visualization-matrix-visual",
+    "https://learn.microsoft.com/en-us/power-bi/visuals/power-bi-visualization-pie-donut-chart",
+    "https://learn.microsoft.com/en-us/power-bi/visuals/power-bi-visualization-powerapp",
+    "https://learn.microsoft.com/en-us/power-bi/visuals/power-bi-visualization-q-and-a",
+    "https://learn.microsoft.com/en-us/power-bi/visuals/power-bi-visualization-radial-gauge-charts",
+    "https://learn.microsoft.com/en-us/power-bi/visuals/power-bi-visualization-scatter",
+    "https://learn.microsoft.com/en-us/power-bi/visuals/power-bi-visualization-slicers",
+    "https://learn.microsoft.com/en-us/power-bi/visuals/power-bi-visualization-small-multiples",
+    "https://learn.microsoft.com/en-us/power-bi/visuals/power-bi-visualization-smart-narrative",
+    "https://learn.microsoft.com/en-us/power-bi/visuals/power-bi-visualization-tables",
+    "https://learn.microsoft.com/en-us/power-bi/visuals/power-bi-visualization-treemaps",
+    "https://learn.microsoft.com/en-us/power-bi/visuals/power-bi-visualization-waterfall-charts",
+    "https://learn.microsoft.com/en-us/power-bi/visuals/power-bi-visualizations-overview"
+  ]
+}
