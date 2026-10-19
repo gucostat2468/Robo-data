@@ -191,6 +191,9 @@ def principal(argv: list[str] | None = None) -> int:
     sdag.add_argument("--destino", help="arquivo da DAG (padrão: airflow/dags/robo_empresa.py na pasta do projeto)")
     sdag.add_argument("--sem-wsl", action="store_true", help="não converter caminhos C:\\ para /mnt/c (Airflow fora do WSL)")
     sdag.add_argument("--python", help="python que o Airflow deve chamar (padrão: o python que está rodando este comando)")
+    spc = sub.add_parser("preparar-pc", help="prepara o computador de uma vez (Prompt como Administrador): banco real, "
+                                             "memória, celular, banco no celular, início com o Windows, vigia e diagnóstico")
+    spc.add_argument("--memoria", help="arquivo trabalho_AAAAMMDD_HHMMSS.db.gz com a memória da empresa a importar")
     svi = sub.add_parser("vigia", help="religa o robô sozinho se ele cair: ligar/desligar a tarefa agendada (Windows), "
                                        "status, ou checar agora")
     svi.add_argument("acao", choices=["ligar", "desligar", "status", "checar"])
@@ -216,6 +219,9 @@ def principal(argv: list[str] | None = None) -> int:
 
     if args.comando == "rotina":
         return _comando_rotina(args)
+    if args.comando == "preparar-pc":
+        from robo import preparar_pc
+        return preparar_pc.preparar(principal, args.config, args.memoria)
     if args.comando == "vigia":
         from robo import vigia
         if args.acao in ("ligar", "desligar", "status"):

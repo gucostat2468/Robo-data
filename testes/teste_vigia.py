@@ -39,3 +39,19 @@ def teste_rodando_sem_painel_registra_sem_matar_e_ok_nao_registra(cfg_factory, m
 def teste_comando_do_app_usa_o_config_e_sem_janela():
     cmd = vigia._comando_app("c:/x/config.yaml")
     assert cmd[1:] == ["-m", "robo", "--config", "c:/x/config.yaml", "app", "--sem-janela"]
+
+
+def teste_preparar_pc_ordem_dos_passos_e_para_no_obrigatorio(monkeypatch, tmp_path):
+    from robo import preparar_pc
+    lista = preparar_pc.passos("mem.db.gz", tem_senha_painel=False, windows=True)
+    assert [a[0] for _, a, _ in lista] == ["instalar-banco", "importar-memoria", "senha", "celular",
+                                           "liberar-banco-celular", "inicializacao", "vigia", "diagnostico"]
+    monkeypatch.setenv("ROBO_PG_SUPER_SENHA", "x")
+    chamados = []
+    def principal(args):
+        chamados.append(args[2] if args[0] == "--config" else args[0])
+        return 1 if "celular" in args else 0      # o app do celular falha (obrigatório): para ali
+    cfg = tmp_path / "config.yaml"
+    cfg.write_text("painel:\n  senha_hash: x\n", encoding="utf-8")
+    assert preparar_pc.preparar(principal, str(cfg), None) == 1
+    assert chamados == ["instalar-banco", "celular"]   # com senha no painel não pede de novo; parou no que falhou
