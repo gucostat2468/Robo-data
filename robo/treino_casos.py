@@ -1058,6 +1058,129 @@ def _v_sql(caso, cfg):
     return [] if len(df) else ["tabela vazia"]
 
 
+
+# =============================================================================== 14. orquestração (SLA das rotinas — Airflow)
+def _orq_pool():
+    from robo.orquestracao import APENAS_NO_ROBO
+    from robo.rotinas import ROTINAS
+    return {n: float(v[2]) * 60 for n, v in ROTINAS.items() if n not in APENAS_NO_ROBO}  # nome → intervalo em minutos
+
+
+def _g_orquestracao(nivel, semente, pasta, cfg):
+    rng = _rng(semente, nivel, "orquestracao")
+    pool = _orq_pool()
+    nomes = [str(x) for x in rng.permutation(sorted(pool))]
+    base = {n: float(rng.uniform(5, 40)) for n in nomes}
+    hist = {n: [{"nome": n, "fim_min_atras": 35 + 30 * k, "segundos": round(base[n] * float(rng.uniform(0.8, 1.2)), 1),
+                 "status": "fez"} for k in range(8)] for n in nomes}
+    estado = {n: {"nome": n, "verif_min_atras": round(0.3 * pool[n], 2), "ultimo_status": "fez"} for n in nomes}
+    if nivel <= 4:
+        qtd = {1: (1, 0, 0), 2: (1, 1, 0), 3: (1, 1, 1), 4: (1, 1, 1)}[nivel]
+    else:
+        qtd = tuple(int(rng.integers(0, 3)) for _ in range(3))
+        if sum(qtd) == 0:
+            qtd = (0, 0, 1)
+    fila = list(nomes)
+    erro, atraso, lenta = [fila.pop() for _ in range(qtd[0])], [fila.pop() for _ in range(qtd[1])], [fila.pop() for _ in range(qtd[2])]
+    plantios = {"erro": erro, "atraso": atraso, "lenta": lenta}
+    for n in erro:
+        hist[n].append({"nome": n, "fim_min_atras": 1, "segundos": 3.0, "status": "erro"})
+    for n in atraso:
+        estado[n]["verif_min_atras"] = round(3 * pool[n] + 10, 2)
+    for n in lenta:
+        hist[n].append({"nome": n, "fim_min_atras": 1, "segundos": round(base[n] * 6 + 120, 1), "status": "fez"})
+    if nivel >= 4:  # iscas: parecem problema mas a regra diz que não são
+        recuperada, lenta_antiga, pouco_hist = fila.pop(), fila.pop(), fila.pop()
+        hist[recuperada] += [{"nome": recuperada, "fim_min_atras": 3, "segundos": 2.0, "status": "erro"},
+                             {"nome": recuperada, "fim_min_atras": 1, "segundos": base[recuperada], "status": "fez"}]
+        hist[lenta_antiga][3]["segundos"] = round(base[lenta_antiga] * 10 + 300, 1)
+        hist[pouco_hist] = hist[pouco_hist][-3:] + [{"nome": pouco_hist, "fim_min_atras": 1,
+                                                    "segundos": round(base[pouco_hist] * 8 + 200, 1), "status": "fez"}]
+        plantios["iscas"] = {"erro_recuperado": recuperada, "lenta_antiga": lenta_antiga, "historico_curto": pouco_hist}
+        if nivel == 5 and fila:
+            quase = fila.pop()
+            estado[quase]["verif_min_atras"] = round(1.2 * pool[quase], 2)  # perto do limite, mas dentro
+            plantios["iscas"]["perto_do_limite"] = quase
+    from robo.orquestracao import APENAS_NO_ROBO
+    em_dia = [{"nome": n, "verif_min_atras": 0.1, "ultimo_status": "fez"} for n in sorted(APENAS_NO_ROBO)]  # o canal (robô) em dia
+    cenario = {"sessao_min_atras": 60 * 24 * 40, "estado": list(estado.values()) + em_dia,
+               "execucoes": [e for n in nomes for e in hist[n]]}
+    gabarito = {"atrasadas": sorted(atraso), "com_erro": sorted(erro), "lentas": sorted(lenta)}
+    return {"arquivo": None, "parametros": {"cenario": cenario, "plantios": plantios},
+            "gabarito": gabarito,
+            "resumo": f"{len(nomes)} rotinas; plantado: {len(erro)} com erro, {len(atraso)} atrasada(s), {len(lenta)} lenta(s)"
+                      + (f"; iscas: {', '.join(plantios['iscas'])}" if "iscas" in plantios else "")}
+
+
+def _x_orquestracao(cfg, sb, pid, caso):
+    import copy
+    from robo.config import Config
+    from robo import orquestracao
+    raiz = Path(sb.dados["pastas"]["logs"]).parent
+    n = 1
+    while (raiz / f"orq_sandbox_{n}").exists():  # computador de teste NOVO a cada tentativa
+        n += 1
+    pasta = raiz / f"orq_sandbox_{n}"
+    dados = copy.deepcopy(sb.dados)
+    dados["pastas"] = {k: str(pasta / k) for k in ("entrada", "logs", "agentes", "habilidades")}
+    c = Config(dados, sb.base)
+    c.criar_pastas()
+    orquestracao.gravar_cenario(c, caso["parametros"]["cenario"])
+    return _usar("orquestracao", c, pid)
+
+
+def _c_orquestracao(caso, r):
+    if (e := _excecao(r)):
+        return e
+    d = r.get("dados") or {}
+    g = caso["gabarito"]
+    total = len(_orq_pool()) * 3
+    faltou, sobrou = [], []
+    for chave in ("atrasadas", "com_erro", "lentas"):
+        esperado, achado = set(g[chave]), set(d.get(chave) or [])
+        faltou += [f"{chave}: {x}" for x in sorted(esperado - achado)]
+        sobrou += [f"{chave}: {x}" for x in sorted(achado - esperado)]
+    if faltou or sobrou:
+        detalhe = "; ".join([f"não detectou {x}" for x in faltou] + [f"alarme falso {x}" for x in sobrou])
+        return (False, round(1 - (len(faltou) + len(sobrou)) / total, 2),
+                "problema_nao_detectado" if faltou else "falso_alarme", detalhe)
+    n = sum(len(g[k]) for k in g)
+    return (True, 1.0, "", f"apontou exatamente {n} problema(s) e nenhuma isca")
+
+
+def _v_orquestracao(caso, cfg):
+    """Revisor: refaz o gabarito direto do cenário, com laços simples, e confere que o nível tem o que promete."""
+    pool = _orq_pool()
+    cen = caso["parametros"]["cenario"]
+    problemas = []
+    atrasadas = sorted(e["nome"] for e in cen["estado"] if e["nome"] in pool and e["verif_min_atras"] > 1.5 * pool[e["nome"]])
+    com_erro, lentas = [], []
+    for nome in pool:
+        execs = sorted((e for e in cen["execucoes"] if e["nome"] == nome), key=lambda e: e["fim_min_atras"])
+        if not execs:
+            continue
+        if execs[0]["status"] == "erro":
+            com_erro.append(nome)
+            continue
+        feitas = [e["segundos"] for e in execs if e["status"] == "fez"]
+        anteriores = sorted(feitas[1:21])
+        if len(anteriores) >= 5:
+            meio = len(anteriores) // 2
+            med = anteriores[meio] if len(anteriores) % 2 else (anteriores[meio - 1] + anteriores[meio]) / 2
+            if feitas[0] > 3 * med and feitas[0] > med + 60:
+                lentas.append(nome)
+    refeito = {"atrasadas": atrasadas, "com_erro": sorted(com_erro), "lentas": sorted(lentas)}
+    for chave, valor in refeito.items():
+        if valor != caso["gabarito"][chave]:
+            problemas.append(f"gabarito de {chave} não confere: gerador {caso['gabarito'][chave]}, revisor {valor}")
+    nivel = int(caso.get("nivel") or 0)
+    if nivel >= 4 and len((caso["parametros"]["plantios"].get("iscas") or {})) < 3:
+        problemas.append("nível 4+ sem as iscas prometidas")
+    if not any(caso["gabarito"].values()):
+        problemas.append("caso sem nenhum problema plantado")
+    return problemas
+
+
 # =============================================================================== catálogo
 CATALOGO: dict[str, Competencia] = {c.id: c for c in [
     Competencia("limpeza", "Limpar e barrar planilha", "diagnosticar_planilha", "casos_engenharia", "limpeza-1",
@@ -1099,6 +1222,11 @@ CATALOGO: dict[str, Competencia] = {c.id: c for c in [
                 {1: "painel sem senha", 2: "+ senha do banco no config", 3: "+ erros no log", 4: "+ código novo sem aviso",
                  5: "problemas sorteados (achar também o que NÃO existe)"}, _g_ronda_ti, _x_ronda_ti, _c_ronda_ti, _v_ronda_ti,
                 descricao="Detectar exatamente os problemas plantados no computador de teste."),
+    Competencia("orquestracao", "SLA das rotinas (Airflow)", "orquestracao", "casos_ti", "orquestracao-1",
+                {1: "uma rotina com erro", 2: "+ uma atrasada", 3: "+ uma lenta", 4: "+ iscas: erro já resolvido, lentidão antiga, "
+                 "histórico curto", 5: "quantidades sorteadas + rotina perto do limite (achar também o que NÃO é problema)"},
+                _g_orquestracao, _x_orquestracao, _c_orquestracao, _v_orquestracao,
+                descricao="Apontar exatamente as rotinas atrasadas, com erro e lentas pela regra de SLA — nenhuma isca."),
     Competencia("resumo_executivo", "Resumo sem inventar", "resumo_executivo", "casos_governanca", "resumo-1",
                 {1: "2 resultados", 2: "3 resultados", 3: "+ uma etapa que falhou", 4: "+ etapa vazia", 5: "8 resultados"},
                 _g_resumo, _x_resumo, _c_resumo, _v_resumo, descricao="Todas as partes, nenhum número que não veio das etapas."),

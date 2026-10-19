@@ -165,24 +165,18 @@ class ControleRobo:
         agora = time.time()
         if agora - getattr(self, "_ultimo_canal", 0) >= 60:
             self._ultimo_canal = agora
-            from robo.canal import Canal
-            rotinas.executar(cfg, "canal", lambda: Canal(cfg).sincronizar())
+            rotinas.executar(cfg, "canal", rotinas.funcao(cfg, "canal"))
+        if str((cfg.dados.get("rotinas") or {}).get("agendador", "robo")).lower() == "airflow":
+            return  # o Airflow agenda as rotinas (robo/orquestracao.py); a equipe de SLA vigia se ele está rodando
         # rotinas pesadas em segundo plano (avaliação, backup, estudo, reunião…): cada uma decide se está na hora
         if agora - getattr(self, "_ultima_estrategia", 0) >= 3600 and not getattr(self, "_estrategia_rodando", False):
             self._ultima_estrategia, self._estrategia_rodando = agora, True
 
             def _rodar():
-                from robo import auditoria, backup, desenvolvimento, estrategia, licoes, memoria, reuniao
-                try:
-                    rotinas.executar(cfg, "estrategia", lambda: estrategia.rotina(cfg))
-                    rotinas.executar(cfg, "backup", lambda: backup.rotina(cfg))
-                    rotinas.executar(cfg, "memoria_pg", lambda: (memoria.sincronizar_postgres(cfg)
-                                                                 if cfg.banco.get("habilitado") else None))
-                    rotinas.executar(cfg, "pdca", lambda: memoria.checar_pdca(cfg)["verificados"])
-                    rotinas.executar(cfg, "licoes", lambda: licoes.rotina(cfg))
-                    rotinas.executar(cfg, "estudo", lambda: desenvolvimento.rotina(cfg))
-                    rotinas.executar(cfg, "auditoria", lambda: auditoria.rotina(cfg))
-                    rotinas.executar(cfg, "reuniao", lambda: reuniao.rotina(cfg))
+                from robo import orquestracao
+                try:  # mesma ordem do fluxo horário do Airflow (robo/orquestracao.py)
+                    for nome in orquestracao.FLUXOS["robo_horario"]["rotinas"]:
+                        rotinas.executar(cfg, nome, rotinas.funcao(cfg, nome))
                 finally:
                     self._estrategia_rodando = False
             threading.Thread(target=_rodar, name="robo-estrategia", daemon=True).start()
@@ -191,9 +185,8 @@ class ControleRobo:
             self._ultimo_lab, self._lab_rodando = agora, True
 
             def _lab():
-                from robo import laboratorio
                 try:
-                    rotinas.executar(cfg, "laboratorio", lambda: laboratorio.rotina(cfg))
+                    rotinas.executar(cfg, "laboratorio", rotinas.funcao(cfg, "laboratorio"))
                 finally:
                     self._lab_rodando = False
             threading.Thread(target=_lab, name="robo-laboratorio", daemon=True).start()
@@ -202,17 +195,15 @@ class ControleRobo:
             self._ultimo_treino, self._treino_rodando = agora, True
 
             def _treino():
-                from robo import treino
                 try:
-                    rotinas.executar(cfg, "treino", lambda: treino.rotina(cfg))
+                    rotinas.executar(cfg, "treino", rotinas.funcao(cfg, "treino"))
                 finally:
                     self._treino_rodando = False
             threading.Thread(target=_treino, name="robo-treino", daemon=True).start()
         from robo.ti import _c as cfg_ti
         if agora - getattr(self, "_ultima_ronda_ti", 0) >= 60 * float(cfg_ti(cfg)["intervalo_minutos"]):
             self._ultima_ronda_ti = agora
-            from robo.ti import ronda
-            rotinas.executar(cfg, "ronda_ti", lambda: ronda(cfg))
+            rotinas.executar(cfg, "ronda_ti", rotinas.funcao(cfg, "ronda_ti"))
 
     def processar_agora(self) -> bool:
         if not self.monitor:

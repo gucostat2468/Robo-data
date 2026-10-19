@@ -6,3 +6,8 @@ logs/
 config.yaml
 *.lock
 demonstracao/
+# DAG do Airflow gerada por computador (tem os caminhos locais): python -m robo airflow-dag
+airflow/
+
+# pastas de trabalho temporárias dos agentes
+.claude/worktrees/

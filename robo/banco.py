@@ -98,6 +98,24 @@ def _valor_pg(v, tipo: str):
     return v
 
 
+def variavel_ambiente(nome: str) -> str:
+    """Lê a variável do processo; no Windows, se não estiver nele, lê a gravada pelo setx (HKCU\\Environment).
+    Assim o robô acha a senha mesmo quando foi aberto antes do setx, ou por outro programa (ex.: Airflow no WSL)."""
+    import os
+    if not nome:
+        return ""
+    if os.environ.get(nome):
+        return os.environ[nome]
+    if os.name == "nt":
+        try:
+            import winreg
+            with winreg.OpenKey(winreg.HKEY_CURRENT_USER, "Environment") as k:
+                return str(winreg.QueryValueEx(k, nome)[0] or "")
+        except OSError:
+            return ""
+    return ""
+
+
 class Banco:
     def __init__(self, cfg_banco: dict, pasta_projeto: Path):
         self.cfg = cfg_banco
@@ -112,15 +130,14 @@ class Banco:
 
     # ------------------------------------------------------------------ conexão
     def _parametros(self, banco: str | None = None, leitura: bool = False) -> dict:
-        import os
         senha = self.cfg.get("senha") or ""
         variavel = self.cfg.get("senha_variavel_ambiente")
-        if variavel and os.environ.get(variavel):
-            senha = os.environ[variavel]
+        if variavel and variavel_ambiente(variavel):
+            senha = variavel_ambiente(variavel)
         usuario = self.cfg.get("usuario", "postgres")
         if leitura and self.cfg.get("usuario_leitura"):  # usuário só com SELECT para consultas livres (o mais seguro)
             usuario = self.cfg["usuario_leitura"]
-            senha = self.cfg.get("senha_leitura") or os.environ.get(self.cfg.get("senha_leitura_variavel_ambiente") or "", "")
+            senha = self.cfg.get("senha_leitura") or variavel_ambiente(self.cfg.get("senha_leitura_variavel_ambiente") or "")
         return {
             "host": self.cfg.get("host", "localhost"),
             "port": int(self.cfg.get("porta", 5432)),

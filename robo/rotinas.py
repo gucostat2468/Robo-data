@@ -11,11 +11,12 @@ A empresa só trabalha com o notebook aberto. Por isso:
 from __future__ import annotations
 
 import logging
-
+import os
 import threading
 import time
 from contextlib import contextmanager
 from datetime import datetime, timedelta
+from pathlib import Path
 
 from robo.trabalho import Trabalho, _agora
 
@@ -34,6 +35,33 @@ ROTINAS = {
     "laboratorio": ("head_engenharia", "Laboratório: treino com planilhas sintéticas de várias áreas, no Excel e no PostgreSQL", 1 / 6),
     "canal": ("canal_nina", "Posta no canal o que aconteceu (aprovações, reprovações, entregas)", 1 / 60),
 }
+
+
+
+def funcao(cfg, nome: str):
+    """O que cada rotina executa. Uma lista só, usada pelo laço do robô (painel/controle.py) e pelo comando
+    `python -m robo rotina <nome>` (que é o que o Airflow chama). Assim os dois nunca divergem."""
+    from robo import auditoria, backup, desenvolvimento, estrategia, laboratorio, licoes, memoria, reuniao, treino
+    from robo.canal import Canal
+    from robo.ti import ronda
+    mapa = {
+        "ronda_ti": lambda: ronda(cfg),
+        "estrategia": lambda: estrategia.rotina(cfg),
+        "backup": lambda: backup.rotina(cfg),
+        "memoria_pg": lambda: memoria.sincronizar_postgres(cfg) if cfg.banco.get("habilitado") else None,
+        "pdca": lambda: memoria.checar_pdca(cfg)["verificados"],
+        "treino": lambda: treino.rotina(cfg),
+        "licoes": lambda: licoes.rotina(cfg),
+        "estudo": lambda: desenvolvimento.rotina(cfg),
+        "reuniao": lambda: reuniao.rotina(cfg),
+        "auditoria": lambda: auditoria.rotina(cfg),
+        "laboratorio": lambda: laboratorio.rotina(cfg),
+        "canal": lambda: Canal(cfg).sincronizar(),
+    }
+    if nome not in mapa:
+        raise KeyError(f"rotina desconhecida: {nome} (existem: {', '.join(ROTINAS)})")
+    return mapa[nome]
+
 
 ESQUEMA = """
 CREATE TABLE IF NOT EXISTS rotinas_execucoes (
@@ -65,17 +93,56 @@ _em_execucao: set[tuple[str, str]] = set()
 _trava_execucao = threading.Lock()
 
 
+@contextmanager
+def _trava_entre_programas(cfg, nome: str):
+    """Trava de arquivo do sistema operacional: o robô e o Airflow (outro programa) nunca rodam a mesma rotina juntos.
+    O próprio sistema solta a trava se o programa morrer — não fica trava esquecida."""
+    pasta = Path(cfg.logs) / "rotinas"
+    pasta.mkdir(parents=True, exist_ok=True)
+    arq = open(pasta / f"{nome}.trava", "a+")
+    obtida = False
+    try:
+        try:
+            arq.seek(0)
+            if os.name == "nt":
+                import msvcrt
+                msvcrt.locking(arq.fileno(), msvcrt.LK_NBLCK, 1)
+            else:
+                import fcntl
+                fcntl.flock(arq.fileno(), fcntl.LOCK_EX | fcntl.LOCK_NB)
+            obtida = True
+        except OSError:
+            pass
+        yield obtida
+    finally:
+        if obtida:
+            try:
+                arq.seek(0)
+                if os.name == "nt":
+                    import msvcrt
+                    msvcrt.locking(arq.fileno(), msvcrt.LK_UNLCK, 1)
+                else:
+                    import fcntl
+                    fcntl.flock(arq.fileno(), fcntl.LOCK_UN)
+            except OSError:
+                pass
+        arq.close()
+
+
 def executar(cfg, nome: str, funcao) -> object:
     """Roda a rotina e registra. Resultado vazio/None = 'em dia' (nada a fazer agora): só atualiza a verificação.
     Erro nunca derruba o robô: fica registrado com o motivo. A mesma rotina nunca roda duas vezes ao mesmo tempo
-    (ex.: botão do painel + horário automático): a segunda chamada devolve {'em_andamento': True}."""
+    (ex.: botão do painel + horário automático, ou o robô + o Airflow): a segunda chamada devolve {'em_andamento': True}."""
     chave = (str(cfg.logs), nome)
     with _trava_execucao:
         if chave in _em_execucao:
             return {"em_andamento": True, "rotina": nome}
         _em_execucao.add(chave)
     try:
-        return _executar(cfg, nome, funcao)
+        with _trava_entre_programas(cfg, nome) as obtida:
+            if not obtida:
+                return {"em_andamento": True, "rotina": nome, "outro_programa": True}
+            return _executar(cfg, nome, funcao)
     finally:
         with _trava_execucao:
             _em_execucao.discard(chave)

@@ -97,6 +97,31 @@ def _comando_banco(cfg, acao: str) -> int:
         return 1
 
 
+def _comando_rotina(args) -> int:
+    from robo import rotinas
+    if not args.nome:
+        for nome, (resp, desc, horas) in rotinas.ROTINAS.items():
+            print(f"{nome:12s} a cada {horas * 60:g} min  ({resp})  {desc}")
+        return 0
+    if args.nome not in rotinas.ROTINAS:
+        print(f"Rotina desconhecida: {args.nome}. Existem: {', '.join(rotinas.ROTINAS)}", file=sys.stderr)
+        return 2
+    try:
+        cfg = carregar_config(Path(args.config) if args.config else None)
+    except ErroConfig as e:
+        print(f"Configuração com problema: {e}", file=sys.stderr)
+        return 1
+    configurar_log(cfg.logs, args.verboso)
+    r = rotinas.executar(cfg, args.nome, rotinas.funcao(cfg, args.nome))
+    if isinstance(r, dict) and r.get("em_andamento"):
+        print(f"{args.nome}: já está rodando em outro programa (o robô ou outra tarefa) — nada feito para não rodar em dobro.")
+        return 99
+    est = next((e for e in rotinas.estado(cfg) if e["nome"] == args.nome), {})
+    status = est.get("ultimo_status")
+    print(f"{args.nome}: em dia (nada a fazer agora)" if status == "em_dia" else f"{args.nome}: {status} — {est.get('detalhe') or ''}")
+    return 1 if est.get("ultimo_status") == "erro" else 0
+
+
 def principal(argv: list[str] | None = None) -> int:
     p = argparse.ArgumentParser(prog="robo", description="Robô de Planilhas — ETL automático Bases-Limpeza -> Bases-Tratadas")
     p.add_argument("--config", help="caminho do config.yaml (padrão: config.yaml na pasta do projeto)")
@@ -132,7 +157,32 @@ def principal(argv: list[str] | None = None) -> int:
     sib.add_argument("--superusuario", default="postgres", help="o usuário administrador criado na instalação do PostgreSQL")
     sib.add_argument("--sem-setx", action="store_true", help="não gravar as senhas nas variáveis do Windows")
     sub.add_parser("banco-doc", help="regera documentacao/banco_de_dados.md a partir do dicionário de dados do código")
+    sro = sub.add_parser("rotina", help="roda UMA rotina da empresa agora e registra (é o que o Airflow chama). "
+                                        "Saída: 0 fez/em dia, 1 erro, 99 já rodando em outro programa")
+    sro.add_argument("nome", nargs="?", help="nome da rotina (sem nome: lista todas)")
+    sdag = sub.add_parser("airflow-dag", help="gera airflow/dags/robo_empresa.py (DAG do Apache Airflow) a partir das rotinas")
+    sdag.add_argument("--destino", help="arquivo da DAG (padrão: airflow/dags/robo_empresa.py na pasta do projeto)")
+    sdag.add_argument("--sem-wsl", action="store_true", help="não converter caminhos C:\\ para /mnt/c (Airflow fora do WSL)")
+    sdag.add_argument("--python", help="python que o Airflow deve chamar (padrão: o python que está rodando este comando)")
     args = p.parse_args(argv)
+
+    if args.comando == "rotina":
+        return _comando_rotina(args)
+    if args.comando == "airflow-dag":
+        from robo import orquestracao
+        try:
+            cfg = carregar_config(Path(args.config) if args.config else None)
+            r = orquestracao.gerar_dag(cfg, Path(args.destino) if args.destino else None, python=args.python,
+                                       wsl=False if args.sem_wsl else None, caminho_config=args.config)
+        except (ErroConfig, ValueError) as e:
+            print(f"Não gerei a DAG: {e}", file=sys.stderr)
+            return 1
+        print(f"DAG gerada: {r['arquivo']}  (assinatura {r['assinatura']})")
+        for dag, d in r["dags"].items():
+            print(f"  {dag:18s} {d['cron']:14s} " + " → ".join(d["tarefas"]))
+        print(f"Cada tarefa roda: {r['comando']} <rotina>")
+        print("Copie o arquivo para a pasta dags do Airflow (no WSL: ~/airflow/dags/). Guia: documentacao/airflow.md")
+        return 0
 
     if args.comando == "banco-doc":
         from robo import dicionario_dados

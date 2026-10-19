@@ -65,6 +65,10 @@ painel:
   ligar_robo_ao_abrir: true
   notificacoes: true
 
+rotinas:
+  agendador: robo                 # robo (padrão) | airflow — quem agenda as rotinas (guia: documentacao/airflow.md)
+  # dag_airflow: airflow/dags/robo_empresa.py   # onde `python -m robo airflow-dag` grava a DAG
+
 manutencao:
   dias_retencao_originais: 0      # 0 = guardar para sempre (a planilha original é a prova e a base para ML)
   dias_retencao_relatorios: 0     # 0 = guardar para sempre

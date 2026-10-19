@@ -175,6 +175,35 @@ def chk_tamanho_logs(cfg) -> list[str]:
     return [f"logs ocupam {total:.0f} MB; maiores: " + ", ".join(f"{p.name} ({p.stat().st_size / 1024 ** 2:.0f} MB)" for p in maiores)]
 
 
+# ------------------------------------------------------------------------------- orquestração (equipe de Airflow)
+def chk_fluxos(cfg) -> list[str]:
+    """Especialista: o desenho dos fluxos é coerente e, se a DAG do Airflow já foi gerada, ela está atualizada."""
+    from robo import orquestracao
+    achados = orquestracao.validar_fluxos()
+    arq = orquestracao.destino_padrao(cfg)
+    if arq.exists():
+        lida = orquestracao.assinatura_no_arquivo(arq)
+        if not lida:
+            achados.append(f"a DAG {arq.name} foi editada à mão ou está corrompida — gere de novo: python -m robo airflow-dag")
+        elif lida[0] != orquestracao.assinatura(lida[1]):
+            achados.append(f"a DAG {arq.name} está desatualizada (as rotinas mudaram) — gere de novo: python -m robo airflow-dag")
+    return achados
+
+
+def chk_sla_rotinas(cfg) -> list[str]:
+    """Pleno: SLA das rotinas pelos registros reais (atrasada, terminou em erro, lenta)."""
+    from robo import orquestracao
+    r = orquestracao.analisar_sla(cfg)
+    return [f"rotina {nome}: " + "; ".join(motivos) for nome, motivos in r["detalhes"].items()]
+
+
+def chk_rotinas_sem_registro(cfg) -> list[str]:
+    """Estagiário (observação): rotinas que nunca deixaram registro de execução."""
+    from robo import rotinas
+    nunca = [e["nome"] for e in rotinas.estado(cfg) if not e["ultima_verificacao"] and not e["ultima_execucao"]]
+    return [f"rotinas sem nenhum registro ainda: {', '.join(nunca)}"] if nunca else []
+
+
 EQUIPE_TI = [
     {"id": "ger_ti", "nome": "Gustavo", "cargo": "Gerente de TI e Infraestrutura", "nivel": "gerente", "cor": "#111827",
      "funcao": None, "area": "Engenharia de Dados",
@@ -213,10 +242,30 @@ EQUIPE_TI = [
      "funcao": chk_tamanho_logs, "area": "Engenharia de Dados",
      "escopo": ["Mede o tamanho dos logs e aponta os maiores (observação)"], "criterios": ["Relato claro"],
      "metodologias": ["Higiene de logs"]},
+    {"id": "airflow_especialista", "nome": "Henrique", "cargo": "Especialista em Orquestração de Dados (Apache Airflow)",
+     "nivel": "especialista", "cor": "#0E7490", "funcao": chk_fluxos, "area": "Engenharia de Dados",
+     "escopo": ["Desenha os fluxos das rotinas (ordem, frequência, tempo limite) — uma fonte só para o robô e o Airflow",
+                "Gera e mantém a DAG do Airflow (python -m robo airflow-dag); recusa DAG com fluxo incoerente",
+                "Decide quem agenda: o próprio robô ou o Airflow (rotinas.agendador no config.yaml)"],
+     "criterios": ["Toda rotina em exatamente um fluxo", "DAG igual ao desenho atual (assinatura confere)",
+                   "Nenhuma rotina roda em dobro (trava entre programas)"],
+     "metodologias": ["DAGs idempotentes", "Retentativas com espera", "Tempo limite por tarefa", "Sem catchup"]},
+    {"id": "airflow_pleno", "nome": "Bianca", "cargo": "Engenheira de Dados Pleno — Airflow e SLA das rotinas",
+     "nivel": "pleno", "cor": "#155E75", "funcao": chk_sla_rotinas, "area": "Engenharia de Dados",
+     "escopo": ["Confere o SLA de cada rotina pelos registros: atrasada, terminou em erro, ficou lenta",
+                "Aponta o responsável de cada rotina com problema"],
+     "criterios": ["Regra objetiva: 1,5 × o intervalo para atraso; 3 × a mediana (e +60 s) para lentidão",
+                   "Erro antigo já resolvido não vira alarme"],
+     "metodologias": ["SLA/SLO de pipelines", "Mediana como referência (resiste a valores extremos)"]},
+    {"id": "airflow_estagiario", "nome": "Davi", "cargo": "Estagiário de Engenharia de Dados (Airflow)", "nivel": "estagiario",
+     "cor": "#67E8F9", "funcao": chk_rotinas_sem_registro, "area": "Engenharia de Dados",
+     "escopo": ["Relata rotinas que ainda não deixaram nenhum registro (observação)"], "criterios": ["Relato claro"],
+     "metodologias": ["Leitura de logs de execução"]},
 ]
 POR_ID = {p["id"]: p for p in EQUIPE_TI}
 GESTORES = {"ger_ti": "dono", "coord_devops": "ger_ti", "sec_senior": "coord_devops", "cloud_aws": "ger_ti",
-            "dev_pleno": "coord_devops", "infra_pleno": "coord_devops", "dev_junior": "dev_pleno", "devops_estagiario": "infra_pleno"}
+            "dev_pleno": "coord_devops", "infra_pleno": "coord_devops", "dev_junior": "dev_pleno", "devops_estagiario": "infra_pleno",
+            "airflow_especialista": "ger_ti", "airflow_pleno": "airflow_especialista", "airflow_estagiario": "airflow_pleno"}
 
 
 # =============================================================================== ronda
@@ -282,6 +331,9 @@ def ultima_ronda(cfg) -> dict | None:
 
 
 # =============================================================================== provas técnicas (RH)
+ROTINAS_TESTE = ["backup", "memoria_pg", "pdca", "licoes"]
+
+
 def provas_ti() -> dict:
     class _Cfg:
         pass
@@ -321,6 +373,24 @@ def provas_ti() -> dict:
         cfg.dados = {"ti": {"disco_minimo_gb": 0.0001, "disco_critico_gb": 0.00001}}
         chk_seguranca(cfg)  # registra o código atual como conhecido
         r3 = ronda(cfg, anunciar=False)
+        # orquestração: computador novo (sem sessão) não tem atraso; cenário com erro, atraso e lentidão plantados
+        from robo import orquestracao
+        sla_vazio = chk_sla_rotinas(cfg)
+        sem_registro = chk_rotinas_sem_registro(cfg)
+        cenario = {"sessao_min_atras": 600, "execucoes": [], "estado": []}
+        from robo.rotinas import ROTINAS
+        cenario["estado"] = [{"nome": nome, "verif_min_atras": 1, "ultimo_status": "fez"} for nome in ROTINAS]
+        for nome in ROTINAS_TESTE:
+            for i in range(8):
+                cenario["execucoes"].append({"nome": nome, "fim_min_atras": 300 - i * 30, "segundos": 10, "status": "fez"})
+        next(e for e in cenario["estado"] if e["nome"] == ROTINAS_TESTE[0])["verif_min_atras"] = 10 ** 6  # atrasada
+        cenario["execucoes"].append({"nome": ROTINAS_TESTE[1], "fim_min_atras": 2, "segundos": 5, "status": "erro"})
+        cenario["execucoes"].append({"nome": ROTINAS_TESTE[2], "fim_min_atras": 2, "segundos": 900, "status": "fez"})
+        cenario["execucoes"].append({"nome": ROTINAS_TESTE[3], "fim_min_atras": 20, "segundos": 5, "status": "erro"})
+        cenario["execucoes"].append({"nome": ROTINAS_TESTE[3], "fim_min_atras": 2, "segundos": 10, "status": "fez"})
+        orquestracao.gravar_cenario(cfg, cenario)
+        sla = orquestracao.analisar_sla(cfg)
+        fluxo_ruim = orquestracao.validar_fluxos({"x": {"cron": "*/90 * * * *", "a_cada_min": 90, "rotinas": ["treino", "treino"]}})
     return {
         "sec_senior": [("Sistema limpo não gera alerta", not seg_ok), ("Pega código novo de habilidade", bool(seg_novo)),
                        ("Pega senha gravada no arquivo", any("PostgreSQL" in x for x in seg_senha)),
@@ -334,4 +404,14 @@ def provas_ti() -> dict:
                               ("Executa sem alterar nada", isinstance(logs_pequenos, list))],
         "coord_devops": [("Não assina ronda com falha crítica", not r1["saudavel"]), ("Assina ronda toda verde", r3["saudavel"])],
         "ger_ti": [("Alerta novo é comunicado", bool(r1["novos_alertas"])), ("Não repete o mesmo alerta", not r2["novos_alertas"])],
+        "airflow_especialista": [("Desenho atual dos fluxos sem problema", not orquestracao.validar_fluxos()),
+                                 ("Recusa rotina repetida", any("dois fluxos" in x for x in fluxo_ruim)),
+                                 ("Recusa fluxo mais lento que a rotina", any("ficaria atrasada" in x for x in fluxo_ruim)),
+                                 ("Recusa frequência que não cabe no cron", any("não cabe" in x for x in fluxo_ruim))],
+        "airflow_pleno": [("Computador novo não gera alarme", not sla_vazio),
+                          ("Acha exatamente a atrasada", sla["atrasadas"] == [ROTINAS_TESTE[0]]),
+                          ("Acha exatamente a que terminou em erro", sla["com_erro"] == [ROTINAS_TESTE[1]]),
+                          ("Acha exatamente a lenta", sla["lentas"] == [ROTINAS_TESTE[2]]),
+                          ("Erro já resolvido não vira alarme", ROTINAS_TESTE[3] not in sla["com_erro"])],
+        "airflow_estagiario": [("Relata rotinas sem registro", bool(sem_registro))],
     }

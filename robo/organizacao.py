@@ -49,7 +49,7 @@ FERRAMENTAS_ANDAR = {
     2: ["calcular", "perfil_indicadores", "resumo_executivo", "consulta_sql"],
     3: ["calcular", "perfil_indicadores"],
     4: ["dados_pessoais", "resumo_executivo"],
-    5: ["ronda_ti"],
+    5: ["ronda_ti", "orquestracao"],
 }
 # Ferramentas extras por pessoa (especialidade)
 LIDERES = ["ger_engenharia", "coord_engenharia", "ger_analise", "coord_analise", "excel_supervisor", "coord_excel",
@@ -69,7 +69,7 @@ ENCAMINHAR = {
     "calcular": "analise_estatistica", "perfil_indicadores": "analise_indicadores",
     "resumo_executivo": "analise_relator", "diagnosticar_planilha": "coord_engenharia",
     "publicar_planilha": "recepcao", "consulta_sql": "dba", "dados_pessoais": "gov_pleno_lgpd",
-    "ronda_ti": "coord_devops", "organizacao": "canal_helena", "reuniao_andar": "ger_operacoes", "ideias": "canal_iara",
+    "ronda_ti": "coord_devops", "orquestracao": "airflow_pleno", "organizacao": "canal_helena", "reuniao_andar": "ger_operacoes", "ideias": "canal_iara",
     "scorecard": "dir_operacoes", "auditoria": "head_engenharia", "drivers": "cd_senior_drivers",
     "segmentacao": "cd_pleno_segmentos", "anomalias": "cd_junior_anomalias", "recrutamento": "rh_rs",
     "desenvolvimento": "rh_td", "desempenho": "rh_desempenho", "people_analytics": "rh_people", "raio_x": "dir_operacoes",
@@ -82,6 +82,7 @@ ENTRADAS = {
     "perfil_indicadores": "planilha ou base publicada", "consulta_sql": "id de uma consulta da biblioteca",
     "dados_pessoais": "planilha ou base publicada", "publicar_planilha": "planilha (com sua aprovação)",
     "resumo_executivo": "resultados das etapas anteriores", "ronda_ti": "nada (lê o próprio computador)",
+    "orquestracao": "nada (lê os registros das rotinas)",
     "conhecimento": "pergunta em texto", "historico": "pergunta sobre o que aconteceu", "organizacao": "pergunta sobre a equipe",
 }
 SAIDAS = {
@@ -89,6 +90,7 @@ SAIDAS = {
     "perfil_indicadores": "perfil das colunas e indicadores com margem de erro", "consulta_sql": "linhas do PostgreSQL",
     "dados_pessoais": "colunas que parecem dado pessoal", "publicar_planilha": "arquivo na fila de Bases-Limpeza",
     "resumo_executivo": "arquivo .md com o resumo executivo", "ronda_ti": "verificações de saúde do sistema",
+    "orquestracao": "rotinas atrasadas, com erro ou lentas e o responsável",
     "conhecimento": "resposta do conhecimento registrado", "historico": "execuções recentes",
     "organizacao": "quem faz o quê na empresa",
 }

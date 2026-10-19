@@ -384,6 +384,13 @@ def f_ronda_ti(cfg, **_) -> dict:
     return resultado(True, "ferramenta", texto, r, evidencia="verificações executadas agora neste computador")
 
 
+def f_orquestracao(cfg, **_) -> dict:
+    from robo import orquestracao
+    r = orquestracao.analisar_sla(cfg)
+    return resultado(True, "ferramenta", orquestracao.texto_sla(r), r,
+                     evidencia="registros de rotinas_execucoes, rotinas_estado e sessoes deste computador")
+
+
 def f_organizacao(cfg, **_) -> dict:
     from robo import organizacao
     lot = organizacao.lotacao(cfg)
@@ -639,6 +646,8 @@ REGISTRO: dict[str, Ferramenta] = {f.id: f for f in [
     Ferramenta("dados_pessoais", "Verificar dados pessoais", "Procura e-mail, CPF e telefone (LGPD)", "baixo", False, f_dados_pessoais),
     Ferramenta("consulta_sql", "Consulta SQL", "Consulta da biblioteca em transação somente leitura", "baixo", False, f_consulta_sql),
     Ferramenta("ronda_ti", "Ronda de TI", "Verificações de saúde do computador e do robô", "baixo", False, f_ronda_ti),
+    Ferramenta("orquestracao", "SLA das rotinas (Airflow)", "Rotinas atrasadas, com erro ou lentas, pelos registros",
+               "baixo", False, f_orquestracao),
     Ferramenta("reuniao_andar", "Reunião ao vivo", "Situação de agora do andar: certo, errado, andamento, plano e PDCA",
                "baixo", False, f_reuniao_andar),
     Ferramenta("ideias", "Ideias para o futuro", "Propostas tiradas da memória de todos, com o dado de origem",
