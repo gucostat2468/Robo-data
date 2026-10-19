@@ -277,7 +277,21 @@ robo/
 
 Testes: `.venv\Scripts\python -m pip install -r requisitos-dev.txt` e `.venv\Scripts\python -m pytest`. Para incluir os testes de PostgreSQL: `set ROBO_TESTE_PG=host=localhost port=5432 user=postgres password=SUA_SENHA`.
 
-## 11. Apache Airflow (opcional)
+## 11. Nada se perde, nada fica parado (deixe ligado)
+
+```
+python -m robo inicializacao ligar    :: o robô liga junto com o Windows
+python -m robo vigia ligar            :: a cada 5 min o Windows confere: se o robô caiu, religa (cada queda fica no banco)
+python -m robo diagnostico            :: confere o computador inteiro e diz como corrigir cada ponto (só lê)
+```
+
+- **Tudo no banco:** log do sistema, canal, atas, RH, conhecimento, estado da TI e versões do config.yaml (sem senhas)
+  entram no SQLite a cada minuto e no PostgreSQL a cada 10 min (só o que é novo). Nada disso pode ser apagado ou alterado.
+- **Backup:** memória conferida (SHA-256) de hora em hora; guarda 24 h inteiras, 1 por dia por 30 dias e o 1º de cada mês
+  para sempre. Para um 2º lugar (HD externo): no config.yaml, `backup: copia_extra: "E:\\Backups"`.
+- **Levar a memória para outro computador:** `python -m robo importar-memoria trabalho_AAAAMMDD_HHMMSS.db.gz`.
+
+## 12. Apache Airflow (opcional)
 
 O robô agenda as próprias rotinas. Se quiser vê-las no Airflow (com histórico, retentativas e tempo limite):
 
@@ -290,7 +304,7 @@ O Airflow roda no WSL2 (Linux dentro do Windows, nada na nuvem). Passo a passo, 
 agenda (`rotinas: agendador: robo | airflow`): **`documentacao/airflow.md`**. O robô e o Airflow nunca rodam a mesma
 rotina ao mesmo tempo (trava entre programas; a tarefa repetida sai com código 99 e o Airflow a marca como pulada).
 
-## 12. Acompanhar pelo celular (somente leitura)
+## 13. Acompanhar pelo celular (somente leitura)
 
 **O que é:** uma página no celular com o estado da empresa (robô ligado, rotinas, treino das últimas 24 h, últimas
 planilhas, decisões atrasadas, alertas da TI e último backup), atualizando a cada 20 segundos. Ela **não tem nenhum

@@ -27,10 +27,10 @@ O que falta é **infraestrutura** e **validação no seu Windows**, não mais fu
 |---|---|---|---|
 | Funcionalidade | 4 | ETL, PostgreSQL em camadas, 5 andares, treino adaptativo, decisões cobradas, Airflow, celular | Uso com planilhas reais por algumas semanas |
 | Qualidade e testes | 4 | Mais de 400 testes automáticos, todos verdes antes de cada envio; erros do próprio robô achados pelo treino e corrigidos | Os mesmos testes rodando num Windows real |
-| Dados e governança | 4 | Nada se apaga (gatilhos no banco), tentativas imutáveis, versão do código em cada registro, dicionário de dados gerado do código | Política de retenção e anonimização para ML |
+| Dados e governança | 4,5 | Nada se apaga (gatilhos no banco); **registro total**: log do sistema, canal, atas, RH, conhecimento, estado da TI e config (sem senhas) dentro do SQLite e do PostgreSQL; dicionário gerado do código | Anonimização para ML quando entrarem dados reais de clientes |
 | Segurança | 3,5 | Painel só em 127.0.0.1 com senha PBKDF2; celular só leitura, só rede privada, bloqueio após 5 erros; banco com usuário de leitura; senhas fora dos arquivos | Criptografia do disco (BitLocker); HTTPS no celular; atualização de dependências |
-| Observabilidade | 3,5 | Ronda de TI a cada 30 min, SLA das rotinas, registro de cada execução, app do celular ao vivo | Alerta que chegue a você mesmo com o app fechado |
-| Infraestrutura e disponibilidade | 2 | Um único notebook: desligado = empresa parada. Backups no mesmo disco, salvo a cópia mensal manual | HD externo automático; máquina sempre ligada (mini PC) ou nobreak |
+| Observabilidade | 4 | Ronda de TI a cada 30 min, SLA das rotinas, cada linha de log no banco, cada queda no banco (vigia), app do celular ao vivo | Alerta que chegue a você mesmo com o app fechado |
+| Infraestrutura e disponibilidade | 3 | Vigia religa o robô em até 5 min (testado com queda brusca); início com o Windows; backup conferido de hora em hora; cópia automática num 2º lugar se configurada. Continua um computador só: desligado = empresa parada | Máquina sempre ligada (mini PC) com nobreak; `copia_extra` apontando para um HD externo |
 | Operação no Windows | 2 | Código de Windows (setx/registro, trava msvcrt, firewall, serviço) testado só em Linux | Rodar `python -m robo diagnostico` no seu PC e me mandar o resultado |
 | Escala | 2,5 | SQLite como fonte e PostgreSQL como espelho, adequado para 1 usuário e milhares de planilhas | Volume real medido; PostgreSQL como fonte principal se crescer |
 
@@ -57,3 +57,15 @@ O que falta é **infraestrutura** e **validação no seu Windows**, não mais fu
 | Planilha real com formato novo | alta | baixo | reprovação explícita, sem gravar nada, e proposta de regra | acompanhar as primeiras semanas |
 | Notebook desligado à noite | alta | médio | ao abrir, o robô roda primeiro o que ficou atrasado | início com o Windows ligado |
 | Senha do painel vazada | baixa | médio | só rede de casa, só leitura no celular | trocar com `python -m robo senha` |
+
+## Ritmo 24 horas e crescimento do banco
+
+- Com o robô ligado, **15 pessoas recebem um caso a cada 2 minutos**: todas as áreas, sem parar.
+  São ~10.800 tentativas por dia, cerca de 117 por pessoa.
+- Cada tentativa custa ~0,2 s de processamento e ~0,7 KB no banco.
+  Com o resto da memória, o banco cresce ~15 MB por dia, ou ~5,5 GB por ano.
+- Os backups seguram o disco porque guardam:
+  - tudo das últimas 24 h;
+  - 1 por dia nos últimos 30 dias;
+  - o 1º de cada mês para sempre (compactado, ~5× menor).
+- O `python -m robo diagnostico` avisa quando o disco começa a apertar.
