@@ -191,6 +191,10 @@ def principal(argv: list[str] | None = None) -> int:
     sdag.add_argument("--destino", help="arquivo da DAG (padrão: airflow/dags/robo_empresa.py na pasta do projeto)")
     sdag.add_argument("--sem-wsl", action="store_true", help="não converter caminhos C:\\ para /mnt/c (Airflow fora do WSL)")
     sdag.add_argument("--python", help="python que o Airflow deve chamar (padrão: o python que está rodando este comando)")
+    stu = sub.add_parser("turno", help="um turno de trabalho na NUVEM grátis (GitHub Actions + PostgreSQL gratuito): restaura a "
+                                       "memória, trabalha, salva tudo a cada 10 min. Lê ROBO_PG_URL e ROBO_PG_SENHA_LEITURA")
+    stu.add_argument("--minutos", type=float, default=20)
+    stu.add_argument("--pasta", default="nuvem_trabalho", help="pasta de trabalho temporária")
     spc = sub.add_parser("preparar-pc", help="prepara o computador de uma vez (Prompt como Administrador): banco real, "
                                              "memória, celular, banco no celular, início com o Windows, vigia e diagnóstico")
     spc.add_argument("--memoria", help="arquivo trabalho_AAAAMMDD_HHMMSS.db.gz com a memória da empresa a importar")
@@ -219,6 +223,24 @@ def principal(argv: list[str] | None = None) -> int:
 
     if args.comando == "rotina":
         return _comando_rotina(args)
+    if args.comando == "turno":
+        import json
+        import os
+        from robo import nuvem
+        url = os.environ.get("ROBO_PG_URL", "").strip()
+        if not url:
+            print("::warning::Falta o segredo ROBO_PG_URL (endereço do PostgreSQL gratuito). Veja documentacao/nuvem_gratis.md"
+                  if os.environ.get("GITHUB_ACTIONS") else "Defina ROBO_PG_URL (veja documentacao/nuvem_gratis.md).")
+            return 0 if os.environ.get("GITHUB_ACTIONS") else 1
+        nuvem.mascarar_para_o_github(url)
+        cfg = nuvem.config_da_nuvem(Path(args.pasta), url, os.environ.get("ROBO_PG_SENHA_LEITURA", ""))
+        configurar_log(cfg.logs, args.verboso)
+        r = nuvem.turno(cfg, args.minutos)
+        r["empresa"] = nuvem.resumo_do_turno(cfg)
+        print(json.dumps(r, ensure_ascii=False, indent=1, default=str))
+        if r["alerta_espaco"]:
+            print(f"::warning::Banco gratuito com {r['banco_mb']} MB de {r['limite_mb']} MB: decidir arquivamento.")
+        return 0
     if args.comando == "preparar-pc":
         from robo import preparar_pc
         return preparar_pc.preparar(principal, args.config, args.memoria)

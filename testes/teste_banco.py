@@ -393,3 +393,27 @@ def teste_instalar_banco_real_com_usuario_so_leitura(tmp_path, cfg_factory, banc
                 c.execute(f'DROP DATABASE IF EXISTS "{nome}" WITH (FORCE)')
             for papel in (app, leitura):
                 c.execute(f'DROP ROLE IF EXISTS "{papel}"')
+
+
+def teste_turnos_na_nuvem_continuam_de_onde_pararam(banco_cfg, tmp_path, monkeypatch):
+    """Dois turnos em máquinas novas: o 2º restaura o instantâneo do 1º, continua a numeração e nada se perde."""
+    import psycopg
+    import sqlite3
+    from robo import nuvem
+    with psycopg.connect(host=banco_cfg["host"], port=banco_cfg["porta"], user=banco_cfg["usuario"],
+                         password=banco_cfg["senha"], dbname="postgres", autocommit=True) as c:
+        c.execute(f'CREATE DATABASE "{banco_cfg["banco"]}"')
+    url = f"postgresql://{banco_cfg['usuario']}@{banco_cfg['host']}:{banco_cfg['porta']}/{banco_cfg['banco']}"
+    monkeypatch.setattr(nuvem, "MEMORIA_INICIAL", tmp_path / "nao_existe.db.gz")
+    cfg1 = nuvem.config_da_nuvem(tmp_path / "turno1", url)
+    r1 = nuvem.turno(cfg1, minutos=0.02, pausa_s=0)
+    assert r1["origem"] == "vazia" and r1["memoria"]["linhas"] > 0
+    t1 = sqlite3.connect(cfg1.logs / "trabalho.db").execute("SELECT COUNT(*), MAX(id) FROM treino_tentativas").fetchone()
+    cfg2 = nuvem.config_da_nuvem(tmp_path / "turno2", url)          # máquina nova: só o banco sobrevive
+    r2 = nuvem.turno(cfg2, minutos=0.02, pausa_s=0)
+    assert r2["origem"].startswith("instantaneo ")
+    c2 = sqlite3.connect(cfg2.logs / "trabalho.db")
+    t2 = c2.execute("SELECT COUNT(*), MAX(id) FROM treino_tentativas").fetchone()
+    assert t2[0] >= t1[0] and c2.execute("SELECT COUNT(*) - COUNT(DISTINCT id) FROM treino_tentativas").fetchone()[0] == 0
+    assert _q(banco_cfg, "SELECT COUNT(*) FROM robo.memoria_treino_tentativas")[0][0] == t2[0]   # a nuvem tem tudo
+    assert _q(banco_cfg, "SELECT COUNT(*) FROM robo.instantaneos_sqlite")[0][0] == 2

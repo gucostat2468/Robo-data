@@ -146,6 +146,7 @@ class Banco:
             "password": senha,
             "connect_timeout": int(self.cfg.get("tempo_limite_conexao", 5)),
             "application_name": "robo_planilhas",
+            **({"sslmode": self.cfg["sslmode"]} if self.cfg.get("sslmode") else {}),  # banco na nuvem: conexão criptografada
         }
 
     def conectar(self, banco: str | None = None, leitura: bool = False):

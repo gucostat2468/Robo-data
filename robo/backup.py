@@ -384,8 +384,8 @@ def rotina(cfg) -> dict | None:
                                          "próxima hora.", "banco", "alerta")
             except Exception:
                 pass
-    if not cfg.banco.get("habilitado"):
-        return None
+    if not cfg.banco.get("habilitado") or not c.get("postgres", True):
+        return None  # sem banco, ou na nuvem (o próprio PostgreSQL gratuito guarda o histórico; robo/nuvem.py)
     u = ultimo(cfg)
     if u and u.get("ok") and u.get("data_hora") and datetime.now() - datetime.strptime(u["data_hora"], "%Y-%m-%d %H:%M:%S") < timedelta(hours=float(c["intervalo_horas"])):
         return None

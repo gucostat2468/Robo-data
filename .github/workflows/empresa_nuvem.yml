@@ -1,0 +1,39 @@
+# Empresa na nuvem GRÁTIS: um turno de trabalho a cada 2 horas (repositório público = minutos do GitHub Actions grátis).
+# A memória fica num PostgreSQL gratuito (ex.: Neon). Guia: documentacao/nuvem_gratis.md
+# Segredos (Settings → Secrets and variables → Actions): ROBO_PG_URL e ROBO_PG_SENHA_LEITURA. Nunca aparecem no log.
+name: Empresa na nuvem (turnos)
+
+on:
+  schedule:
+    - cron: "17 */2 * * *"   # a cada 2 horas, no minuto 17 (fora do pico da hora cheia)
+  workflow_dispatch:
+    inputs:
+      minutos:
+        description: "Duração do turno (minutos)"
+        default: "20"
+
+concurrency:
+  group: empresa-nuvem      # nunca dois turnos ao mesmo tempo (o 2º espera o 1º salvar)
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+
+jobs:
+  turno:
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+          cache: pip
+          cache-dependency-path: requisitos.txt
+      - name: Instalar dependências
+        run: python -m pip install -r requisitos.txt
+      - name: Turno de trabalho (restaura, trabalha, salva a cada 10 min)
+        env:
+          ROBO_PG_URL: ${{ secrets.ROBO_PG_URL }}
+          ROBO_PG_SENHA_LEITURA: ${{ secrets.ROBO_PG_SENHA_LEITURA }}
+        run: python -m robo turno --minutos "${{ github.event.inputs.minutos || '20' }}" --pasta "$RUNNER_TEMP/empresa"

@@ -213,6 +213,12 @@ def _capturar_versao(c, caminho: Path, nome: str, redigir: bool = False) -> int:
     return cur.rowcount
 
 
+def _exportacao_do_banco(rel: Path) -> bool:
+    """conhecimento/licoes_AAAAMMDD.jsonl = licoes.exportar(): despejo diário de licoes, licoes_funcionario, licoes_uso e
+    registro_conhecimento (todas já no banco). A âncora (ancora.jsonl) continua entrando: ela é a prova fora do banco."""
+    return len(rel.parts) == 2 and rel.parts[0] == "conhecimento" and rel.name.startswith("licoes_") and rel.suffix == ".jsonl"
+
+
 def _fontes(cfg) -> list[tuple[str, Path, str]]:
     """(tipo, caminho, nome registrado) de tudo que é texto e não está no trabalho.db."""
     logs = Path(cfg.logs)
@@ -224,6 +230,8 @@ def _fontes(cfg) -> list[tuple[str, Path, str]]:
                 continue
             if p.name == "robo.log" or p.name.startswith("robo.log."):
                 continue  # vai para logs_sistema
+            if _exportacao_do_banco(rel):
+                continue  # cópia legível de tabelas que JÁ estão no banco: guardar de novo só duplicaria
             if rel.as_posix() == "canal/mensagens.jsonl":
                 fontes.append(("canal", p, "logs/" + rel.as_posix()))
             elif p.suffix.lower() in EXT_LINHAS:
@@ -271,6 +279,56 @@ def capturar(cfg) -> dict:
     return {k: v for k, v in contagem.items() if v}
 
 
+def _destino_restauracao(cfg, nome: str) -> Path | None:
+    base = Path(getattr(cfg, "base", "") or ".")
+    agentes = Path((cfg.dados.get("pastas") or {}).get("agentes") or base / "agentes")
+    agentes = agentes if agentes.is_absolute() else base / agentes
+    if nome.startswith("logs/"):
+        return Path(cfg.logs) / nome[len("logs/"):]
+    if nome.startswith("agentes/"):
+        return agentes / nome[len("agentes/"):]
+    return None  # config.yaml (sem senhas) e relatórios de erro ficam só no banco, como prova
+
+
+def restaurar_arquivos(cfg) -> dict:
+    """O caminho de volta: recria, a partir do banco, os arquivos que a empresa usa para trabalhar (canal, estado da TI,
+    âncora, RH, equipe contratada…) numa máquina nova. Recria BYTE A BYTE o que foi capturado — por isso a captura
+    seguinte não acha nada novo (mesma geração, mesma posição). Nunca sobrescreve arquivo que já existe."""
+    tb = _tb(cfg)
+    feitos = {"versoes": 0, "linhas": 0, "canal": 0}
+    with tb.tx() as c:
+        for r in c.execute("SELECT arquivo, conteudo FROM arquivos_versoes WHERE id IN "
+                           "(SELECT MAX(id) FROM arquivos_versoes GROUP BY arquivo)").fetchall():
+            destino = _destino_restauracao(cfg, r["arquivo"])
+            if destino and not destino.exists():
+                destino.parent.mkdir(parents=True, exist_ok=True)
+                destino.write_bytes(r["conteudo"].encode("utf-8"))
+                feitos["versoes"] += 1
+        for r in c.execute("SELECT arquivo, geracao FROM arquivos_linhas WHERE id IN "
+                           "(SELECT MAX(id) FROM arquivos_linhas GROUP BY arquivo)").fetchall():
+            destino = _destino_restauracao(cfg, r["arquivo"])
+            if not destino or destino.exists():
+                continue
+            linhas = [x[0] for x in c.execute("SELECT conteudo FROM arquivos_linhas WHERE arquivo=? AND geracao=? "
+                                              "ORDER BY n_linha", (r["arquivo"], r["geracao"]))]
+            destino.parent.mkdir(parents=True, exist_ok=True)
+            destino.write_bytes(("\n".join(linhas) + "\n").encode("utf-8"))
+            feitos["linhas"] += 1
+        canal = Path(cfg.logs) / "canal" / "mensagens.jsonl"
+        if not canal.exists():
+            msgs = c.execute("SELECT id, data_hora, canal, autor, nome, papel, tipo, texto, extra FROM canal_mensagens "
+                             "ORDER BY id").fetchall()
+            if msgs:
+                canal.parent.mkdir(parents=True, exist_ok=True)
+                with open(canal, "wb") as f:
+                    for m in msgs:
+                        d = {k: m[k] for k in ("id", "data_hora", "canal", "autor", "nome", "papel", "tipo", "texto")}
+                        d.update(json.loads(m["extra"] or "{}"))  # mesma ordem de chaves do Canal.postar
+                        f.write((json.dumps(d, ensure_ascii=False) + "\n").encode("utf-8"))
+                feitos["canal"] = len(msgs)
+    return feitos
+
+
 def cobertura(cfg) -> list[str]:
     """Arquivos de texto da pasta de logs que NÃO entram no banco. Tem que ser vazio."""
     logs = Path(cfg.logs)
@@ -282,6 +340,8 @@ def cobertura(cfg) -> list[str]:
             continue
         if p.name.startswith("trabalho.db") or p.suffix == ".trava" or p.suffix in (".tmp", ".parcial"):
             continue  # o próprio banco, travas de execução e arquivos temporários
+        if _exportacao_do_banco(rel):
+            continue
         if str(p) not in cobertos:
             faltando.append(rel.as_posix())
     return sorted(faltando)

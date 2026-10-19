@@ -96,3 +96,29 @@ def teste_registros_sao_imutaveis_e_cobertura_aponta_o_que_falta(cfg_factory):
     assert rt.cobertura(cfg) == []
     (cfg.logs / "formato_novo.xyz").write_text("?", encoding="utf-8")
     assert rt.cobertura(cfg) == ["formato_novo.xyz"]               # arquivo de tipo desconhecido não passa calado
+
+
+def teste_maquina_nova_recebe_os_arquivos_byte_a_byte(cfg_factory, tmp_path):
+    import shutil
+    from robo.canal import Canal
+    origem = cfg_factory(pastas={"entrada": str(tmp_path / "a" / "entrada"), "logs": str(tmp_path / "a" / "logs")})
+    origem.criar_pastas()
+    canal = Canal(origem)
+    canal.postar("dba", "primeira mensagem", "banco", "alerta", ref="H-1")
+    canal.postar("coord_devops", "segunda — com acento", "ti")
+    (origem.logs / "ti").mkdir(exist_ok=True)
+    (origem.logs / "ti" / "estado.json").write_text('{"alertas_ativos": ["x"]}', encoding="utf-8")
+    (origem.logs / "rh").mkdir(exist_ok=True)
+    (origem.logs / "rh" / "avaliacoes.jsonl").write_text('{"a": 1}\n{"a": 2}\n', encoding="utf-8")
+    rt.capturar(origem)
+    nova = cfg_factory(pastas={"entrada": str(tmp_path / "b" / "entrada"), "logs": str(tmp_path / "b" / "logs")})
+    nova.criar_pastas()
+    shutil.copy(origem.logs / "trabalho.db", nova.logs / "trabalho.db")   # só o banco viaja
+    feitos = rt.restaurar_arquivos(nova)
+    assert feitos["canal"] == 2 and feitos["versoes"] >= 2 and feitos["linhas"] == 1
+    for rel in ("canal/mensagens.jsonl", "canal/estado.json", "ti/estado.json", "rh/avaliacoes.jsonl"):
+        assert (nova.logs / rel).read_bytes() == (origem.logs / rel).read_bytes(), rel
+    assert rt.capturar(nova) == {}                        # nada "novo": mesma geração, mesma posição
+    Canal(nova).postar("dba", "terceira, já na máquina nova", "banco")
+    rt.capturar(nova)
+    assert [r[0] for r in _q(nova, "SELECT id FROM canal_mensagens ORDER BY id")] == [1, 2, 3]  # o contador continuou
