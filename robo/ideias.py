@@ -19,6 +19,98 @@ from robo import memoria, organizacao
 from robo.trabalho import Trabalho
 
 
+def _ideias_do_treino(tb, nome) -> list[dict]:
+    """Expansão a partir do treino: onde a empresa trava, onde ficou fácil demais (hora de subir o teto) e mentorias
+    que não estão funcionando. Só fala com número na mão."""
+    from robo.treino_casos import CATALOGO
+    nome_comp = lambda c: CATALOGO[c].nome if c in CATALOGO else c  # noqa: E731
+    ideias = []
+    with tb.tx() as c:
+        tabelas = {r[0] for r in c.execute("SELECT name FROM sqlite_master WHERE type='table'")}
+        if "treino_tentativas" not in tabelas:
+            return []
+        desde = (datetime.now() - timedelta(days=14)).isoformat(timespec="seconds")
+        gargalos = c.execute("SELECT competencia, nivel, COUNT(*) n, AVG(acertou) taxa FROM treino_tentativas WHERE data_hora>=? "
+                             "GROUP BY 1, 2 HAVING n >= 10 AND taxa < 0.8 ORDER BY taxa LIMIT 2", (desde,)).fetchall()
+        faceis = c.execute("SELECT t.competencia, COUNT(*) n, AVG(t.acertou) taxa, "
+                           "(SELECT COUNT(*) FROM treino_niveis v WHERE v.competencia=t.competencia AND v.nivel=5) no_topo, "
+                           "(SELECT COUNT(*) FROM treino_niveis v WHERE v.competencia=t.competencia) pessoas "
+                           "FROM treino_tentativas t WHERE t.data_hora>=? AND t.nivel=5 GROUP BY 1 "
+                           "HAVING n >= 20 AND taxa >= 0.95", (desde,)).fetchall()
+        mentores = c.execute("SELECT mentor, SUM(situacao='ajudou') ok, SUM(situacao='nao_ajudou') nao FROM mentorias "
+                             "GROUP BY mentor HAVING nao >= 3 AND nao > ok").fetchall() if "mentorias" in tabelas else []
+    for g in gargalos:
+        ideias.append({"impacto": 4, "titulo": f"Gargalo de aprendizado: {nome_comp(g['competencia'])} no nível {g['nivel']}",
+                       "motivo": f"{g['n']} tentativas nos últimos 14 dias com só {g['taxa'] * 100:.0f}% de acerto",
+                       "primeiro_passo": "A Sala de Casos revisa os casos desse nível e o dono da ferramenta confere se o erro é "
+                                         "da pessoa ou do código (o treino já achou falhas reais do robô assim)",
+                       "dono": CATALOGO[g["competencia"]].designer if g["competencia"] in CATALOGO else "head_casos"})
+    for f in faceis:
+        if f["pessoas"] and f["no_topo"] / f["pessoas"] >= 0.5:
+            ideias.append({"impacto": 3, "titulo": f"Subir o teto: {nome_comp(f['competencia'])} ficou fácil no nível máximo",
+                           "motivo": f"{f['taxa'] * 100:.0f}% de acerto em {f['n']} tentativas no nível 5; {f['no_topo']} de "
+                                     f"{f['pessoas']} pessoas já estão no topo",
+                           "primeiro_passo": "A Sala de Casos desenha um desafio novo (dados mais sujos, casos de borda) com "
+                                             "gabarito e revisão independente",
+                           "dono": "head_casos"})
+    for m in mentores:
+        ideias.append({"impacto": 3, "titulo": f"Mentoria que não está funcionando: {nome(m['mentor'])}",
+                       "motivo": f"{m['nao']} mentorias sem efeito contra {m['ok']} que ajudaram",
+                       "primeiro_passo": "O RH revê as conversas registradas e pareia essa pessoa com um mentor mais experiente",
+                       "dono": "rh_td"})
+    return ideias
+
+
+ESQUEMA_REGISTRO = """CREATE TABLE IF NOT EXISTS ideias_registro (
+  id INTEGER PRIMARY KEY AUTOINCREMENT, data_hora TEXT, titulo TEXT, motivo TEXT, primeiro_passo TEXT, dono TEXT,
+  impacto INTEGER, chave TEXT);
+CREATE INDEX IF NOT EXISTS ix_ideias_chave ON ideias_registro(chave, data_hora);
+CREATE TRIGGER IF NOT EXISTS ideias_registro_sem_alterar BEFORE UPDATE ON ideias_registro
+BEGIN SELECT RAISE(ABORT, 'registro permanente: ideias_registro não pode ser alterado'); END;"""
+
+
+def _tb_registro(cfg) -> Trabalho:
+    from robo.trabalho import proteger
+    tb = Trabalho(cfg)
+    with tb.tx() as c:
+        c.executescript(ESQUEMA_REGISTRO)
+        proteger(c)
+    return tb
+
+
+def rotina(cfg, dias_sem_repetir: int = 7) -> dict | None:
+    """Iara (ideias e expansão), uma vez por dia: gera as ideias pela memória e REGISTRA as novas. A mesma ideia só
+    volta a ser registrada depois de 7 dias (se o problema continuar, ela insiste — com o número novo)."""
+    import hashlib
+    tb = _tb_registro(cfg)
+    agora = datetime.now()
+    with tb.tx() as c:
+        ultima = c.execute("SELECT MAX(data_hora) FROM ideias_registro").fetchone()[0]
+    if ultima and agora - datetime.fromisoformat(ultima) < timedelta(hours=24):
+        return None
+    limite = (agora - timedelta(days=dias_sem_repetir)).isoformat(timespec="seconds")
+    novas = []
+    for i in gerar(cfg, limite=15):
+        if i["impacto"] <= 1:
+            continue
+        chave = hashlib.sha256(i["titulo"].encode()).hexdigest()[:16]
+        with tb.tx() as c:
+            if c.execute("SELECT 1 FROM ideias_registro WHERE chave=? AND data_hora>=?", (chave, limite)).fetchone():
+                continue
+            c.execute("INSERT INTO ideias_registro (data_hora, titulo, motivo, primeiro_passo, dono, impacto, chave) "
+                      "VALUES (?,?,?,?,?,?,?)", (agora.isoformat(timespec="seconds"), i["titulo"], i["motivo"],
+                                                 i["primeiro_passo"], i["dono"], i["impacto"], chave))
+        novas.append(i)
+    if novas:
+        try:
+            from robo.canal import Canal
+            Canal(cfg).postar("canal_iara", f"Ideias do dia ({len(novas)}): " + " | ".join(f"{i['titulo']} → {i['dono_nome']}"
+                                                                                       for i in novas[:5]), "geral", "ideia")
+        except Exception:
+            pass
+    return {"registradas": len(novas)} if novas else {"registradas": 0}
+
+
 def gerar(cfg, limite: int = 10) -> list[dict]:
     tb = Trabalho(cfg)
     gente = organizacao.por_id(cfg)
@@ -80,6 +172,7 @@ def gerar(cfg, limite: int = 10) -> list[dict]:
                            "motivo": f"{n} carga(s) reprovada(s) no histórico",
                            "primeiro_passo": "Abrir a lista de erros dessa base e combinar um padrão de envio com a origem",
                            "dono": "coord_engenharia"})
+    ideias += _ideias_do_treino(tb, nome)
     if not ideias:
         ideias.append({"impacto": 1, "titulo": "Nada urgente na memória agora",
                        "motivo": "Sem erro repetido, sem handover parado, sem pedido sem resposta",

@@ -6,7 +6,7 @@
 
 | Onde | O que guarda | Para quê |
 |---|---|---|
-| `logs/trabalho.db` (SQLite) | **Fonte de tudo**: a memória da empresa (53 tabelas abaixo) | Funciona sem internet e sem servidor; nada se apaga |
+| `logs/trabalho.db` (SQLite) | **Fonte de tudo**: a memória da empresa (54 tabelas abaixo) | Funciona sem internet e sem servidor; nada se apaga |
 | `logs/backups_sqlite/` | Cópia diária do `trabalho.db`, conferida (`integrity_check`) e com SHA-256 | Restaurar se o disco falhar; o 1º de cada mês fica para sempre |
 | PostgreSQL `robo_dados`, schema `robo` | Espelho de TODAS as tabelas (`memoria_<tabela>`) | Consultas em SQL, Power BI e Machine Learning |
 | PostgreSQL schemas `bruto` → `tratado` → `analitico` | As planilhas de negócio (ELT) | Análise e Power BI |
@@ -63,6 +63,7 @@
 | `registro_conhecimento` | Cadeia com hash (SHA-256) de tudo o que acontece com o conhecimento | um elo da cadeia (com o hash do anterior) | só acrescenta (imutável: não altera nem apaga) | auditoria: prova de que nada foi adulterado |
 | `propostas_regra` | Regras propostas a partir de reprovações (só o dono aprova) e a prova | uma proposta de regra | registro com situação (a situação muda; a linha nunca some) | o que reprova e o que resolve |
 | `regras_aprendidas` | Regras aprovadas em vigor (sinônimo, valor, correção, apelido) e desativações | uma regra aprovada | registro com situação (a situação muda; a linha nunca some) | efeito das regras na taxa de aprovação |
+| `ideias_registro` | Cada ideia da Iara (ideias e expansão), com o dado que a originou e o dono | uma ideia registrada num dia | só acrescenta (imutável: não altera nem apaga) | quais problemas mais geram ideias e quanto tempo levam para sumir |
 
 ### Treino contínuo e laboratório (casos com gabarito, tentativas e níveis)
 
@@ -129,6 +130,7 @@
 - **`experiencias`**: `id`, `funcionario`, `data_hora`, `tipo`, `resumo`, `detalhe`, `origem`, `referencia`, `andar`
 - **`handover_eventos`**: `id`, `handover_id`, `data_hora`, `tipo`, `de`, `para`, `quem`, `detalhe`
 - **`handovers`**: `id`, `chave`, `andar`, `area`, `responsavel`, `detectado_por`, `erro`, `causa`, `regra`, `como_verificar`, `exemplo`, `recorrencias`, `estado`, `backlog_id`, `criado_em`, `ultima_ocorrencia`, `atualizado_em`
+- **`ideias_registro`**: `id`, `data_hora`, `titulo`, `motivo`, `primeiro_passo`, `dono`, `impacto`, `chave`
 - **`interacoes`**: `id`, `data_hora`, `de`, `para`, `tipo`, `texto`, `ref`
 - **`laboratorio_exercicios`**: `id`, `rodada`, `data_hora`, `area`, `semente`, `etapa`, `responsavel`, `ok`, `detalhe`, `segundos`, `nivel`
 - **`laboratorio_medidas`**: `id`, `data_hora`, `area`, `linhas`, `segundos`

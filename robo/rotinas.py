@@ -27,6 +27,8 @@ ROTINAS = {
     "backup": ("dba", "Backup conferido do SQLite (de hora em hora) e do PostgreSQL (diário); cópia no 2º lugar; o 1º de "
                       "cada mês fica para sempre", 1),
     "memoria_pg": ("dba", "Cópia de TODA a memória para o PostgreSQL (incremental: só o que é novo)", 1 / 6),
+    "ideias": ("canal_iara", "Iara (ideias e expansão): ideias do dia tiradas da memória e do treino, registradas no banco",
+               24),
     "registro": ("dba", "Registro total: log do sistema, canal, atas, RH, conhecimento e configurações vão para o banco", 1 / 60),
     "pdca": ("ger_operacoes", "Etapa C do PDCA: o que foi corrigido e não voltou vira boa prática", 1),
     "treino": ("casos_planejamento", "Treino contínuo: cada funcionário recebe um caso com gabarito no seu nível; erro vira lição", 0.1),
@@ -47,8 +49,8 @@ ROTINAS = {
 def funcao(cfg, nome: str):
     """O que cada rotina executa. Uma lista só, usada pelo laço do robô (painel/controle.py) e pelo comando
     `python -m robo rotina <nome>` (que é o que o Airflow chama). Assim os dois nunca divergem."""
-    from robo import (alcadas, auditoria, backup, desenvolvimento, estrategia, laboratorio, licoes, memoria, registro_total,
-                      reuniao, rh_desempenho, treino)
+    from robo import (alcadas, auditoria, backup, desenvolvimento, estrategia, ideias, laboratorio, licoes, memoria,
+                      registro_total, reuniao, rh_desempenho, treino)
     from robo.canal import Canal
     from robo.ti import ronda
     mapa = {
@@ -65,6 +67,7 @@ def funcao(cfg, nome: str):
         "laboratorio": lambda: laboratorio.rotina(cfg),
         "canal": lambda: Canal(cfg).sincronizar(),
         "registro": lambda: registro_total.capturar(cfg),
+        "ideias": lambda: ideias.rotina(cfg),
         "rh_desempenho": lambda: rh_desempenho.rotina(cfg),
         "alcadas": lambda: alcadas.rotina(cfg),
     }
