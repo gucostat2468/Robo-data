@@ -289,6 +289,11 @@ class Api:
                     "descricao": "; ".join(p["escopo"]), "nativo": True, "aceita_habilidades": False, "habilidades": [],
                     "ativo": True, "ronda": p["nivel"] == "coordenador", "prontidao": "",
                     "ficha": _ficha_curta(rh.ficha({"id": p["id"], "habilidades": []}))} for p in ti.EQUIPE_TI]
+        from robo.paineis import EQUIPE_BI
+        equipe += [{"id": p["id"], "nome": p["nome"], "papel": p["cargo"].split(" — ")[0], "cor": p["cor"], "andar": p["andar"],
+                    "descricao": "; ".join(p["escopo"]), "nativo": True, "aceita_habilidades": False, "habilidades": [],
+                    "ativo": True, "ronda": False, "prontidao": "",
+                    "ficha": _ficha_curta(rh.ficha({"id": p["id"], "habilidades": []}))} for p in EQUIPE_BI]
         from robo import lideranca
         equipe += [{"id": p["id"], "nome": p["nome"], "papel": p["papel"], "cor": p["cor"], "andar": p["andar"],
                     "descricao": p["descricao"], "nativo": True, "aceita_habilidades": False, "habilidades": [], "ativo": True,
@@ -607,6 +612,18 @@ class Api:
     def central(self, q) -> dict:
         from robo import central
         return central.montar(self.cfg, int(q.get("dias", ["1"])[0] or 1))
+
+    def paineis(self, _q) -> dict:
+        """Dashboards montados pela Bárbara e conferidos pelo Heitor (logs/paineis/painel.json) + o registro de versões."""
+        from robo import paineis
+        cfg = self.cfg
+        return {"painel": paineis.publicado(cfg), "versoes": paineis.versoes(cfg, 12),
+                "equipe": [{"id": p["id"], "nome": p["nome"], "cargo": p["cargo"], "cor": p["cor"]} for p in paineis.EQUIPE_BI]}
+
+    def paineis_atualizar(self, _corpo) -> dict:
+        from robo import paineis
+        r = paineis.rotina(self.cfg)
+        return {"ok": r["situacao"] != "reprovado", **{k: v for k, v in r.items() if k != "estrela"}}
 
     def estrategia(self, _q) -> dict:
         from robo import estrategia, treinamento
@@ -1307,6 +1324,7 @@ ROTAS_GET = {
     "/api/conhecimento": Api.conhecimento, "/api/conhecimento/caderno": Api.conhecimento_caderno,
     "/api/conhecimento/licao": Api.conhecimento_licao, "/api/conhecimento/buscar": Api.conhecimento_buscar,
     "/api/erros": Api.erros_sistema, "/api/gestao": Api.gestao, "/api/treino": Api.treino, "/api/banco/registros": Api.banco_registros, "/api/treino/pessoa": Api.treino_pessoa, "/api/aprendizado": Api.aprendizado,
+    "/api/paineis": Api.paineis,
 }
 ROTAS_POST = {
     "/api/robo/ligar": Api.ligar, "/api/robo/pausar": Api.pausar, "/api/robo/processar-agora": Api.processar_agora,
@@ -1330,6 +1348,7 @@ ROTAS_POST = {
     "/api/conhecimento/rodar": Api.conhecimento_rodar, "/api/conhecimento/criar": Api.conhecimento_criar,
     "/api/conhecimento/versao": Api.conhecimento_versao, "/api/conhecimento/arquivar": Api.conhecimento_arquivar,
     "/api/erros/resolver": Api.erros_resolver, "/api/aprendizado/decidir": Api.aprendizado_decidir, "/api/treino/rodar": Api.treino_rodar, "/api/aprendizado/desativar": Api.aprendizado_desativar,
+    "/api/paineis/atualizar": Api.paineis_atualizar,
 }
 ROTAS_UPLOAD = {"/api/testar": Api.testar, "/api/enviar": Api.enviar, "/api/conversa/anexar": Api.anexar}
 

@@ -65,6 +65,7 @@ FERRAMENTAS_PESSOA = {
     "canal_nina": ["calcular"], "canal_iara": ["historico", "ideias"], "canal_helena": ["organizacao"],
     "ger_operacoes": ["organizacao"], "ger_ti": ["organizacao"], "excel_supervisor": ["diagnosticar_planilha"],
     "sec_senior": ["dados_pessoais"], "coord_devops": ["diagnosticar_planilha"],
+    "bi_powerbi": ["paineis", "consulta_sql"], "bi_reconciliacao": ["paineis", "consulta_sql"],
 }
 # Sala de Casos (4º andar): a revisão independente de casos de treino é a ferramenta de trabalho de todos eles
 for _pid in ("head_casos", "casos_engenharia", "casos_analytics", "casos_governanca", "casos_ti", "casos_revisor",
@@ -76,7 +77,7 @@ ENCAMINHAR = {
     "calcular": "analise_estatistica", "perfil_indicadores": "analise_indicadores",
     "resumo_executivo": "analise_relator", "diagnosticar_planilha": "coord_engenharia",
     "publicar_planilha": "recepcao", "consulta_sql": "dba", "dados_pessoais": "gov_pleno_lgpd",
-    "ronda_ti": "coord_devops", "orquestracao": "airflow_pleno", "organizacao": "canal_helena", "reuniao_andar": "ger_operacoes", "ideias": "canal_iara",
+    "ronda_ti": "coord_devops", "orquestracao": "airflow_pleno", "organizacao": "canal_helena", "reuniao_andar": "ger_operacoes", "ideias": "canal_iara", "paineis": "bi_powerbi",
     "scorecard": "dir_operacoes", "auditoria": "head_engenharia", "drivers": "cd_senior_drivers",
     "segmentacao": "cd_pleno_segmentos", "anomalias": "cd_junior_anomalias", "recrutamento": "rh_rs",
     "desenvolvimento": "rh_td", "desempenho": "rh_desempenho", "people_analytics": "rh_people", "raio_x": "dir_operacoes",
@@ -91,6 +92,7 @@ ENTRADAS = {
     "resumo_executivo": "resultados das etapas anteriores", "ronda_ti": "nada (lê o próprio computador)",
     "orquestracao": "nada (lê os registros das rotinas)", "revisar_caso": "caso de treino (arquivo, gabarito e semente)",
     "conhecimento": "pergunta em texto", "historico": "pergunta sobre o que aconteceu", "organizacao": "pergunta sobre a equipe",
+    "paineis": "nada (lê a memória da empresa)",
 }
 SAIDAS = {
     "diagnosticar_planilha": "lista de erros e avisos com linha do Excel", "calcular": "tabela com o resultado e a base usada",
@@ -101,6 +103,7 @@ SAIDAS = {
     "revisar_caso": "aprovado ou reprovado, com cada problema encontrado",
     "conhecimento": "resposta do conhecimento registrado", "historico": "execuções recentes",
     "organizacao": "quem faz o quê na empresa",
+    "paineis": "5 painéis com cada número conferido por outra pessoa (logs/paineis/painel.json)",
 }
 
 
@@ -138,6 +141,9 @@ def _fixos() -> tuple:
           for x in QUADRO]
     p += [{"id": x["id"], "nome": x["nome"], "papel": _papel_curto(x["cargo"]), "andar": 5, "grupo": "ti", "canal": "ti",
            "cor": x.get("cor"), "descricao": "; ".join(x.get("escopo") or [])} for x in EQUIPE_TI]
+    from robo.paineis import EQUIPE_BI
+    p += [{"id": x["id"], "nome": x["nome"], "papel": _papel_curto(x["cargo"]), "andar": x["andar"], "grupo": "bi", "canal": "excel",
+           "cor": x.get("cor"), "descricao": "; ".join(x.get("escopo") or [])} for x in EQUIPE_BI]
     from robo.lideranca import EQUIPE as LIDERANCA
     p += [{"id": x["id"], "nome": x["nome"], "papel": _papel_curto(x["cargo"]), "andar": x["andar"], "grupo": "lideranca",
            "canal": "lideranca" if x["nivel"] in ("diretor", "head") else ("rh" if x["id"].startswith("rh_") else CANAL_DO_ANDAR[x["andar"]]),
@@ -235,7 +241,9 @@ def area_de(pid: str) -> str:
 
 
 def gestor_de(pid: str) -> str | None:
-    from robo import lideranca, quadro, ti
+    from robo import lideranca, paineis, quadro, ti
+    if pid in paineis.GESTORES:
+        return paineis.GESTORES[pid]
     if pid in lideranca.NOVOS_GESTORES:  # gerentes que passaram a ter head ou diretor acima
         return lideranca.NOVOS_GESTORES[pid]
     if pid in lideranca.POR_ID:

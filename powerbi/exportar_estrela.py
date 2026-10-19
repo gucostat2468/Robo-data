@@ -149,16 +149,16 @@ def _txt(v):
     return str(v)
 
 
-def gravar_csv_xlsx(tabelas: dict[str, list[dict]]) -> None:
+def gravar_csv_xlsx(tabelas: dict[str, list[dict]], destino: Path = DADOS) -> None:
     from openpyxl import Workbook
     from openpyxl.styles import Font, PatternFill
-    DADOS.mkdir(parents=True, exist_ok=True)
+    destino.mkdir(parents=True, exist_ok=True)
     wb = Workbook()
     wb.remove(wb.active)
     for nome, linhas in tabelas.items():
         # tabela vazia ainda leva o cabeçalho certo: o Power Query precisa das colunas para não quebrar a consulta
         cols = list(linhas[0].keys()) if linhas else COLUNAS_SE_VAZIA.get(nome, ["(vazia)"])
-        with open(DADOS / f"{nome}.csv", "w", encoding="utf-8-sig", newline="") as f:
+        with open(destino / f"{nome}.csv", "w", encoding="utf-8-sig", newline="") as f:
             w = csv.writer(f, delimiter=";")
             w.writerow(cols)
             for r in linhas:
@@ -173,7 +173,7 @@ def gravar_csv_xlsx(tabelas: dict[str, list[dict]]) -> None:
         ws.freeze_panes = "A2"
         for i, col in enumerate(cols, 1):
             ws.column_dimensions[ws.cell(1, i).column_letter].width = min(48, max(12, len(col) + 4))
-    wb.save(DADOS / "modelo_estrela.xlsx")
+    wb.save(destino / "modelo_estrela.xlsx")
 
 
 def _sql_lit(v):
@@ -297,6 +297,20 @@ CREATE TABLE bi.dim_nivel (nivel INT PRIMARY KEY, nivel_nome TEXT);"""]
         partes.append(f"INSERT INTO bi.{tabela} ({', '.join(cols)}) VALUES\n  {valores};")
     partes.append(VIEWS_SQL.strip())
     return "\n\n".join(partes) + "\n"
+
+
+def exportar(cfg, caminho_db: Path, destino: Path) -> dict:
+    """Usado pela rotina dos painéis (robo/paineis.py): atualiza o modelo estrela em `destino` a cada publicação."""
+    dims = dimensoes_do_codigo(cfg)
+    c = sqlite3.connect(f"file:{caminho_db}?mode=ro", uri=True)
+    c.row_factory = sqlite3.Row
+    try:
+        fat = fatos(c)
+    finally:
+        c.close()
+    tabelas = {**completar_dimensoes(dims, fat), **fat}
+    gravar_csv_xlsx(tabelas, destino)
+    return {n: len(v) for n, v in tabelas.items()}
 
 
 def main(caminho_db: Path) -> dict:

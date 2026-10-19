@@ -216,6 +216,16 @@ RETURN DIVIDE ( Prom - Det, [Respostas] ) * 100
 ```
 Com a habilidade **Classificar NPS**, você também ganha a coluna `grupo_nps` (Promotor/Neutro/Detrator) para gráficos de barras empilhadas.
 
+**Os painéis da própria empresa**
+- **Tela Dashboards** (menu Acompanhar): 5 painéis (Visão Executiva, Treino & Evolução, Pessoas & Andares, Conversas &
+  Mentorias, Operação & Rotinas). A Bárbara (especialista em Power BI, 3º andar) monta do banco real de hora em hora
+  (rotina `paineis`); o Heitor (analista de BI) refaz cada total por outro caminho e só então publica. Cada versão fica
+  registrada para sempre em `paineis_versoes`. Para montar agora: `python -m robo rotina paineis`.
+- **Kit Power BI** (`powerbi/`): modelo estrela da empresa (schema `bi` no PostgreSQL/Neon + CSV/Excel em `powerbi/dados`),
+  ~50 medidas DAX comentadas (`medidas.dax`), consultas do Power Query (`power_query.m`), tema de cores e as telas de
+  referência. Passo a passo clique a clique: `powerbi/GUIA_CONSTRUCAO.md`. A cada publicação dos painéis, a Bárbara
+  também refaz o modelo estrela em `logs/paineis/estrela/` (Obter dados → Pasta, para atualizar sem internet).
+
 ## 7. Logs e resumo de erros
 
 | Onde | O quê |

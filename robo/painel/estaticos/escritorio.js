@@ -1073,6 +1073,11 @@ function mostrarBalao(id, texto, para, quando, tom) {
 }
 const _vetorBalao = new THREE.Vector3();
 function posicionarBaloes(agora) {
+  if (!baloes.size) return;
+  // o balão nunca fica por baixo da barra do topo nem da lista da equipe (à direita): encosta na borda livre
+  const topo = document.querySelector(".hud-topo")?.getBoundingClientRect().bottom || 0;
+  const lista = document.getElementById("hud-equipe");
+  const direita = lista && lista.offsetParent ? lista.getBoundingClientRect().left : innerWidth;
   for (const [id, b] of baloes) {
     const est = estado.estacoes.get(id);
     if (!est || agora > b.ate) { b.el.remove(); baloes.delete(id); continue; }
@@ -1081,8 +1086,11 @@ function posicionarBaloes(agora) {
     _vetorBalao.project(camera);
     const fora = _vetorBalao.z > 1 || Math.abs(_vetorBalao.x) > 1.1 || Math.abs(_vetorBalao.y) > 1.1;
     b.el.style.display = fora ? "none" : "block";
-    b.el.style.left = `${(_vetorBalao.x + 1) / 2 * innerWidth}px`;
-    b.el.style.top = `${(1 - _vetorBalao.y) / 2 * innerHeight}px`;
+    const w = b.el.offsetWidth, h = b.el.offsetHeight;
+    const x = Math.min(Math.max((_vetorBalao.x + 1) / 2 * innerWidth, w / 2 + 8), Math.max(w / 2 + 8, direita - w / 2 - 8));
+    const y = Math.max((1 - _vetorBalao.y) / 2 * innerHeight, topo + h + 8);
+    b.el.style.left = `${x}px`;
+    b.el.style.top = `${y}px`;
     b.el.style.opacity = Math.min(1, (b.ate - agora) / 800).toFixed(2);
   }
 }

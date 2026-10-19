@@ -6,7 +6,7 @@
 
 | Onde | O que guarda | Para quê |
 |---|---|---|
-| `logs/trabalho.db` (SQLite) | **Fonte de tudo**: a memória da empresa (54 tabelas abaixo) | Funciona sem internet e sem servidor; nada se apaga |
+| `logs/trabalho.db` (SQLite) | **Fonte de tudo**: a memória da empresa (55 tabelas abaixo) | Funciona sem internet e sem servidor; nada se apaga |
 | `logs/backups_sqlite/` | Cópia diária do `trabalho.db`, conferida (`integrity_check`) e com SHA-256 | Restaurar se o disco falhar; o 1º de cada mês fica para sempre |
 | PostgreSQL `robo_dados`, schema `robo` | Espelho de TODAS as tabelas (`memoria_<tabela>`) | Consultas em SQL, Power BI e Machine Learning |
 | PostgreSQL schemas `bruto` → `tratado` → `analitico` | As planilhas de negócio (ELT) | Análise e Power BI |
@@ -99,6 +99,7 @@
 | `erros_sistema` | Todo erro de programa (com traceback), agrupado por tipo, ligado a um handover da TI | um tipo de erro (repetição soma ocorrência) | registro com situação (a situação muda; a linha nunca some) | estabilidade do código por versão |
 | `auditorias` | Auditorias por amostragem dos heads (conferido por outro caminho) | uma auditoria | só acrescenta (imutável: não altera nem apaga) | confiança nos resultados publicados |
 | `backups_registro` | Cada backup (SQLite e PostgreSQL): arquivo, SHA-256, linhas e integridade | um backup | só acrescenta (imutável: não altera nem apaga) | prova de que dá para restaurar |
+| `paineis_versoes` | Cada montagem dos painéis (Bárbara) e a conferência do Heitor: situação, indicadores e divergências | uma versão dos painéis | só acrescenta (imutável: não altera nem apaga) | evolução de cada indicador no tempo; qualidade dos painéis |
 | `vigia_eventos` | Cada vez que o vigia achou o robô parado (e religou) ou sem responder | um evento do vigia | só acrescenta (imutável: não altera nem apaga) | disponibilidade real: quedas por dia e tempo até voltar |
 | `logs_sistema` | Cada registro do log do sistema (robo.log e os girados), com nível e mensagem completa | um registro do log (com o traceback, se houver) | só acrescenta (imutável: não altera nem apaga) | série de eventos e erros por módulo e hora; prever falha antes de acontecer |
 | `arquivos_linhas` | Cada linha nova dos arquivos que só crescem (.jsonl, .csv): RH, conhecimento, histórico | uma linha de um arquivo, na ordem | só acrescenta (imutável: não altera nem apaga) | reconstruir qualquer arquivo da pasta de logs |
@@ -141,6 +142,7 @@
 - **`memoria`**: `id`, `tipo`, `chave`, `texto`, `origem`, `solicitacao_id`, `criada_em`
 - **`mensagens`**: `id`, `conversa_id`, `autor`, `texto`, `natureza`, `dados`, `solicitacao_id`, `criada_em`
 - **`mentorias`**: `id`, `data_hora`, `mentor`, `aprendiz`, `competencia`, `nivel`, `tentativa_erro_id`, `licao_id`, `situacao`, `fechada_em`, `tentativa_resultado_id`
+- **`paineis_versoes`**: `id`, `data_hora`, `autor`, `conferente`, `situacao`, `assinatura`, `paginas`, `indicadores`, `divergencias`
 - **`propostas_regra`**: `id`, `criada_em`, `arquivo`, `arquivo_erros`, `padrao`, `tipo`, `coluna`, `valor`, `motivo`, `evidencia`, `alerta`, `autor`, `estado`, `decidido_por`, `decidido_em`, `motivo_decisao`, `comprovada_em`, `prova`, `para`
 - **`registro_conhecimento`**: `id`, `data_hora`, `tipo`, `ref`, `quem`, `dados`, `hash_anterior`, `hash`
 - **`registro_cursores`**: `chave`, `posicao`, `linhas`, `assinatura`, `atualizado_em`

@@ -101,5 +101,10 @@ Legenda: ✅ feito e testado · 🟡 feito em parte · ⏳ pendente
 | 95 | Tudo registrado no SQLite e no PostgreSQL | ✅ | `robo/registro_total.py`: log do sistema, canal, atas, RH, conhecimento, estado da TI e config (sem senhas) no banco; cópia incremental no PostgreSQL a cada 10 min |
 | 96 | Backup constante e nunca cair | ✅ | backup conferido de hora em hora + cópia num 2º lugar (`backup: copia_extra`); vigia que religa o robô (`python -m robo vigia ligar`); `python -m robo diagnostico` |
 | 97 | App só meu no celular, ao vivo | ✅ | abas Ao vivo / Andares / Operação, renova a cada 10 s, só leitura, só rede de casa |
+| 99 | Menu organizado e responsivo | ✅ | menu em 4 grupos (Acompanhar, Pessoas, Dados, Gestão) que lembram se estão abertos; no celular vira gaveta (☰) |
+| 100 | Ver a conversa dos funcionários em balões, ao vivo | ✅ | escritório 3D: balões em cima de quem fala, com as conversas e as tentativas de treino REGISTRADAS no banco (`interacoes`, `treino_tentativas`) e há quanto tempo |
+| 101 | Especialista de Power BI que monta e mantém os dashboards | ✅ | Bárbara (especialista) e Heitor (reconciliação), 3º andar: `robo/paineis.py`, tela Dashboards, rotina `paineis` de hora em hora, versões em `paineis_versoes` (imutável), modelo estrela refeito em `logs/paineis/estrela/` |
+| 102 | Kit Power BI (estrela, DAX, Power Query, telas) | ✅ | `powerbi/` com guia clique a clique; o .pbix não foi gerado porque o Power BI Desktop só roda no Windows |
+| 103 | Tudo registrado para ML/DL, nada se perde | ✅ | todo registro de treino, conversa, mentoria, RH, rotina e painel é só de inclusão (gatilho bloqueia UPDATE/DELETE), copiado para o PostgreSQL e com a versão do código em cada tentativa |
 | 98 | Você acessar meu PC | 🟡 | esta sessão roda na nuvem e não alcança o seu PC; para eu operar no Windows: Claude Desktop ou `claude remote-control` na pasta do projeto |
 | 38 | IA opcional sem fingir | 🟡 | `robo/ia.py`: só modelo local, desligado; ainda não usado nas respostas |

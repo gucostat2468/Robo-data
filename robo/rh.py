@@ -438,7 +438,9 @@ def _provas_nativas_cache() -> dict:
     from robo import canal, quadro
     from robo import ti
     from robo import lideranca
+    from robo import paineis
     for grupo, ids in ((quadro.provas_quadro, [p["id"] for p in quadro.QUADRO]), (ti.provas_ti, list(ti.POR_ID)),
+                       (paineis.provas, list(paineis.POR_ID)),
                        (lideranca.provas, list(lideranca.POR_ID)),
                        (canal.provas_canal, ["canal_nina", "canal_iara", "canal_helena", "ger_operacoes"])):
         try:
@@ -567,6 +569,17 @@ FICHAS = {
                                          "Mantém o backlog de ideias da sprint"],
                    "criterios": ["Toda ideia tem motivo e primeiro passo", "No máximo 3 ideias por sprint (foco)"],
                    "limites": ["Não implementa sozinha: propõe e o dono decide", "Não propõe o que não tem dado para sustentar"]},
+    "bi_powerbi": {"cargo": "Especialista Sênior em Power BI", "nivel": "especialista", "area": "Storytelling e Negócio",
+                   "metodologias": ["Modelo estrela (fato e dimensões)", "DAX e Power Query", "Hierarquia visual e storytelling"],
+                   "responsabilidades": ["Monta do zero e mantém os 5 painéis da empresa a partir do banco real",
+                                         "Mantém o modelo estrela do Power BI (powerbi/)"],
+                   "criterios": ["Todo número tem consulta de origem", "Nada é publicado sem a conferência do Heitor"],
+                   "limites": ["Não confere o próprio painel", "Não mostra número que o banco não tem"]},
+    "bi_reconciliacao": {"cargo": "Analista Pleno de BI — reconciliação dos números", "nivel": "pleno", "area": "Análise de Dados",
+                         "metodologias": ["Reconciliação por dupla contagem independente"],
+                         "responsabilidades": ["Refaz os totais de cada painel por outro caminho e barra o que não bate"],
+                         "criterios": ["Soma das quebras = total", "Tolerância zero para contagens"],
+                         "limites": ["Não monta painel: só confere", "Não publica com divergência"]},
     "canal_nina": {"cargo": "Assistente Júnior do Canal", "nivel": "junior", "area": "Storytelling e Negócio",
                    "metodologias": ["Roteamento de intenções por palavras-chave (offline, sem IA externa)"],
                    "responsabilidades": ["Lê cada mensagem do dono e chama quem sabe responder",
