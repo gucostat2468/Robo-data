@@ -276,3 +276,39 @@ robo/
 ```
 
 Testes: `.venv\Scripts\python -m pip install -r requisitos-dev.txt` e `.venv\Scripts\python -m pytest`. Para incluir os testes de PostgreSQL: `set ROBO_TESTE_PG=host=localhost port=5432 user=postgres password=SUA_SENHA`.
+
+## 11. Acompanhar pelo celular (somente leitura)
+
+**O que é:** uma página no celular com o estado da empresa (robô ligado, rotinas, treino das últimas 24 h, últimas
+planilhas, decisões atrasadas, alertas da TI e último backup), atualizando a cada 20 segundos. Ela **não tem nenhum
+botão que mude algo**: é só para acompanhar. O painel completo continua abrindo só no notebook.
+
+**Ligar (uma vez):**
+1. Tenha a senha do painel definida (`python -m robo senha`). Sem senha, o celular não abre — de propósito.
+2. No Prompt de Comando, na pasta do projeto: `python -m robo celular --ligar`. Ele mostra o endereço, por exemplo
+   `http://192.168.0.23:8766/`.
+3. Feche e abra o robô. Na 1ª vez o Windows pergunta sobre o firewall: marque **só "Redes privadas"**.
+4. No iPhone (na **mesma rede Wi-Fi** de casa), abra o endereço no Safari, entre com a senha do painel e toque em
+   **Compartilhar → Adicionar à Tela de Início**. Vira um ícone "Robô" como um app.
+
+**Fora de casa:** instale o Tailscale (VPN gratuita) no notebook e no celular e use o IP `100.x.x.x` do notebook.
+**Nunca** abra a porta no roteador.
+
+**Segurança:** só aceita endereços de rede privada; 5 senhas erradas bloqueiam o aparelho por 15 minutos; toda entrada
+(certa ou errada) fica registrada para sempre na tabela `acessos_celular`. Desligar: `python -m robo celular --desligar`.
+
+### App de banco no celular (ler o PostgreSQL direto)
+
+Se você usa um app de PostgreSQL no celular, rode **uma vez** no Prompt **como Administrador**:
+`python -m robo liberar-banco-celular`. Ele libera **só o usuário `robo_leitura`** (não altera nada) e **só para a rede
+da sua casa**, faz uma cópia do `pg_hba.conf` antes de mexer, reinicia o serviço do PostgreSQL e cria a regra de
+firewall só para "Redes privadas". No fim, imprime os campos do app:
+
+| Campo do app | O que preencher |
+|---|---|
+| Name | Robô de Planilhas |
+| Hostname | o IP do notebook na rede de casa (o comando mostra, ex.: 192.168.0.23) |
+| Port | 5432 |
+| Database | robo_dados |
+| User | robo_leitura |
+| Password | no Prompt: `echo %ROBO_PG_SENHA_LEITURA%` (a senha nunca fica em arquivo) |

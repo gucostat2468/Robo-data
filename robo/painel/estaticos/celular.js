@@ -1,0 +1,130 @@
+// Acompanhamento pelo celular: só lê /api/resumo a cada 20 s. Não existe nenhuma ação que altere a empresa.
+"use strict";
+(function () {
+  const $ = (id) => document.getElementById(id);
+  let relogio = null;
+
+  function el(tag, classe, texto) {
+    const e = document.createElement(tag);
+    if (classe) e.className = classe;
+    if (texto !== undefined && texto !== null) e.textContent = String(texto);
+    return e;
+  }
+
+  function mostrar(login) {
+    $("tela-login").hidden = !login;
+    $("tela-resumo").hidden = login;
+    $("sair").hidden = login;
+    if (login) { clearInterval(relogio); relogio = null; $("senha").focus(); }
+  }
+
+  function dataBr(iso) {
+    if (!iso) return "—";
+    const m = String(iso).match(/^(\d{4})-(\d{2})-(\d{2})[ T](\d{2}):(\d{2})/);
+    return m ? `${m[3]}/${m[2]} ${m[4]}:${m[5]}` : String(iso);
+  }
+
+  function kpi(rotulo, valor, det, tom, largo) {
+    const c = el("div", "kpi" + (tom ? " " + tom : "") + (largo ? " largo" : ""));
+    c.append(el("div", "rotulo", rotulo), el("div", "valor", valor), el("div", "det", det || ""));
+    return c;
+  }
+
+  function indisponivel(p) { return !p || p.indisponivel; }
+
+  function lista(alvo, itens, vazio, montar) {
+    const ul = $(alvo);
+    ul.replaceChildren();
+    if (!itens || !itens.length) { const li = el("li"); li.append(el("span", "vazio", vazio)); ul.append(li); return; }
+    itens.forEach((x) => ul.append(montar(x)));
+  }
+
+  function desenhar(r) {
+    $("atualizado").textContent = "Atualizado em " + r.gerado_em + " · renova a cada 20 s";
+    const g = $("cartoes");
+    g.replaceChildren();
+    const robo = r.robo || {};
+    g.append(indisponivel(robo) ? kpi("Robô", "—", robo.indisponivel, "atencao")
+      : robo.ligado === null ? kpi("Robô", "—", "sem informação do monitor", "atencao")
+      : kpi("Robô", robo.ligado ? "Ligado" : "Pausado", robo.fila == null ? "" : `${robo.fila} arquivo(s) na fila`, robo.ligado ? "bom" : "atencao"));
+    const ro = r.rotinas || {};
+    if (indisponivel(ro)) g.append(kpi("Rotinas", "—", ro.indisponivel, "atencao"));
+    else {
+      const probl = ro.atrasadas.length + ro.com_erro.length;
+      const det = probl ? [ro.com_erro.length ? "erro: " + ro.com_erro.map((x) => x.nome).join(", ") : "",
+        ro.atrasadas.length ? "atrasadas: " + ro.atrasadas.join(", ") : ""].filter(Boolean).join(" · ") : `${ro.total} rotinas em dia`;
+      g.append(kpi("Rotinas", probl ? `${probl} com problema` : "Em dia", det, ro.com_erro.length ? "ruim" : (probl ? "atencao" : "bom")));
+    }
+    const t = r.treino || {};
+    g.append(indisponivel(t) ? kpi("Treino 24 h", "—", t.indisponivel, "atencao")
+      : kpi("Treino 24 h", t.tentativas_24h ? `${t.pct_24h}%` : "—",
+        `${t.acertos_24h} de ${t.tentativas_24h} certas · ${t.pessoas_24h} de ${t.elegiveis} pessoas`,
+        t.tentativas_24h ? (t.pct_24h >= 80 ? "bom" : "atencao") : "atencao"));
+    const d = r.decisoes || {};
+    g.append(indisponivel(d) ? kpi("Decisões", "—", d.indisponivel, "atencao")
+      : kpi("Decisões", d.atrasadas.length ? `${d.atrasadas.length} atrasada(s)` : "Em dia", `${d.abertas} aberta(s)`,
+        d.atrasadas.length ? "ruim" : "bom"));
+    const ti = r.ti || {};
+    g.append(indisponivel(ti) ? kpi("TI", "—", ti.indisponivel, "atencao")
+      : kpi("Ronda de TI", ti.saudavel === false ? "Com alerta" : (ti.saudavel ? "Saudável" : "—"), dataBr(ti.data_hora),
+        ti.saudavel === false ? "ruim" : (ti.saudavel ? "bom" : "atencao")));
+    const b = r.backup || {};
+    g.append(indisponivel(b) ? kpi("Backup", "—", b.indisponivel, "atencao")
+      : kpi("Último backup", dataBr(b.sqlite), "PostgreSQL: " + dataBr(b.postgres), b.sqlite ? "bom" : "atencao"));
+
+    lista("planilhas", indisponivel(r.planilhas) ? [] : r.planilhas, "Nenhuma planilha processada ainda.", (p) => {
+      const li = el("li"), txt = el("div");
+      txt.append(el("div", "princ", p.arquivo), el("div", "sec", `${dataBr(p.data_hora)} · ${p.linhas || 0} linhas`));
+      const ok = /sucesso|aprov/i.test(p.status);
+      li.append(txt, el("span", "selo " + (ok ? "ok" : "falha"), ok ? "Aprovada" : "Reprovada"));
+      return li;
+    });
+    lista("decisoes", indisponivel(d) ? [] : d.atrasadas, "Nenhuma decisão atrasada.", (x) => {
+      const li = el("li"), txt = el("div");
+      txt.append(el("div", "princ", x.texto), el("div", "sec", `${x.dono} · prazo ${dataBr(x.prazo + " 00:00").slice(0, 5)}`));
+      li.append(txt);
+      return li;
+    });
+    lista("alertas", indisponivel(ti) ? [] : ti.alertas, "Nenhum alerta ativo.", (a) => {
+      const li = el("li");
+      li.append(el("div", "sec", a));
+      return li;
+    });
+  }
+
+  async function atualizar() {
+    try {
+      const resp = await fetch("/api/resumo", { credentials: "same-origin", cache: "no-store" });
+      if (resp.status === 401) return mostrar(true);
+      const r = await resp.json();
+      if (!resp.ok) throw new Error(r.erro || resp.status);
+      mostrar(false);
+      desenhar(r);
+      if (!relogio) relogio = setInterval(atualizar, 20000);
+    } catch (e) {
+      $("atualizado").textContent = "Sem conexão com o notebook (" + e.message + "). Tentando de novo…";
+    }
+  }
+
+  $("form-login").addEventListener("submit", async (ev) => {
+    ev.preventDefault();
+    $("erro-login").textContent = "";
+    try {
+      const resp = await fetch("/entrar", { method: "POST", credentials: "same-origin",
+        headers: { "Content-Type": "application/json" }, body: JSON.stringify({ senha: $("senha").value }) });
+      const r = await resp.json();
+      if (!resp.ok) { $("erro-login").textContent = r.erro || "Não foi possível entrar."; return; }
+      $("senha").value = "";
+      atualizar();
+    } catch (e) {
+      $("erro-login").textContent = "Sem conexão com o notebook.";
+    }
+  });
+
+  $("sair").addEventListener("click", async () => {
+    await fetch("/sair", { method: "POST", credentials: "same-origin" }).catch(() => {});
+    mostrar(true);
+  });
+
+  atualizar();
+})();

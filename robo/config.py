@@ -95,6 +95,11 @@ PADROES: dict = {
         "ligar_robo_ao_abrir": True,
         "notificacoes": True,
     },
+    # acompanhamento pelo celular (somente leitura, só rede de casa/VPN, mesma senha do painel) — robo/painel/celular.py
+    "celular": {
+        "habilitado": False,
+        "porta": 8766,
+    },
     "manutencao": {
         "dias_retencao_originais": 0,
         "dias_retencao_relatorios": 0,

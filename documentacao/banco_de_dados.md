@@ -6,7 +6,7 @@
 
 | Onde | O que guarda | Para quê |
 |---|---|---|
-| `logs/trabalho.db` (SQLite) | **Fonte de tudo**: a memória da empresa (39 tabelas abaixo) | Funciona sem internet e sem servidor; nada se apaga |
+| `logs/trabalho.db` (SQLite) | **Fonte de tudo**: a memória da empresa (40 tabelas abaixo) | Funciona sem internet e sem servidor; nada se apaga |
 | `logs/backups_sqlite/` | Cópia diária do `trabalho.db`, conferida (`integrity_check`) e com SHA-256 | Restaurar se o disco falhar; o 1º de cada mês fica para sempre |
 | PostgreSQL `robo_dados`, schema `robo` | Espelho de TODAS as tabelas (`memoria_<tabela>`) | Consultas em SQL, Power BI e Machine Learning |
 | PostgreSQL schemas `bruto` → `tratado` → `analitico` | As planilhas de negócio (ELT) | Análise e Power BI |
@@ -91,9 +91,11 @@
 | `erros_sistema` | Todo erro de programa (com traceback), agrupado por tipo, ligado a um handover da TI | um tipo de erro (repetição soma ocorrência) | registro com situação (a situação muda; a linha nunca some) | estabilidade do código por versão |
 | `auditorias` | Auditorias por amostragem dos heads (conferido por outro caminho) | uma auditoria | só acrescenta (imutável: não altera nem apaga) | confiança nos resultados publicados |
 | `backups_registro` | Cada backup (SQLite e PostgreSQL): arquivo, SHA-256, linhas e integridade | um backup | só acrescenta (imutável: não altera nem apaga) | prova de que dá para restaurar |
+| `acessos_celular` | Cada tentativa de entrar pelo celular (certa, errada ou bloqueada), com IP e aparelho | uma tentativa de entrada no acompanhamento pelo celular | só acrescenta (imutável: não altera nem apaga) | padrão de uso e detecção de acesso estranho (horário, IP, erros seguidos) |
 
 ## Colunas de cada tabela
 
+- **`acessos_celular`**: `id`, `data_hora`, `ip`, `evento`, `detalhe`, `navegador`
 - **`aprovacoes`**: `id`, `solicitacao_id`, `etapa_id`, `pedido`, `risco`, `solicitante`, `aprovador`, `estado`, `decidido_por`, `decidido_em`, `motivo`, `criada_em`
 - **`arquivos`**: `id`, `conversa_id`, `solicitacao_id`, `caminho`, `nome`, `criado_em`
 - **`artefatos`**: `id`, `solicitacao_id`, `etapa_id`, `caminho`, `tipo`, `descricao`, `criado_em`
