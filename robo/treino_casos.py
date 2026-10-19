@@ -175,6 +175,11 @@ def _v_limpeza(caso, cfg):
     refs = sum(1 for l in linhas for c in (l or ()) if c == "#REF!")
     if caso["parametros"]["defeito"] != bool(refs):
         problemas.append(f"defeito plantado={caso['parametros']['defeito']} mas o arquivo tem {refs} #REF!")
+    if caso["gabarito"]["aprovaria"] != (refs == 0):
+        problemas.append(f"gabarito diz aprovaria={caso['gabarito']['aprovaria']}, mas o arquivo tem {refs} célula(s) #REF!")
+    linhas_ref = sorted(i for i, l in enumerate(linhas, 1) if any(c == "#REF!" for c in (l or ())))
+    if linhas_ref != sorted(caso["gabarito"]["celulas_ref"]):
+        problemas.append(f"#REF! no arquivo nas linhas {linhas_ref}; o gabarito diz {sorted(caso['gabarito']['celulas_ref'])}")
     return problemas
 
 
@@ -439,6 +444,15 @@ def _v_lgpd(caso, cfg):
     for c in caso["parametros"]["iscas"]:
         if any(cpf_valido(v) for v in col.get(c, [])):
             problemas.append(f"isca {c} tem CPF válido (deveria ser só parecido)")
+    # gabarito refeito pelo CONTEÚDO de cada coluna (e-mail, CPF com dígito válido, telefone com DDD) — outro caminho
+    def pessoal(v) -> bool:
+        v = str(v)
+        return bool(re.search(r"[\w.]+@[\w.]+\.\w{2,}", v)) or cpf_valido(v) or \
+            (len(re.sub(r"\D", "", v)) in (10, 11, 12, 13) and "(" in v)
+    refeito = sorted(normalizar_nome_coluna(c) for c, vals in col.items()
+                     if vals and sum(pessoal(v) for v in vals) >= 0.6 * len(vals))
+    if refeito != sorted(caso["gabarito"]["pessoais"]):
+        problemas.append(f"pelo conteúdo, as colunas pessoais são {refeito}; o gabarito diz {sorted(caso['gabarito']['pessoais'])}")
     return problemas
 
 
@@ -507,8 +521,28 @@ def _c_anomalias(caso, r):
 
 
 def _v_anomalias(caso, cfg):
+    """Revisor: relê a planilha crua (N/A e vírgula decimal tratados à mão) e reconta pela regra de Tukey (3×IQR)."""
+    from openpyxl import load_workbook
     if not caso["gabarito"]["por_coluna"]:
         return ["caso sem nenhuma anomalia: não treina nada"]
+    wb = load_workbook(caso["arquivo"], read_only=True)
+    linhas = list(wb.active.iter_rows(values_only=True))
+    wb.close()
+    cab = [str(c) for c in linhas[0]]
+    refeito = {}
+    for c in caso["parametros"]["colunas"]:
+        xs = []
+        for l in linhas[1:]:
+            v = l[cab.index(c)]
+            if v is None or str(v).strip().upper() == "N/A":
+                continue
+            xs.append(float(str(v).replace(",", ".")) if isinstance(v, str) else float(v))
+        lo, hi = _tukey(xs)
+        n = sum(1 for x in xs if x < lo or x > hi)
+        if n:
+            refeito[c] = n
+    if refeito != caso["gabarito"]["por_coluna"]:
+        return [f"recontando no arquivo: {refeito}; o gabarito diz {caso['gabarito']['por_coluna']}"]
     return []
 
 
@@ -576,7 +610,10 @@ def _v_segmentacao(caso, cfg):
         b = min(D[i, rot == j].mean() for j in set(rot.tolist()) if j != rot[i])
         s.append((b - a) / max(a, b))
     sil = float(np.mean(s))
-    return [] if sil >= 0.5 else [f"grupos plantados mal separados (silhueta {sil:.2f} < 0,50)"]
+    problemas = [] if sil >= 0.5 else [f"grupos plantados mal separados (silhueta {sil:.2f} < 0,50)"]
+    if len(set(rot.tolist())) != caso["gabarito"]["k"]:
+        problemas.append(f"foram plantados {len(set(rot.tolist()))} grupo(s); o gabarito diz {caso['gabarito']['k']}")
+    return problemas
 
 
 # =============================================================================== 7. drivers
@@ -710,6 +747,12 @@ def _v_conhecimento(caso, cfg):
         achadas = [l["id"].split(".v")[0] for l in (licoes.buscar(cfg, caso["parametros"].get(chave) or "") or [])[:1]]
         if alvo not in achadas:
             problemas.append(f"{rotulo} não acha esta lição em 1º lugar no índice: caso injusto")
+    with licoes._tb(cfg).tx() as c:  # o título do gabarito é o da lição no caderno (não outro)
+        r = c.execute("SELECT titulo FROM licoes WHERE id=?", (caso["gabarito"]["licao"],)).fetchone()
+    if not r:
+        problemas.append(f"a lição {caso['gabarito']['licao']} do gabarito não existe no caderno")
+    elif r["titulo"] != caso["gabarito"]["titulo"]:
+        problemas.append(f"o título no caderno é “{r['titulo']}”; o gabarito diz “{caso['gabarito']['titulo']}”")
     return problemas
 
 
@@ -759,11 +802,20 @@ def _c_historico(caso, r):
 
 
 def _v_historico(caso, cfg):
+    """Revisor: lê o CSV e a fila de pendentes direto (sem robo.historico) e refaz as 10 últimas execuções."""
     p = Path(caso["parametros"]["logs"]) / "historico_processamentos.csv"
     with open(p, encoding="utf-8-sig", newline="") as f:
-        n = sum(1 for _ in csv.DictReader(f, delimiter=";"))
+        linhas = list(csv.DictReader(f, delimiter=";"))
     esperado = caso["parametros"]["n"] - caso["parametros"]["pendentes"]
-    return [] if n == esperado else [f"CSV gravado com {n} linha(s); deveria ter {esperado}"]
+    problemas = [] if len(linhas) == esperado else [f"CSV gravado com {len(linhas)} linha(s); deveria ter {esperado}"]
+    pend = Path(caso["parametros"]["logs"]) / "historico_pendente.jsonl"
+    if pend.exists():
+        linhas += [json.loads(l) for l in pend.read_text(encoding="utf-8").splitlines() if l.strip()]
+    linhas.sort(key=lambda r: r["data_hora"])
+    refeito = [[r["arquivo"], r["status"]] for r in reversed(linhas)][:10]
+    if refeito != caso["gabarito"]["ultimos"]:
+        problemas.append("as 10 últimas execuções lidas do CSV não batem com o gabarito")
+    return problemas
 
 
 # =============================================================================== 10. ronda de TI
@@ -829,7 +881,15 @@ def _c_ronda_ti(caso, r):
 
 
 def _v_ronda_ti(caso, cfg):
-    return [] if all(p in _PLANTIOS_TI for p in caso["parametros"]["plantados"]) else ["plantio desconhecido"]
+    plantados = caso["parametros"]["plantados"]
+    if not all(p in _PLANTIOS_TI for p in plantados):
+        return ["plantio desconhecido"]
+    if not plantados:
+        return ["nenhum problema plantado"]
+    refeito = {p: (p in plantados) for p in _PLANTIOS_TI}
+    if refeito != caso["gabarito"]["problemas"]:
+        return [f"pelos plantios, o gabarito seria {refeito}; está {caso['gabarito']['problemas']}"]
+    return []
 
 
 # =============================================================================== 11. resumo executivo
@@ -880,7 +940,21 @@ def _c_resumo(caso, r):
 
 
 def _v_resumo(caso, cfg):
-    return [] if caso["gabarito"]["titulos"] else ["caso sem nenhuma parte com resultado"]
+    """Revisor: refaz títulos e números das partes palavra por palavra (sem a expressão regular do gerador)."""
+    partes = caso["parametros"]["partes"]
+    titulos = [p["titulo"] for p in partes if p.get("texto")]
+    numeros = set()
+    for p in partes:
+        for palavra in str(p.get("texto") or "").split():
+            palavra = palavra.strip("-+().:;!?%")
+            if palavra and palavra[0].isdigit():
+                numeros.add(palavra)
+    problemas = [] if titulos else ["caso sem nenhuma parte com resultado"]
+    if titulos != caso["gabarito"]["titulos"]:
+        problemas.append(f"títulos com resultado: {titulos}; o gabarito diz {caso['gabarito']['titulos']}")
+    if sorted(numeros) != caso["gabarito"]["numeros"]:
+        problemas.append(f"números nas partes: {sorted(numeros)}; o gabarito diz {caso['gabarito']['numeros']}")
+    return problemas
 
 
 # =============================================================================== 12. desempenho (RH)
@@ -970,10 +1044,20 @@ def _v_desempenho(caso, cfg):
     problemas = []
     if len(set(caso["parametros"]["pessoas"])) != len(caso["parametros"]["pessoas"]):
         problemas.append("pessoa repetida na semana sintética")
+    from robo.lideranca import EXIGENCIA
+    from robo.memoria import TAXA_MINIMA
     for pid, g in caso["gabarito"]["por_pessoa"].items():
         x = contas.get(pid, {"acerto": 0, "erro": 0})
         if (x["acerto"], x["erro"]) != (g["acertos"], g["erros"]):
             problemas.append(f"{pid}: banco tem {x['acerto']}/{x['erro']}, gabarito diz {g['acertos']}/{g['erros']}")
+        n = x["acerto"] + x["erro"]
+        taxa = round(100 * x["acerto"] / n, 1) if n else None
+        situacao = _situacao_independente(x["acerto"], x["erro"], EXIGENCIA.get(pid, TAXA_MINIMA))
+        if (g["taxa"], g["situacao"]) != (taxa, situacao):
+            problemas.append(f"{pid}: pela política, {taxa}% {situacao}; o gabarito diz {g['taxa']}% {g['situacao']}")
+    com_eventos = sorted(f for f, x in contas.items() if f in caso["parametros"]["pessoas"] and x["acerto"] + x["erro"])
+    if com_eventos != sorted(caso["gabarito"]["por_pessoa"]):
+        problemas.append("as pessoas do gabarito não são as que têm acerto/erro na semana")
     return problemas
 
 
@@ -1054,8 +1138,53 @@ def _c_sql(caso, r):
 
 
 def _v_sql(caso, cfg):
-    df = pd.read_csv(caso["arquivo"])
-    return [] if len(df) else ["tabela vazia"]
+    """Revisor: refaz a conta lendo o CSV com o módulo csv (texto puro, sem pandas), filtro e grupos à mão."""
+    from robo.conferencia import _chave
+    p = caso["parametros"]
+    with open(caso["arquivo"], encoding="utf-8", newline="") as f:
+        linhas = list(csv.DictReader(f))
+    if not linhas:
+        return ["tabela vazia"]
+    grupos: dict = {}
+    for l in linhas:
+        if any(str(l.get(c)) != str(v) for c, _s, v in p["filtros"]):
+            continue
+        if any(l.get(c) in (None, "") for c in p["por"]):
+            continue
+        chave = _chave(tuple(l[c] for c in p["por"])) if p["por"] else "(total)"
+        x = l.get(p["metrica"]) if p["metrica"] else None
+        try:
+            x = float(x) if x not in (None, "") else None
+        except ValueError:
+            x = None
+        grupos.setdefault(chave, []).append(x)
+    refeito = {}
+    for chave, xs in grupos.items():
+        num = [x for x in xs if x is not None and not math.isnan(x)]
+        if p["op"] == "contagem":
+            refeito[chave] = float(len(xs))
+        elif not num:
+            refeito[chave] = float("nan")
+        elif p["op"] == "soma":
+            refeito[chave] = math.fsum(num)
+        elif p["op"] == "media":
+            refeito[chave] = math.fsum(num) / len(num)
+        elif p["op"] == "mediana":
+            o = sorted(num)
+            refeito[chave] = o[len(o) // 2] if len(o) % 2 else (o[len(o) // 2 - 1] + o[len(o) // 2]) / 2
+        elif p["op"] in ("minimo", "maximo"):
+            refeito[chave] = min(num) if p["op"] == "minimo" else max(num)
+        else:
+            return [f"operação {p['op']} sem conferência independente"]
+    g = caso["gabarito"]["valores"]
+    problemas = []
+    if set(refeito) != set(g):
+        problemas.append(f"grupos refeitos {sorted(refeito)[:4]}; o gabarito tem {sorted(g)[:4]}")
+    for chave in set(refeito) & set(g):
+        a, b = refeito[chave], g[chave]
+        if not ((a != a and (b is None or b != b)) or _fechado(a, b, 1e-9)):
+            problemas.append(f"{chave}: conta independente {a}, gabarito {b}")
+    return problemas
 
 
 
@@ -1181,9 +1310,205 @@ def _v_orquestracao(caso, cfg):
     return problemas
 
 
+
+# =============================================================================== 15. revisão de casos (Sala de Casos)
+def revisao_independente(caso: dict, cfg, sha: str | None = None, pasta_tmp: Path | None = None) -> dict:
+    """O exame que a revisora faz em QUALQUER caso, sem gravar nada (função pura, usada pelo treino.revisar e pela
+    ferramenta revisar_caso):
+      1. integridade      — o conteúdo de agora (arquivo + gabarito) é o mesmo que foi gravado (sha da criação)?
+      2. reprodutibilidade — gerado de novo pela semente, sai igual ao gravado?
+      3. conferência      — o gabarito confere por outro caminho (conferir da competência)?"""
+    import shutil
+    import tempfile
+    c = CATALOGO[caso["competencia"]]
+    problemas = []
+    atual = conteudo_hash(caso.get("arquivo"), caso["gabarito"])
+    sha = sha or atual
+    if atual != sha:
+        problemas.append("o conteúdo do caso mudou depois de gravado (arquivo ou gabarito alterado)")
+    tmp = Path(pasta_tmp) if pasta_tmp else Path(tempfile.mkdtemp(prefix="revisao_"))
+    try:
+        shutil.rmtree(tmp, ignore_errors=True)
+        tmp.mkdir(parents=True)
+        de_novo = c.gerar(caso["nivel"], caso["semente"], tmp, cfg)
+        if conteudo_hash(de_novo.get("arquivo"), de_novo["gabarito"]) != sha:
+            problemas.append("refeito pela mesma semente, o caso saiu diferente (não é reprodutível)")
+    except Exception as e:
+        problemas.append(f"não consegui refazer o caso: {type(e).__name__}: {e}")
+    finally:
+        shutil.rmtree(tmp, ignore_errors=True)
+    try:
+        problemas += list(c.conferir(caso, cfg) or [])
+    except Exception as e:
+        problemas.append(f"a conferência independente quebrou: {type(e).__name__}: {e}")
+    return {"aprovado": not problemas, "problemas": problemas}
+
+
+DEFEITOS = {"nenhum": "caso correto (tem que ser aprovado)", "gabarito_grosseiro": "gabarito grosseiramente errado",
+            "gabarito_sutil": "gabarito com erro sutil", "conteudo": "arquivo do caso alterado depois de gravado"}
+
+
+def _folhas_gabarito(o, cam=()):
+    """Folhas alteráveis do gabarito, em ordem fixa (número, verdadeiro/falso, texto ou lista simples)."""
+    if isinstance(o, (bool, int, float, str)):
+        yield cam, o
+    elif isinstance(o, dict):
+        for k in sorted(o, key=str):
+            yield from _folhas_gabarito(o[k], cam + (k,))
+    elif isinstance(o, list):
+        if o and all(not isinstance(x, (dict, list)) for x in o):
+            yield cam, o
+        else:
+            for i, x in enumerate(o):
+                yield from _folhas_gabarito(x, cam + (i,))
+
+
+def _alterar(v, sutil: bool):
+    if isinstance(v, bool):
+        return not v
+    if isinstance(v, int):
+        return v + 1 if sutil else v * 2 + 3
+    if isinstance(v, float):
+        return v + max(abs(v) * 0.005, 0.01) if sutil else v * 2 + 3
+    if isinstance(v, str):
+        return v + " (alterado)"
+    return v[:-1] if v else ["intruso"]
+
+
+def _sabotar_gabarito(gabarito: dict, rng, sutil: bool) -> str:
+    folhas = [(c, v) for c, v in _folhas_gabarito(gabarito) if c]
+    if sutil and any(isinstance(v, (bool, int, float)) for _, v in folhas):
+        folhas = [(c, v) for c, v in folhas if isinstance(v, (bool, int, float))]
+    cam, v = folhas[int(rng.integers(0, len(folhas)))]
+    alvo = gabarito
+    for k in cam[:-1]:
+        alvo = alvo[k]
+    alvo[cam[-1]] = _alterar(v, sutil)
+    return "/".join(map(str, cam))
+
+
+def _sabotar_arquivo(arquivo: str, rng) -> str:
+    """Altera UMA célula de dado do arquivo (depois de o caso ter sido gravado)."""
+    arq = Path(arquivo)
+    if arq.suffix.lower() == ".csv":
+        with open(arq, encoding="utf-8", newline="") as f:
+            linhas = list(csv.reader(f))
+        i = 1 + int(rng.integers(0, len(linhas) - 1))
+        j = int(rng.integers(0, len(linhas[i])))
+        linhas[i][j] = (linhas[i][j] or "0") + "9"
+        with open(arq, "w", encoding="utf-8", newline="") as f:
+            csv.writer(f).writerows(linhas)
+        return f"linha {i + 1}, coluna {j + 1}"
+    from openpyxl import load_workbook
+    wb = load_workbook(arq)
+    ws = wb.active
+    cheias = [(c.row, c.column) for linha in ws.iter_rows(min_row=2) for c in linha if c.value not in (None, "")]
+    r, col = cheias[int(rng.integers(0, len(cheias)))]
+    v = ws.cell(r, col).value
+    ws.cell(r, col, v * 3 + 7 if isinstance(v, (int, float)) and not isinstance(v, bool) else f"{v} alterado")
+    wb.save(arq)
+    return f"célula linha {r}, coluna {col}"
+
+
+def _revisaveis() -> list[str]:
+    """Competências que dá para revisar num computador de teste: o caso não depende do caderno real da empresa."""
+    return [c.id for c in CATALOGO.values() if c.ferramenta != "revisar_caso" and not c.usa_conhecimento_real]
+
+
+def _g_revisao(nivel, semente, pasta, cfg):
+    rng = _rng(semente, nivel, "revisao")
+    if nivel == 1:
+        defeito = "gabarito_grosseiro"
+    elif nivel == 2:
+        defeito = "gabarito_sutil"
+    elif nivel == 3:
+        defeito = "nenhum" if semente % 2 == 0 else "gabarito_sutil"
+    elif nivel == 4:
+        defeito = "conteudo"
+    else:
+        defeito = str(rng.choice(list(DEFEITOS), p=[0.3, 0.2, 0.25, 0.25]))
+    candidatas = _revisaveis()
+    ordem = [candidatas[int(i)] for i in rng.permutation(len(candidatas))]
+    for comp in ordem:
+        sub_nivel, sub_semente = int(rng.integers(1, 6)), int(rng.integers(1, 1_000_000))
+        destino = Path(pasta) / "caso_revisado"
+        import shutil
+        shutil.rmtree(destino, ignore_errors=True)
+        destino.mkdir(parents=True)
+        sub = CATALOGO[comp].gerar(sub_nivel, sub_semente, destino, cfg)
+        if defeito == "conteudo" and not sub.get("arquivo"):
+            continue  # alteração de arquivo só em caso que tem arquivo
+        break
+    sub.update({"competencia": comp, "nivel": sub_nivel, "semente": sub_semente})
+    onde = ""
+    if defeito in ("gabarito_grosseiro", "gabarito_sutil"):
+        onde = _sabotar_gabarito(sub["gabarito"], rng, defeito == "gabarito_sutil")  # o designer gravou a resposta errada
+    sha = conteudo_hash(sub.get("arquivo"), sub["gabarito"])
+    if defeito == "conteudo":
+        onde = _sabotar_arquivo(sub["arquivo"], rng)  # alterado DEPOIS de gravado
+    revisar = {k: sub[k] for k in ("competencia", "nivel", "semente", "parametros", "gabarito", "arquivo") if k in sub}
+    revisar["sha"] = sha
+    return {"arquivo": sub.get("arquivo"), "parametros": {"caso": revisar},
+            "gabarito": {"deve_aprovar": defeito == "nenhum", "defeito": defeito, "onde": onde},
+            "resumo": f"revisar um caso de {CATALOGO[comp].nome} (nível {sub_nivel})"}
+
+
+def _x_revisao(cfg, sb, pid, caso):
+    return _usar("revisar_caso", sb, pid, caso=caso["parametros"]["caso"])
+
+
+def _c_revisao(caso, r):
+    if (e := _excecao(r)):
+        return e
+    d = r.get("dados") or {}
+    if "aprovado" not in d:
+        return (False, 0.0, "nao_revisou", r.get("texto", "")[:200])
+    g = caso["gabarito"]
+    if bool(d["aprovado"]) == g["deve_aprovar"]:
+        return (True, 1.0, "", "aprovou o caso correto" if g["deve_aprovar"] else
+                f"reprovou o caso com defeito ({DEFEITOS[g['defeito']]}): " + "; ".join(d.get("problemas") or [])[:150])
+    if g["deve_aprovar"]:
+        return (False, 0.0, "reprovou_caso_correto", "reprovou um caso correto: " + "; ".join(d.get("problemas") or [])[:200])
+    return (False, 0.0, "aprovou_caso_com_defeito", f"aprovou um caso com defeito: {DEFEITOS[g['defeito']]} ({g['onde']})")
+
+
+def _v_revisao(caso, cfg):
+    """Revisor do caso de revisão: refaz o caso revisado pela semente e confirma, comparando o JSON direto (sem hash),
+    que o defeito prometido existe de verdade — ou que o caso correto está mesmo correto."""
+    import shutil
+    import tempfile
+    sub = caso["parametros"]["caso"]
+    g = caso["gabarito"]
+    tmp = Path(tempfile.mkdtemp(prefix="revisao_v_"))
+    try:
+        refeito = CATALOGO[sub["competencia"]].gerar(sub["nivel"], sub["semente"], tmp, cfg)
+        mesmo_gabarito = json.dumps(refeito["gabarito"], sort_keys=True, default=str) == \
+            json.dumps(sub["gabarito"], sort_keys=True, default=str)
+        mesmo_arquivo = True
+        if sub.get("arquivo"):
+            mesmo_arquivo = conteudo_hash(sub["arquivo"], {}) == conteudo_hash(refeito.get("arquivo"), {})
+    finally:
+        shutil.rmtree(tmp, ignore_errors=True)
+    problemas = []
+    if g["defeito"] not in DEFEITOS:
+        problemas.append(f"defeito desconhecido: {g['defeito']}")
+    if g["deve_aprovar"] != (g["defeito"] == "nenhum"):
+        problemas.append("deve_aprovar não combina com o defeito")
+    if g["defeito"] == "nenhum":
+        if not (mesmo_gabarito and mesmo_arquivo):
+            problemas.append("o caso dito correto não é igual ao refeito pela semente")
+        elif CATALOGO[sub["competencia"]].conferir(sub, cfg):
+            problemas.append("o caso dito correto é reprovado pela própria conferência da competência")
+    elif g["defeito"].startswith("gabarito") and mesmo_gabarito:
+        problemas.append("prometeu gabarito errado, mas o gabarito é o certo")
+    elif g["defeito"] == "conteudo" and mesmo_arquivo:
+        problemas.append("prometeu arquivo alterado, mas o arquivo é igual ao original")
+    return problemas
+
+
 # =============================================================================== catálogo
 CATALOGO: dict[str, Competencia] = {c.id: c for c in [
-    Competencia("limpeza", "Limpar e barrar planilha", "diagnosticar_planilha", "casos_engenharia", "limpeza-1",
+    Competencia("limpeza", "Limpar e barrar planilha", "diagnosticar_planilha", "casos_engenharia", "limpeza-2",
                 {1: "título, R$, data em texto, duplicata, Total", 2: "+ nulos '-'/'N/A', subtotal, espaços; às vezes #REF!",
                  3: "+ número americano, datas misturadas, coluna vazia, rodapé", 4: "+ SAP '1.234,56-', '−' de PDF, 'R$ 1,2 mil'",
                  5: "nível 4 + fórmula quebrada que TEM que barrar"},
@@ -1195,30 +1520,30 @@ CATALOGO: dict[str, Competencia] = {c.id: c for c in [
     Competencia("indicadores", "NPS com a base certa", "perfil_indicadores", "casos_analytics", "indicadores-2",
                 {1: "NPS limpo", 2: "+ vazios", 3: "+ código 99 (não sabe)", 4: "+ sujeira de sistema", 5: "tudo junto"},
                 _g_indicadores, _x_indicadores, _c_indicadores, _v_indicadores, descricao="NPS e base (n) certos."),
-    Competencia("lgpd", "Achar dado pessoal", "dados_pessoais", "casos_governanca", "lgpd-1",
+    Competencia("lgpd", "Achar dado pessoal", "dados_pessoais", "casos_governanca", "lgpd-2",
                 {1: "colunas com nome óbvio", 2: "nomes neutros", 3: "formatos crus (+55, só dígitos)",
                  4: "+ isca com cara de CPF (dígito inválido)", 5: "+ e-mail escondido em texto livre"},
                 _g_lgpd, _x_lgpd, _c_lgpd, _v_lgpd, descricao="Apontar exatamente as colunas com dado pessoal (nem mais, nem menos)."),
-    Competencia("anomalias", "Achar anomalias", "anomalias", "casos_analytics", "anomalias-1",
+    Competencia("anomalias", "Achar anomalias", "anomalias", "casos_analytics", "anomalias-2",
                 {1: "1 valor absurdo", 2: "vários em 2 colunas", 3: "distribuição assimétrica", 4: "+ 'N/A' e vírgula decimal",
                  5: "+ anomalias para baixo"}, _g_anomalias, _x_anomalias, _c_anomalias, _v_anomalias,
                 descricao="Regra de Tukey (3×IQR): quantas fora da faixa em cada coluna."),
-    Competencia("segmentacao", "Achar os perfis", "segmentacao", "casos_analytics", "segmentacao-2",
+    Competencia("segmentacao", "Achar os perfis", "segmentacao", "casos_analytics", "segmentacao-3",
                 {1: "2 perfis", 2: "3 perfis", 3: "3 perfis + coluna de ruído", 4: "4 perfis", 5: "4 perfis mais próximos"},
                 _g_segmentacao, _x_segmentacao, _c_segmentacao, _v_segmentacao, descricao="Número certo de grupos plantados."),
     Competencia("drivers", "Achar o que move o NPS", "drivers", "casos_analytics", "drivers-1",
                 {1: "3 atributos, pouco ruído", 2: "mais ruído", 3: "5 atributos", 4: "+ distrator correlacionado",
                  5: "+ vazios"}, _g_drivers, _x_drivers, _c_drivers, _v_drivers, descricao="O 1º driver é o plantado."),
-    Competencia("conhecimento", "Achar o conhecimento certo", "conhecimento", "casos_governanca", "conhecimento-3",
+    Competencia("conhecimento", "Achar o conhecimento certo", "conhecimento", "casos_governanca", "conhecimento-4",
                 {1: "pergunta exata", 2: "palavras embaralhadas, sem acento", 3: "só 60% das palavras",
                  4: "+ erro de digitação", 5: "metade das palavras + erro"},
                 _g_conhecimento, _x_conhecimento, _c_conhecimento, _v_conhecimento, usa_conhecimento_real=True,
                 descricao="Recuperar a lição certa do caderno da empresa (não conta como 'aplicada')."),
-    Competencia("historico", "Ler o histórico", "historico", "casos_engenharia", "historico-1",
+    Competencia("historico", "Ler o histórico", "historico", "casos_engenharia", "historico-2",
                 {1: "15 execuções", 2: "200 execuções", 3: "+ linhas esperando o CSV fechar", 4: "3.000 execuções",
                  5: "nomes com ';' e aspas + pendentes"}, _g_historico, _x_historico, _c_historico, _v_historico,
                 descricao="As 10 últimas execuções, na ordem certa."),
-    Competencia("ronda_ti", "Ronda de TI", "ronda_ti", "casos_ti", "ronda-1",
+    Competencia("ronda_ti", "Ronda de TI", "ronda_ti", "casos_ti", "ronda-2",
                 {1: "painel sem senha", 2: "+ senha do banco no config", 3: "+ erros no log", 4: "+ código novo sem aviso",
                  5: "problemas sorteados (achar também o que NÃO existe)"}, _g_ronda_ti, _x_ronda_ti, _c_ronda_ti, _v_ronda_ti,
                 descricao="Detectar exatamente os problemas plantados no computador de teste."),
@@ -1227,15 +1552,20 @@ CATALOGO: dict[str, Competencia] = {c.id: c for c in [
                  "histórico curto", 5: "quantidades sorteadas + rotina perto do limite (achar também o que NÃO é problema)"},
                 _g_orquestracao, _x_orquestracao, _c_orquestracao, _v_orquestracao,
                 descricao="Apontar exatamente as rotinas atrasadas, com erro e lentas pela regra de SLA — nenhuma isca."),
-    Competencia("resumo_executivo", "Resumo sem inventar", "resumo_executivo", "casos_governanca", "resumo-1",
+    Competencia("resumo_executivo", "Resumo sem inventar", "resumo_executivo", "casos_governanca", "resumo-2",
                 {1: "2 resultados", 2: "3 resultados", 3: "+ uma etapa que falhou", 4: "+ etapa vazia", 5: "8 resultados"},
                 _g_resumo, _x_resumo, _c_resumo, _v_resumo, descricao="Todas as partes, nenhum número que não veio das etapas."),
-    Competencia("desempenho", "Conta de desempenho (RH)", "desempenho", "casos_governanca", "desempenho-2",
+    Competencia("desempenho", "Conta de desempenho (RH)", "desempenho", "casos_governanca", "desempenho-3",
                 {1: "4 pessoas", 2: "12 pessoas", 3: "+ eventos fora da janela de 7 dias", 4: "+ tipos que não contam",
                  5: "+ exigência de 90% no limite"}, _g_desempenho, _x_desempenho, _c_desempenho, _v_desempenho,
                 descricao="Taxa e situação de cada pessoa pela regra da política de RH."),
-    Competencia("sql", "Mesma conta em SQL", "consulta_sql", "casos_engenharia", "sql-1",
+    Competencia("sql", "Mesma conta em SQL", "consulta_sql", "casos_engenharia", "sql-2",
                 {1: "conta por segmento", 2: "com filtro", 3: "contagem", 4: "filtro com apóstrofo (d'Oeste)",
                  5: "dois segmentos"}, _g_sql, _x_sql, _c_sql, _v_sql, requer_banco=True,
                 descricao="O SQL gerado roda no PostgreSQL (somente leitura) e bate com a verdade."),
+    Competencia("revisao_casos", "Revisar caso de treino", "revisar_caso", "casos_governanca", "revisao-1",
+                {1: "gabarito grosseiramente errado", 2: "gabarito com erro sutil", 3: "caso correto ou erro sutil "
+                 "(aprovar o certo também conta)", 4: "arquivo alterado depois de gravado",
+                 5: "mistura sorteada, com casos corretos"}, _g_revisao, _x_revisao, _c_revisao, _v_revisao,
+                descricao="Sala de Casos: integridade, reprodutibilidade e conferência — reprovar o caso com defeito e aprovar o certo."),
 ]}

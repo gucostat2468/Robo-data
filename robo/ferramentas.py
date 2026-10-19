@@ -391,6 +391,15 @@ def f_orquestracao(cfg, **_) -> dict:
                      evidencia="registros de rotinas_execucoes, rotinas_estado e sessoes deste computador")
 
 
+def f_revisar_caso(cfg, caso: dict | None = None, **_) -> dict:
+    """Revisão independente de um caso de treino (Sala de Casos): integridade, reprodutibilidade e conferência."""
+    from robo.treino_casos import revisao_independente
+    r = revisao_independente(caso, cfg, sha=caso.get("sha"))
+    texto = "Caso aprovado: íntegro, reprodutível e com gabarito conferido." if r["aprovado"] else \
+        "Caso reprovado: " + "; ".join(r["problemas"][:3])
+    return resultado(True, "ferramenta", texto, r, evidencia="caso refeito pela semente e conferido por outro caminho")
+
+
 def f_organizacao(cfg, **_) -> dict:
     from robo import organizacao
     lot = organizacao.lotacao(cfg)
@@ -648,6 +657,8 @@ REGISTRO: dict[str, Ferramenta] = {f.id: f for f in [
     Ferramenta("ronda_ti", "Ronda de TI", "Verificações de saúde do computador e do robô", "baixo", False, f_ronda_ti),
     Ferramenta("orquestracao", "SLA das rotinas (Airflow)", "Rotinas atrasadas, com erro ou lentas, pelos registros",
                "baixo", False, f_orquestracao),
+    Ferramenta("revisar_caso", "Revisar caso de treino", "Integridade, reprodutibilidade e conferência de um caso",
+               "baixo", False, f_revisar_caso, ["caso"]),
     Ferramenta("reuniao_andar", "Reunião ao vivo", "Situação de agora do andar: certo, errado, andamento, plano e PDCA",
                "baixo", False, f_reuniao_andar),
     Ferramenta("ideias", "Ideias para o futuro", "Propostas tiradas da memória de todos, com o dado de origem",
