@@ -1,0 +1,49 @@
+{
+  "name": "Robô de Planilhas · Dark Premium",
+  "dataColors": ["#8B5CF6", "#0D9488", "#D97706", "#E11D48", "#3B82F6", "#A1A1AA"],
+  "background": "#27272A",
+  "foreground": "#F4F4F5",
+  "tableAccent": "#9D5CF5",
+  "good": "#4CC272",
+  "neutral": "#E6C558",
+  "bad": "#E06666",
+  "maximum": "#9D5CF5",
+  "center": "#3F3F46",
+  "minimum": "#27272A",
+  "textClasses": {
+    "callout": { "fontFace": "Segoe UI Semibold", "fontSize": 28, "color": "#F4F4F5" },
+    "title": { "fontFace": "Segoe UI Semibold", "fontSize": 11, "color": "#A1A1AA" },
+    "header": { "fontFace": "Segoe UI Semibold", "fontSize": 11, "color": "#A1A1AA" },
+    "label": { "fontFace": "Segoe UI", "fontSize": 10, "color": "#A1A1AA" }
+  },
+  "visualStyles": {
+    "*": {
+      "*": {
+        "background": [{ "show": false, "transparency": 100 }],
+        "border": [{ "show": false }],
+        "dropShadow": [{ "show": false }],
+        "title": [{ "show": false }]
+      }
+    },
+    "page": {
+      "*": {
+        "background": [{ "transparency": 0 }],
+        "outspace": [{ "color": { "solid": { "color": "#18181B" } } }]
+      }
+    },
+    "tableEx": {
+      "*": {
+        "grid": [{ "gridHorizontal": true, "gridHorizontalColor": { "solid": { "color": "#34343A" } }, "gridVertical": false, "rowPadding": 6 }],
+        "columnHeaders": [{ "fontColor": { "solid": { "color": "#A1A1AA" } }, "backColor": { "solid": { "color": "#27272A" } } }],
+        "values": [{ "fontColorPrimary": { "solid": { "color": "#F4F4F5" } }, "backColorPrimary": { "solid": { "color": "#27272A" } },
+                     "fontColorSecondary": { "solid": { "color": "#F4F4F5" } }, "backColorSecondary": { "solid": { "color": "#27272A" } } }]
+      }
+    },
+    "slicer": {
+      "*": {
+        "items": [{ "fontColor": { "solid": { "color": "#F4F4F5" } }, "background": { "solid": { "color": "#27272A" } } }],
+        "header": [{ "show": false }]
+      }
+    }
+  }
+}
