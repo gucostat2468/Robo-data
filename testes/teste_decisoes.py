@@ -110,3 +110,18 @@ def teste_plano_da_semanal_vira_decisao_ligada_ao_handover(cfg, planilha_bagunca
     from datetime import datetime
     reuniao.gerar(c2, ate=datetime.now() + timedelta(days=7))  # a semanal seguinte não duplica a mesma pendência
     assert len([d for d in decisoes.listar(c2) if d["origem"] == "semanal"]) == len(ds)
+
+
+def teste_so_o_dono_da_como_cumprida_e_com_evidencia(cfg):
+    r = sala.abrir(cfg, 4)
+    d = decisoes.registrar(cfg, "combinar com o fornecedor o novo layout da pesquisa", "ger_operacoes", _em(5),
+                           "fornecedor confirma o layout por e-mail", 4, "R0")
+    with pytest.raises(PermissionError):
+        decisoes.concluir(cfg, d["id"], "e-mail recebido em 20/10", r["conversa_id"], quem="ger_operacoes")
+    with pytest.raises(ValueError):
+        sala.concluir_decisao(cfg, r["conversa_id"], d["id"], "ok")
+    sala.concluir_decisao(cfg, r["conversa_id"], d["id"], "e-mail do fornecedor de 20/10 na pasta Pesquisas/2026")
+    x = next(y for y in decisoes.listar(cfg, 4) if y["id"] == d["id"])
+    assert x["estado"] == "cumprida" and x["evidencia"].startswith("declarada pelo dono")
+    decisoes.atualizar(cfg)  # a apuração automática não desfaz o que o dono declarou
+    assert next(y for y in decisoes.listar(cfg, 4) if y["id"] == d["id"])["estado"] == "cumprida"

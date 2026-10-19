@@ -203,6 +203,21 @@ def cancelar(cfg, did: str, motivo: str, reuniao_id: str, quem: str = "dono") ->
     return {"ok": True}
 
 
+def concluir(cfg, did: str, evidencia: str, reuniao_id: str, quem: str = "dono") -> dict:
+    """Para o que o robô não executa sozinho (ex.: combinar com o fornecedor): só VOCÊ dá como cumprida, e só com a
+    evidência escrita. Fica marcada como declarada pelo dono — diferente da cumprida apurada pelos registros."""
+    if quem != "dono":
+        raise PermissionError("Só o dono dá uma decisão como cumprida sem a prova automática.")
+    if len((evidencia or "").strip()) < 15:
+        raise ValueError("Diga qual é a evidência de que foi feito (onde ver, o que mudou).")
+    with _tb(cfg).tx() as c:
+        d = _aberta(c, did)
+        texto = f"declarada pelo dono com evidência: {evidencia.strip()}"
+        c.execute("UPDATE decisoes SET estado='cumprida', estado_em=?, evidencia=? WHERE id=?", (_agora(), texto[:600], did))
+        _evento(c, did, "cumprida_pelo_dono", d["estado"], "cumprida", quem, reuniao_id, evidencia.strip())
+    return {"ok": True}
+
+
 def nao_tratadas(cfg, andar: int, reuniao_id: str) -> list[dict]:
     """Atrasadas do andar que esta reunião ainda não repactuou nem cancelou."""
     atualizar(cfg)

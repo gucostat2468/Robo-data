@@ -115,10 +115,11 @@ function painelNotas(s) {
       <b>${esc(d.id)}</b> ${esc(d.texto)} <span class="muted">· ${esc(d.dono_nome)} · prazo ${esc(d.prazo.split("-").reverse().join("/"))}
       ${d.dias_para_o_prazo < 0 ? `(${-d.dias_para_o_prazo} dia(s) de atraso)` : `(faltam ${d.dias_para_o_prazo})`} · pronto quando: ${esc(d.criterio)}${d.repactuacoes ? ` · repactuada ${d.repactuacoes}x` : ""}</span>
       ${fechada ? "" : `<div class="acoes" style="margin-top:4px"><button class="btn pequeno" data-acao="sala-repactuar" data-id="${esc(d.id)}">Novo prazo</button>
+        <button class="btn pequeno" data-acao="sala-concluir-decisao" data-id="${esc(d.id)}">Cumprida (com evidência)</button>
         <button class="btn pequeno" data-acao="sala-cancelar-decisao" data-id="${esc(d.id)}">Cancelar</button></div>`}</li>`).join("") || "<li class='muted'>Nenhuma decisão aberta neste andar.</li>"}</ul>
     <div class="secao-titulo" style="margin-top:12px">Decisões desta reunião (viram tarefa na central)</div>
     <ul class="lista-ficha">${tarefas.map((t) => `<li><button class="btn pequeno" data-acao="ver-solicitacao" data-id="${esc(t.id)}">${esc(t.id)}</button> ${t.decisao ? `<b>${esc(t.decisao)}</b> ` : ""}${esc(nomeNaSala(t.responsavel))}: ${esc(t.texto)}
-      ${t.prazo ? `<span class="muted">· prazo ${esc(t.prazo.split("-").reverse().join("/"))} · pronto quando: ${esc(t.criterio || "")}</span>` : ""} ${t.estado ? etiquetaEstado(t.estado) : ""}</li>`).join("") || "<li class='muted'>Nenhuma decisão ainda.</li>"}</ul>
+      ${t.prazo ? `<span class="muted">· prazo ${esc(t.prazo.split("-").reverse().join("/"))} · pronto quando: ${esc(t.criterio || "")}</span>` : ""} ${t.estado ? etiquetaEstado(t.estado, t.estado_nome) : ""}</li>`).join("") || "<li class='muted'>Nenhuma decisão ainda.</li>"}</ul>
     ${fechada ? "" : `<label>O que foi decidido<input id="sala-tarefa" placeholder="Ex.: padronizar a coluna de data da base nps_outubro"></label>
       <label>Dono (quem faz)<select id="sala-tarefa-resp">${s.pessoas.map((p) => `<option value="${esc(p.id)}">${esc(p.nome)} · ${esc(p.cargo)}</option>`).join("")}
         ${Object.entries(E.nomes || {}).filter(([id]) => !s.contexto.participantes.includes(id)).map(([id, n]) => `<option value="${esc(id)}">${esc(n)}</option>`).join("")}</select></label>
@@ -253,6 +254,9 @@ Object.assign(ACOES, {
     const prazo = prompt("Novo prazo (dd/mm/aaaa):"); if (!prazo) return;
     const motivo = prompt("Motivo do novo prazo (o que mudou)?"); if (!motivo) return;
     await salaAcao("repactuar", { id: el.dataset.id, prazo, motivo }); avisar("Novo prazo registrado.", "sucesso"); }),
+  "sala-concluir-decisao": (el) => comSala(el, async () => {
+    const evidencia = prompt("Qual é a evidência de que foi feito (onde ver, o que mudou)?"); if (!evidencia) return;
+    await salaAcao("concluir_decisao", { id: el.dataset.id, evidencia }); avisar("Decisão cumprida (declarada por você, com evidência).", "sucesso"); }),
   "sala-cancelar-decisao": (el) => comSala(el, async () => {
     const motivo = prompt("Por que cancelar esta decisão?"); if (!motivo) return;
     await salaAcao("cancelar_decisao", { id: el.dataset.id, motivo }); avisar("Decisão cancelada (o registro fica).", "sucesso"); }),

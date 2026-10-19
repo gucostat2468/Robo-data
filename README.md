@@ -168,11 +168,16 @@ regras:
    - **Password:** crie uma senha e **anote** (é a do usuário `postgres`);
    - **Port:** deixe `5432`;
    - no final, desmarque o *Stack Builder*.
-3. No painel: **Configurações → Banco de dados PostgreSQL** → ligue a chave e preencha:
-   servidor `127.0.0.1`, porta `5432`, banco `robo_dados`, usuário `postgres` e a senha → **Testar conexão** → **Salvar**.
-4. Mais seguro (recomendado pelo time de segurança): em vez de gravar a senha no arquivo, crie a variável de ambiente
-   do Windows `ROBO_PG_SENHA` (Iniciar → digite "variáveis de ambiente" → **Editar as variáveis de ambiente para sua conta**
-   → **Novo** → nome `ROBO_PG_SENHA`, valor = sua senha → OK) e deixe o campo de senha vazio. Reinicie o robô.
+3. **Recomendado:** abra o Prompt de Comando na pasta do robô e rode `python -m robo instalar-banco` (digite a senha do
+   `postgres`). Ele cria o banco `robo_dados`, o usuário `robo_app` (o robô grava com ele, não com o administrador) e o
+   `robo_leitura` (só lê: painel e Power BI), dá as permissões, grava as senhas nas variáveis de ambiente do Windows
+   (`ROBO_PG_SENHA` e `ROBO_PG_SENHA_LEITURA`), prova que o de leitura não escreve e copia a memória inteira.
+   **Guarde as duas senhas que ele mostra** (num gerenciador de senhas) e reinicie o robô.
+4. Alternativa manual: **Configurações → Banco de dados PostgreSQL** → servidor `127.0.0.1`, porta `5432`, banco
+   `robo_dados`, usuário e senha em `ROBO_PG_SENHA` (nunca no arquivo) → **Testar conexão** → **Salvar**.
+
+Tudo sobre o banco (cada tabela, proteção, backup, restauração e ML): `documentacao/banco_de_dados.md` e
+`documentacao/boas_praticas_operacao.md`. No painel: **Banco da empresa**.
 
 Onde isso fica gravado: seção `banco:` do `config.yaml` (`habilitado: true`, `host`, `porta`, `banco`, `usuario`).
 

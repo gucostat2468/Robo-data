@@ -84,4 +84,11 @@ Legenda: ✅ feito e testado · 🟡 feito em parte · ⏳ pendente
 | 78 | Correção minha no chat valendo para todos | ✅ | vira proposta; aprovada, todo cálculo da empresa usa e avisa; o 1º cálculo comprova |
 | 79 | Fechar os itens abertos da auditoria | ✅ | os 6, mais 9 achados novos (N1–N9 em `documentacao/auditoria_e_gestao.md`) |
 | 80 | Alerta quando alguém piora | ✅ | queda de 5 pontos ou mais → mão levantada na reunião do andar, com nomes e números |
+| 81 | Como está o banco e como está organizado | ✅ | página **Banco da empresa** (ao vivo) + `documentacao/banco_de_dados.md` (gerado do código, 40 tabelas) |
+| 82 | Nunca perder nada (base para Machine Learning) | ✅ | toda tabela recusa DELETE (inclusive as futuras); backup diário conferido do SQLite; 1º backup do mês para sempre; espelho completo no PostgreSQL; originais guardados para sempre |
+| 83 | Treino contínuo de todos, no nível de cada um, sem planilha real | ✅ | `robo/treino.py`: 13 competências × 5 níveis, casos sintéticos com gabarito, a ferramenta real do contrato, nível sobe/desce com prova |
+| 84 | Uma sala de quem prepara os trabalhos, que saiba mais que todos | ✅ | Sala de Casos (4º andar): designers certificados no nível desafio, revisora independente, planejadora |
+| 85 | Reuniões levadas a sério | ✅ | decisão com dono, prazo e critério; reunião abre cobrando; atrasada não passa em branco; ata com SHA-256 |
+| 86 | Criar o banco real e passar as variáveis | ✅ | `python -m robo instalar-banco` (usuários robo_app e robo_leitura, senhas em variáveis de ambiente) |
+| 87 | Boas práticas para tudo | ✅ | `documentacao/boas_praticas_operacao.md` |
 | 38 | IA opcional sem fingir | 🟡 | `robo/ia.py`: só modelo local, desligado; ainda não usado nas respostas |

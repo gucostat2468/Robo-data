@@ -1079,6 +1079,8 @@ class Api:
                                          str(b.get("prazo") or ""), str(b.get("criterio") or ""))
             if acao == "repactuar":
                 return sala.repactuar(self.cfg, cid, str(b.get("id") or ""), str(b.get("prazo") or ""), str(b.get("motivo") or ""))
+            if acao == "concluir_decisao":
+                return sala.concluir_decisao(self.cfg, cid, str(b.get("id") or ""), str(b.get("evidencia") or ""))
             if acao == "cancelar_decisao":
                 return sala.cancelar_decisao(self.cfg, cid, str(b.get("id") or ""), str(b.get("motivo") or ""))
             if acao == "encerrar":

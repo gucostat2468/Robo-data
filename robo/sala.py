@@ -385,6 +385,15 @@ def repactuar(cfg, cid: str, decisao_id: str, novo_prazo, motivo: str) -> dict:
     return r
 
 
+def concluir_decisao(cfg, cid: str, decisao_id: str, evidencia: str) -> dict:
+    from robo import decisoes
+    tb, conv = _sala(cfg, cid)
+    r = decisoes.concluir(cfg, decisao_id, evidencia, cid, "dono")
+    tb.mensagem(cid, "dono", f"✔️ {decisao_id} cumprida (declarada pelo dono). Evidência: {evidencia}", "", {})
+    _evento(tb, cid, "dono", "concluir_decisao", {"id": decisao_id, "evidencia": evidencia[:500]})
+    return r
+
+
 def cancelar_decisao(cfg, cid: str, decisao_id: str, motivo: str) -> dict:
     from robo import decisoes
     tb, conv = _sala(cfg, cid)
@@ -474,7 +483,7 @@ def _eventos_decisao(cfg, cid: str) -> list[dict]:
     from robo import decisoes
     with decisoes._tb(cfg).tx() as c:
         return [dict(r) for r in c.execute("SELECT * FROM decisoes_eventos WHERE reuniao_id=? AND tipo IN "
-                                           "('repactuada','cancelada') ORDER BY id", (cid,))]
+                                           "('repactuada','cancelada','cumprida_pelo_dono') ORDER BY id", (cid,))]
 
 
 def falar(cfg, conversa_id: str, texto: str, para: str | None = None) -> dict:
@@ -511,6 +520,7 @@ def detalhes(cfg, conversa_id: str) -> dict | None:
     for t in conv["contexto"].get("tarefas") or []:
         sol = tb.solicitacao(t["id"]) if hasattr(tb, "solicitacao") else None
         t["estado"] = (sol or {}).get("estado", "")
+        t["estado_nome"] = (sol or {}).get("estado_nome", "")
     from robo import decisoes
     conv["decisoes_pendentes"] = decisoes.listar(cfg, conv["contexto"].get("andar"), abertas=True)
     conv["eventos"] = evs[-200:]

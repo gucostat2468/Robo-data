@@ -366,13 +366,14 @@ def teste_instalar_banco_real_com_usuario_so_leitura(tmp_path, cfg_factory, banc
     from robo import instalacao_banco
     sufixo = banco_cfg["banco"].split("_")[-1]
     app, leitura = f"robo_app_{sufixo}", f"robo_leitura_{sufixo}"
+    demo = f"{banco_cfg['banco']}_demo"
     base = cfg_factory()
     base.criar_pastas()
     caminho = tmp_path / "config.yaml"
     caminho.write_text(yaml.safe_dump(base.dados, allow_unicode=True), encoding="utf-8")
     try:
         r = instalacao_banco.instalar(caminho, banco_cfg["usuario"], banco_cfg["senha"], banco_cfg["host"], banco_cfg["porta"],
-                                      banco_cfg["banco"], app, leitura, gravar_variaveis=False)
+                                      banco_cfg["banco"], app, leitura, gravar_variaveis=False, banco_demonstracao=demo)
         assert r["ok"] and any("recusou" in p for p in r["passos"])
         b = yaml.safe_load(caminho.read_text(encoding="utf-8"))["banco"]
         assert b["habilitado"] and b["usuario"] == app and b["usuario_leitura"] == leitura and not b.get("senha")
@@ -380,11 +381,15 @@ def teste_instalar_banco_real_com_usuario_so_leitura(tmp_path, cfg_factory, banc
         with psycopg.connect(host=banco_cfg["host"], port=banco_cfg["porta"], user=leitura, password=r["senhas"][leitura],
                              dbname=banco_cfg["banco"]) as c:
             assert c.execute("SELECT count(*) FROM robo.memoria_experiencias").fetchone()[0] >= 0  # lê
+        with psycopg.connect(host=banco_cfg["host"], port=banco_cfg["porta"], user=app, password=r["senhas"][app],
+                             dbname=demo, autocommit=True) as c:  # o modo demonstração tem banco próprio e o robo_app grava nele
+            c.execute("CREATE TABLE robo.prova_demo (x int)")
         instalacao_banco.instalar(caminho, banco_cfg["usuario"], banco_cfg["senha"], banco_cfg["host"], banco_cfg["porta"],
-                                  banco_cfg["banco"], app, leitura, gravar_variaveis=False)  # rodar de novo não estraga
+                                  banco_cfg["banco"], app, leitura, gravar_variaveis=False, banco_demonstracao=demo)  # rodar de novo não estraga
     finally:
         with psycopg.connect(host=banco_cfg["host"], port=banco_cfg["porta"], user=banco_cfg["usuario"],
                              password=banco_cfg["senha"], dbname="postgres", autocommit=True) as c:
-            c.execute(f'DROP DATABASE IF EXISTS "{banco_cfg["banco"]}" WITH (FORCE)')
+            for nome in (banco_cfg["banco"], demo):
+                c.execute(f'DROP DATABASE IF EXISTS "{nome}" WITH (FORCE)')
             for papel in (app, leitura):
                 c.execute(f'DROP ROLE IF EXISTS "{papel}"')
