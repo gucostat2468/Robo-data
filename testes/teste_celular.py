@@ -82,7 +82,8 @@ def teste_fluxo_completo_somente_leitura(servidor):
     assert cab["Cache-Control"] == "no-store"
     for arq in ("/celular.js", "/celular.css", "/robo.svg", "/manifest.webmanifest"):
         assert _pedir(porta, "GET", arq)[0] == 200, arq
-    assert _pedir(porta, "GET", "/api/resumo")[0] == 401
+    st, _, corpo = _pedir(porta, "GET", "/api/resumo")
+    assert st == 200 and json.loads(corpo) == {"erro": "Entre com a senha do painel.", "login": True}  # sem dado nenhum
     # nenhuma rota do painel principal existe aqui (nem para ler, nem para mudar)
     for metodo, rota in (("GET", "/api/historico"), ("POST", "/api/robo/pausar"), ("POST", "/api/consultas/executar"),
                          ("GET", "/../config.yaml"), ("GET", "/inicio.html"), ("POST", "/api/login")):
@@ -94,11 +95,13 @@ def teste_fluxo_completo_somente_leitura(servidor):
     cookie = cab["Set-Cookie"].split(";")[0]
     st, _, corpo = _pedir(porta, "GET", "/api/resumo", cookie=cookie)
     r = json.loads(corpo)
-    assert st == 200 and {"robo", "rotinas", "treino", "planilhas", "ti", "decisoes", "backup"} <= set(r)
+    assert st == 200 and {"robo", "rotinas", "treino", "planilhas", "ti", "decisoes", "backup", "ao_vivo", "andares",
+                          "gente"} <= set(r)
+    assert isinstance(r["ao_vivo"], list) and isinstance(r["andares"], list) and "conversas" in r["gente"]
     assert r["robo"] == {"ligado": None, "fila": None} and isinstance(r["rotinas"]["atrasadas"], list)
     assert "tentativas_24h" in r["treino"] and r["decisoes"]["abertas"] == 0
     assert _pedir(porta, "POST", "/sair", cookie=cookie)[0] == 200
-    assert _pedir(porta, "GET", "/api/resumo", cookie=cookie)[0] == 401  # saiu = sessão morta
+    assert json.loads(_pedir(porta, "GET", "/api/resumo", cookie=cookie)[2]).get("login") is True  # saiu = sessão morta
     eventos = [a["evento"] for a in celular.acessos(cfg)]
     assert eventos == ["entrou", "senha_errada"] and celular.acessos(cfg)[0]["navegador"] == "iPhone teste"
 

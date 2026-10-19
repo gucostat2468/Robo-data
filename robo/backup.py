@@ -221,6 +221,81 @@ def backup_sqlite(cfg) -> dict:
     return r
 
 
+TABELAS_COM_HISTORIA = ("treino_tentativas", "experiencias", "rotinas_execucoes", "licoes_funcionario", "decisoes")
+
+
+def _contagens(caminho: Path) -> tuple[str, dict]:
+    import sqlite3
+    con = sqlite3.connect(f"file:{caminho}?mode=ro", uri=True)
+    try:
+        integridade = con.execute("PRAGMA integrity_check").fetchone()[0]
+        tabelas = [r[0] for r in con.execute("SELECT name FROM sqlite_master WHERE type='table' AND name NOT LIKE 'sqlite_%'")]
+        return integridade, {t: con.execute(f'SELECT COUNT(*) FROM "{t}"').fetchone()[0] for t in tabelas}
+    finally:
+        con.close()
+
+
+def restaurar_sqlite(cfg, arquivo: Path, substituir: bool = False) -> dict:
+    """Traz para este computador a memória da empresa de um backup (trabalho_*.db.gz ou .db) — ex.: a memória criada em
+    outro computador. Nada se perde:
+      - o arquivo é descompactado numa cópia temporária e conferido (integridade e, se houver manifesto, SHA-256);
+      - se este computador JÁ tem história registrada, recusa — a não ser com substituir=True, que antes faz um backup
+        da memória atual e guarda o arquivo atual renomeado (nunca apaga);
+      - recusa com o robô aberto (o arquivo estaria em uso)."""
+    import hashlib
+    import shutil
+    from robo.monitor import TravaInstancia
+    arquivo = Path(arquivo)
+    if not arquivo.exists():
+        raise FileNotFoundError(f"não achei {arquivo}")
+    logs = Path(cfg.logs)
+    destino = logs / "trabalho.db"
+    temp = logs / f"restauracao_{datetime.now():%Y%m%d_%H%M%S}.db.parcial"
+    logs.mkdir(parents=True, exist_ok=True)
+    with TravaInstancia(logs):  # levanta erro claro se o robô estiver aberto
+        h = hashlib.sha256()
+        abrir = gzip.open if arquivo.suffix == ".gz" else open
+        with abrir(arquivo, "rb") as f, open(temp, "wb") as g:
+            for bloco in iter(lambda: f.read(1 << 20), b""):
+                h.update(bloco)
+                g.write(bloco)
+        try:
+            manifesto = arquivo.with_name(arquivo.name.replace(".db.gz", ".db").replace(".db", ".db.manifesto.json", 1))
+            esperado = json.loads(manifesto.read_text(encoding="utf-8")).get("sha256") if manifesto.exists() else None
+            if esperado and esperado != h.hexdigest():
+                raise ValueError(f"o SHA-256 não confere com o manifesto ({manifesto.name}): arquivo corrompido ou alterado")
+            integridade, contagens = _contagens(temp)
+            if integridade != "ok":
+                raise ValueError(f"o backup não passou na conferência de integridade: {integridade}")
+            passos = [f"backup conferido: integridade ok, {len(contagens)} tabelas, {sum(contagens.values())} linhas"
+                      + (", SHA-256 igual ao manifesto" if esperado else "")]
+            if destino.exists():
+                _, atuais = _contagens(destino)
+                historia = {t: atuais.get(t, 0) for t in TABELAS_COM_HISTORIA if atuais.get(t)}
+                if historia and not substituir:
+                    raise ValueError("este computador já tem história registrada (" + ", ".join(f"{t}: {n}" for t, n in historia.items())
+                                     + "). Nada foi mudado. Para trocar mesmo assim (a memória atual é guardada), use --substituir.")
+                if historia:
+                    b = backup_sqlite(cfg)
+                    if not b.get("ok"):
+                        raise RuntimeError(f"não consegui fazer o backup da memória atual antes de trocar: {b.get('motivo')}")
+                    passos.append(f"memória atual guardada antes da troca: {b['arquivo']}")
+                guardado = logs / f"trabalho_antes_da_restauracao_{datetime.now():%Y%m%d_%H%M%S}.db"
+                for sufixo in ("", "-wal", "-shm"):
+                    atual = Path(str(destino) + sufixo)
+                    if atual.exists():
+                        shutil.move(str(atual), str(guardado) + sufixo)
+                passos.append(f"arquivo atual guardado como {guardado.name}")
+            temp.replace(destino)
+        finally:
+            temp.unlink(missing_ok=True)
+    passos.append(f"memória restaurada em {destino}")
+    r = {"ok": True, "arquivo": str(arquivo), "sha256": h.hexdigest(), "tabelas": len(contagens),
+         "linhas": sum(contagens.values()), "contagens": contagens, "passos": passos}
+    _registrar(cfg, "restauracao_sqlite", {**r, "integridade": "ok", "metodo": f"restaurado de {arquivo.name}"})
+    return r
+
+
 def _rodizio_sqlite(cfg) -> None:
     manter = max(1, int(_c(cfg)["manter_sqlite"]))
     arquivos = sorted(p.name for p in pasta_sqlite(cfg).glob("trabalho_*.db.gz"))

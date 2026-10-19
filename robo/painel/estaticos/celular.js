@@ -1,4 +1,4 @@
-// Acompanhamento pelo celular: só lê /api/resumo a cada 20 s. Não existe nenhuma ação que altere a empresa.
+// Acompanhamento pelo celular: só lê /api/resumo a cada 10 s. Não existe nenhuma ação que altere a empresa.
 "use strict";
 (function () {
   const $ = (id) => document.getElementById(id);
@@ -40,7 +40,7 @@
   }
 
   function desenhar(r) {
-    $("atualizado").textContent = "Atualizado em " + r.gerado_em + " · renova a cada 20 s";
+    $("atualizado").textContent = "Atualizado em " + r.gerado_em + " · renova a cada 10 s";
     const g = $("cartoes");
     g.replaceChildren();
     const robo = r.robo || {};
@@ -85,6 +85,36 @@
       li.append(txt);
       return li;
     });
+    const gt = r.gente || {};
+    const gg = $("gente");
+    gg.replaceChildren();
+    const conta = (x, rotulo, vazio) => (x ? kpi(rotulo, String(x["24h"]), `${x["7d"]} em 7 dias`, x["24h"] ? "bom" : "")
+      : kpi(rotulo, "—", vazio, "atencao"));
+    if (!indisponivel(gt)) {
+      gg.append(conta(gt.conversas, "Conversas 24 h", "ainda não registradas"),
+        conta(gt.mentorias, "Mentorias 24 h", "módulo ainda não ativo"),
+        conta(gt.rh, "RH 24 h", "módulo ainda não ativo"),
+        conta(gt.lideranca, "Liderança decidiu 24 h", "módulo ainda não ativo"));
+    }
+    lista("feed", indisponivel(r.ao_vivo) ? [] : r.ao_vivo, "Nada registrado ainda.", (x) => {
+      const li = el("li"), l1 = el("div", "linha1");
+      const rot = { canal: "canal", conversa: "conversa", acerto: "acertou", erro: "errou", nivel: "nível", rh: "RH", lideranca: "liderança" };
+      l1.append(el("span", "", `${dataBr(x.data_hora)} · ${x.quem}`), el("span", "tag " + x.tipo, rot[x.tipo] || x.tipo));
+      li.append(l1, el("div", "texto", x.texto));
+      return li;
+    });
+    lista("andares", indisponivel(r.andares) ? [] : r.andares, "Sem treino registrado.", (a) => {
+      const li = el("li"), txt = el("div");
+      txt.style.flex = "1";
+      txt.append(el("div", "princ", `${a.andar}º · ${a.nome}`),
+        el("div", "sec", `${a.pessoas_24h} de ${a.quadro} pessoas treinaram · ${a.tentativas_24h} tentativas · nível médio ${a.nivel_medio ?? "—"}`));
+      const barra = el("div", "barra"), s = el("span");
+      s.style.width = (a.pct_24h ?? 0) + "%";
+      barra.append(s);
+      txt.append(barra);
+      li.append(txt, el("span", "selo " + (a.pct_24h == null ? "" : a.pct_24h >= 80 ? "ok" : "falha"), a.pct_24h == null ? "—" : a.pct_24h + "%"));
+      return li;
+    });
     lista("alertas", indisponivel(ti) ? [] : ti.alertas, "Nenhum alerta ativo.", (a) => {
       const li = el("li");
       li.append(el("div", "sec", a));
@@ -95,12 +125,12 @@
   async function atualizar() {
     try {
       const resp = await fetch("/api/resumo", { credentials: "same-origin", cache: "no-store" });
-      if (resp.status === 401) return mostrar(true);
       const r = await resp.json();
+      if (resp.status === 401 || r.login) return mostrar(true);
       if (!resp.ok) throw new Error(r.erro || resp.status);
       mostrar(false);
       desenhar(r);
-      if (!relogio) relogio = setInterval(atualizar, 20000);
+      if (!relogio) relogio = setInterval(atualizar, 10000);
     } catch (e) {
       $("atualizado").textContent = "Sem conexão com o notebook (" + e.message + "). Tentando de novo…";
     }
@@ -125,6 +155,11 @@
     await fetch("/sair", { method: "POST", credentials: "same-origin" }).catch(() => {});
     mostrar(true);
   });
+
+  document.querySelectorAll(".aba").forEach((b) => b.addEventListener("click", () => {
+    document.querySelectorAll(".aba").forEach((x) => x.classList.toggle("ativa", x === b));
+    document.querySelectorAll("[data-painel]").forEach((p) => { p.hidden = p.dataset.painel !== b.dataset.aba; });
+  }));
 
   atualizar();
 })();

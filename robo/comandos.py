@@ -191,6 +191,11 @@ def principal(argv: list[str] | None = None) -> int:
     sdag.add_argument("--destino", help="arquivo da DAG (padrão: airflow/dags/robo_empresa.py na pasta do projeto)")
     sdag.add_argument("--sem-wsl", action="store_true", help="não converter caminhos C:\\ para /mnt/c (Airflow fora do WSL)")
     sdag.add_argument("--python", help="python que o Airflow deve chamar (padrão: o python que está rodando este comando)")
+    sim = sub.add_parser("importar-memoria", help="traz a memória da empresa de um backup trabalho_*.db.gz (ex.: de outro "
+                                                  "computador). Com o robô FECHADO. Nada se perde")
+    sim.add_argument("arquivo")
+    sim.add_argument("--substituir", action="store_true", help="trocar mesmo se este computador já tiver história "
+                                                                "(a memória atual é guardada antes)")
     scel = sub.add_parser("celular", help="acompanhamento pelo celular (somente leitura, rede de casa): ligar, desligar ou ver")
     grupo = scel.add_mutually_exclusive_group()
     grupo.add_argument("--ligar", action="store_true")
@@ -206,6 +211,19 @@ def principal(argv: list[str] | None = None) -> int:
 
     if args.comando == "rotina":
         return _comando_rotina(args)
+    if args.comando == "importar-memoria":
+        from robo import backup
+        try:
+            cfg = carregar_config(Path(args.config) if args.config else None)
+            r = backup.restaurar_sqlite(cfg, Path(args.arquivo), substituir=args.substituir)
+        except Exception as e:
+            print(f"Não importei: {e}", file=sys.stderr)
+            return 1
+        for passo in r["passos"]:
+            print(f"  ✔ {passo}")
+        print("Abra o robô (python -m robo app). Com o PostgreSQL instalado, em até 1 hora a memória inteira é copiada para o "
+              "schema robo do banco robo_dados (ou rode agora: python -m robo rotina memoria_pg).")
+        return 0
     if args.comando == "airflow-dag":
         from robo import orquestracao
         try:

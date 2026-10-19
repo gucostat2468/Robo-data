@@ -25,7 +25,7 @@ import socket
 import threading
 import time
 import urllib.parse
-from datetime import datetime
+from datetime import datetime, timedelta
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
 
@@ -208,8 +208,108 @@ def resumo(cfg, controle=None) -> dict:
         return {"sqlite": s.get("data_hora") or s.get("criado_em"), "postgres": p.get("data_hora") or p.get("criado_em")}
 
     for chave, f in (("robo", _robo), ("rotinas", _rotinas), ("treino", _treino), ("planilhas", _planilhas),
-                     ("ti", _ti), ("decisoes", _decisoes), ("backup", _backup)):
+                     ("ti", _ti), ("decisoes", _decisoes), ("backup", _backup),
+                     ("ao_vivo", lambda: ao_vivo(cfg)), ("andares", lambda: andares(cfg)),
+                     ("gente", lambda: movimentos_de_gente(cfg))):
         _parte(saida, chave, f)
+    return saida
+
+
+def _tabelas(c) -> set[str]:
+    return {r[0] for r in c.execute("SELECT name FROM sqlite_master WHERE type='table'")}
+
+
+def ao_vivo(cfg, limite: int = 30) -> list[dict]:
+    """O que acabou de acontecer, de todas as fontes registradas, na ordem do tempo (mais recente primeiro).
+    Só lê: canal, conversas entre funcionários, tentativas de treino, mudanças de nível, RH e decisões da liderança."""
+    from robo import organizacao
+    from robo.canal import Canal
+    from robo.treino_casos import CATALOGO
+    gente = organizacao.por_id(cfg)
+    nome = lambda x: (gente.get(x) or {}).get("nome", x or "")  # noqa: E731
+    comp = lambda x: CATALOGO[x].nome if x in CATALOGO else x  # noqa: E731
+    itens = []
+    for m in Canal(cfg).listar(limite=limite)[-limite:]:
+        itens.append({"data_hora": m["data_hora"], "tipo": "canal", "quem": m.get("nome") or m["autor"],
+                      "texto": f"#{m['canal']}: {m['texto']}"})
+    with Trabalho(cfg).tx() as c:
+        t = _tabelas(c)
+        if "interacoes" in t:
+            for r in c.execute("SELECT data_hora, de, para, tipo, texto FROM interacoes ORDER BY id DESC LIMIT ?", (limite,)):
+                itens.append({"data_hora": r["data_hora"], "tipo": "conversa", "quem": nome(r["de"]),
+                              "texto": (f"→ {nome(r['para'])}: " if r["para"] else "") + r["texto"]})
+        if "treino_tentativas" in t:
+            for r in c.execute("SELECT data_hora, funcionario, competencia, nivel, acertou, detalhe FROM treino_tentativas "
+                               "ORDER BY id DESC LIMIT ?", (limite,)):
+                itens.append({"data_hora": r["data_hora"], "tipo": "acerto" if r["acertou"] else "erro", "quem": nome(r["funcionario"]),
+                              "texto": f"{comp(r['competencia'])} nível {r['nivel']}: "
+                                       + ("acertou" if r["acertou"] else "errou — " + str(r["detalhe"] or "")[:120])})
+        if "treino_niveis_eventos" in t:
+            for r in c.execute("SELECT data_hora, funcionario, competencia, de, para FROM treino_niveis_eventos WHERE de IS NOT NULL "
+                               "ORDER BY id DESC LIMIT ?", (limite,)):
+                itens.append({"data_hora": r["data_hora"], "tipo": "nivel", "quem": nome(r["funcionario"]),
+                              "texto": f"{comp(r['competencia'])}: {'subiu' if r['para'] > r['de'] else 'desceu'} do nível "
+                                       f"{r['de']} para o {r['para']}"})
+        if "rh_movimentos" in t:
+            for r in c.execute("SELECT * FROM rh_movimentos ORDER BY id DESC LIMIT ?", (limite,)):
+                r = dict(r)
+                itens.append({"data_hora": r.get("data_hora"), "tipo": "rh", "quem": nome(r.get("funcionario")),
+                              "texto": f"RH — {r.get('tipo')}: {r.get('motivo') or ''}"[:220]})
+        if "alcadas_decisoes" in t:
+            for r in c.execute("SELECT * FROM alcadas_decisoes ORDER BY id DESC LIMIT ?", (limite,)):
+                r = dict(r)
+                itens.append({"data_hora": r.get("data_hora"), "tipo": "lideranca", "quem": nome(r.get("decisor")),
+                              "texto": f"decidiu ({r.get('item_tipo')}): {r.get('decisao')} — validado por "
+                                       f"{nome(r.get('validador'))}. {r.get('motivo') or ''}"[:220]})
+    itens.sort(key=lambda x: str(x["data_hora"]).replace("T", " "), reverse=True)
+    return itens[:limite]
+
+
+def andares(cfg) -> list[dict]:
+    """Treino por andar nas últimas 24 h e nível médio atual — para ver quem está evoluindo."""
+    from robo import organizacao
+    desde = (datetime.now() - timedelta(hours=24)).isoformat(timespec="seconds")
+    gente = organizacao.por_id(cfg)
+    with Trabalho(cfg).tx() as c:
+        if "treino_tentativas" not in _tabelas(c):
+            return []
+        rec = {r["andar"]: dict(r) for r in c.execute(
+            "SELECT andar, COUNT(*) n, SUM(acertou) ok, COUNT(DISTINCT funcionario) pessoas FROM treino_tentativas "
+            "WHERE data_hora>=? GROUP BY andar", (desde,))}
+        niveis = [dict(r) for r in c.execute("SELECT funcionario, nivel FROM treino_niveis")]
+    medio: dict = {}
+    for n in niveis:
+        andar = (gente.get(n["funcionario"]) or {}).get("andar")
+        if andar:
+            medio.setdefault(int(andar), []).append(n["nivel"])
+    saida = []
+    for andar in sorted({int(a) for a in organizacao.NOME_ANDAR} | set(medio)):
+        r = rec.get(andar) or {"n": 0, "ok": 0, "pessoas": 0}
+        quadro = sum(1 for p in gente.values() if int(p.get("andar") or 0) == andar)
+        saida.append({"andar": andar, "nome": organizacao.NOME_ANDAR.get(andar, ""), "quadro": quadro,
+                      "tentativas_24h": r["n"], "pct_24h": round(100 * (r["ok"] or 0) / r["n"], 1) if r["n"] else None,
+                      "pessoas_24h": r["pessoas"],
+                      "nivel_medio": round(sum(medio[andar]) / len(medio[andar]), 2) if medio.get(andar) else None})
+    return saida
+
+
+def movimentos_de_gente(cfg) -> dict:
+    """RH, liderança e conversas: contagens das últimas 24 h e 7 dias (só o que está registrado)."""
+    agora = datetime.now()
+    d1, d7 = ((agora - timedelta(hours=h)).isoformat(timespec="seconds") for h in (24, 24 * 7))
+    saida = {}
+    with Trabalho(cfg).tx() as c:
+        t = _tabelas(c)
+        for tabela, chave in (("interacoes", "conversas"), ("rh_movimentos", "rh"), ("alcadas_decisoes", "lideranca"),
+                              ("mentorias", "mentorias")):
+            if tabela in t:
+                saida[chave] = {"24h": c.execute(f"SELECT COUNT(*) FROM {tabela} WHERE data_hora>=?", (d1,)).fetchone()[0],
+                                "7d": c.execute(f"SELECT COUNT(*) FROM {tabela} WHERE data_hora>=?", (d7,)).fetchone()[0]}
+            else:
+                saida[chave] = None
+        if "mentorias" in t:
+            saida["mentorias_ajudou"] = c.execute("SELECT COUNT(*) FROM mentorias WHERE situacao='ajudou'").fetchone()[0]
+            saida["mentorias_abertas"] = c.execute("SELECT COUNT(*) FROM mentorias WHERE situacao='aberta'").fetchone()[0]
     return saida
 
 
@@ -279,7 +379,8 @@ def criar_manipulador(obter_cfg, senha_hash, controle=None, portao: PortaoCelula
                 return self._enviar(200, (ESTATICOS / nome).read_bytes(), tipo, {"Cache-Control": "no-cache"})
             if caminho == "/api/resumo":
                 if not portao.valida(self._token()):
-                    return self._json({"erro": "Entre com a senha do painel.", "login": True}, 401)
+                    # 200 com login=True (e não 401): a página pergunta "estou logado?" ao abrir e isso não é erro
+                    return self._json({"erro": "Entre com a senha do painel.", "login": True})
                 try:
                     return self._json(resumo(obter_cfg(), controle))
                 except Exception as e:

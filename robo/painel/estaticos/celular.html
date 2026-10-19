@@ -36,12 +36,28 @@
   <section id="tela-resumo" hidden>
     <p class="atualizado" id="atualizado">—</p>
     <div class="grade" id="cartoes"></div>
+    <nav class="abas" role="tablist">
+      <button class="aba ativa" data-aba="vivo" role="tab">Ao vivo</button>
+      <button class="aba" data-aba="andares" role="tab">Andares</button>
+      <button class="aba" data-aba="operacao" role="tab">Operação</button>
+    </nav>
+    <div data-painel="vivo">
+      <div class="grade" id="gente"></div>
+      <h2>Acontecendo agora</h2>
+      <ul class="lista feed" id="feed"></ul>
+    </div>
+    <div data-painel="andares" hidden>
+      <h2>Treino por andar (24 h)</h2>
+      <ul class="lista" id="andares"></ul>
+    </div>
+    <div data-painel="operacao" hidden>
     <h2>Últimas planilhas</h2>
     <ul class="lista" id="planilhas"></ul>
     <h2>Decisões atrasadas</h2>
     <ul class="lista" id="decisoes"></ul>
     <h2>Alertas da TI</h2>
     <ul class="lista" id="alertas"></ul>
+    </div>
   </section>
 </main>
 <script src="/celular.js"></script>

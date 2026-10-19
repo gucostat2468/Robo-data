@@ -51,3 +51,16 @@ button { font: inherit; cursor: pointer; }
 .selo.ok { color: var(--verde); background: var(--verde-fundo); }
 .selo.falha { color: var(--vermelho); background: var(--vermelho-fundo); }
 .vazio { color: var(--suave); font-size: 13px; }
+.abas { display: flex; gap: 6px; margin: 18px 0 4px; position: sticky; top: 58px; z-index: 1; background: var(--fundo); padding: 6px 0; }
+.aba { flex: 1; padding: 9px 6px; border-radius: 10px; border: 1px solid var(--borda); background: var(--cartao);
+       color: var(--suave); font-weight: 600; font-size: 14px; }
+.aba.ativa { background: var(--azul); border-color: var(--azul); color: #fff; }
+.feed li { display: block; }
+.feed .linha1 { display: flex; justify-content: space-between; gap: 8px; font-size: 12px; color: var(--suave); }
+.feed .texto { margin-top: 2px; word-break: break-word; }
+.tag { font-size: 11px; font-weight: 700; padding: 1px 7px; border-radius: 999px; background: var(--fundo); color: var(--suave); }
+.tag.acerto { color: var(--verde); background: var(--verde-fundo); }
+.tag.erro { color: var(--vermelho); background: var(--vermelho-fundo); }
+.tag.nivel, .tag.rh, .tag.lideranca { color: var(--azul); }
+.barra { height: 6px; border-radius: 999px; background: var(--borda); margin-top: 6px; overflow: hidden; }
+.barra > span { display: block; height: 100%; background: var(--verde); }
