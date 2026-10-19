@@ -191,6 +191,8 @@ def principal(argv: list[str] | None = None) -> int:
     sdag.add_argument("--destino", help="arquivo da DAG (padrão: airflow/dags/robo_empresa.py na pasta do projeto)")
     sdag.add_argument("--sem-wsl", action="store_true", help="não converter caminhos C:\\ para /mnt/c (Airflow fora do WSL)")
     sdag.add_argument("--python", help="python que o Airflow deve chamar (padrão: o python que está rodando este comando)")
+    sub.add_parser("diagnostico", help="confere este computador (Python, pastas, PostgreSQL, senhas, trava, rede, firewall, "
+                                       "serviço, backups) — só lê, não altera nada")
     sim = sub.add_parser("importar-memoria", help="traz a memória da empresa de um backup trabalho_*.db.gz (ex.: de outro "
                                                   "computador). Com o robô FECHADO. Nada se perde")
     sim.add_argument("arquivo")
@@ -211,6 +213,23 @@ def principal(argv: list[str] | None = None) -> int:
 
     if args.comando == "rotina":
         return _comando_rotina(args)
+    if args.comando == "diagnostico":
+        from robo import diagnostico_pc
+        try:
+            cfg = carregar_config(Path(args.config) if args.config else None)
+        except ErroConfig as e:
+            print(f"Configuração com problema: {e}", file=sys.stderr)
+            return 1
+        itens = diagnostico_pc.rodar(cfg)
+        marca = {"ok": "✔", "atencao": "!", "falha": "✘", "nao_se_aplica": "–"}
+        for i in itens:
+            print(f" {marca[i['situacao']]} {i['titulo']}: {i['detalhe']}")
+            if i["corrigir"] and i["situacao"] != "ok":
+                print(f"     → {i['corrigir']}")
+        falhas = sum(i["situacao"] == "falha" for i in itens)
+        atencoes = sum(i["situacao"] == "atencao" for i in itens)
+        print(f"\nResultado: {falhas} falha(s), {atencoes} ponto(s) de atenção." + (" Tudo certo." if not falhas and not atencoes else ""))
+        return 1 if falhas else 0
     if args.comando == "importar-memoria":
         from robo import backup
         try:
