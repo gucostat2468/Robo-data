@@ -97,6 +97,33 @@ def _comando_banco(cfg, acao: str) -> int:
         return 1
 
 
+def _celular(args) -> int:
+    from robo.config import RAIZ_PROJETO
+    from robo.painel import celular, configuracao
+    arq = Path(args.config) if args.config else RAIZ_PROJETO / "config.yaml"
+    if not arq.exists():
+        print("Ainda não existe config.yaml: abra o robô uma vez (python -m robo app) antes.", file=sys.stderr)
+        return 1
+    if args.ligar or args.desligar:
+        configuracao._gravar(arq, "celular", "habilitado", bool(args.ligar))
+    cfg = carregar_config(arq)
+    conf = celular.configuracao(cfg)
+    if not conf["habilitado"]:
+        print("Acompanhamento pelo celular: DESLIGADO. Para ligar: python -m robo celular --ligar")
+        return 0
+    if not (cfg.painel or {}).get("senha_hash"):
+        print("Ligado no config.yaml, mas NÃO vai abrir: o painel está sem senha. Defina com: python -m robo senha",
+              file=sys.stderr)
+        return 1
+    ip = celular.ip_da_rede() or "<ip-deste-computador>"
+    print("Acompanhamento pelo celular: LIGADO (somente leitura). Feche e abra o robô para valer.")
+    print(f"  No celular, na MESMA rede Wi-Fi: http://{ip}:{conf['porta']}/  (Safari → Compartilhar → 'Adicionar à Tela de Início')")
+    print("  Senha: a mesma do painel.")
+    print("  Na 1ª vez o Windows pergunta sobre o firewall: marque SÓ 'Redes privadas'.")
+    print("  Fora de casa: use a VPN Tailscale (nos dois aparelhos). Nunca abra esta porta no roteador.")
+    return 0
+
+
 def principal(argv: list[str] | None = None) -> int:
     p = argparse.ArgumentParser(prog="robo", description="Robô de Planilhas — ETL automático Bases-Limpeza -> Bases-Tratadas")
     p.add_argument("--config", help="caminho do config.yaml (padrão: config.yaml na pasta do projeto)")
@@ -132,7 +159,42 @@ def principal(argv: list[str] | None = None) -> int:
     sib.add_argument("--superusuario", default="postgres", help="o usuário administrador criado na instalação do PostgreSQL")
     sib.add_argument("--sem-setx", action="store_true", help="não gravar as senhas nas variáveis do Windows")
     sub.add_parser("banco-doc", help="regera documentacao/banco_de_dados.md a partir do dicionário de dados do código")
+    scel = sub.add_parser("celular", help="acompanhamento pelo celular (somente leitura, rede de casa): ligar, desligar ou ver")
+    grupo = scel.add_mutually_exclusive_group()
+    grupo.add_argument("--ligar", action="store_true")
+    grupo.add_argument("--desligar", action="store_true")
+    slb = sub.add_parser("liberar-banco-celular", help="deixa o app de banco do celular ler o PostgreSQL (só robo_leitura, "
+                                                       "só rede de casa) — rode no Prompt como Administrador")
+    slb.add_argument("--host", default="localhost")
+    slb.add_argument("--porta", type=int, default=5432)
+    slb.add_argument("--banco", default="robo_dados")
+    slb.add_argument("--superusuario", default="postgres")
+    slb.add_argument("--rede", help="rede da casa (padrão: descoberta sozinha, ex.: 192.168.0.0/24)")
     args = p.parse_args(argv)
+
+    if args.comando == "celular":
+        return _celular(args)
+
+    if args.comando == "liberar-banco-celular":
+        import getpass
+        import os
+        from robo import acesso_rede_banco
+        senha = os.environ.get("ROBO_PG_SUPER_SENHA")
+        if senha is None:
+            print(f"Senha do usuário '{args.superusuario}' do PostgreSQL (a que você criou ao instalar o PostgreSQL):")
+            senha = getpass.getpass("Senha: ")
+        try:
+            r = acesso_rede_banco.liberar(args.superusuario, senha, args.host, args.porta, args.banco, rede=args.rede)
+        except Exception as e:
+            print(f"Não consegui liberar: {e}", file=sys.stderr)
+            return 1
+        for passo in r["passos"]:
+            print(f"  ✔ {passo}")
+        print("\nPREENCHA NO APP DO CELULAR (celular na MESMA rede Wi-Fi da casa):")
+        for campo, valor in r["app"].items():
+            print(f"  {campo:9s} {valor}")
+        print("\nO usuário robo_leitura só lê: pelo celular ninguém altera nem apaga nada. Nunca abra a porta no roteador.")
+        return 0
 
     if args.comando == "banco-doc":
         from robo import dicionario_dados

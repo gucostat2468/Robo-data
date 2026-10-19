@@ -91,4 +91,6 @@ Legenda: ✅ feito e testado · 🟡 feito em parte · ⏳ pendente
 | 85 | Reuniões levadas a sério | ✅ | decisão com dono, prazo e critério; reunião abre cobrando; atrasada não passa em branco; ata com SHA-256 |
 | 86 | Criar o banco real e passar as variáveis | ✅ | `python -m robo instalar-banco` (usuários robo_app e robo_leitura, senhas em variáveis de ambiente) |
 | 87 | Boas práticas para tudo | ✅ | `documentacao/boas_praticas_operacao.md` |
+| 88 | Acompanhar a empresa pelo celular | ✅ | `python -m robo celular --ligar`: página SOMENTE LEITURA na rede de casa, mesma senha do painel, bloqueio por força bruta, todo acesso registrado (`acessos_celular`) |
+| 89 | Ligar o app de banco do celular no meu PostgreSQL | ✅ | `python -m robo liberar-banco-celular` (Prompt como Administrador): só `robo_leitura`, só a rede de casa, cópia do pg_hba.conf antes de mexer, imprime os campos do app |
 | 38 | IA opcional sem fingir | 🟡 | `robo/ia.py`: só modelo local, desligado; ainda não usado nas respostas |

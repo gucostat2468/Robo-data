@@ -1,0 +1,49 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="Robô">
+<meta name="theme-color" content="#1D4ED8">
+<link rel="manifest" href="/manifest.webmanifest">
+<link rel="icon" href="/robo.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="/robo.svg">
+<link rel="stylesheet" href="/celular.css">
+<title>Robô de Planilhas</title>
+</head>
+<body>
+<header class="topo">
+  <div class="marca"><img src="/robo.svg" alt="" width="28" height="28"><div><strong>Robô de Planilhas</strong><span>acompanhamento · somente leitura</span></div></div>
+  <button id="sair" class="link" hidden>Sair</button>
+</header>
+
+<main>
+  <section id="tela-login" class="cartao login" hidden>
+    <h1>Entrar</h1>
+    <p>Use a mesma senha do painel do notebook.</p>
+    <form id="form-login">
+      <label for="senha">Senha</label>
+      <input id="senha" type="password" autocomplete="current-password" required>
+      <button type="submit" class="primario">Entrar</button>
+    </form>
+    <p id="erro-login" class="erro" role="alert"></p>
+    <p class="nota">Só funciona na rede de casa (ou pela VPN). Nada pode ser alterado por aqui.</p>
+  </section>
+
+  <section id="tela-resumo" hidden>
+    <p class="atualizado" id="atualizado">—</p>
+    <div class="grade" id="cartoes"></div>
+    <h2>Últimas planilhas</h2>
+    <ul class="lista" id="planilhas"></ul>
+    <h2>Decisões atrasadas</h2>
+    <ul class="lista" id="decisoes"></ul>
+    <h2>Alertas da TI</h2>
+    <ul class="lista" id="alertas"></ul>
+  </section>
+</main>
+<script src="/celular.js"></script>
+</body>
+</html>

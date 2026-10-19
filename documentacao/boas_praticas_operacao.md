@@ -196,3 +196,16 @@ depende de você, ela aparece como **(você)**.
 | "No PostgreSQL" diferente de "Linhas" por mais de 2 h | Banco da empresa | PostgreSQL fora do ar ou senha trocada: rode `python -m robo banco testar` |
 | Mesmo erro de treino 3x | Treino contínuo / handovers | É defeito de código, não da pessoa: a TI corrige e o treino comprova |
 | Decisão repactuada 2x ou mais | Pendências do andar | Quebre a decisão em entregas menores ou troque o dono |
+
+## Acesso pelo celular (regras que não se negociam)
+
+| Regra | Por quê |
+|---|---|
+| Pelo celular é **só leitura** (página de acompanhamento e usuário `robo_leitura` no banco) | Ninguém altera, aprova ou apaga nada fora do notebook, nem com a senha vazada |
+| Só **rede privada** (Wi-Fi de casa ou VPN Tailscale) | O servidor do celular recusa qualquer endereço de internet (403); o pg_hba.conf só aceita a sub-rede da casa |
+| **Nunca** abrir porta no roteador (redirecionamento de porta) | Expõe o notebook à internet inteira; para fora de casa existe a VPN |
+| Painel **com senha** antes de ligar o celular | Sem senha o celular não liga, e a ronda de segurança da TI acusa CRÍTICO |
+| Firewall do Windows: marcar só **"Redes privadas"** | Em Wi-Fi público (café, aeroporto) a porta fica fechada |
+| 5 senhas erradas = aparelho bloqueado 15 min; toda entrada registrada (`acessos_celular`) | Força bruta não passa e tudo fica auditável |
+| Senha do banco só em variável de ambiente (`%ROBO_PG_SENHA_LEITURA%`) | Nunca em arquivo, print ou mensagem |
+| Celular perdido ou trocado | Troque a senha do painel (derruba todas as sessões) e rode de novo `python -m robo instalar-banco` (senhas novas do banco) |

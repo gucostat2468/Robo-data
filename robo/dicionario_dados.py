@@ -106,6 +106,9 @@ TABELAS = {
                    IMUTAVEL, "confiança nos resultados publicados"),
     "backups_registro": ("operacao", "Cada backup (SQLite e PostgreSQL): arquivo, SHA-256, linhas e integridade",
                          "um backup", IMUTAVEL, "prova de que dá para restaurar"),
+    "acessos_celular": ("operacao", "Cada tentativa de entrar pelo celular (certa, errada ou bloqueada), com IP e aparelho",
+                        "uma tentativa de entrada no acompanhamento pelo celular", IMUTAVEL,
+                        "padrão de uso e detecção de acesso estranho (horário, IP, erros seguidos)"),
 }
 COLUNAS_DE_DATA = ("data_hora", "criada_em", "criado_em", "inicio", "primeira", "aberto_em", "atualizada_em",
                    "ultima_verificacao", "atribuida_em", "aprovada_em")
@@ -114,11 +117,12 @@ COLUNAS_DE_DATA = ("data_hora", "criada_em", "criado_em", "inicio", "primeira", 
 def _todas_as_tabelas(cfg) -> None:
     """Garante que todo módulo criou o próprio esquema (para listar e documentar tudo)."""
     from robo import aprendizado, auditoria, backup, decisoes, erros, interacoes, laboratorio, licoes, sala, treino
+    from robo.painel import celular
     from robo.ferramentas import USO_ESQUEMA
     from robo.rotinas import ESQUEMA as ROTINAS
     from robo.trabalho import Trabalho
     Trabalho(cfg)
-    for m in (aprendizado, auditoria, erros, interacoes, laboratorio, licoes, sala, treino, decisoes):
+    for m in (aprendizado, auditoria, erros, interacoes, laboratorio, licoes, sala, treino, decisoes, celular):
         m._tb(cfg)
     from robo.trabalho import proteger
     with Trabalho(cfg).tx() as c:

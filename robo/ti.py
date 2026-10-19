@@ -118,6 +118,9 @@ def chk_seguranca(cfg) -> list[str]:
         problemas.append("o painel não está preso a 127.0.0.1 (ficaria visível na rede)")
     if cfg.banco.get("senha"):
         problemas.append("senha do PostgreSQL gravada no config.yaml — prefira a variável de ambiente ROBO_PG_SENHA")
+    if ((getattr(cfg, "dados", None) or {}).get("celular") or {}).get("habilitado") and not (cfg.painel or {}).get("senha_hash"):
+        problemas.append("CRÍTICO: acompanhamento pelo celular ligado com o painel sem senha — o celular não abre até "
+                         "você definir a senha ('python -m robo senha') ou desligar ('python -m robo celular --desligar')")
     if not (cfg.painel or {}).get("senha_hash"):
         problemas.append("o painel está sem senha: qualquer pessoa logada neste Windows abre os dados "
                          "(Configurações → Senha do painel, ou 'python -m robo senha')")

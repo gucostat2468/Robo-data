@@ -65,6 +65,13 @@ painel:
   ligar_robo_ao_abrir: true
   notificacoes: true
 
+# Acompanhar pelo celular (SOMENTE LEITURA): página no celular, na mesma rede Wi-Fi da casa (ou pela VPN Tailscale).
+# Liga com: python -m robo celular --ligar   (exige senha no painel; usa a mesma senha)
+# Nunca abra esta porta no roteador: fora de casa, use a VPN.
+celular:
+  habilitado: false
+  porta: 8766
+
 manutencao:
   dias_retencao_originais: 0      # 0 = guardar para sempre (a planilha original é a prova e a base para ML)
   dias_retencao_relatorios: 0     # 0 = guardar para sempre

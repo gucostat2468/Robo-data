@@ -1492,6 +1492,11 @@ def iniciar_app(caminho_config: Path | None = None, abrir_janela: bool = True, p
     servidor.daemon_threads = True
     threading.Thread(target=servidor.serve_forever, name="robo-painel", daemon=True).start()
     log.info("Painel disponível em %s", url)
+    try:  # acompanhamento pelo celular: servidor separado, SOMENTE LEITURA, desligado por padrão (robo/painel/celular.py)
+        from robo.painel import celular
+        celular.iniciar(lambda: controle.cfg, lambda: api.senha_hash, controle)
+    except Exception:
+        log.exception("Não consegui ligar o acompanhamento pelo celular")
 
     controle.iniciar_rotinas()
     if controle.cfg and controle.cfg.painel.get("ligar_robo_ao_abrir", True):
