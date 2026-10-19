@@ -106,7 +106,7 @@ def teste_rodizio_de_hora_em_hora_guarda_48h_um_por_dia_e_o_mes(cfg, monkeypatch
     backup._rodizio_sqlite(cfg)
     ficaram = {p.name for p in pasta.glob("*.db.gz")}
     nome = lambda t: f"trabalho_{t:%Y%m%d_%H%M%S}.db.gz"  # noqa: E731
-    assert all(nome(t) in ficaram for t in horas if agora - t <= timedelta(hours=48))       # tudo das últimas 48 h
+    assert all(nome(t) in ficaram for t in horas if agora - t <= timedelta(hours=47))       # tudo das últimas 48 h (folga: o relógio anda)
     for dia in {t.date() for t in horas if agora - t <= timedelta(days=89)}:                  # 1 por dia em 90 dias
         assert nome(min(t for t in horas if t.date() == dia)) in ficaram
     assert not any(nome(t) in ficaram for t in horas                                         # o resto sai…
