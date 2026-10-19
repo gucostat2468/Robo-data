@@ -96,7 +96,7 @@ def teste_primeiro_backup_de_cada_mes_nunca_e_apagado(cfg, monkeypatch):
 
 def teste_rodizio_de_hora_em_hora_guarda_48h_um_por_dia_e_o_mes(cfg, monkeypatch):
     from datetime import datetime, timedelta
-    monkeypatch.setitem(cfg.dados, "backup", {"manter_sqlite": 1})  # isola as regras de 48 h, dia e mês
+    monkeypatch.setitem(cfg.dados, "backup", {"manter_sqlite": 1, "manter_sqlite_horas": 48, "manter_sqlite_dias": 90})
     pasta = backup.pasta_sqlite(cfg)
     pasta.mkdir(parents=True)
     agora = datetime.now().replace(minute=0, second=0, microsecond=0)

@@ -6,7 +6,7 @@
 
 | Onde | O que guarda | Para quê |
 |---|---|---|
-| `logs/trabalho.db` (SQLite) | **Fonte de tudo**: a memória da empresa (52 tabelas abaixo) | Funciona sem internet e sem servidor; nada se apaga |
+| `logs/trabalho.db` (SQLite) | **Fonte de tudo**: a memória da empresa (53 tabelas abaixo) | Funciona sem internet e sem servidor; nada se apaga |
 | `logs/backups_sqlite/` | Cópia diária do `trabalho.db`, conferida (`integrity_check`) e com SHA-256 | Restaurar se o disco falhar; o 1º de cada mês fica para sempre |
 | PostgreSQL `robo_dados`, schema `robo` | Espelho de TODAS as tabelas (`memoria_<tabela>`) | Consultas em SQL, Power BI e Machine Learning |
 | PostgreSQL schemas `bruto` → `tratado` → `analitico` | As planilhas de negócio (ELT) | Análise e Power BI |
@@ -98,6 +98,7 @@
 | `erros_sistema` | Todo erro de programa (com traceback), agrupado por tipo, ligado a um handover da TI | um tipo de erro (repetição soma ocorrência) | registro com situação (a situação muda; a linha nunca some) | estabilidade do código por versão |
 | `auditorias` | Auditorias por amostragem dos heads (conferido por outro caminho) | uma auditoria | só acrescenta (imutável: não altera nem apaga) | confiança nos resultados publicados |
 | `backups_registro` | Cada backup (SQLite e PostgreSQL): arquivo, SHA-256, linhas e integridade | um backup | só acrescenta (imutável: não altera nem apaga) | prova de que dá para restaurar |
+| `vigia_eventos` | Cada vez que o vigia achou o robô parado (e religou) ou sem responder | um evento do vigia | só acrescenta (imutável: não altera nem apaga) | disponibilidade real: quedas por dia e tempo até voltar |
 | `logs_sistema` | Cada registro do log do sistema (robo.log e os girados), com nível e mensagem completa | um registro do log (com o traceback, se houver) | só acrescenta (imutável: não altera nem apaga) | série de eventos e erros por módulo e hora; prever falha antes de acontecer |
 | `arquivos_linhas` | Cada linha nova dos arquivos que só crescem (.jsonl, .csv): RH, conhecimento, histórico | uma linha de um arquivo, na ordem | só acrescenta (imutável: não altera nem apaga) | reconstruir qualquer arquivo da pasta de logs |
 | `arquivos_versoes` | Cada versão de arquivo reescrito (.json, .md, .yaml, .txt): atas, estado da TI, relatórios de erro, config.yaml sem senhas, equipe | uma versão de um arquivo | só acrescenta (imutável: não altera nem apaga) | como a configuração e os documentos mudaram ao longo do tempo |
@@ -159,6 +160,7 @@
 - **`treino_niveis_eventos`**: `id`, `data_hora`, `funcionario`, `competencia`, `de`, `para`, `motivo`, `evidencia`
 - **`treino_tentativas`**: `id`, `data_hora`, `rodada`, `caso_id`, `funcionario`, `andar`, `cargo_nivel`, `competencia`, `nivel`, `ferramenta`, `acertou`, `nota`, `tipo_erro`, `detalhe`, `resposta`, `segundos`, `versao_codigo`
 - **`uso_ferramentas`**: `id`, `data_hora`, `ferramenta`, `quem`, `ok`, `natureza`, `excecao`, `segundos`
+- **`vigia_eventos`**: `id`, `data_hora`, `evento`, `detalhe`
 
 ## Como usar para Machine Learning (exemplo em SQL no PostgreSQL)
 

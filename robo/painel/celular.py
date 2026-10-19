@@ -382,7 +382,13 @@ def criar_manipulador(obter_cfg, senha_hash, controle=None, portao: PortaoCelula
                     # 200 com login=True (e não 401): a página pergunta "estou logado?" ao abrir e isso não é erro
                     return self._json({"erro": "Entre com a senha do painel.", "login": True})
                 try:
-                    return self._json(resumo(obter_cfg(), controle))
+                    cfg = obter_cfg()
+                    try:  # acompanhar pelo celular = dono presente (as alçadas da liderança só agem com o dono fora)
+                        from robo import alcadas
+                        alcadas.marcar_presenca(cfg, "celular")
+                    except Exception:
+                        log.debug("Celular: não marquei presença", exc_info=True)
+                    return self._json(resumo(cfg, controle))
                 except Exception as e:
                     log.exception("Celular: falha ao montar o resumo")
                     return self._json({"erro": f"{type(e).__name__}: {e}"}, 500)

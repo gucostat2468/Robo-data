@@ -47,7 +47,7 @@ from robo.treino_casos import CATALOGO, NIVEIS, conteudo_hash
 
 log = logging.getLogger("robo")
 
-PADRAO = {"habilitado": True, "intervalo_minutos": 2, "por_rodada": 6, "janela_nivel": 5, "sobe_com": 4, "desce_com": 2,
+PADRAO = {"habilitado": True, "intervalo_minutos": 2, "por_rodada": 15, "janela_nivel": 5, "sobe_com": 4, "desce_com": 2,
           "erros_para_handover": 3, "max_tentativas_por_caso": 12, "dias_caso_ativo": 7}
 NIVEL_INICIAL = {"estagiario": 1, "junior": 1, "pleno": 2, "senior": 2, "especialista": 3, "coordenador": 3, "gerente": 3,
                  "diretor": 3, "head": 4}
@@ -393,6 +393,15 @@ def rodada(cfg, quantos: int | None = None, funcionarios: list[str] | None = Non
         _rodando.release()
 
 
+def _pdis_abertos(cfg, pid: str) -> list[str]:
+    """Competências com plano de melhoria aberto pelo RH (robo/rh_desempenho.py) — vazio se o RH ainda não rodou."""
+    with _tb(cfg).tx() as c:
+        if not c.execute("SELECT 1 FROM sqlite_master WHERE type='table' AND name='rh_pdi'").fetchone():
+            return []
+        return [r[0] for r in c.execute("SELECT competencia FROM rh_pdi WHERE funcionario=? AND fechado_em IS NULL ORDER BY id",
+                                        (pid,))]
+
+
 def _rodada(cfg, quantos, funcionarios) -> dict:
     _tb(cfg)
     rid = f"TR-{datetime.now():%Y%m%d-%H%M%S}"
@@ -408,6 +417,9 @@ def _rodada(cfg, quantos, funcionarios) -> dict:
         if not comps:
             continue
         comp = min(comps, key=lambda c: ultima.get((pid, c), ""))  # a competência há mais tempo sem prática
+        pdi = [x for x in _pdis_abertos(cfg, pid) if x in comps]
+        if pdi and ultima.get((pid, pdi[0]), "") <= max(ultima.get((pid, c), "") for c in comps):
+            comp = pdi[0]  # plano de melhoria aberto (RH): essa competência vem antes, em rodadas alternadas
         nivel = nivel_atual(cfg, pid, comp)
         try:
             caso = obter_caso(cfg, comp, nivel, pid)

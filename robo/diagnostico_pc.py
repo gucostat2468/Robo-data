@@ -225,8 +225,27 @@ def _inicializacao(cfg) -> tuple:
         "" if ligado else "rode: python -m robo inicializacao ligar"
 
 
+def _vigia(cfg) -> tuple:
+    from robo import vigia
+    ligada = vigia.tarefa_ligada()
+    if ligada is None:
+        return NA, "Vigia (religa se cair)", "só no Windows", ""
+    return (OK if ligada else ATENCAO), "Vigia (religa se cair)", "tarefa agendada ativa (a cada 5 min)" if ligada else \
+        "desligado: se o robô cair, ninguém religa", "" if ligada else "rode: python -m robo vigia ligar"
+
+
+def _registro_total(cfg) -> tuple:
+    from robo import registro_total
+    faltando = registro_total.cobertura(cfg)
+    if faltando:
+        return ATENCAO, "Tudo registrado no banco", f"{len(faltando)} arquivo(s) fora do banco: {', '.join(faltando[:5])}", \
+            "me mande esta lista: é um tipo de arquivo novo que precisa entrar no registro total"
+    return OK, "Tudo registrado no banco", "nenhum arquivo de texto da pasta de logs fica fora do banco", ""
+
+
 VERIFICACOES = [_python, _dependencias, _pastas, _disco, _senha_painel, _trava_entre_programas, _variaveis, _postgres,
-                _servico_postgres, _pg_dump, _backups, _rede, _celular, _inicializacao]
+                _servico_postgres, _pg_dump, _backups, _rede, _celular, _inicializacao,
+                _vigia, _registro_total]
 
 
 def rodar(cfg) -> list[dict]:

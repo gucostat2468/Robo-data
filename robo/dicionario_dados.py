@@ -109,6 +109,8 @@ TABELAS = {
                    IMUTAVEL, "confiança nos resultados publicados"),
     "backups_registro": ("operacao", "Cada backup (SQLite e PostgreSQL): arquivo, SHA-256, linhas e integridade",
                          "um backup", IMUTAVEL, "prova de que dá para restaurar"),
+    "vigia_eventos": ("operacao", "Cada vez que o vigia achou o robô parado (e religou) ou sem responder", "um evento do vigia",
+                      IMUTAVEL, "disponibilidade real: quedas por dia e tempo até voltar"),
     "logs_sistema": ("operacao", "Cada registro do log do sistema (robo.log e os girados), com nível e mensagem completa",
                      "um registro do log (com o traceback, se houver)", IMUTAVEL,
                      "série de eventos e erros por módulo e hora; prever falha antes de acontecer"),
@@ -148,14 +150,14 @@ COLUNAS_DE_DATA = ("data_hora", "criada_em", "criado_em", "inicio", "primeira", 
 def _todas_as_tabelas(cfg) -> None:
     """Garante que todo módulo criou o próprio esquema (para listar e documentar tudo)."""
     from robo import (alcadas, aprendizado, auditoria, backup, decisoes, erros, interacoes, laboratorio, licoes,
-                      registro_total, rh_desempenho, sala, treino)
+                      registro_total, rh_desempenho, sala, treino, vigia)
     from robo.painel import celular
     from robo.ferramentas import USO_ESQUEMA
     from robo.rotinas import ESQUEMA as ROTINAS
     from robo.trabalho import Trabalho
     Trabalho(cfg)
     for m in (aprendizado, auditoria, erros, interacoes, laboratorio, licoes, sala, treino, decisoes, celular,
-              rh_desempenho, alcadas, registro_total):
+              rh_desempenho, alcadas, registro_total, vigia):
         m._tb(cfg)
     from robo.trabalho import proteger
     with Trabalho(cfg).tx() as c:

@@ -191,6 +191,9 @@ def principal(argv: list[str] | None = None) -> int:
     sdag.add_argument("--destino", help="arquivo da DAG (padrão: airflow/dags/robo_empresa.py na pasta do projeto)")
     sdag.add_argument("--sem-wsl", action="store_true", help="não converter caminhos C:\\ para /mnt/c (Airflow fora do WSL)")
     sdag.add_argument("--python", help="python que o Airflow deve chamar (padrão: o python que está rodando este comando)")
+    svi = sub.add_parser("vigia", help="religa o robô sozinho se ele cair: ligar/desligar a tarefa agendada (Windows), "
+                                       "status, ou checar agora")
+    svi.add_argument("acao", choices=["ligar", "desligar", "status", "checar"])
     sub.add_parser("diagnostico", help="confere este computador (Python, pastas, PostgreSQL, senhas, trava, rede, firewall, "
                                        "serviço, backups) — só lê, não altera nada")
     sim = sub.add_parser("importar-memoria", help="traz a memória da empresa de um backup trabalho_*.db.gz (ex.: de outro "
@@ -213,6 +216,31 @@ def principal(argv: list[str] | None = None) -> int:
 
     if args.comando == "rotina":
         return _comando_rotina(args)
+    if args.comando == "vigia":
+        from robo import vigia
+        if args.acao in ("ligar", "desligar", "status"):
+            try:
+                if args.acao == "ligar":
+                    print(f"Vigia ligado: a cada 5 minutos o Windows roda {vigia.ligar_tarefa()}")
+                    print("Se o robô cair, ele volta sozinho em até 5 minutos. Cada queda fica registrada (vigia_eventos).")
+                elif args.acao == "desligar":
+                    vigia.desligar_tarefa()
+                    print("Vigia desligado.")
+                else:
+                    estado = vigia.tarefa_ligada()
+                    print("Vigia: " + ("ligado" if estado else "desligado" if estado is False else "só existe no Windows"))
+                return 0
+            except Exception as e:
+                print(f"Não foi possível: {e}", file=sys.stderr)
+                return 1
+        try:
+            cfg = carregar_config(Path(args.config) if args.config else None)
+        except ErroConfig as e:
+            print(f"Configuração com problema: {e}", file=sys.stderr)
+            return 1
+        r = vigia.checar(cfg, args.config)
+        print(f"Vigia: {r['situacao']}")
+        return 0 if r["situacao"] != "sem_resposta" else 1
     if args.comando == "diagnostico":
         from robo import diagnostico_pc
         try:

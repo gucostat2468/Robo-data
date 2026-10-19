@@ -34,10 +34,10 @@ from datetime import datetime, timedelta
 from pathlib import Path
 
 log = logging.getLogger("robo")
-PADRAO = {"habilitado": True, "manter": 7, "intervalo_horas": 24, "manter_sqlite": 30,
-          # memória da empresa (SQLite): backup de hora em hora; guarda tudo das últimas 48 h, um por dia por 90 dias e
-          # o 1º de cada mês para sempre
-          "intervalo_sqlite_horas": 1, "manter_sqlite_horas": 48, "manter_sqlite_dias": 90,
+PADRAO = {"habilitado": True, "manter": 7, "intervalo_horas": 24, "manter_sqlite": 24,
+          # memória da empresa (SQLite): backup de hora em hora; guarda tudo das últimas 24 h, um por dia por 30 dias e
+          # o 1º de cada mês para sempre (com a empresa treinando 24 h, o banco cresce ~15 MB/dia: isso segura o disco)
+          "intervalo_sqlite_horas": 1, "manter_sqlite_horas": 24, "manter_sqlite_dias": 30,
           # segundo lugar (HD externo, pendrive, outra pasta): cada backup novo é copiado e conferido lá também
           "copia_extra": ""}
 SCHEMAS = ("bruto", "tratado", "analitico", "robo", "analise")
