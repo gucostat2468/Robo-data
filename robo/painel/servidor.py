@@ -329,8 +329,28 @@ class Api:
             "canal_hoje": self._canal_hoje(cfg),
             "ti": {"saudavel": ronda_ti.get("saudavel"), "data_hora": ronda_ti.get("data_hora"),
                    "alertas": [a for i in ronda_ti.get("itens") or [] for a in i["achados"]][:5]},
+            "vivo": self._vivo(cfg),
         })
         return dados
+
+    def _vivo(self, cfg) -> dict:
+        """O que acabou de ser REGISTRADO no banco (conversas e tentativas de treino) — vira balão em cima de quem fez."""
+        from robo.trabalho import Trabalho
+        from robo.treino_casos import CATALOGO
+        saida = {"conversas": [], "treino": []}
+        try:
+            with Trabalho(cfg).tx() as c:
+                tabelas = {r[0] for r in c.execute("SELECT name FROM sqlite_master WHERE type='table'")}
+                if "interacoes" in tabelas:
+                    saida["conversas"] = [dict(r) for r in c.execute(
+                        "SELECT id, data_hora, de, para, tipo, substr(texto, 1, 220) AS texto FROM interacoes ORDER BY id DESC LIMIT 12")]
+                if "treino_tentativas" in tabelas:
+                    saida["treino"] = [{**dict(r), "competencia": CATALOGO[r["competencia"]].nome if r["competencia"] in CATALOGO
+                                        else r["competencia"]} for r in c.execute(
+                        "SELECT id, data_hora, funcionario, competencia, nivel, acertou FROM treino_tentativas ORDER BY id DESC LIMIT 30")]
+        except Exception:
+            log.debug("Escritório: registros ao vivo indisponíveis", exc_info=True)
+        return saida
 
     def _execucao_resumida(self, cfg, i: str) -> dict:
         """Partes do JSON da execução usadas no escritório (lidas uma vez só e guardadas em memória)."""

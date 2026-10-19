@@ -973,6 +973,7 @@ async function atualizar() {
       if (ev.fala) { mostrarBalao(ev.etapa, ev.fala, ev.para); if (!ev.tarefa) continue; } // conversa: balão na hora
       estado.filaEventos.push(ev);
     }
+    mostrarVivo(d.vivo || {});
     estado.ultimoSeq = Math.max(estado.ultimoSeq, d.ultimo_seq || 0);
     estado.iniciado = true;
     $("#hud-status").innerHTML = d.erro_config ? `<i class="ponto erro"></i>Configuração pendente`
@@ -1032,7 +1033,29 @@ const relogio = new THREE.Clock();
 let ultimoQuadro = performance.now();
 // ------------------------------------------------------------------ balões de conversa em cima de cada pessoa
 const baloes = new Map(); // id → {el, ate}
-function mostrarBalao(id, texto, para) {
+// O que foi REGISTRADO no banco vira balão: conversas (com o horário real) e cada tentativa de treino (✔/✘).
+const vivo = { conversa: 0, treino: 0, iniciado: false };
+function haQuanto(iso) {
+  const seg = Math.max(0, (Date.now() - new Date(String(iso).replace(" ", "T")).getTime()) / 1000);
+  if (!isFinite(seg)) return "";
+  return seg < 60 ? "agora" : seg < 3600 ? `há ${Math.round(seg / 60)} min` : seg < 86400 ? `há ${Math.round(seg / 3600)} h` : `há ${Math.round(seg / 86400)} d`;
+}
+function mostrarVivo(v) {
+  const conversas = (v.conversas || []).slice().reverse(), treino = (v.treino || []).slice().reverse();
+  if (!vivo.iniciado) {  // ao abrir: as últimas conversas reais, uma por vez, com o horário em que aconteceram
+    vivo.iniciado = true;
+    conversas.slice(-6).forEach((c, i) => setTimeout(() => mostrarBalao(c.de, c.texto, c.para, haQuanto(c.data_hora)), 900 + i * 2600));
+    vivo.conversa = Math.max(0, ...conversas.map((c) => c.id));
+    vivo.treino = Math.max(0, ...treino.map((t) => t.id));
+    return;
+  }
+  for (const c of conversas) if (c.id > vivo.conversa) { mostrarBalao(c.de, c.texto, c.para, haQuanto(c.data_hora)); vivo.conversa = c.id; }
+  for (const t of treino) if (t.id > vivo.treino) {
+    mostrarBalao(t.funcionario, `${t.acertou ? "✔ acertei" : "✘ errei"} ${t.competencia} · nível ${t.nivel}`, null, "treino", t.acertou ? "ok" : "erro");
+    vivo.treino = t.id;
+  }
+}
+function mostrarBalao(id, texto, para, quando, tom) {
   const est = estado.estacoes.get(id); if (!est) return;
   let b = baloes.get(id);
   if (!b) {
@@ -1042,7 +1065,9 @@ function mostrarBalao(id, texto, para) {
     document.body.appendChild(el); b = { el }; baloes.set(id, b);
   }
   const nomePara = para && estado.estacoes.get(para) ? `<b>→ ${esc(estado.estacoes.get(para).agente.nome)}</b> ` : "";
-  b.el.innerHTML = `<b>${esc(est.agente.nome)}</b>: ${nomePara}${esc(texto)}`;
+  b.el.innerHTML = `<b>${esc(est.agente.nome)}</b>: ${nomePara}${esc(texto)}` +
+    (quando ? `<div style="margin-top:3px;font-size:10.5px;color:#64748b">${esc(quando)}</div>` : "");
+  b.el.style.borderLeft = tom === "ok" ? "4px solid #059669" : tom === "erro" ? "4px solid #dc2626" : "4px solid #2563eb";
   b.ate = performance.now() + 8000;
   if (baloes.size > 8) { const [velho] = [...baloes.entries()].sort((a, c) => a[1].ate - c[1].ate); velho[1].el.remove(); baloes.delete(velho[0]); }
 }

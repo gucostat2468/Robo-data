@@ -120,14 +120,39 @@ svg.icone { width: 18px; height: 18px; flex: none; stroke: currentColor; fill: n
 .grade.kpis { grid-template-columns: repeat(4, minmax(0, 1fr)); }
 .grade.duas { grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr); align-items: start; }
 @media (max-width: 1100px) { .grade.kpis { grid-template-columns: repeat(2, minmax(0, 1fr)); } .grade.duas { grid-template-columns: minmax(0, 1fr); } }
+/* menu em grupos (abre/fecha) */
+.sidebar { overflow-y: auto; }
+.nav { gap: 6px; }
+.nav-grupo { display: flex; flex-direction: column; gap: 2px; }
+.nav-grupo > summary {
+  list-style: none; cursor: pointer; user-select: none; display: flex; align-items: center; justify-content: space-between;
+  padding: 6px 10px 4px; font-size: 11px; font-weight: 700; letter-spacing: .07em; text-transform: uppercase; color: var(--texto-3);
+  border-radius: var(--raio-p);
+}
+.nav-grupo > summary::-webkit-details-marker { display: none; }
+.nav-grupo > summary::after { content: "▾"; font-size: 12px; transition: transform .15s; }
+.nav-grupo:not([open]) > summary::after { transform: rotate(-90deg); }
+.nav-grupo > summary:hover { color: var(--texto); }
+.nav-grupo > summary:focus-visible { outline: 2px solid var(--primaria); outline-offset: 1px; }
+.nav-grupo a { padding: 7px 10px; }
+.topo-movel, .menu-fundo { display: none; }
 @media (max-width: 760px) {
-  .app { grid-template-columns: 1fr; grid-template-rows: auto 1fr; }
-  .sidebar { flex-direction: row; overflow-x: auto; padding: 8px; }
-  .brand span, .brand div, .status-lateral { display: none; }
-  .nav { flex-direction: row; }
-  .nav a span { display: none; }
+  .app { grid-template-columns: 1fr; height: calc(100vh - 52px); height: calc(100dvh - 52px); }
+  .topo-movel {
+    display: flex; align-items: center; gap: 10px; height: 52px; padding: 0 12px; position: sticky; top: 0; z-index: 30;
+    background: var(--superficie); border-bottom: 1px solid var(--borda);
+  }
+  .topo-movel .btn { font-size: 20px; padding: 6px 10px; }
+  .sidebar {
+    position: fixed; z-index: 40; top: 0; left: 0; bottom: 0; width: min(300px, 86vw);
+    transform: translateX(-102%); transition: transform .2s ease; box-shadow: var(--sombra);
+  }
+  body.menu-aberto .sidebar { transform: none; }
+  body.menu-aberto .menu-fundo { display: block; position: fixed; inset: 0; z-index: 35; background: rgba(15, 23, 42, .45); }
+  .nav-grupo a { padding: 11px 10px; }   /* alvo de toque confortável */
   .conteudo { padding: 16px; }
 }
+@media (prefers-reduced-motion: reduce) { .sidebar, .nav-grupo > summary::after { transition: none; } }
 
 /* ---------------------------------------------------------------- cartões */
 .cartao { background: var(--superficie); border: 1px solid var(--borda); border-radius: var(--raio); box-shadow: var(--sombra); }

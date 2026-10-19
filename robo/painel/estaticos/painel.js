@@ -194,11 +194,41 @@ const PAGINAS = {
   configuracoes: { titulo: "Configurações", render: renderConfig, carregar: carregarConfig },
 };
 
+// ------------------------------------------------------------------ menu: grupos que lembram se estão abertos + gaveta no celular
+function fecharMenuMovel() {
+  document.body.classList.remove("menu-aberto");
+  const b = $("#abrir-menu");
+  if (b) b.setAttribute("aria-expanded", "false");
+}
+function prepararMenu() {
+  let fechados = [];
+  try { fechados = JSON.parse(localStorage.getItem("menu-fechados") || "[]"); } catch (e) { fechados = []; }
+  document.querySelectorAll("#nav details[data-grupo]").forEach((d) => {
+    if (fechados.includes(d.dataset.grupo) && !d.querySelector("a.ativo")) d.open = false;
+    d.addEventListener("toggle", () => {
+      const lista = [...document.querySelectorAll("#nav details[data-grupo]")].filter((x) => !x.open).map((x) => x.dataset.grupo);
+      try { localStorage.setItem("menu-fechados", JSON.stringify(lista)); } catch (e) { /* navegador sem armazenamento */ }
+    });
+  });
+  const botao = $("#abrir-menu");
+  if (botao) botao.addEventListener("click", () => {
+    const aberto = document.body.classList.toggle("menu-aberto");
+    botao.setAttribute("aria-expanded", String(aberto));
+  });
+  const fundo = $("#menu-fundo");
+  if (fundo) fundo.addEventListener("click", fecharMenuMovel);
+  document.addEventListener("keydown", (e) => { if (e.key === "Escape") fecharMenuMovel(); });
+  document.querySelectorAll("#nav a").forEach((a) => a.addEventListener("click", fecharMenuMovel));
+}
+
 async function irPara(pagina) {
   if (!PAGINAS[pagina]) pagina = "inicio";
   E.pagina = pagina;
   fecharGaveta();
   document.querySelectorAll("#nav a").forEach((a) => a.classList.toggle("ativo", a.dataset.pagina === pagina));
+  const grupoAtivo = document.querySelector(`#nav a[data-pagina="${pagina}"]`)?.closest("details");
+  if (grupoAtivo) grupoAtivo.open = true;  // o grupo da página atual sempre aberto
+  fecharMenuMovel();
   document.title = `${PAGINAS[pagina].titulo} · Robô de Planilhas`;
   desenhar();
   if (PAGINAS[pagina].carregar) { await PAGINAS[pagina].carregar(); desenhar(); }
@@ -1635,6 +1665,7 @@ window.addEventListener("drop", (e) => {
 // ------------------------------------------------------------------ início
 document.querySelectorAll("[data-icone]").forEach((el) => { el.outerHTML = icone(el.dataset.icone); });
 window.addEventListener("hashchange", () => irPara(location.hash.slice(1)));
+prepararMenu();
 (async () => {
   // pergunta antes se precisa de senha (rota livre): sem login, nada de chamadas que voltariam 401
   try { const a = await (await fetch("/api/acesso")).json(); if (a.senha && !a.logado) { mostrarLogin(); return; } } catch { /* sem conexão: o aviso sai abaixo */ }
