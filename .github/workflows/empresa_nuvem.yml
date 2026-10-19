@@ -6,6 +6,8 @@ name: Empresa na nuvem (turnos)
 on:
   schedule:
     - cron: "17 */2 * * *"   # a cada 2 horas, no minuto 17 (fora do pico da hora cheia)
+  push:                      # ligar/forçar um turno sem o botão: mudar o arquivo nuvem/ligar
+    paths: ["nuvem/ligar"]
   workflow_dispatch:
     inputs:
       minutos:
@@ -36,4 +38,7 @@ jobs:
         env:
           ROBO_PG_URL: ${{ secrets.ROBO_PG_URL }}
           ROBO_PG_SENHA_LEITURA: ${{ secrets.ROBO_PG_SENHA_LEITURA }}
-        run: python -m robo turno --minutos "${{ github.event.inputs.minutos || '20' }}" --pasta "$RUNNER_TEMP/empresa"
+        run: |
+          MIN="${{ github.event.inputs.minutos }}"
+          [ -z "$MIN" ] && [ "${{ github.event_name }}" = "push" ] && MIN="$(grep -Eo '^[0-9]+' nuvem/ligar | head -1)"
+          python -m robo turno --minutos "${MIN:-20}" --pasta "$RUNNER_TEMP/empresa"
