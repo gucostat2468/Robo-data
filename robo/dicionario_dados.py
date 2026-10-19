@@ -111,6 +111,15 @@ TABELAS = {
                          "um backup", IMUTAVEL, "prova de que dá para restaurar"),
     "ideias_registro": ("conhecimento", "Cada ideia da Iara (ideias e expansão), com o dado que a originou e o dono",
                         "uma ideia registrada num dia", IMUTAVEL, "quais problemas mais geram ideias e quanto tempo levam para sumir"),
+    "caixa_dono_eventos": ("conhecimento", "Cada decisão do dono na Caixa do dono (ideia, sugestão, regra, RH ou aprovação): "
+                           "aprovada ou recusada, com a nota e o número que motivou", "uma decisão do dono", IMUTAVEL,
+                           "que tipo de ideia o dono aprova; tempo até decidir"),
+    "caixa_dono_sugestoes": ("conhecimento", "Sugestões que os funcionários fazem a partir de fatos registrados (erros repetidos "
+                             "no treino, rotinas com erro)", "uma sugestão registrada", IMUTAVEL,
+                             "de onde vêm as melhores ideias; problemas recorrentes"),
+    "jornada_execucoes": ("operacao", "Cada volta completa da esteira com planilha sintética (equipe de Airflow): etapa a "
+                          "etapa, com o tempo de cada uma", "uma volta da jornada", IMUTAVEL,
+                          "confiabilidade da esteira por versão do código; etapa que mais falha; tempo por etapa"),
     "paineis_versoes": ("operacao", "Cada montagem dos painéis (Bárbara) e a conferência do Heitor: situação, indicadores e "
                         "divergências", "uma versão dos painéis", IMUTAVEL, "evolução de cada indicador no tempo; qualidade dos painéis"),
     "vigia_eventos": ("operacao", "Cada vez que o vigia achou o robô parado (e religou) ou sem responder", "um evento do vigia",
@@ -155,7 +164,7 @@ def _todas_as_tabelas(cfg) -> None:
     """Garante que todo módulo criou o próprio esquema (para listar e documentar tudo)."""
     from robo import (alcadas, aprendizado, auditoria, backup, decisoes, erros, interacoes, laboratorio, licoes,
                       registro_total, rh_desempenho, sala, treino, vigia)
-    from robo import ideias, paineis
+    from robo import caixa_dono, ideias, jornada, paineis
     from robo.painel import celular
     from robo.ferramentas import USO_ESQUEMA
     from robo.rotinas import ESQUEMA as ROTINAS
@@ -166,6 +175,8 @@ def _todas_as_tabelas(cfg) -> None:
         m._tb(cfg)
     ideias._tb_registro(cfg)
     paineis._tb(cfg)
+    caixa_dono._tb(cfg)
+    jornada._tb(cfg)
     from robo.trabalho import proteger
     with Trabalho(cfg).tx() as c:
         c.executescript(USO_ESQUEMA + ROTINAS + backup.ESQUEMA_REGISTRO)

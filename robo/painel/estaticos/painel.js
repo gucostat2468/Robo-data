@@ -1389,12 +1389,40 @@ function renderTI() {
           dev_pleno: "Python e bibliotecas nas versões exigidas", infra_pleno: "Espaço em disco e permissão de escrita nas pastas",
           dev_junior: "Erros de programa no log das últimas 24h", devops_estagiario: "Tamanho dos logs (observação)" })[i.id] || "")}</small></td>
         <td>${i.ok ? `<span class="etiqueta sucesso">${icone("ok")}OK</span>` : i.achados.map((a) => `<div class="etiqueta ${i.nivel === "estagiario" ? "" : "alerta"}" style="white-space:normal;margin:2px 0">${esc(a)}</div>`).join("")}</td></tr>`).join("")}
-    </tbody></table></div>`;
+    </tbody></table></div>` + blocoJornada(E.ti.jornada || []);
+}
+
+// Jornada ponta a ponta (equipe de Airflow): a esteira inteira com uma planilha sintética, de hora em hora
+function blocoJornada(lista) {
+  const etapas = ["entrada", "leitura", "limpeza", "validacao", "saida", "historico", "analise"];
+  const nomes = { entrada: "Entrada", leitura: "Leitura", limpeza: "Limpeza", validacao: "Validação", saida: "Saída",
+    historico: "Histórico", analise: "Análise" };
+  const ult = lista[0];
+  const cab = `<div class="secao-titulo" style="margin-top:16px;display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap">
+    <span>Jornada ponta a ponta — Bianca e Henrique (Airflow) conferem a esteira inteira de hora em hora</span>
+    <button class="btn" data-acao="jornada-rodar">${icone("play")}Rodar a jornada agora</button></div>`;
+  if (!ult) return cab + `<div class="cartao vazio"><p>Nenhuma volta registrada ainda. A rotina “jornada” roda de hora em hora — ou clique em “Rodar a jornada agora”.</p></div>`;
+  const trilha = etapas.map((e) => { const x = ult.etapas[e] || {}; return `<div class="jornada-etapa ${x.ok ? "ok" : "falha"}" title="${esc(x.detalhe || "")}">
+    ${icone(x.ok ? "ok" : "alerta")}<b>${nomes[e]}</b><small>${esc(x.detalhe || "")}</small></div>`; }).join("");
+  const hist = lista.map((j) => `<tr><td>J${j.id}</td><td>${esc(dataT(j.data_hora))}</td><td>${esc(j.area)}</td>
+    <td>${j.ok ? `<span class="etiqueta sucesso">ok</span>` : `<span class="etiqueta perigo">parou em ${esc(nomes[j.etapa_falhou] || j.etapa_falhou)}</span>`}</td>
+    <td>${num(j.linhas_saida ?? 0)} / ${num(j.linhas_esperadas)}</td><td>${num(Math.round(j.segundos * 10) / 10)} s</td></tr>`).join("");
+  return cab + `<div class="cartao" style="padding:14px 16px"><div class="muted" style="margin-bottom:8px">Última volta J${ult.id} (${esc(dataT(ult.data_hora))}):
+    planilha sintética de ${esc(ult.area)} com ${num(ult.linhas_esperadas)} linhas certas, título, R$, data em texto, duplicata e Total plantados.</div>
+    <div class="jornada-trilha">${trilha}</div></div>
+    <div class="cartao tabela-envoltorio"><table class="tabela"><thead><tr><th>Volta</th><th>Quando</th><th>Área</th><th>Resultado</th><th>Linhas (saída/certas)</th><th>Tempo</th></tr></thead><tbody>${hist}</tbody></table></div>`;
 }
 
 function dataBr(iso) { const [a, m, d] = String(iso || "").slice(0, 10).split("-"); return d ? `${d}/${m}/${a}` : ""; }
 
 const ACOES = {
+  "jornada-rodar": (el) => comCarregando(el, async () => {
+    try {
+      const r = await api("/api/jornada/rodar", { corpo: {} });
+      avisar(r.ok ? `Jornada J${r.id}: todas as etapas certas (${num(r.segundos)} s).` : `Jornada J${r.id} parou em ${r.etapa_falhou}.`, r.ok ? "sucesso" : "alerta");
+    } catch (e) { avisar(e.message, "erro"); }
+    await carregarTI(); desenhar();
+  }),
   "definir-senha": (el) => comCarregando(el, async () => {
     const r = await fetch("/api/senha", { method: "POST", headers: { "X-Robo-Painel": "1", "Content-Type": "application/json" },
       body: JSON.stringify({ atual: $("#senha-atual")?.value || "", nova: $("#senha-nova").value, confirmacao: $("#senha-conf").value }) });

@@ -642,3 +642,26 @@ pre.sql, .consultas pre { max-width: 100%; overflow: auto; }
   .pb-kpi-valor { font-size: 23px; }
   .pb-sql code { max-width: 260px; }
 }
+
+/* ------------------------------------------------------------------ Caixa do dono (caixa_dono.js) */
+.caixa-lista { display: flex; flex-direction: column; gap: 12px; }
+.caixa-item { background: var(--superficie); border: 1px solid var(--borda); border-radius: var(--raio); padding: 14px 16px;
+  box-shadow: var(--sombra); }
+.caixa-item.nova { border-left: 4px solid var(--primaria); }
+.caixa-item header { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; margin-bottom: 6px; font-size: 13px; }
+.caixa-item h3 { margin: 4px 0; font-size: 16px; }
+.caixa-quem { margin: 0 0 8px; font-size: 13px; color: var(--texto-2); }
+.caixa-item dl { display: grid; grid-template-columns: 140px 1fr; gap: 4px 12px; margin: 0 0 10px; font-size: 13px; }
+.caixa-item dt { color: var(--texto-2); }
+.caixa-item dd { margin: 0; }
+.caixa-acoes { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
+.caixa-acoes input { flex: 1 1 220px; min-width: 0; padding: 8px 10px; border: 1px solid var(--borda-forte); border-radius: var(--raio-p);
+  background: var(--superficie); color: var(--texto); font: inherit; }
+@media (max-width: 520px) { .caixa-item dl { grid-template-columns: 1fr; } }
+
+/* ------------------------------------------------------------------ Jornada ponta a ponta (TI) */
+.jornada-trilha { display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 8px; }
+.jornada-etapa { border-radius: var(--raio-p); padding: 8px 10px; display: flex; flex-direction: column; gap: 2px; font-size: 13px; }
+.jornada-etapa.ok { background: var(--sucesso-suave); }
+.jornada-etapa.falha { background: var(--perigo-suave); }
+.jornada-etapa small { color: var(--texto-2); font-size: 11.5px; line-height: 1.3; overflow-wrap: anywhere; }

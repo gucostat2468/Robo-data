@@ -203,12 +203,18 @@ def resumo(cfg, controle=None) -> dict:
                 "atrasadas": [{"texto": d["texto"][:140], "dono": d["dono_nome"], "prazo": d["prazo"]}
                               for d in abertas if d["estado"] == "atrasada"][:8]}
 
+    def _caixa():
+        from robo import caixa_dono
+        r = caixa_dono.resumo(cfg)
+        novas = [i for i in caixa_dono.itens(cfg, com_decididos=False)][:5]
+        return {**r, "ultimas": [{"titulo": i["titulo"][:140], "de": i["sugerido_por"]["nome"]} for i in novas]}
+
     def _backup():
         s, p = backup.ultimo_sqlite(cfg) or {}, backup.ultimo(cfg) or {}
         return {"sqlite": s.get("data_hora") or s.get("criado_em"), "postgres": p.get("data_hora") or p.get("criado_em")}
 
     for chave, f in (("robo", _robo), ("rotinas", _rotinas), ("treino", _treino), ("planilhas", _planilhas),
-                     ("ti", _ti), ("decisoes", _decisoes), ("backup", _backup),
+                     ("ti", _ti), ("decisoes", _decisoes), ("backup", _backup), ("caixa", _caixa),
                      ("ao_vivo", lambda: ao_vivo(cfg)), ("andares", lambda: andares(cfg)),
                      ("gente", lambda: movimentos_de_gente(cfg))):
         _parte(saida, chave, f)
