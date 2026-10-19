@@ -6,7 +6,7 @@
 
 | Onde | O que guarda | Para quê |
 |---|---|---|
-| `logs/trabalho.db` (SQLite) | **Fonte de tudo**: a memória da empresa (46 tabelas abaixo) | Funciona sem internet e sem servidor; nada se apaga |
+| `logs/trabalho.db` (SQLite) | **Fonte de tudo**: a memória da empresa (52 tabelas abaixo) | Funciona sem internet e sem servidor; nada se apaga |
 | `logs/backups_sqlite/` | Cópia diária do `trabalho.db`, conferida (`integrity_check`) e com SHA-256 | Restaurar se o disco falhar; o 1º de cada mês fica para sempre |
 | PostgreSQL `robo_dados`, schema `robo` | Espelho de TODAS as tabelas (`memoria_<tabela>`) | Consultas em SQL, Power BI e Machine Learning |
 | PostgreSQL schemas `bruto` → `tratado` → `analitico` | As planilhas de negócio (ELT) | Análise e Power BI |
@@ -34,6 +34,10 @@
 | `memoria` | Lembretes da empresa (correções do dono, estados de provas, conferências de cálculo) | um lembrete com tipo e chave | só acrescenta (imutável: não altera nem apaga) | contexto e decisões do dono |
 | `interacoes` | Conversas entre funcionários (pedido de ajuda, mentoria, cobrança) | uma interação entre duas pessoas | só acrescenta (imutável: não altera nem apaga) | rede de colaboração (quem ajuda quem) |
 | `mentorias` | Mentoria nascida de um erro de treino: quem ajudou quem, com qual lição, e se ajudou | um pedido de ajuda a um mentor escolhido pelos acertos registrados | registro com situação (a situação muda; a linha nunca some) | qualidade de cada mentor (taxa de 'ajudou') e efeito da mentoria no acerto seguinte |
+| `rh_movimentos` | Cada movimento de RH: promoção, plano de melhoria, afastamento, reintegração, propostas ao dono, decisões e reversões — com a evidência (números) e quem propôs e quem validou | um movimento de RH de uma pessoa | só acrescenta (imutável: não altera nem apaga) | carreira por pessoa; rótulo de promoção/PDI a partir do desempenho dos 30 dias anteriores |
+| `rh_cargos` | Nível efetivo de quem foi promovido pela política (vale sobre o nível do cadastro) | uma pessoa promovida e o nível atual dela | estado atual (sobrescrito de propósito; a história fica em outra tabela) | nível atual (a história está em rh_movimentos) |
+| `rh_pdi` | Planos de melhoria abertos e fechados, e o afastamento da ferramenta em produção | um plano de melhoria de uma pessoa numa competência | registro com situação (a situação muda; a linha nunca some) | tempo até recuperar; efeito do PDI no acerto |
+| `rh_ciclos` | Cada rodada do ciclo de desempenho do RH, com o resumo do que decidiu | uma execução do ciclo de RH | só acrescenta (imutável: não altera nem apaga) | frequência de promoções e PDIs ao longo do tempo |
 
 ### Trabalho (central de solicitações, conversas e entregas)
 
@@ -81,6 +85,7 @@
 | `salas_encerradas` | Ata (recap) de cada reunião de andar, com o hash do arquivo | uma reunião encerrada | só acrescenta (imutável: não altera nem apaga) | decisões e pendências por reunião |
 | `decisoes` | Decisões de reunião: dono, prazo, critério de pronto e situação apurada pelos registros | uma decisão | registro com situação (a situação muda; a linha nunca some) | cumprimento de prazo por área e por pessoa |
 | `decisoes_eventos` | Histórico de cada decisão (criada, cobrada, repactuada, cancelada, situação) | um evento de uma decisão | só acrescenta (imutável: não altera nem apaga) | quantas repactuações até cumprir |
+| `alcadas_decisoes` | O que a liderança decidiu (ou deixou para o dono) com o dono fora: quem decidiu, quem validou, a prova e até quando o dono pode reverter | uma decisão de alçada ou uma reversão | só acrescenta (imutável: não altera nem apaga) | padrão de decisões delegadas e reversões do dono (qualidade da autonomia) |
 
 ### Operação, TI e qualidade (rotinas, ferramentas, erros, auditorias e backups)
 
@@ -98,10 +103,12 @@
 | `arquivos_versoes` | Cada versão de arquivo reescrito (.json, .md, .yaml, .txt): atas, estado da TI, relatórios de erro, config.yaml sem senhas, equipe | uma versão de um arquivo | só acrescenta (imutável: não altera nem apaga) | como a configuração e os documentos mudaram ao longo do tempo |
 | `registro_cursores` | Até onde cada arquivo já foi lido pelo registro total | um arquivo (por geração) | estado atual (sobrescrito de propósito; a história fica em outra tabela) | controle interno: a história fica nas tabelas acima |
 | `acessos_celular` | Cada tentativa de entrar pelo celular (certa, errada ou bloqueada), com IP e aparelho | uma tentativa de entrada no acompanhamento pelo celular | só acrescenta (imutável: não altera nem apaga) | padrão de uso e detecção de acesso estranho (horário, IP, erros seguidos) |
+| `dono_presenca` | Última vez que o dono usou o painel (base para saber se ele está fora) | uma origem de presença e o último horário | estado atual (sobrescrito de propósito; a história fica em outra tabela) | horários de presença do dono |
 
 ## Colunas de cada tabela
 
 - **`acessos_celular`**: `id`, `data_hora`, `ip`, `evento`, `detalhe`, `navegador`
+- **`alcadas_decisoes`**: `id`, `data_hora`, `item_tipo`, `item_id`, `decisor`, `validador`, `decisao`, `motivo`, `evidencia`, `reversivel_ate`, `ref`
 - **`aprovacoes`**: `id`, `solicitacao_id`, `etapa_id`, `pedido`, `risco`, `solicitante`, `aprovador`, `estado`, `decidido_por`, `decidido_em`, `motivo`, `criada_em`
 - **`arquivos`**: `id`, `conversa_id`, `solicitacao_id`, `caminho`, `nome`, `criado_em`
 - **`arquivos_linhas`**: `id`, `arquivo`, `geracao`, `n_linha`, `conteudo`, `capturado_em`
@@ -114,6 +121,7 @@
 - **`conversas`**: `id`, `funcionario`, `titulo`, `origem`, `criada_em`, `atualizada_em`, `contexto`, `arquivada`
 - **`decisoes`**: `id`, `criada_em`, `origem`, `reuniao_id`, `andar`, `texto`, `dono`, `prazo`, `criterio`, `vinculo_tipo`, `vinculo_id`, `registrada_por`, `estado`, `estado_em`, `evidencia`, `repactuacoes`
 - **`decisoes_eventos`**: `id`, `decisao_id`, `data_hora`, `tipo`, `de`, `para`, `quem`, `reuniao_id`, `detalhe`
+- **`dono_presenca`**: `origem`, `ultima`
 - **`erros_sistema`**: `id`, `impressao`, `primeira`, `ultima`, `ocorrencias`, `modulo`, `funcao`, `tipo`, `mensagem`, `traceback_primeiro`, `traceback_ultimo`, `handover_id`, `estado`
 - **`etapas`**: `id`, `solicitacao_id`, `ordem`, `titulo`, `funcionario`, `ferramenta`, `parametros`, `depende`, `risco`, `precisa_aprovacao`, `estado`, `natureza`, `resultado`, `tentativas`, `inicio`, `fim`
 - **`eventos`**: `id`, `solicitacao_id`, `data_hora`, `tipo`, `quem`, `de`, `para`, `texto`, `dados`
@@ -135,6 +143,10 @@
 - **`registro_cursores`**: `chave`, `posicao`, `linhas`, `assinatura`, `atualizado_em`
 - **`regras_aprendidas`**: `id`, `proposta_id`, `padrao`, `tipo`, `coluna`, `valor`, `aprovada_por`, `aprovada_em`, `ativa`, `para`, `desativada_em`, `desativada_por`, `motivo_desativacao`
 - **`reunioes`**: `id`, `inicio`, `fim`, `data_hora`, `ata`, `arquivo`
+- **`rh_cargos`**: `funcionario`, `nivel`, `desde`, `movimento_id`
+- **`rh_ciclos`**: `id`, `data_hora`, `resumo`
+- **`rh_movimentos`**: `id`, `data_hora`, `funcionario`, `tipo`, `de_nivel`, `para_nivel`, `competencia`, `motivo`, `evidencia`, `proposto_por`, `validado_por`, `situacao`, `ref`
+- **`rh_pdi`**: `id`, `funcionario`, `competencia`, `ferramenta`, `aberto_em`, `acerto_abertura`, `movimento_id`, `afastado_em`, `fechado_em`
 - **`rotinas_estado`**: `nome`, `ultima_verificacao`, `ultima_execucao`, `ultimo_status`, `detalhe`
 - **`rotinas_execucoes`**: `id`, `nome`, `inicio`, `fim`, `segundos`, `status`, `detalhe`
 - **`sala_eventos`**: `id`, `conversa_id`, `data_hora`, `quem`, `tipo`, `dados`

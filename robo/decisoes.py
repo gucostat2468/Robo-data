@@ -174,10 +174,14 @@ def cobrar(cfg, did: str, reuniao_id: str, quem: str, situacao: str) -> None:
         _evento(c, did, "cobrada", None, None, quem, reuniao_id, situacao)
 
 
-def repactuar(cfg, did: str, novo_prazo, motivo: str, reuniao_id: str, quem: str = "dono") -> dict:
-    """Novo prazo, sempre com motivo e só por você (quem cobra não é quem se dá mais prazo)."""
+def repactuar(cfg, did: str, novo_prazo, motivo: str, reuniao_id: str, quem: str = "dono", validador: str | None = None) -> dict:
+    """Novo prazo, sempre com motivo e só por você (quem cobra não é quem se dá mais prazo). Única exceção: com você
+    fora, o gestor do responsável repactua UMA vez, validado por outro líder (robo/alcadas.py confere tudo)."""
     if quem != "dono":
-        raise PermissionError("Só o dono repactua o prazo de uma decisão.")
+        from robo import alcadas
+        ok, porque = alcadas.autoriza(cfg, "decisao_atrasada", did, quem, validador)
+        if not ok:
+            raise PermissionError(f"Só o dono repactua o prazo de uma decisão. Alçada: {porque}.")
     if len((motivo or "").strip()) < 10:
         raise ValueError("Repactuar exige o motivo (o que mudou).")
     p = ler_prazo(novo_prazo)
@@ -188,6 +192,19 @@ def repactuar(cfg, did: str, novo_prazo, motivo: str, reuniao_id: str, quem: str
         c.execute("UPDATE decisoes SET prazo=?, estado='em_andamento', estado_em=?, repactuacoes=repactuacoes+1 WHERE id=?",
                   (p.isoformat(), _agora(), did))
         _evento(c, did, "repactuada", d["prazo"], p.isoformat(), quem, reuniao_id, motivo.strip())
+    return {"ok": True, "prazo": p.isoformat()}
+
+
+def reverter_repactuacao(cfg, did: str, prazo_anterior: str, motivo: str, quem: str = "dono") -> dict:
+    """O dono desfaz a repactuação feita por alçada: o prazo volta ao anterior (e a decisão volta a contar atraso)."""
+    if quem != "dono":
+        raise PermissionError("Só o dono reverte uma repactuação.")
+    p = ler_prazo(prazo_anterior)
+    with _tb(cfg).tx() as c:
+        d = _aberta(c, did)
+        c.execute("UPDATE decisoes SET prazo=?, estado_em=? WHERE id=?", (p.isoformat(), _agora(), did))
+        _evento(c, did, "repactuacao_revertida", d["prazo"], p.isoformat(), quem, "ALCADA", motivo.strip())
+    atualizar(cfg)
     return {"ok": True, "prazo": p.isoformat()}
 
 

@@ -100,6 +100,13 @@ PADROES: dict = {
         "habilitado": False,
         "porta": 8766,
     },
+    # alçadas da liderança com o dono fora (robo/alcadas.py): duas pessoas, só a matriz, o dono reverte em 7 dias
+    "autonomia": {
+        "habilitada": True,
+        "horas_offline": 12,
+        "horas_pendente": 6,
+        "dias_reversao": 7,
+    },
     "manutencao": {
         "dias_retencao_originais": 0,
         "dias_retencao_relatorios": 0,

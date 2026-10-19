@@ -222,10 +222,15 @@ def listar(cfg, estado: str | None = None, limite: int = 200) -> list[dict]:
 
 
 # =============================================================================== decisão (só o dono) e reenvio
-def decidir(cfg, proposta_id: str, aprovar: bool, quem: str = "dono", motivo: str = "") -> dict:
+def decidir(cfg, proposta_id: str, aprovar: bool, quem: str = "dono", motivo: str = "", validador: str | None = None) -> dict:
     from robo import licoes, memoria
-    if quem != "dono":
-        raise PermissionError("Só o dono aprova ou recusa uma regra nova (ninguém aprova a própria proposta).")
+    if quem != "dono":  # única exceção: alçada da liderança com o dono fora (robo/alcadas.py confere tudo de novo)
+        from robo import alcadas
+        ok, porque = alcadas.autoriza(cfg, "proposta_regra", proposta_id, quem, validador) if aprovar else (False, "")
+        if not ok:
+            raise PermissionError("Só o dono aprova ou recusa uma regra nova (ninguém aprova a própria proposta)."
+                                  + (f" Alçada: {porque}." if porque else ""))
+    por_quem = "pelo dono" if quem == "dono" else f"por alçada ({quem}, validado por {validador}; o dono pode reverter)"
     tb = _tb(cfg)
     with tb.tx() as c:
         p = c.execute("SELECT * FROM propostas_regra WHERE id=?", (proposta_id,)).fetchone()
@@ -251,12 +256,12 @@ def decidir(cfg, proposta_id: str, aprovar: bool, quem: str = "dono", motivo: st
     if aprovar:
         if p["tipo"] == "apelido":
             licoes.criar(cfg, "regra", proposta_id, titulo,
-                         f"{p['motivo']}\nDecisão: aprovada pelo dono.\nA partir de agora, em qualquer conversa, quando "
+                         f"{p['motivo']}\nDecisão: aprovada {por_quem}.\nA partir de agora, em qualquer conversa, quando "
                          f"alguém disser '{p['valor']}' num cálculo, é a coluna '{p['coluna']}'.", f"{p['valor']} {p['coluna']}",
                          "um cálculo usa a correção e dá resultado", None, None, "todos", "dono")
         else:
             licoes.criar(cfg, "regra", proposta_id, titulo,
-                         f"{p['motivo']}\nDecisão: aprovada pelo dono.\nA partir de agora, arquivos '{p['padrao']}' aceitam "
+                         f"{p['motivo']}\nDecisão: aprovada {por_quem}.\nA partir de agora, arquivos '{p['padrao']}' aceitam "
                          f"isso automaticamente.\nEvidência: {p['evidencia']}", f"{p['coluna']} {p['valor']}",
                          "o arquivo que reprovou passa depois da regra", andar, p["autor"])
         memoria.experiencia(cfg, p["autor"], "acerto", f"Proposta de regra aprovada: {titulo}", "aprendizado", proposta_id)

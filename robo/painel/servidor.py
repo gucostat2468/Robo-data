@@ -172,6 +172,18 @@ class Api:
             raise ErroApi(self.c.erro_config or "Configuração indisponível", 409)
         return self.c.cfg
 
+    def presenca(self) -> None:
+        """O dono está usando o painel: registra (no máximo 1x por minuto). Base das alçadas (robo/alcadas.py)."""
+        agora = time.time()
+        if agora - getattr(self, "_ultima_presenca", 0) < 60 or not self.c.cfg:
+            return
+        self._ultima_presenca = agora
+        try:
+            from robo import alcadas
+            alcadas.marcar_presenca(self.c.cfg, "painel")
+        except Exception:
+            log.debug("Não consegui registrar a presença do dono", exc_info=True)
+
     # ---------------- leitura
     def estado(self, _q) -> dict:
         c = self.c
@@ -1233,6 +1245,12 @@ class Api:
         from robo import treino
         return treino.painel(self.cfg)
 
+    def governanca(self, _q) -> dict:
+        """RH de desempenho e alçadas (somente leitura)."""
+        from robo import alcadas, rh_desempenho
+        return {"rh": rh_desempenho.resumo(self.cfg), "alcadas": alcadas.listar(self.cfg, 50),
+                "dono": alcadas.dono_offline(self.cfg), "matriz": {k: list(v) for k, v in alcadas.MATRIZ.items()}}
+
     def treino_pessoa(self, q) -> dict:
         from robo import treino
         return treino.pessoa(self.cfg, q.get("id", [""])[0])
@@ -1256,6 +1274,7 @@ class Api:
 
 ROTAS_GET = {
     "/api/ping": lambda api, q: {"app": "robo-planilhas", "versao": __version__},
+    "/api/governanca": Api.governanca,
     "/api/estado": Api.estado, "/api/escritorio": Api.escritorio, "/api/agentes": Api.agentes, "/api/historico": Api.historico, "/api/execucao": Api.execucao,
     "/api/reprovados": Api.reprovados, "/api/log": Api.log, "/api/config": Api.config,
     "/api/banco/resumo": Api.banco_resumo, "/api/canal": Api.canal, "/api/ti": Api.ti,
@@ -1327,9 +1346,12 @@ def criar_manipulador(api: Api):
 
         def _bloqueado(self, caminho: str) -> bool:
             """Com senha definida, toda rota /api (menos login e ping) exige sessão válida."""
-            if not caminho.startswith("/api/") or caminho in ROTAS_LIVRES or not api.senha_hash:
+            if not caminho.startswith("/api/") or caminho in ROTAS_LIVRES:
                 return False
-            return not api.acesso.valida(self._token())
+            if api.senha_hash and not api.acesso.valida(self._token()):
+                return True
+            api.presenca()  # quem passou daqui é o dono usando o painel
+            return False
 
         def do_GET(self):
             if not self._host_ok():

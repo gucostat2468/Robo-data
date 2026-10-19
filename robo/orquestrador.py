@@ -107,7 +107,7 @@ def classificar(texto: str) -> str:
 def _responsavel(ferramenta: str | None, preferido: str, cfg) -> str:
     if not ferramenta:
         return preferido
-    if organizacao.pode_usar(preferido, ferramenta, cfg):
+    if organizacao.pode_usar(preferido, ferramenta, cfg, producao=True):
         return preferido
     return organizacao.quem_usa(ferramenta, cfg) or preferido
 
@@ -264,7 +264,7 @@ def _executar(cfg, sid: str) -> str:
             por_ordem[e["ordem"]]["estado"] = "bloqueada"
             continue
         quem = e["funcionario"]
-        if not organizacao.pode_usar(quem, e["ferramenta"], cfg):
+        if not organizacao.pode_usar(quem, e["ferramenta"], cfg, producao=True):
             outro = organizacao.quem_usa(e["ferramenta"], cfg)
             if not outro:
                 tb.atualizar_etapa(e["id"], estado="bloqueada", natureza="limitacao", resultado=ferramentas.resultado(

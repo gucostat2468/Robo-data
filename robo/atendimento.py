@@ -291,7 +291,7 @@ def _com_ferramenta(cfg, tb, conversa_id, contrato, texto, ferr, params, pronto=
     pid = contrato["id"]
     msgs = []
     executor = pid
-    if not organizacao.pode_usar(pid, ferr, cfg):
+    if not organizacao.pode_usar(pid, ferr, cfg, producao=True):
         executor = organizacao.quem_usa(ferr, cfg)
         colega = organizacao.contrato(executor, cfg) if executor else None
         aviso = ferramentas.resultado(False, "limitacao",

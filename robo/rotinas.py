@@ -36,6 +36,10 @@ ROTINAS = {
     "auditoria": ("dir_dados", "Auditoria por amostragem dos heads (confiança nos resultados)", 24 * 7),
     "laboratorio": ("head_engenharia", "Laboratório: treino com planilhas sintéticas de várias áreas, no Excel e no PostgreSQL", 1 / 6),
     "canal": ("canal_nina", "Posta no canal o que aconteceu (aprovações, reprovações, entregas)", 1 / 60),
+    "rh_desempenho": ("rh_desempenho", "Ciclo de desempenho do RH: promoção, plano de melhoria, afastamento e reintegração "
+                      "(1x por dia, pela política em robo/rh_desempenho.py)", 24),
+    "alcadas": ("dir_operacoes", "Alçadas: com o dono fora, a liderança decide o que a matriz permite (duas pessoas; "
+                "o dono reverte em 7 dias)", 1),
 }
 
 
@@ -43,8 +47,8 @@ ROTINAS = {
 def funcao(cfg, nome: str):
     """O que cada rotina executa. Uma lista só, usada pelo laço do robô (painel/controle.py) e pelo comando
     `python -m robo rotina <nome>` (que é o que o Airflow chama). Assim os dois nunca divergem."""
-    from robo import (auditoria, backup, desenvolvimento, estrategia, laboratorio, licoes, memoria, registro_total, reuniao,
-                      treino)
+    from robo import (alcadas, auditoria, backup, desenvolvimento, estrategia, laboratorio, licoes, memoria, registro_total,
+                      reuniao, rh_desempenho, treino)
     from robo.canal import Canal
     from robo.ti import ronda
     mapa = {
@@ -61,6 +65,8 @@ def funcao(cfg, nome: str):
         "laboratorio": lambda: laboratorio.rotina(cfg),
         "canal": lambda: Canal(cfg).sincronizar(),
         "registro": lambda: registro_total.capturar(cfg),
+        "rh_desempenho": lambda: rh_desempenho.rotina(cfg),
+        "alcadas": lambda: alcadas.rotina(cfg),
     }
     if nome not in mapa:
         raise KeyError(f"rotina desconhecida: {nome} (existem: {', '.join(ROTINAS)})")
