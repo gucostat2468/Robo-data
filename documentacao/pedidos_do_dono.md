@@ -93,4 +93,5 @@ Legenda: ✅ feito e testado · 🟡 feito em parte · ⏳ pendente
 | 87 | Boas práticas para tudo | ✅ | `documentacao/boas_praticas_operacao.md` |
 | 88 | Acompanhar a empresa pelo celular | ✅ | `python -m robo celular --ligar`: página SOMENTE LEITURA na rede de casa, mesma senha do painel, bloqueio por força bruta, todo acesso registrado (`acessos_celular`) |
 | 89 | Ligar o app de banco do celular no meu PostgreSQL | ✅ | `python -m robo liberar-banco-celular` (Prompt como Administrador): só `robo_leitura`, só a rede de casa, cópia do pg_hba.conf antes de mexer, imprime os campos do app |
+| 90 | Profissionais de Airflow | ✅ | Henrique, Bianca e Davi (5º andar): fluxos únicos para robô e Airflow, DAG gerada (`python -m robo airflow-dag`) e validada no Airflow 3.1.8 real, SLA das rotinas na ronda de TI, competência de treino 'orquestracao' — guia `documentacao/airflow.md` |
 | 38 | IA opcional sem fingir | 🟡 | `robo/ia.py`: só modelo local, desligado; ainda não usado nas respostas |

@@ -277,7 +277,20 @@ robo/
 
 Testes: `.venv\Scripts\python -m pip install -r requisitos-dev.txt` e `.venv\Scripts\python -m pytest`. Para incluir os testes de PostgreSQL: `set ROBO_TESTE_PG=host=localhost port=5432 user=postgres password=SUA_SENHA`.
 
-## 11. Acompanhar pelo celular (somente leitura)
+## 11. Apache Airflow (opcional)
+
+O robô agenda as próprias rotinas. Se quiser vê-las no Airflow (com histórico, retentativas e tempo limite):
+
+```
+python -m robo airflow-dag        :: gera airflow\dags\robo_empresa.py a partir das rotinas (caminhos já para o WSL)
+python -m robo rotina backup      :: roda UMA rotina e registra — é o que cada tarefa do Airflow chama
+```
+
+O Airflow roda no WSL2 (Linux dentro do Windows, nada na nuvem). Passo a passo, regras de SLA e como escolher quem
+agenda (`rotinas: agendador: robo | airflow`): **`documentacao/airflow.md`**. O robô e o Airflow nunca rodam a mesma
+rotina ao mesmo tempo (trava entre programas; a tarefa repetida sai com código 99 e o Airflow a marca como pulada).
+
+## 12. Acompanhar pelo celular (somente leitura)
 
 **O que é:** uma página no celular com o estado da empresa (robô ligado, rotinas, treino das últimas 24 h, últimas
 planilhas, decisões atrasadas, alertas da TI e último backup), atualizando a cada 20 segundos. Ela **não tem nenhum

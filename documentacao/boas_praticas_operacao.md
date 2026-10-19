@@ -209,3 +209,13 @@ depende de você, ela aparece como **(você)**.
 | 5 senhas erradas = aparelho bloqueado 15 min; toda entrada registrada (`acessos_celular`) | Força bruta não passa e tudo fica auditável |
 | Senha do banco só em variável de ambiente (`%ROBO_PG_SENHA_LEITURA%`) | Nunca em arquivo, print ou mensagem |
 | Celular perdido ou trocado | Troque a senha do painel (derruba todas as sessões) e rode de novo `python -m robo instalar-banco` (senhas novas do banco) |
+
+## Orquestração (Airflow)
+
+- **Uma fonte só:** os fluxos ficam em `robo/orquestracao.py`. Nunca edite a DAG à mão; gere de novo com `python -m robo airflow-dag`.
+- **Um agendador só:** ou o robô (padrão), ou o Airflow (`rotinas: agendador: airflow`). Os dois ao mesmo tempo não
+  quebram nada (há trava), mas enchem o Airflow de tarefas puladas.
+- **SLA com regra escrita:** atrasada = mais de 1,5 × o intervalo; lenta = mais de 3 × a mediana e +60 s; erro =
+  só a última execução. Alarme que não segue a regra é ruído.
+- **Toda falha tem dono:** cada rotina tem responsável (`robo/rotinas.py`); a Bianca aponta o nome na ronda de TI.
+
