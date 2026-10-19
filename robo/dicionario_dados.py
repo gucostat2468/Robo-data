@@ -109,6 +109,22 @@ TABELAS = {
     "acessos_celular": ("operacao", "Cada tentativa de entrar pelo celular (certa, errada ou bloqueada), com IP e aparelho",
                         "uma tentativa de entrada no acompanhamento pelo celular", IMUTAVEL,
                         "padrão de uso e detecção de acesso estranho (horário, IP, erros seguidos)"),
+    "rh_movimentos": ("pessoas", "Cada movimento de RH: promoção, plano de melhoria, afastamento, reintegração, propostas ao "
+                      "dono, decisões e reversões — com a evidência (números) e quem propôs e quem validou",
+                      "um movimento de RH de uma pessoa", IMUTAVEL,
+                      "carreira por pessoa; rótulo de promoção/PDI a partir do desempenho dos 30 dias anteriores"),
+    "rh_cargos": ("pessoas", "Nível efetivo de quem foi promovido pela política (vale sobre o nível do cadastro)",
+                  "uma pessoa promovida e o nível atual dela", ESTADO_ATUAL, "nível atual (a história está em rh_movimentos)"),
+    "rh_pdi": ("pessoas", "Planos de melhoria abertos e fechados, e o afastamento da ferramenta em produção",
+               "um plano de melhoria de uma pessoa numa competência", SITUACAO,
+               "tempo até recuperar; efeito do PDI no acerto"),
+    "rh_ciclos": ("pessoas", "Cada rodada do ciclo de desempenho do RH, com o resumo do que decidiu",
+                  "uma execução do ciclo de RH", IMUTAVEL, "frequência de promoções e PDIs ao longo do tempo"),
+    "alcadas_decisoes": ("reunioes", "O que a liderança decidiu (ou deixou para o dono) com o dono fora: quem decidiu, "
+                         "quem validou, a prova e até quando o dono pode reverter", "uma decisão de alçada ou uma reversão",
+                         IMUTAVEL, "padrão de decisões delegadas e reversões do dono (qualidade da autonomia)"),
+    "dono_presenca": ("operacao", "Última vez que o dono usou o painel (base para saber se ele está fora)",
+                      "uma origem de presença e o último horário", ESTADO_ATUAL, "horários de presença do dono"),
 }
 COLUNAS_DE_DATA = ("data_hora", "criada_em", "criado_em", "inicio", "primeira", "aberto_em", "atualizada_em",
                    "ultima_verificacao", "atribuida_em", "aprovada_em")
@@ -116,13 +132,15 @@ COLUNAS_DE_DATA = ("data_hora", "criada_em", "criado_em", "inicio", "primeira", 
 
 def _todas_as_tabelas(cfg) -> None:
     """Garante que todo módulo criou o próprio esquema (para listar e documentar tudo)."""
-    from robo import aprendizado, auditoria, backup, decisoes, erros, interacoes, laboratorio, licoes, sala, treino
+    from robo import (alcadas, aprendizado, auditoria, backup, decisoes, erros, interacoes, laboratorio, licoes,
+                      rh_desempenho, sala, treino)
     from robo.painel import celular
     from robo.ferramentas import USO_ESQUEMA
     from robo.rotinas import ESQUEMA as ROTINAS
     from robo.trabalho import Trabalho
     Trabalho(cfg)
-    for m in (aprendizado, auditoria, erros, interacoes, laboratorio, licoes, sala, treino, decisoes, celular):
+    for m in (aprendizado, auditoria, erros, interacoes, laboratorio, licoes, sala, treino, decisoes, celular,
+              rh_desempenho, alcadas):
         m._tb(cfg)
     from robo.trabalho import proteger
     with Trabalho(cfg).tx() as c:

@@ -76,6 +76,15 @@ celular:
   habilitado: false
   porta: 8766
 
+# Alçadas: com você FORA (sem abrir o painel nem entrar pelo celular) há horas_offline horas, a liderança decide o que
+# a matriz de robo/alcadas.py permite — sempre duas pessoas diferentes, tudo registrado, e você reverte em dias_reversao.
+# Risco médio/alto, permissões, estagiário, exclusão, segurança e configuração continuam esperando você.
+autonomia:
+  habilitada: true
+  horas_offline: 12
+  horas_pendente: 6
+  dias_reversao: 7
+
 manutencao:
   dias_retencao_originais: 0      # 0 = guardar para sempre (a planilha original é a prova e a base para ML)
   dias_retencao_relatorios: 0     # 0 = guardar para sempre

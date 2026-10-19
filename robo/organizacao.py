@@ -17,7 +17,10 @@ Regras de hierarquia (valem para todo mundo, inclusive contratados):
 
 from __future__ import annotations
 
+import sqlite3
+import time
 from functools import lru_cache
+from pathlib import Path
 
 DONO = "dono"
 
@@ -154,7 +157,57 @@ def lista(cfg=None, com_contratados: bool = True) -> list[dict]:
                                 "_agente": a})
         except Exception:  # configuração com problema não pode esconder o quadro fixo
             pass
+    if cfg is not None:  # nível efetivo decidido pelo ciclo de RH (promoção registrada em rh_movimentos)
+        niveis = _rh_estado(cfg)[0]
+        for x in pessoas:
+            if x["id"] in niveis:
+                x["nivel_rh"] = niveis[x["id"]]
     return pessoas
+
+
+# ------------------------------------------------------------------- RH: nível efetivo e afastamentos (rh_desempenho)
+_CACHE_RH: dict[str, tuple[float, dict, dict]] = {}
+
+
+def _rh_estado(cfg) -> tuple[dict, dict]:
+    """(nível efetivo por pessoa, ferramentas de produção afastadas por pessoa), lidos de rh_cargos e rh_pdi.
+    Leitura direta e somente leitura; guarda 5 s (o ciclo de RH limpa na hora em que grava)."""
+    logs = getattr(cfg, "logs", None)
+    if not logs:
+        return {}, {}
+    arq = Path(logs) / "trabalho.db"
+    chave, agora = str(arq), time.monotonic()
+    guardado = _CACHE_RH.get(chave)
+    if guardado and agora - guardado[0] < 5:
+        return guardado[1], guardado[2]
+    niveis: dict = {}
+    afastadas: dict = {}
+    if arq.exists():
+        try:
+            con = sqlite3.connect(f"file:{arq}?mode=ro", uri=True, timeout=5)
+            try:
+                tabelas = {r[0] for r in con.execute("SELECT name FROM sqlite_master WHERE type='table'")}
+                if "rh_cargos" in tabelas:
+                    niveis = {f: n for f, n in con.execute("SELECT funcionario, nivel FROM rh_cargos")}
+                if "rh_pdi" in tabelas:
+                    for f, ferr in con.execute("SELECT funcionario, ferramenta FROM rh_pdi "
+                                               "WHERE afastado_em IS NOT NULL AND fechado_em IS NULL"):
+                        afastadas.setdefault(f, set()).add(ferr)
+            finally:
+                con.close()
+        except sqlite3.Error:
+            pass
+    _CACHE_RH[chave] = (agora, niveis, afastadas)
+    return niveis, afastadas
+
+
+def limpar_cache_rh() -> None:
+    _CACHE_RH.clear()
+
+
+def afastado_de(pid: str, cfg=None) -> list[str]:
+    """Ferramentas que a pessoa NÃO usa em produção enquanto o plano de melhoria não fecha (continua treinando)."""
+    return sorted(_rh_estado(cfg)[1].get(pid, ())) if cfg is not None else []
 
 
 def por_id(cfg=None) -> dict[str, dict]:
@@ -162,6 +215,9 @@ def por_id(cfg=None) -> dict[str, dict]:
 
 
 def nivel_de(pid: str, pessoa: dict | None = None) -> str:
+    """Nível do cargo. Promoção registrada pelo ciclo de RH vale primeiro (chega em `pessoa` por lista(cfg))."""
+    if pessoa and pessoa.get("nivel_rh"):
+        return pessoa["nivel_rh"]
     from robo import lideranca, quadro, rh, ti
     f = rh.FICHAS.get(pid) or quadro.POR_ID.get(pid) or ti.POR_ID.get(pid) or lideranca.POR_ID.get(pid) or {}
     return f.get("nivel") or (pessoa or {}).get("nivel") or "pleno"
@@ -255,7 +311,7 @@ def contrato(pid: str, cfg=None) -> dict | None:
         "gestor": gestor, "gestor_nome": nome_de(gestor) if gestor else None,
         "especialidade": f.get("area") or "", "objetivo": p.get("descricao") or "; ".join(f.get("responsabilidades") or [])[:300],
         "responsabilidades": list(f.get("responsabilidades") or []),
-        "ferramentas": ferramentas,
+        "ferramentas": ferramentas, "afastado_de": afastado_de(pid, cfg),
         "entradas": {x: ENTRADAS.get(x, "") for x in ferramentas}, "saidas": {x: SAIDAS.get(x, "") for x in ferramentas},
         "permissoes": perm, "risco_maximo": perm["risco_maximo"],
         "criterios_sucesso": list(f.get("criterios") or []),
@@ -275,23 +331,29 @@ def contrato(pid: str, cfg=None) -> dict | None:
     }
 
 
-def pode_usar(pid: str, ferramenta: str, cfg=None) -> bool:
-    return ferramenta in autorizadas(pid, cfg)
+def pode_usar(pid: str, ferramenta: str, cfg=None, producao: bool = False) -> bool:
+    """producao=True: além do contrato, respeita o afastamento do RH (plano de melhoria sem evolução). O treino chama
+    sem producao — quem está afastado continua treinando a ferramenta até voltar."""
+    if ferramenta not in autorizadas(pid, cfg):
+        return False
+    return not (producao and ferramenta in afastado_de(pid, cfg))
 
 
 def quem_usa(ferramenta: str, cfg=None, preferido: str | None = None) -> str | None:
     """Quem deve executar uma ferramenta: o preferido (se pode), o responsável padrão, ou o primeiro autorizado."""
     for c in (preferido, ENCAMINHAR.get(ferramenta)):
-        if c and pode_usar(c, ferramenta, cfg):
+        if c and pode_usar(c, ferramenta, cfg, producao=True):
             return c
     for p in lista(cfg, com_contratados=False):
-        if pode_usar(p["id"], ferramenta, cfg):
+        if pode_usar(p["id"], ferramenta, cfg, producao=True):
             return p["id"]
     return None
 
 
 def pode_alterar_permissoes(quem: str, alvo: str) -> bool:
-    """Só o dono muda permissões e promove. Ninguém mexe nas próprias permissões."""
+    """Mudança MANUAL de permissões: só o dono. Ninguém mexe nas próprias permissões. (Promoção por política, medida
+    nos registros, segue robo/rh_desempenho.py: RH propõe, o gestor — outra pessoa — valida, e o que dá direito de
+    alterar dados ou tira alguém do estágio continua sendo decisão do dono.)"""
     return quem == DONO and alvo != DONO
 
 

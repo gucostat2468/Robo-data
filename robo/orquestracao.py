@@ -33,7 +33,8 @@ APENAS_NO_ROBO = {"canal"}
 FLUXOS = {
     "robo_horario": {"descricao": "Rotinas de gestão em sequência: cada uma decide se está na hora (backup diário, "
                                   "reunião semanal…)", "cron": "0 * * * *", "a_cada_min": 60, "limite_min": 120,
-                     "rotinas": ["estrategia", "backup", "memoria_pg", "pdca", "licoes", "estudo", "auditoria", "reuniao"]},
+                     "rotinas": ["estrategia", "backup", "memoria_pg", "pdca", "licoes", "estudo", "auditoria", "reuniao",
+                                 "rh_desempenho", "alcadas"]},
     "robo_treino": {"descricao": "Treino contínuo de todos os funcionários", "cron": "*/5 * * * *", "a_cada_min": 5,
                     "limite_min": 20, "rotinas": ["treino"]},
     "robo_laboratorio": {"descricao": "Laboratório de planilhas sintéticas", "cron": "*/10 * * * *", "a_cada_min": 10,
