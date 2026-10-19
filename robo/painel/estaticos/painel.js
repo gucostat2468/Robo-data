@@ -295,7 +295,8 @@ function desenhar() {
   if (!E.geral) { alvo.innerHTML = `<div class="carregando">Conectando ao robô…</div>`; return; }
   if (E.geral.erro_config && E.pagina !== "atividade") { alvo.innerHTML = renderBoasVindas(); acessivel(alvo); return; }
   const guardado = E._paginaDesenhada === E.pagina ? guardarCampos(alvo) : null;
-  alvo.innerHTML = `<div class="pagina">${PAGINAS[E.pagina].render()}</div>`;
+  const nova = E._paginaDesenhada !== E.pagina;  // só a troca de página anima (a atualização automática não pisca)
+  alvo.innerHTML = `<div class="pagina${nova ? " entrando" : ""}">${PAGINAS[E.pagina].render()}</div>`;
   if (guardado) devolverCampos(alvo, guardado);
   E._paginaDesenhada = E.pagina;
   acessivel(alvo);

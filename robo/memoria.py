@@ -495,7 +495,7 @@ ESPELHO_EXTRA = {
     "logs_sistema": "imutavel", "canal_mensagens": "imutavel", "arquivos_linhas": "imutavel", "arquivos_versoes": "imutavel",
     "treino_tentativas": "imutavel", "treino_niveis_eventos": "imutavel", "backups_registro": "imutavel",
     "decisoes_eventos": "imutavel", "rh_movimentos": "imutavel", "rh_ciclos": "imutavel", "alcadas_decisoes": "imutavel",
-    "vigia_eventos": "imutavel", "ideias_registro": "imutavel", "paineis_versoes": "imutavel",
+    "vigia_eventos": "imutavel", "ideias_registro": "imutavel", "paineis_versoes": "imutavel", "paineis_planilhas": "imutavel",
 }
 # Toda tabela do trabalho.db vai para o PostgreSQL (inclusive as criadas no futuro): a que não está acima é copiada
 # como "atualiza" (o estado mais novo substitui). "imutavel" = a cópia do banco nunca é sobrescrita.

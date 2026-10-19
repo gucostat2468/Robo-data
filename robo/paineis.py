@@ -53,7 +53,13 @@ ESQUEMA = """CREATE TABLE IF NOT EXISTS paineis_versoes (
   id INTEGER PRIMARY KEY AUTOINCREMENT, data_hora TEXT, autor TEXT, conferente TEXT, situacao TEXT, assinatura TEXT,
   paginas INTEGER, indicadores TEXT, divergencias TEXT);
 CREATE TRIGGER IF NOT EXISTS paineis_versoes_sem_alterar BEFORE UPDATE ON paineis_versoes
-BEGIN SELECT RAISE(ABORT, 'registro permanente: paineis_versoes não pode ser alterado'); END;"""
+BEGIN SELECT RAISE(ABORT, 'registro permanente: paineis_versoes não pode ser alterado'); END;
+CREATE TABLE IF NOT EXISTS paineis_planilhas (
+  id INTEGER PRIMARY KEY AUTOINCREMENT, data_hora TEXT, nome TEXT, origem TEXT, assinatura TEXT, tema TEXT, linhas INTEGER,
+  colunas INTEGER, regras_quebradas INTEGER, ancoras TEXT, leitura TEXT);
+CREATE INDEX IF NOT EXISTS ix_paineis_planilhas ON paineis_planilhas(nome, assinatura);
+CREATE TRIGGER IF NOT EXISTS paineis_planilhas_sem_alterar BEFORE UPDATE ON paineis_planilhas
+BEGIN SELECT RAISE(ABORT, 'registro permanente: paineis_planilhas não pode ser alterado'); END;"""
 
 
 def pasta(cfg) -> Path:
@@ -250,7 +256,7 @@ def construir(cfg, agora: datetime | None = None) -> dict:
         sql_tab = "SELECT name FROM sqlite_master WHERE type='table'"
         tamanhos = []
         for t in sorted(tem):
-            if t.startswith("sqlite_") or t == "paineis_versoes":  # o próprio registro do painel não entra na conta
+            if t.startswith("sqlite_") or t.startswith("paineis_"):  # os próprios registros do painel não entram na conta
                 continue
             tamanhos.append({"tabela": t, "linhas": c.execute(f'SELECT COUNT(*) FROM "{t}"').fetchone()[0]})
         tamanhos.sort(key=lambda x: -x["linhas"])
@@ -367,9 +373,13 @@ def versoes(cfg, limite: int = 20) -> list[dict]:
 
 def rotina(cfg) -> dict:
     """Manutenção (de hora em hora): Bárbara monta, Heitor confere, e só então publica. Toda tentativa fica registrada."""
+    from robo import leitura_bi
     tb = _tb(cfg)
     painel = construir(cfg)
     divergencias = reconciliar(cfg, painel)
+    painel["planilhas"], div_planilhas = leitura_bi.analisar_tudo(cfg)   # Bárbara lê cada planilha; Heitor confere
+    divergencias += div_planilhas
+    _registrar_planilhas(tb, painel["planilhas"])
     assinatura = _assinatura(painel)
     anterior = publicado(cfg)
     situacao = "reprovado" if divergencias else ("sem_mudanca" if anterior and anterior.get("assinatura") == assinatura
@@ -393,6 +403,20 @@ def rotina(cfg) -> dict:
     estrela = atualizar_estrela(cfg) if situacao == "publicado" else None
     _avisar(cfg, situacao, painel, divergencias, anterior)
     return {"situacao": situacao, "versao": versao, "divergencias": divergencias, "estrela": estrela}
+
+
+def _registrar_planilhas(tb, leituras: list[dict]) -> None:
+    """Cada leitura nova (planilha nova ou conteúdo diferente) fica registrada para sempre — com o JSON inteiro,
+    para treinar modelos no futuro (cabeçalho → tema/papel/regra)."""
+    with tb.tx() as c:
+        for le in leituras:
+            if c.execute("SELECT 1 FROM paineis_planilhas WHERE nome=? AND assinatura=?", (le["nome"], le["assinatura"])).fetchone():
+                continue
+            c.execute("INSERT INTO paineis_planilhas (data_hora, nome, origem, assinatura, tema, linhas, colunas, regras_quebradas, "
+                      "ancoras, leitura) VALUES (?,?,?,?,?,?,?,?,?,?)",
+                      (_agora(), le["nome"], le["origem"], le["assinatura"], le["tema"]["nome"], le["linhas"], le["colunas_qtd"],
+                       sum(1 for r in le["regras"] if r["nivel"] == "erro" and r["violacoes"]),
+                       json.dumps(le["ancoras"], ensure_ascii=False, default=str), json.dumps(le, ensure_ascii=False, default=str)))
 
 
 def atualizar_estrela(cfg) -> dict | None:

@@ -113,6 +113,9 @@ TABELAS = {
                         "uma ideia registrada num dia", IMUTAVEL, "quais problemas mais geram ideias e quanto tempo levam para sumir"),
     "paineis_versoes": ("operacao", "Cada montagem dos painéis (Bárbara) e a conferência do Heitor: situação, indicadores e "
                         "divergências", "uma versão dos painéis", IMUTAVEL, "evolução de cada indicador no tempo; qualidade dos painéis"),
+    "paineis_planilhas": ("conhecimento", "Cada planilha lida pela Bárbara: tema, papel e regra de cada cabeçalho, regras "
+                          "quebradas, medidas DAX e números-âncora (leitura completa em JSON)", "uma planilha com um conteúdo",
+                          IMUTAVEL, "aprender a reconhecer tema e regra de negócio pelo cabeçalho (rótulo supervisionado)"),
     "vigia_eventos": ("operacao", "Cada vez que o vigia achou o robô parado (e religou) ou sem responder", "um evento do vigia",
                       IMUTAVEL, "disponibilidade real: quedas por dia e tempo até voltar"),
     "logs_sistema": ("operacao", "Cada registro do log do sistema (robo.log e os girados), com nível e mensagem completa",

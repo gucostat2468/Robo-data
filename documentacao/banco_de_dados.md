@@ -6,7 +6,7 @@
 
 | Onde | O que guarda | Para quê |
 |---|---|---|
-| `logs/trabalho.db` (SQLite) | **Fonte de tudo**: a memória da empresa (55 tabelas abaixo) | Funciona sem internet e sem servidor; nada se apaga |
+| `logs/trabalho.db` (SQLite) | **Fonte de tudo**: a memória da empresa (56 tabelas abaixo) | Funciona sem internet e sem servidor; nada se apaga |
 | `logs/backups_sqlite/` | Cópia diária do `trabalho.db`, conferida (`integrity_check`) e com SHA-256 | Restaurar se o disco falhar; o 1º de cada mês fica para sempre |
 | PostgreSQL `robo_dados`, schema `robo` | Espelho de TODAS as tabelas (`memoria_<tabela>`) | Consultas em SQL, Power BI e Machine Learning |
 | PostgreSQL schemas `bruto` → `tratado` → `analitico` | As planilhas de negócio (ELT) | Análise e Power BI |
@@ -64,6 +64,7 @@
 | `propostas_regra` | Regras propostas a partir de reprovações (só o dono aprova) e a prova | uma proposta de regra | registro com situação (a situação muda; a linha nunca some) | o que reprova e o que resolve |
 | `regras_aprendidas` | Regras aprovadas em vigor (sinônimo, valor, correção, apelido) e desativações | uma regra aprovada | registro com situação (a situação muda; a linha nunca some) | efeito das regras na taxa de aprovação |
 | `ideias_registro` | Cada ideia da Iara (ideias e expansão), com o dado que a originou e o dono | uma ideia registrada num dia | só acrescenta (imutável: não altera nem apaga) | quais problemas mais geram ideias e quanto tempo levam para sumir |
+| `paineis_planilhas` | Cada planilha lida pela Bárbara: tema, papel e regra de cada cabeçalho, regras quebradas, medidas DAX e números-âncora (leitura completa em JSON) | uma planilha com um conteúdo | só acrescenta (imutável: não altera nem apaga) | aprender a reconhecer tema e regra de negócio pelo cabeçalho (rótulo supervisionado) |
 
 ### Treino contínuo e laboratório (casos com gabarito, tentativas e níveis)
 
@@ -142,6 +143,7 @@
 - **`memoria`**: `id`, `tipo`, `chave`, `texto`, `origem`, `solicitacao_id`, `criada_em`
 - **`mensagens`**: `id`, `conversa_id`, `autor`, `texto`, `natureza`, `dados`, `solicitacao_id`, `criada_em`
 - **`mentorias`**: `id`, `data_hora`, `mentor`, `aprendiz`, `competencia`, `nivel`, `tentativa_erro_id`, `licao_id`, `situacao`, `fechada_em`, `tentativa_resultado_id`
+- **`paineis_planilhas`**: `id`, `data_hora`, `nome`, `origem`, `assinatura`, `tema`, `linhas`, `colunas`, `regras_quebradas`, `ancoras`, `leitura`
 - **`paineis_versoes`**: `id`, `data_hora`, `autor`, `conferente`, `situacao`, `assinatura`, `paginas`, `indicadores`, `divergencias`
 - **`propostas_regra`**: `id`, `criada_em`, `arquivo`, `arquivo_erros`, `padrao`, `tipo`, `coluna`, `valor`, `motivo`, `evidencia`, `alerta`, `autor`, `estado`, `decidido_por`, `decidido_em`, `motivo_decisao`, `comprovada_em`, `prova`, `para`
 - **`registro_conhecimento`**: `id`, `data_hora`, `tipo`, `ref`, `quem`, `dados`, `hash_anterior`, `hash`

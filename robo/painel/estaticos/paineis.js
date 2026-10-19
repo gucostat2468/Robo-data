@@ -2,7 +2,7 @@
 // em hora; o Heitor (analista de BI) refaz as contas por outro caminho antes de publicar. Tudo vem de /api/paineis.
 // Gráficos em SVG puro (sem biblioteca externa): linha para tendência, barras para comparar, colunas para níveis.
 
-Object.assign(E, { paineis: null, paineisAba: "executiva" });
+Object.assign(E, { paineis: null, paineisAba: "planilhas", paineisPlanilha: 0 });
 
 async function carregarPaineis() {
   try { E.paineis = await api("/api/paineis"); } catch (e) { avisar(e.message, "erro"); }
@@ -135,31 +135,77 @@ function pbPagina(p) {
   return pbKpis(p) + `<div class="pb-grade-cartoes">${(blocos[p.id] ? blocos[p.id]() : []).join("")}</div>` + achados;
 }
 
+// ------------------------------------------------------------------ Planilhas: a leitura da Bárbara de cada planilha
+const pbNumBr = (v) => v == null ? "—" : Math.abs(v) >= 1000 ? num(Math.round(v * 100) / 100) : String(Math.round(v * 10000) / 10000).replace(".", ",");
+const PB_PAPEL = { id: "identificador", data: "data", categoria: "categoria (dimensão)", numero: "métrica (medida)",
+  texto_livre: "texto livre", texto: "texto", vazia: "vazia" };
+
+function pbPlanilhas(lista) {
+  if (!lista || !lista.length) return pbVazio("Nenhuma planilha lida ainda. Quando uma planilha for publicada em Bases-Tratadas (ou o laboratório gerar as sintéticas), a Bárbara lê aqui.");
+  const i = Math.min(E.paineisPlanilha || 0, lista.length - 1), L = lista[i];
+  const seletor = `<div class="pl-lista" role="tablist" aria-label="Planilhas lidas">${lista.map((x, k) => `<button role="tab" aria-selected="${k === i}"
+    class="pl-item${k === i ? " ativo" : ""}" data-acao="paineis-planilha" data-i="${k}"><b>${esc(x.nome.replace(/\.(xlsx|csv)$/i, "").replace(/^laboratorio_/, ""))}</b>
+    <small>${esc(x.tema.nome)}</small><span class="etiqueta ${x.origem === "real" ? "sucesso" : ""}">${x.origem === "real" ? "real" : "sintética"}</span></button>`).join("")}</div>`;
+  const kpis = `<div class="pb-kpis">${Object.entries(L.ancoras).map(([n, v]) => `<div class="pb-kpi"><span class="pb-kpi-rotulo">${esc(n)}</span>
+    <strong class="pb-kpi-valor">${esc(/taxa/i.test(n) ? pbPct(v, 2) : pbNumBr(v))}</strong><small class="muted">número-âncora: o Power BI tem que mostrar este valor sem filtro</small></div>`).join("")}</div>`;
+  const seg = L.por_segmento;
+  const grafico = seg ? pbCartao({ titulo: `${seg.principal} por ${seg.rotulo}`, sql: `agrupado por ${seg.coluna} (pandas), conferido pelo Heitor com numpy` },
+    pbBarras({ linhas: seg.linhas }, seg.principal, (r) => r.segmento), true) : "";
+  const regrasOk = L.regras.filter((r) => r.nivel === "ok").length;
+  const dicionario = pbCartao({ titulo: "Dicionário dos cabeçalhos (o que é cada coluna)", sql: "papel pelo conteúdo (robo/analise.py) + glossário de negócio (robo/leitura_bi.py)" },
+    pbTabela({ linhas: L.colunas }, [["Cabeçalho", (r) => `<b>${esc(r.rotulo)}</b><br><small class="mono muted">${esc(r.coluna)}</small>`],
+      ["Papel", (r) => esc(PB_PAPEL[r.papel] || r.papel)], ["Significado", (r) => esc(r.significado)], ["Regra de negócio", (r) => esc(r.regra || "—")],
+      ["Preenchido", (r) => pbPct(r.preenchimento, 0)]]), true);
+  const regras = pbCartao({ titulo: `Regras de negócio conferidas nos dados (${regrasOk} de ${L.regras.length} sem problema)`, sql: "cada regra contada linha a linha" },
+    pbTabela({ linhas: L.regras }, [["Coluna", (r) => esc(r.coluna)], ["Regra", (r) => esc(r.regra)],
+      ["Resultado", (r) => `<span class="etiqueta ${r.nivel === "erro" ? "perigo" : r.nivel === "aviso" ? "alerta" : r.nivel === "ok" ? "sucesso" : ""}">${esc(r.texto)}</span>`]]]]), true);
+  const m = L.modelo;
+  const estrela = pbCartao({ titulo: "Modelo estrela proposto", sql: "fato = métricas + chaves; dimensões = categorias; calendário = coluna de data" },
+    `<div class="pl-estrela"><div class="pl-dims">${m.dimensoes.map((d) => `<div class="pl-caixa">${esc(d.tabela)}<small>${d.valores} valores</small></div>`).join("")}
+      ${m.calendario ? `<div class="pl-caixa">dim_calendario<small>a partir de ${esc(m.calendario)}</small></div>` : ""}</div>
+      <div class="pl-seta">1 → *</div><div class="pl-caixa fato">${esc(m.fato)}<small>${m.metricas.map(esc).join(", ") || "sem métricas"}</small></div></div>
+      <ul class="lista-ficha">${m.relacoes.map((r) => `<li class="mono" style="font-size:12px">${esc(r)}</li>`).join("")}</ul>`);
+  const medidas = pbCartao({ titulo: `Medidas DAX (${L.medidas.length}) — prontas para colar em Página Inicial → Nova medida`, sql: "geradas para as colunas desta planilha" },
+    L.medidas.map((d) => `<details class="pl-medida"><summary><b>${esc(d.nome)}</b>${L.ancoras[d.nome] !== undefined ? ` <span class="muted">→ deve mostrar ${esc(/taxa/i.test(d.nome) ? pbPct(L.ancoras[d.nome], 2) : pbNumBr(L.ancoras[d.nome]))}</span>` : ""}</summary>
+      <pre class="pl-dax">${esc(d.dax)}</pre><p>${esc(d.explicacao)}</p><p class="muted">${esc(d.contexto)}</p></details>`).join(""), true);
+  const visuais = pbCartao({ titulo: "Visuais recomendados", sql: "pela pergunta de negócio" },
+    pbTabela({ linhas: L.visuais }, [["Visual", (r) => `<b>${esc(r.visual)}</b>`], ["Responde", (r) => esc(r.pergunta)], ["Por quê", (r) => esc(r.porque)], ["Quando não usar", (r) => esc(r.nao_usar)]]), true);
+  const tema = `<div class="pl-tema"><div><span class="etiqueta ${L.origem === "real" ? "sucesso" : ""}">${L.origem === "real" ? "planilha real" : "dados sintéticos (laboratório)"}</span>
+    <h2>${esc(L.tema.nome)}</h2><p>${esc(L.tema.descricao)}</p><small class="muted">${esc(L.nome)} · ${num(L.linhas)} linhas × ${L.colunas_qtd} colunas${L.tema.evidencia ? ` · reconhecido por: ${L.tema.evidencia.map(esc).join(", ")}` : ""}</small></div>
+    ${L.tema.perguntas.length ? `<div><b>Perguntas que este painel responde</b><ul class="lista-ficha">${L.tema.perguntas.map((q) => `<li>${esc(q)}</li>`).join("")}</ul></div>` : ""}</div>`;
+  const achados = `<div class="pb-achados">${L.achados.map((a) => /^Regra quebrada/.test(a) ? `<div class="alerta">⚠ ${esc(a)}</div>` : `<div>✔ ${esc(a)}</div>`).join("")}</div>`;
+  return seletor + tema + kpis + achados + `<div class="pb-grade-cartoes" style="margin-top:12px">${grafico}${dicionario}${regras}${estrela}${medidas}${visuais}</div>`;
+}
+
 function renderPaineis() {
   const d = E.paineis;
   const acoes = `<button class="btn primario" data-acao="paineis-atualizar">${icone("recarregar")}Montar e conferir agora</button>`;
-  const desc = "Montados do zero pela Bárbara (especialista em Power BI) direto do banco da empresa e mantidos de hora em hora. " +
+  const desc = "Planilhas: a Bárbara lê cada planilha (reais e sintéticas), entende o tema pelos cabeçalhos, confere as regras de negócio e entrega o modelo e as medidas DAX. " +
+    "Equipe: os painéis de desempenho, montados do banco da empresa de hora em hora. " +
     "Antes de publicar, o Heitor refaz cada total por outro caminho: se um número não bate, o painel não é publicado. " +
     "Passe o mouse num número ou abra “consulta” para ver de onde ele veio.";
   if (!d) return cabecalho("Dashboards", desc, acoes) + `<div class="carregando">Lendo os painéis…</div>`;
   if (!d.painel) return cabecalho("Dashboards", desc, acoes) +
     `<div class="cartao"><div class="cartao-corpo">Ainda não há painel publicado. A rotina “paineis” monta o primeiro na próxima hora — ou clique em “Montar e conferir agora”.</div></div>`;
   const P = d.painel;
-  const aba = P.paginas.find((p) => p.id === E.paineisAba) || P.paginas[0];
+  const temPlanilhas = Array.isArray(P.planilhas);
+  const abasLista = (temPlanilhas ? [{ id: "planilhas", titulo: `Planilhas (${P.planilhas.length})` }] : []).concat(P.paginas);
+  const aba = abasLista.find((p) => p.id === E.paineisAba) || abasLista[0];
   const conf = P.conferencia || {};
   const selo = `<div class="pb-selo"><span class="ponto ligado"></span><span>Versão ${esc(String(P.versao))} · montada por <b>${esc(P.autor_nome)}</b> em ${esc(dataT(P.montado_em))}
     · conferida por <b>${esc(conf.conferente_nome || "")}</b>: ${conf.divergencias === 0 ? "nenhuma divergência" : esc(String(conf.divergencias))}</span></div>`;
-  const abas = `<div class="pb-abas" role="tablist">${P.paginas.map((p) => `<button role="tab" aria-selected="${p.id === aba.id}" class="pb-aba${p.id === aba.id ? " ativa" : ""}"
+  const abas = `<div class="pb-abas" role="tablist">${abasLista.map((p) => `<button role="tab" aria-selected="${p.id === aba.id}" class="pb-aba${p.id === aba.id ? " ativa" : ""}"
     data-acao="paineis-aba" data-aba="${esc(p.id)}">${esc(p.titulo)}</button>`).join("")}</div>`;
   const versoes = `<details class="pb-versoes"><summary>Registro de manutenção (${d.versoes.length} últimas montagens — nada é apagado)</summary>
     ${pbTabela({ linhas: d.versoes }, [["Quando", (r) => esc(dataT(r.data_hora))], ["Situação", (r) => `<span class="etiqueta ${r.situacao === "reprovado" ? "perigo" : r.situacao === "publicado" ? "sucesso" : ""}">${esc(r.situacao.replace("_", " "))}</span>`],
       ["Assinatura", (r) => `<span class="mono">${esc(r.assinatura)}</span>`], ["Divergências", (r) => esc((JSON.parse(r.divergencias || "[]")).join("; ") || "—")]])}</details>`;
-  return cabecalho("Dashboards", desc, acoes) + selo + abas + `<div class="pb-pagina">${pbPagina(aba)}</div>` + versoes;
+  return cabecalho("Dashboards", desc, acoes) + selo + abas + `<div class="pb-pagina">${aba.id === "planilhas" ? pbPlanilhas(P.planilhas) : pbPagina(aba)}</div>` + versoes;
 }
 
 Object.assign(PAGINAS, { paineis: { titulo: "Dashboards", render: renderPaineis, carregar: carregarPaineis } });
 Object.assign(ACOES, {
   "paineis-aba": (el) => { E.paineisAba = el.dataset.aba; desenhar(); },
+  "paineis-planilha": (el) => { E.paineisPlanilha = Number(el.dataset.i) || 0; desenhar(); },
   "paineis-atualizar": (el) => comCarregando(el, async () => {
     try {
       const r = await api("/api/paineis/atualizar", { corpo: {} });
