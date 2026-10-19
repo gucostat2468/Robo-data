@@ -1,0 +1,16 @@
+﻿competencia_id;competencia;ferramenta;designer_id;designer_nome;descricao
+limpeza;Limpar e barrar planilha;diagnosticar_planilha;casos_engenharia;Lívia;O pipeline real em diagnóstico: contar as linhas certas e barrar defeito.
+calculo;Calcular o pedido;calcular;casos_analytics;Murilo;Entender o pedido em português e acertar o número de cada grupo.
+indicadores;NPS com a base certa;perfil_indicadores;casos_analytics;Murilo;NPS e base (n) certos.
+lgpd;Achar dado pessoal;dados_pessoais;casos_governanca;Raquel;Apontar exatamente as colunas com dado pessoal (nem mais, nem menos).
+anomalias;Achar anomalias;anomalias;casos_analytics;Murilo;Regra de Tukey (3×IQR): quantas fora da faixa em cada coluna.
+segmentacao;Achar os perfis;segmentacao;casos_analytics;Murilo;Número certo de grupos plantados.
+drivers;Achar o que move o NPS;drivers;casos_analytics;Murilo;O 1º driver é o plantado.
+conhecimento;Achar o conhecimento certo;conhecimento;casos_governanca;Raquel;Recuperar a lição certa do caderno da empresa (não conta como 'aplicada').
+historico;Ler o histórico;historico;casos_engenharia;Lívia;As 10 últimas execuções, na ordem certa.
+ronda_ti;Ronda de TI;ronda_ti;casos_ti;Augusto;Detectar exatamente os problemas plantados no computador de teste.
+orquestracao;SLA das rotinas (Airflow);orquestracao;casos_ti;Augusto;Apontar exatamente as rotinas atrasadas, com erro e lentas pela regra de SLA — nenhuma isca.
+resumo_executivo;Resumo sem inventar;resumo_executivo;casos_governanca;Raquel;Todas as partes, nenhum número que não veio das etapas.
+desempenho;Conta de desempenho (RH);desempenho;casos_governanca;Raquel;Taxa e situação de cada pessoa pela regra da política de RH.
+sql;Mesma conta em SQL;consulta_sql;casos_engenharia;Lívia;O SQL gerado roda no PostgreSQL (somente leitura) e bate com a verdade.
+revisao_casos;Revisar caso de treino;revisar_caso;casos_governanca;Raquel;Sala de Casos: integridade, reprodutibilidade e conferência — reprovar o caso com defeito e aprovar o certo.

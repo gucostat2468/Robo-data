@@ -1,0 +1,438 @@
+// =====================================================================================================
+// CATÁLOGO DE MEDIDAS — Painel "Robô de Planilhas" (modelo estrela do schema bi)
+// =====================================================================================================
+// COMO USAR (duas formas, escolha uma):
+//
+//  A) TUDO DE UMA VEZ (recomendado, Power BI Desktop de 2024 em diante)
+//     1. Crie antes a tabela vazia _Medidas (Página Inicial → Inserir dados → nome "_Medidas" → Carregar).
+//     2. Na barra da esquerda, clique no ícone "Exibição de consulta DAX" (o 4º ícone, com o símbolo DAX).
+//     3. Cole ESTE ARQUIVO inteiro e clique em "Executar" (ou F5). O resultado mostra as âncoras de validação
+//        (o EVALUATE no final): confira com a seção "Validação" do GUIA_CONSTRUCAO.md.
+//     4. Clique no botão "Atualizar modelo com alterações" (aparece acima do editor). As medidas passam a existir
+//        de verdade na tabela _Medidas.
+//
+//  B) UMA A UMA (qualquer versão)
+//     Selecione a tabela _Medidas no painel Dados → Ferramentas de tabela → Nova medida → cole o trecho DEPOIS de
+//     "MEASURE '_Medidas'[" — ou seja, comece pelo nome: Tentativas = COUNTROWS ( fato_treino )
+//
+// Depois de criar: defina o FORMATO de cada medida (Ferramentas de medida → Formato). O formato sugerido está no
+// comentário "formato:" de cada uma. A consulta DAX não grava formato — por isso o passo manual.
+//
+// CONVENÇÕES
+//  • Toda conta é MEDIDA (nunca coluna calculada): medidas respeitam os filtros da página e não pesam no arquivo.
+//  • DIVIDE ( a ; b ) em vez de a / b: se b for zero ou vazio, devolve vazio em vez de erro.
+//  • Nomes falantes, como o gestor fala. Medidas auxiliares começam com "_" e ficam ocultas.
+//  • Cores das medidas de cor = mesma paleta do fundo (powerbi/telas): positivo #4CC272, atenção #E6C558,
+//    negativo #E06666, neutro #A1A1AA.
+//
+// Observação de separador: no Power BI em português, o separador de argumentos pode ser ";" (ponto e vírgula)
+// em vez de ",". Este arquivo usa "," (padrão do motor DAX e da exibição de consulta). Se o editor de medida
+// reclamar, é só trocar "," por ";" — o Power BI faz isso sozinho na maioria das instalações.
+// =====================================================================================================
+
+DEFINE
+
+    // =================================================================================================
+    // 1. TREINO — a tabela fato principal (fato_treino: 1 linha = 1 tentativa de 1 funcionário em 1 caso)
+    // =================================================================================================
+
+    // Quantas tentativas de treino existem no contexto atual.
+    // Contexto de filtro: COUNTROWS conta as linhas de fato_treino QUE SOBRARAM depois dos filtros
+    // (segmentação de andar, competência, nível, data e o próprio eixo do gráfico).
+    // formato: número inteiro, separador de milhar.
+    MEASURE '_Medidas'[Tentativas] =
+        COUNTROWS ( fato_treino )
+
+    // Soma da coluna 0/1 "acertou". Somar um 0/1 = contar os acertos — mais rápido que COUNTROWS(FILTER(...)).
+    // formato: número inteiro.
+    MEASURE '_Medidas'[Acertos] =
+        SUM ( fato_treino[acertou] )
+
+    // Mesma ideia para os erros (a view já entrega "errou" = 1 - acertou).
+    // formato: número inteiro.
+    MEASURE '_Medidas'[Erros] =
+        SUM ( fato_treino[errou] )
+
+    // A pergunta nº 1 do painel: de cada 100 tentativas, quantas acertam?
+    // Por que DIVIDE e não SUM/COUNTROWS direto: num andar sem tentativas o denominador é 0 → DIVIDE devolve vazio
+    // e o visual simplesmente não mostra a barra (em vez de "Infinito" ou erro).
+    // Total vs. linhas: no total da tabela a taxa é recalculada sobre TODAS as tentativas (não é a média das taxas
+    // de cada linha). Isso é o correto — média de porcentagens daria peso igual a um andar com 2 e outro com 200 tentativas.
+    // formato: porcentagem, 1 casa decimal (98,6%).
+    MEASURE '_Medidas'[Taxa de Acerto] =
+        DIVIDE ( [Acertos], [Tentativas] )
+
+    // formato: porcentagem, 1 casa.
+    MEASURE '_Medidas'[Taxa de Erro] =
+        DIVIDE ( [Erros], [Tentativas] )
+
+    // Meta fixa usada na linha tracejada dos gráficos de acerto. Medida (e não número digitado no visual)
+    // para mudar num lugar só. formato: porcentagem, 0 casas.
+    MEASURE '_Medidas'[Meta de Acerto] =
+        0.95
+
+    // Distância até a meta em pontos percentuais (p.p.): 98,6% - 95% = +3,6 p.p.
+    // formato: personalizado  +0,0" p.p.";-0,0" p.p."
+    MEASURE '_Medidas'[Acerto vs Meta (p.p.)] =
+        IF (
+            NOT ISBLANK ( [Taxa de Acerto] ),
+            ( [Taxa de Acerto] - [Meta de Acerto] ) * 100
+        )
+
+    // Quantas PESSOAS diferentes treinaram (não quantas tentativas). DISTINCTCOUNT conta ids únicos.
+    // formato: número inteiro.
+    MEASURE '_Medidas'[Pessoas que Treinaram] =
+        DISTINCTCOUNT ( fato_treino[funcionario_id] )
+
+    // Tempo médio que a ferramenta real levou por tentativa (segundos).
+    // AVERAGE ignora linhas com segundos vazio — é o que queremos (sem tempo medido ≠ tempo zero).
+    // formato: decimal, 2 casas, sufixo " s".
+    MEASURE '_Medidas'[Tempo Médio por Tentativa (s)] =
+        AVERAGE ( fato_treino[segundos] )
+
+    // Participação de cada tipo de erro no total de erros (gráfico "Erros por tipo").
+    // Como funciona o contexto: na linha "achou_outra_coisa" o filtro do eixo deixa só esses erros no numerador;
+    // no denominador, ALL ( fato_treino[tipo_erro] ) REMOVE só o filtro dessa coluna — os outros filtros
+    // (andar, data, nível) continuam valendo. Resultado: % dentro do recorte que o usuário escolheu.
+    // Limitação: se alguém colocar outra coluna da fato no eixo, o denominador muda junto (é o comportamento esperado).
+    // formato: porcentagem, 1 casa.
+    MEASURE '_Medidas'[% do Erro por Tipo] =
+        DIVIDE (
+            [Erros],
+            CALCULATE ( [Erros], ALL ( fato_treino[tipo_erro] ) )
+        )
+
+    // =================================================================================================
+    // 2. COMPARAÇÃO "ÚLTIMAS 8 HORAS × 8 HORAS ANTERIORES"
+    //    A empresa roda em turnos de 2 em 2 horas; comparar dias ainda não faz sentido (há só 2 dias de dados).
+    //    Quando houver semanas de histórico, troque por DATEADD ( dim_data[data], -7, DAY ) — ver alternativas no guia.
+    // =================================================================================================
+
+    // Momento da última tentativa visível. ALLSELECTED ( dim_data ) = "respeite o período escolhido na
+    // segmentação, mas ignore o filtro de data que vem do eixo do gráfico". Assim o cartão sempre olha o fim do período.
+    // formato: data/hora dd/mm/aaaa hh:mm.
+    MEASURE '_Medidas'[_Fim do Período] =
+        CALCULATE ( MAX ( fato_treino[data_hora] ), ALLSELECTED ( dim_data ) )
+
+    // Tentativas nas últimas 8 h. 8/24 = 8 horas em fração de dia (no DAX, 1 = um dia).
+    // O filtro booleano em fato_treino[data_hora] SUBSTITUI só o filtro dessa coluna; REMOVEFILTERS ( dim_data )
+    // tira o filtro de data para a janela poder "voltar" além do dia selecionado no eixo.
+    MEASURE '_Medidas'[Tentativas Últimas 8h] =
+        VAR _fim = [_Fim do Período]
+        RETURN
+            CALCULATE (
+                [Tentativas],
+                REMOVEFILTERS ( dim_data ),
+                fato_treino[data_hora] > _fim - 8 / 24,
+                fato_treino[data_hora] <= _fim
+            )
+
+    MEASURE '_Medidas'[Tentativas 8h Anteriores] =
+        VAR _fim = [_Fim do Período]
+        RETURN
+            CALCULATE (
+                [Tentativas],
+                REMOVEFILTERS ( dim_data ),
+                fato_treino[data_hora] > _fim - 16 / 24,
+                fato_treino[data_hora] <= _fim - 8 / 24
+            )
+
+    // Variação percentual. formato: porcentagem, 1 casa (+74,7%).
+    MEASURE '_Medidas'[Δ Tentativas %] =
+        DIVIDE ( [Tentativas Últimas 8h] - [Tentativas 8h Anteriores], [Tentativas 8h Anteriores] )
+
+    MEASURE '_Medidas'[Taxa de Acerto Últimas 8h] =
+        VAR _fim = [_Fim do Período]
+        RETURN
+            CALCULATE (
+                [Taxa de Acerto],
+                REMOVEFILTERS ( dim_data ),
+                fato_treino[data_hora] > _fim - 8 / 24,
+                fato_treino[data_hora] <= _fim
+            )
+
+    MEASURE '_Medidas'[Taxa de Acerto 8h Anteriores] =
+        VAR _fim = [_Fim do Período]
+        RETURN
+            CALCULATE (
+                [Taxa de Acerto],
+                REMOVEFILTERS ( dim_data ),
+                fato_treino[data_hora] > _fim - 16 / 24,
+                fato_treino[data_hora] <= _fim - 8 / 24
+            )
+
+    // Diferença de TAXAS se mede em pontos percentuais (p.p.), não em %: 99,2% → 98,2% é -1,0 p.p.
+    // (dizer "-1%" seria errado: seria 1% de 99,2%). formato: decimal, 1 casa.
+    MEASURE '_Medidas'[Δ Acerto (p.p.)] =
+        IF (
+            NOT ISBLANK ( [Taxa de Acerto 8h Anteriores] ),
+            ( [Taxa de Acerto Últimas 8h] - [Taxa de Acerto 8h Anteriores] ) * 100
+        )
+
+    // ---- Rótulos e cores dos cartões KPI (a linha pequena "▲ +74,7% vs 8 h anteriores") -----------------
+    // Uso: Cartão (novo) → Valor de referência / Rótulo de detalhe = esta medida;
+    //      cor da fonte → fx → Formatar estilo "Valor do campo" → campo = medida de cor abaixo.
+    MEASURE '_Medidas'[Rótulo Δ Tentativas] =
+        VAR _d = [Δ Tentativas %]
+        RETURN
+            IF (
+                ISBLANK ( _d ),
+                "sem base anterior",
+                // Na string de FORMAT o ponto é SEMPRE o marcador decimal e a vírgula o de milhar (padrão do motor);
+                // o Power BI troca para vírgula decimal na tela quando o arquivo está em português.
+                IF ( _d >= 0, "▲ +", "▼ " ) & FORMAT ( _d, "0.0%" ) & " vs 8 h anteriores"
+            )
+
+    MEASURE '_Medidas'[Cor Δ Tentativas] =
+        VAR _d = [Δ Tentativas %]
+        RETURN
+            SWITCH ( TRUE (), ISBLANK ( _d ), "#A1A1AA", _d >= 0, "#4CC272", "#E06666" )
+
+    MEASURE '_Medidas'[Rótulo Δ Acerto] =
+        VAR _d = [Δ Acerto (p.p.)]
+        RETURN
+            IF (
+                ISBLANK ( _d ),
+                "sem base anterior",
+                IF ( _d >= 0, "▲ +", "▼ " ) & FORMAT ( _d, "0.0" ) & " p.p. vs 8 h anteriores"
+            )
+
+    MEASURE '_Medidas'[Cor Δ Acerto] =
+        VAR _d = [Δ Acerto (p.p.)]
+        RETURN
+            SWITCH ( TRUE (), ISBLANK ( _d ), "#A1A1AA", _d >= 0, "#4CC272", "#E06666" )
+
+    // Cor das barras de acerto (por nível, andar ou competência): verde na meta, amarelo perto, vermelho abaixo.
+    // Uso: gráfico de colunas → Colunas → Cor → fx → Valor do campo → esta medida.
+    MEASURE '_Medidas'[Cor Acerto vs Meta] =
+        VAR _t = [Taxa de Acerto]
+        RETURN
+            SWITCH (
+                TRUE (),
+                ISBLANK ( _t ), "#A1A1AA",
+                _t >= [Meta de Acerto], "#4CC272",
+                _t >= 0.85, "#E6C558",
+                "#E06666"
+            )
+
+    // =================================================================================================
+    // 3. EVOLUÇÃO DE NÍVEL — fato_nivel_atual (foto de hoje) e fato_evolucao_nivel (histórico de mudanças)
+    // =================================================================================================
+
+    // Nível médio (1 a 5) nas competências de cada pessoa. É uma FOTO do momento atual (não tem data):
+    // por isso fato_nivel_atual não se liga à dim_data, e o filtro de período NÃO muda esta medida.
+    // Contexto: numa linha de andar, a dim_andar filtra a dim_funcionario, que filtra fato_nivel_atual.
+    // formato: decimal, 2 casas.
+    MEASURE '_Medidas'[Nível Médio] =
+        AVERAGE ( fato_nivel_atual[nivel] )
+
+    // Evento "subiu" = a pessoa passou para um nível mais difícil numa competência.
+    // O filtro tipo_evento = "subiu" é uma tabela de 1 coluna que o CALCULATE soma aos filtros já existentes.
+    // formato: número inteiro.
+    MEASURE '_Medidas'[Subidas de Nível] =
+        CALCULATE ( COUNTROWS ( fato_evolucao_nivel ), fato_evolucao_nivel[tipo_evento] = "subiu" )
+
+    MEASURE '_Medidas'[Quedas de Nível] =
+        CALCULATE ( COUNTROWS ( fato_evolucao_nivel ), fato_evolucao_nivel[tipo_evento] = "desceu" )
+
+    // "+0" no fim: quando não há nenhuma queda, o cartão mostra 0 em vez de "(Em branco)".
+    // Use esta versão nos cartões; a versão sem +0 nos gráficos (para não desenhar barras de zero em tudo).
+    MEASURE '_Medidas'[Quedas de Nível (cartão)] =
+        [Quedas de Nível] + 0
+
+    // Saldo líquido de degraus ganhos (soma de +1 / -1). formato: +0;-0;0
+    MEASURE '_Medidas'[Saldo de Níveis] =
+        SUM ( fato_evolucao_nivel[variacao] )
+
+    MEASURE '_Medidas'[Rótulo Evolução] =
+        "▲ " & [Subidas de Nível] + 0 & " subidas · " & [Quedas de Nível] + 0 & " quedas"
+
+    // =================================================================================================
+    // 4. PESSOAS — dim_funcionario (organograma do código + quem aparece nas fatos e saiu do quadro)
+    // =================================================================================================
+
+    // Quem está no organograma atual. no_quadro = 0 marca pessoas que aparecem no histórico mas saíram.
+    // Contexto: dim_andar → dim_funcionario é 1:N, então a segmentação de andar filtra esta contagem direto.
+    // formato: número inteiro.
+    MEASURE '_Medidas'[Funcionários no Quadro] =
+        CALCULATE ( COUNTROWS ( dim_funcionario ), dim_funcionario[no_quadro] = 1 )
+
+    // Cobertura do treino: das pessoas do quadro, quantas treinaram no período?
+    // O numerador também filtra no_quadro = 1 para não passar de 100% por causa de quem saiu.
+    // formato: porcentagem, 0 casas.
+    MEASURE '_Medidas'[% do Quadro que Treinou] =
+        DIVIDE (
+            CALCULATE ( [Pessoas que Treinaram], dim_funcionario[no_quadro] = 1 ),
+            [Funcionários no Quadro]
+        )
+
+    // Ranking de pessoas pelo nível médio, com desempate por número de tentativas.
+    // Linha a linha (contexto de linha DENTRO do RANKX): para cada funcionário de ALLSELECTED ( dim_funcionario ),
+    // o RANKX calcula a expressão — a transição de contexto transforma a linha em filtro — e compara com a pessoa da linha atual.
+    // O truque do desempate: nível (1–5) + tentativas/1.000.000 — as tentativas só decidem quando o nível empata.
+    // HASONEVALUE evita um "1" sem sentido na linha de Total.
+    // Limitação: com milhares de pessoas e muitos filtros, RANKX sobre ALLSELECTED fica mais lento — aqui são 88.
+    // formato: número inteiro.
+    MEASURE '_Medidas'[Ranking por Nível] =
+        IF (
+            HASONEVALUE ( dim_funcionario[funcionario_id] ) && NOT ISBLANK ( [Nível Médio] ),
+            RANKX (
+                ALLSELECTED ( dim_funcionario ),
+                [Nível Médio] + DIVIDE ( [Tentativas], 1000000 ),
+                ,
+                DESC,
+                DENSE
+            )
+        )
+
+    // =================================================================================================
+    // 5. CONVERSAS E MENTORIAS — duas colunas de pessoa na mesma fato (de/para, mentor/aprendiz)
+    //    Relação ATIVA: fato_interacoes[de_id] e fato_mentorias[aprendiz_id].
+    //    Relação INATIVA (linha tracejada no diagrama): fato_interacoes[para_id] e fato_mentorias[mentor_id].
+    //    USERELATIONSHIP liga a inativa só durante o cálculo da medida.
+    // =================================================================================================
+
+    // formato: número inteiro.
+    MEASURE '_Medidas'[Conversas] =
+        COUNTROWS ( fato_interacoes )
+
+    // Conversas que a pessoa ENVIOU (usa a relação ativa de_id). Idêntica a [Conversas]; existe para o nome ficar claro
+    // ao lado de "Conversas Recebidas" na mesma tabela.
+    MEASURE '_Medidas'[Conversas Enviadas] =
+        [Conversas]
+
+    MEASURE '_Medidas'[Conversas Recebidas] =
+        CALCULATE (
+            [Conversas],
+            USERELATIONSHIP ( fato_interacoes[para_id], dim_funcionario[funcionario_id] )
+        )
+
+    // formato: número inteiro.
+    MEASURE '_Medidas'[Mentorias] =
+        COUNTROWS ( fato_mentorias )
+
+    MEASURE '_Medidas'[Mentorias Fechadas] =
+        SUM ( fato_mentorias[fechada] ) + 0
+
+    MEASURE '_Medidas'[Mentorias Abertas] =
+        [Mentorias] - [Mentorias Fechadas]
+
+    MEASURE '_Medidas'[Mentorias que Ajudaram] =
+        SUM ( fato_mentorias[ajudou] ) + 0
+
+    // Efetividade da mentoria: das que já FECHARAM (o aprendiz tentou de novo), quantas ajudaram?
+    // Denominador = fechadas, não todas: uma mentoria aberta ainda não teve chance de ajudar.
+    // formato: porcentagem, 0 casas.
+    MEASURE '_Medidas'[% Mentorias que Ajudaram] =
+        DIVIDE ( [Mentorias que Ajudaram], [Mentorias Fechadas] )
+
+    // Aviso de amostra pequena (regra do guia: menos de 30 casos fechados → não tire conclusão).
+    MEASURE '_Medidas'[Aviso Mentorias] =
+        IF (
+            [Mentorias Fechadas] < 30,
+            "amostra pequena (" & [Mentorias Fechadas] & " fechadas): leia com cautela",
+            "base suficiente (" & [Mentorias Fechadas] & " fechadas)"
+        )
+
+    MEASURE '_Medidas'[Cor Aviso Mentorias] =
+        IF ( [Mentorias Fechadas] < 30, "#E6C558", "#A1A1AA" )
+
+    // Mentorias DADAS (a pessoa como mentora) — liga a relação inativa mentor_id só aqui dentro.
+    // Uso: gráfico "Quem mais ensinou" com dim_funcionario[nome] no eixo.
+    MEASURE '_Medidas'[Mentorias Dadas] =
+        CALCULATE (
+            [Mentorias],
+            USERELATIONSHIP ( fato_mentorias[mentor_id], dim_funcionario[funcionario_id] )
+        )
+
+    // formato: número inteiro.
+    MEASURE '_Medidas'[Mentores Diferentes] =
+        DISTINCTCOUNT ( fato_mentorias[mentor_id] )
+
+    // =================================================================================================
+    // 6. OPERAÇÃO — fato_rotinas (1 linha = 1 execução de rotina automática: treino, backup, memória...)
+    // =================================================================================================
+
+    // formato: número inteiro.
+    MEASURE '_Medidas'[Execuções] =
+        COUNTROWS ( fato_rotinas )
+
+    MEASURE '_Medidas'[Execuções com Erro] =
+        SUM ( fato_rotinas[com_erro] ) + 0
+
+    // formato: porcentagem, 1 casa. Meta operacional: 99%.
+    MEASURE '_Medidas'[Taxa de Sucesso das Rotinas] =
+        DIVIDE ( [Execuções] - [Execuções com Erro], [Execuções] )
+
+    MEASURE '_Medidas'[Cor Sucesso Rotinas] =
+        VAR _t = [Taxa de Sucesso das Rotinas]
+        RETURN
+            SWITCH ( TRUE (), ISBLANK ( _t ), "#A1A1AA", _t >= 0.99, "#4CC272", _t >= 0.95, "#E6C558", "#E06666" )
+
+    // formato: decimal, 2 casas, sufixo " s".
+    MEASURE '_Medidas'[Tempo Médio da Rotina (s)] =
+        AVERAGE ( fato_rotinas[segundos] )
+
+    MEASURE '_Medidas'[Rotinas Diferentes] =
+        DISTINCTCOUNT ( fato_rotinas[rotina] )
+
+    // =================================================================================================
+    // 7. RH — fato_rh_movimentos (hoje VAZIA: nenhuma promoção formal registrada ainda)
+    //    A medida já existe para a página de RH funcionar no dia em que o primeiro movimento entrar.
+    // =================================================================================================
+
+    MEASURE '_Medidas'[Movimentos de RH] =
+        COUNTROWS ( fato_rh_movimentos ) + 0
+
+    // =================================================================================================
+    // 8. CABEÇALHO E TEXTOS DINÂMICOS
+    // =================================================================================================
+
+    // Chip "Atualizado em ..." do canto superior direito. MAXX sobre as datas das 3 fatos mais vivas.
+    // REMOVEFILTERS: a data de atualização não deve mudar quando alguém filtra um andar.
+    MEASURE '_Medidas'[Atualizado em] =
+        VAR _ult =
+            CALCULATE (
+                MAX (
+                    MAX ( fato_treino[data_hora] ),
+                    MAX ( MAX ( fato_rotinas[data_hora] ), MAX ( fato_interacoes[data_hora] ) )
+                ),
+                REMOVEFILTERS ()
+            )
+        RETURN
+            "Atualizado em " & FORMAT ( _ult, "dd/mm/yyyy hh:nn" )
+
+    // Rodapé com a fonte e o tamanho da base no recorte atual (regra: contagem por extenso, nunca "n=").
+    MEASURE '_Medidas'[Rodapé Fonte] =
+        "Fonte: PostgreSQL (Neon) · schema bi · "
+            & FORMAT ( [Tentativas], "#,0" ) & " tentativas de treino de "
+            & [Pessoas que Treinaram] & " funcionários"
+
+    // Frase de destaque automática (chips de insight da Visão Executiva).
+    MEASURE '_Medidas'[Insight Acerto] =
+        FORMAT ( [Taxa de Acerto], "0.0%" ) & " de acerto em " & FORMAT ( [Tentativas], "#,0" )
+            & " tentativas — " & [Pessoas que Treinaram] & " pessoas treinaram"
+
+// =====================================================================================================
+// ÂNCORAS DE VALIDAÇÃO — ao executar na Exibição de consulta DAX, a tabela abaixo deve bater com o guia
+// (valores do instantâneo de 19/10/2026 17:25; com a nuvem rodando, os números crescem a cada turno).
+// =====================================================================================================
+EVALUATE
+ROW (
+    "Tentativas", [Tentativas],                         // 726
+    "Taxa de Acerto", [Taxa de Acerto],                 // 0,9862
+    "Pessoas que Treinaram", [Pessoas que Treinaram],   // 88
+    "Funcionários no Quadro", [Funcionários no Quadro], // 87
+    "Nível Médio", [Nível Médio],                       // 2,40
+    "Subidas de Nível", [Subidas de Nível],             // 7
+    "Quedas de Nível", [Quedas de Nível (cartão)],      // 0
+    "Δ Tentativas %", [Δ Tentativas %],                 // 0,747  (435 vs 249)
+    "Δ Acerto (p.p.)", [Δ Acerto (p.p.)],               // -1,0
+    "Conversas", [Conversas],                           // 30
+    "Mentorias", [Mentorias],                           // 10
+    "Mentorias Fechadas", [Mentorias Fechadas],         // 2
+    "Execuções", [Execuções],                           // 160
+    "Execuções com Erro", [Execuções com Erro],         // 2
+    "Taxa de Sucesso das Rotinas", [Taxa de Sucesso das Rotinas], // 0,9875
+    "Movimentos de RH", [Movimentos de RH]              // 0
+)
