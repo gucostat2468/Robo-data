@@ -327,8 +327,11 @@ def tentar(cfg, pid: str, comp: str, caso: dict, rodada: str = "") -> dict:
     if not acertou:
         _aprender_com_o_erro(cfg, pid, p, c, caso, tipo, detalhe)
     mudanca = ajustar_nivel(cfg, pid, comp)
-    return {"tentativa": tid, "funcionario": pid, "competencia": comp, "nivel": caso["nivel"], "acertou": bool(acertou),
-            "nota": nota, "tipo_erro": tipo, "detalhe": detalhe, "segundos": seg, "mudanca_nivel": mudanca}
+    r = {"tentativa": tid, "funcionario": pid, "competencia": comp, "nivel": caso["nivel"], "acertou": bool(acertou),
+         "nota": nota, "tipo_erro": tipo, "detalhe": detalhe, "segundos": seg, "mudanca_nivel": mudanca}
+    from robo import interacoes
+    interacoes.apos_tentativa(cfg, r)  # mentoria do erro, fechamento da mentoria anterior, troca ao subir de nível
+    return r
 
 
 def _aprender_com_o_erro(cfg, pid, p, c, caso, tipo, detalhe) -> None:
@@ -417,6 +420,11 @@ def _rodada(cfg, quantos, funcionarios) -> dict:
             continue
         feitas.append(tentar(cfg, pid, comp, caso, rid))
     encerrar_casos(cfg)
+    try:
+        from robo import interacoes
+        interacoes.conversas_por_fatos(cfg)  # SLA das rotinas e acerto baixo num andar viram conversa registrada
+    except Exception:
+        log.exception("Treino: conversas por fatos falharam")
     return {"ok": True, "rodada": rid, "tentativas": len(feitas), "acertos": sum(f["acertou"] for f in feitas),
             "mudancas_de_nivel": [f for f in feitas if f["mudanca_nivel"]], "sem_caso": sem_caso, "detalhe": feitas}
 
