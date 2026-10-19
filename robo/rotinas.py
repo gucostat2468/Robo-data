@@ -40,6 +40,10 @@ ROTINAS = {
     "canal": ("canal_nina", "Posta no canal o que aconteceu (aprovações, reprovações, entregas)", 1 / 60),
     "rh_desempenho": ("rh_desempenho", "Ciclo de desempenho do RH: promoção, plano de melhoria, afastamento e reintegração "
                       "(1x por dia, pela política em robo/rh_desempenho.py)", 24),
+    "jornada": ("airflow_pleno", "Jornada ponta a ponta: planilha sintética suja passa pela esteira inteira (entrada, leitura, "
+                "limpeza, validação, saída, histórico e análise) num computador de teste; cada etapa conferida", 1),
+    "caixa_dono": ("ger_operacoes", "Caixa do dono: sugestões da equipe tiradas dos fatos (erros repetidos no treino, rotinas "
+                   "com erro) chegam ao dono junto com as ideias e pendências", 1),
     "paineis": ("bi_powerbi", "Estúdio de Painéis: Bárbara monta os 5 dashboards do banco real, Heitor reconcilia os "
                 "números e só então publica (cada versão registrada)", 1),
     "alcadas": ("dir_operacoes", "Alçadas: com o dono fora, a liderança decide o que a matriz permite (duas pessoas; "
@@ -51,6 +55,7 @@ ROTINAS = {
 def funcao(cfg, nome: str):
     """O que cada rotina executa. Uma lista só, usada pelo laço do robô (painel/controle.py) e pelo comando
     `python -m robo rotina <nome>` (que é o que o Airflow chama). Assim os dois nunca divergem."""
+    from robo import caixa_dono, jornada
     from robo import (alcadas, auditoria, backup, desenvolvimento, estrategia, ideias, laboratorio, licoes, memoria,
                       paineis, registro_total, reuniao, rh_desempenho, treino)
     from robo.canal import Canal
@@ -73,6 +78,8 @@ def funcao(cfg, nome: str):
         "rh_desempenho": lambda: rh_desempenho.rotina(cfg),
         "alcadas": lambda: alcadas.rotina(cfg),
         "paineis": lambda: paineis.rotina(cfg),
+        "jornada": lambda: jornada.rotina(cfg),
+        "caixa_dono": lambda: caixa_dono.rotina(cfg),
     }
     if nome not in mapa:
         raise KeyError(f"rotina desconhecida: {nome} (existem: {', '.join(ROTINAS)})")

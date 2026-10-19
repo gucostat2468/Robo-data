@@ -686,8 +686,31 @@ class Api:
 
     # ------------------------------------------------------------ TI (5º andar)
     def ti(self, _q) -> dict:
-        from robo import ti
-        return {"ronda": ti.ultima_ronda(self.cfg), "intervalo_minutos": ti._c(self.cfg)["intervalo_minutos"]}
+        from robo import jornada, ti
+        return {"ronda": ti.ultima_ronda(self.cfg), "intervalo_minutos": ti._c(self.cfg)["intervalo_minutos"],
+                "jornada": jornada.ultimas(self.cfg, 8)}
+
+    def jornada_rodar(self, _b) -> dict:
+        from robo import jornada
+        return jornada.rotina(self.cfg)
+
+    def caixa_dono(self, _q) -> dict:
+        """Tudo que chega ao dono: ideias e sugestões da equipe + o que só ele decide."""
+        from robo import alcadas, caixa_dono
+        try:
+            alcadas.marcar_presenca(self.cfg, "painel")
+        except Exception:
+            pass
+        itens = caixa_dono.itens(self.cfg)
+        return {"itens": itens, "resumo": caixa_dono.resumo(self.cfg)}
+
+    def caixa_dono_decidir(self, b) -> dict:
+        """Quem está no painel é o dono (o painel exige a senha dele)."""
+        from robo import caixa_dono
+        try:
+            return caixa_dono.decidir(self.cfg, str(b.get("id") or ""), bool(b.get("aprovar")), str(b.get("nota") or "")[:500])
+        except (ValueError, PermissionError) as e:
+            raise ErroApi(str(e))
 
     def ti_ronda(self, _b) -> dict:
         from robo import ti
@@ -1330,6 +1353,7 @@ ROTAS_GET = {
     "/api/conhecimento/licao": Api.conhecimento_licao, "/api/conhecimento/buscar": Api.conhecimento_buscar,
     "/api/erros": Api.erros_sistema, "/api/gestao": Api.gestao, "/api/treino": Api.treino, "/api/banco/registros": Api.banco_registros, "/api/treino/pessoa": Api.treino_pessoa, "/api/aprendizado": Api.aprendizado,
     "/api/paineis": Api.paineis, "/api/quem-faz-o-que": Api.quem_faz_o_que,
+    "/api/caixa-dono": Api.caixa_dono,
 }
 ROTAS_POST = {
     "/api/robo/ligar": Api.ligar, "/api/robo/pausar": Api.pausar, "/api/robo/processar-agora": Api.processar_agora,
@@ -1354,6 +1378,7 @@ ROTAS_POST = {
     "/api/conhecimento/versao": Api.conhecimento_versao, "/api/conhecimento/arquivar": Api.conhecimento_arquivar,
     "/api/erros/resolver": Api.erros_resolver, "/api/aprendizado/decidir": Api.aprendizado_decidir, "/api/treino/rodar": Api.treino_rodar, "/api/aprendizado/desativar": Api.aprendizado_desativar,
     "/api/paineis/atualizar": Api.paineis_atualizar,
+    "/api/caixa-dono/decidir": Api.caixa_dono_decidir, "/api/jornada/rodar": Api.jornada_rodar,
 }
 ROTAS_UPLOAD = {"/api/testar": Api.testar, "/api/enviar": Api.enviar, "/api/conversa/anexar": Api.anexar}
 

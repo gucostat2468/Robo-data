@@ -64,6 +64,11 @@
     g.append(indisponivel(d) ? kpi("Decisões", "—", d.indisponivel, "atencao")
       : kpi("Decisões", d.atrasadas.length ? `${d.atrasadas.length} atrasada(s)` : "Em dia", `${d.abertas} aberta(s)`,
         d.atrasadas.length ? "ruim" : "bom"));
+    const cx = r.caixa || {};
+    g.append(indisponivel(cx) ? kpi("Caixa do dono", "—", cx.indisponivel, "atencao")
+      : kpi("Caixa do dono", cx.novas ? `${cx.novas} esperando você` : "Nada pendente",
+        cx.novas ? `${cx.ideias_novas} ideia(s) · ${cx.pendencias_novas} decisão(ões) — decida no painel` : "ideias e decisões em dia",
+        cx.novas ? "atencao" : "bom"));
     const ti = r.ti || {};
     g.append(indisponivel(ti) ? kpi("TI", "—", ti.indisponivel, "atencao")
       : kpi("Ronda de TI", ti.saudavel === false ? "Com alerta" : (ti.saudavel ? "Saudável" : "—"), dataBr(ti.data_hora),
