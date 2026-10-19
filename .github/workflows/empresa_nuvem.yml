@@ -1,11 +1,11 @@
-# Empresa na nuvem GRÁTIS: um turno de trabalho a cada 2 horas (repositório público = minutos do GitHub Actions grátis).
+# Empresa na nuvem GRÁTIS: um turno de trabalho por hora (o GitHub às vezes pula horários) (repositório público = minutos do GitHub Actions grátis).
 # A memória fica num PostgreSQL gratuito (ex.: Neon). Guia: documentacao/nuvem_gratis.md
 # Segredos (Settings → Secrets and variables → Actions): ROBO_PG_URL e ROBO_PG_SENHA_LEITURA. Nunca aparecem no log.
 name: Empresa na nuvem (turnos)
 
 on:
   schedule:
-    - cron: "17 */2 * * *"   # a cada 2 horas, no minuto 17 (fora do pico da hora cheia)
+    - cron: "17 * * * *"     # toda hora, no minuto 17: o GitHub pula horários em momentos de carga; pedir toda hora compensa
   push:                      # ligar/forçar um turno sem o botão: mudar o arquivo nuvem/ligar
     paths: ["nuvem/ligar"]
   workflow_dispatch:

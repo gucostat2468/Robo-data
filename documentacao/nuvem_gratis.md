@@ -4,7 +4,7 @@
 
 | Peça | Onde | Custo |
 |---|---|---|
-| A empresa trabalhando (88 funcionários, todas as rotinas) | GitHub Actions: um turno de 20 min a cada 2 horas | Grátis (repositório público) |
+| A empresa trabalhando (90 funcionários, todas as rotinas) | GitHub Actions: um turno de 20 min por hora (pedido toda hora) | Grátis (repositório público) |
 | O banco com toda a memória | PostgreSQL gratuito do Neon | Grátis (0,5 a 1 GB) |
 | Você acompanhando | O app de banco do seu celular, ligado direto no Neon | Grátis |
 
@@ -52,7 +52,7 @@
 
 1. No repositório, toque em **Actions**.
 2. Toque em **Empresa na nuvem (turnos)**, depois em **Run workflow**, e confirme em **Run workflow**.
-3. Em uns 25 minutos o turno termina com o ✔ verde. A partir daí, a empresa trabalha sozinha a cada 2 horas.
+3. Em uns 25 minutos o turno termina com o ✔ verde. A partir daí, a empresa trabalha sozinha: um turno pedido toda hora.
 
 ### 4. Ligar o app do celular (o da tela "New Connecion")
 
@@ -72,7 +72,8 @@ Toque em **TEST**. As tabelas ficam no schema `robo` e todas começam com `memor
 
 ## Limites (com franqueza)
 
-- **Não é 24 h contínuas:** são 12 turnos de 20 minutos por dia, cerca de 1.800 tentativas por dia. Rodar sem parar no
+- **Não é 24 h contínuas:** o turno é pedido toda hora, mas o agendador gratuito do GitHub pula horários em momentos
+  de carga (em 19/10, de 3 horários pedidos, só 1 rodou). Na prática, entre 8 e 24 turnos de 20 minutos por dia. Rodar sem parar no
   GitHub iria contra as regras de uso do Actions.
 - **Espaço:** o plano gratuito do Neon dá 0,5 a 1 GB.
   - No ritmo dos turnos, o banco cresce alguns MB por dia.

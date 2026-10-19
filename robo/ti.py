@@ -170,12 +170,18 @@ def chk_tamanho_logs(cfg) -> list[str]:
     pasta = Path(cfg.logs)
     if not pasta.exists():
         return []
-    arquivos = [p for p in pasta.rglob("*") if p.is_file()]
-    total = sum(p.stat().st_size for p in arquivos) / 1024 ** 2
+    tamanhos = {}
+    for p in pasta.rglob("*"):
+        try:  # o -wal/-shm do SQLite e arquivos .tmp somem entre a listagem e a medida: isso não é erro
+            if p.is_file():
+                tamanhos[p] = p.stat().st_size
+        except FileNotFoundError:
+            continue
+    total = sum(tamanhos.values()) / 1024 ** 2
     if total < 500:
         return []
-    maiores = sorted(arquivos, key=lambda p: p.stat().st_size, reverse=True)[:3]
-    return [f"logs ocupam {total:.0f} MB; maiores: " + ", ".join(f"{p.name} ({p.stat().st_size / 1024 ** 2:.0f} MB)" for p in maiores)]
+    maiores = sorted(tamanhos, key=tamanhos.get, reverse=True)[:3]
+    return [f"logs ocupam {total:.0f} MB; maiores: " + ", ".join(f"{p.name} ({tamanhos[p] / 1024 ** 2:.0f} MB)" for p in maiores)]
 
 
 # ------------------------------------------------------------------------------- orquestração (equipe de Airflow)
