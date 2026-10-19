@@ -613,6 +613,11 @@ class Api:
         from robo import central
         return central.montar(self.cfg, int(q.get("dias", ["1"])[0] or 1))
 
+    def quem_faz_o_que(self, _q) -> dict:
+        """Escopo de cada funcionário + o último trabalho que ele deixou registrado (robo/atividade_equipe.py)."""
+        from robo import atividade_equipe
+        return atividade_equipe.quadro(self.cfg)
+
     def paineis(self, _q) -> dict:
         """Dashboards montados pela Bárbara e conferidos pelo Heitor (logs/paineis/painel.json) + o registro de versões."""
         from robo import paineis
@@ -1324,7 +1329,7 @@ ROTAS_GET = {
     "/api/conhecimento": Api.conhecimento, "/api/conhecimento/caderno": Api.conhecimento_caderno,
     "/api/conhecimento/licao": Api.conhecimento_licao, "/api/conhecimento/buscar": Api.conhecimento_buscar,
     "/api/erros": Api.erros_sistema, "/api/gestao": Api.gestao, "/api/treino": Api.treino, "/api/banco/registros": Api.banco_registros, "/api/treino/pessoa": Api.treino_pessoa, "/api/aprendizado": Api.aprendizado,
-    "/api/paineis": Api.paineis,
+    "/api/paineis": Api.paineis, "/api/quem-faz-o-que": Api.quem_faz_o_que,
 }
 ROTAS_POST = {
     "/api/robo/ligar": Api.ligar, "/api/robo/pausar": Api.pausar, "/api/robo/processar-agora": Api.processar_agora,

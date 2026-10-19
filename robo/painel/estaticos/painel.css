@@ -672,3 +672,36 @@ pre.sql, .consultas pre { max-width: 100%; overflow: auto; }
 .pagina.entrando { animation: pagina-entra .18s ease-out; }
 @keyframes pagina-entra { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
 @media (prefers-reduced-motion: reduce) { .pagina.entrando { animation: none; } }
+/* ------------------------------------------------------------------ Quem faz o quê (equipe_escopo.js) */
+.qf-resumo { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 10px; margin-bottom: 12px; }
+.qf-andar { background: var(--superficie); border: 1px solid var(--borda); border-radius: var(--raio); padding: 10px 12px;
+  display: flex; flex-direction: column; gap: 6px; font-size: 13px; box-shadow: var(--sombra); }
+.qf-andar > span { display: flex; flex-wrap: wrap; gap: 4px; }
+.qf-parados { background: var(--alerta-suave); color: var(--alerta); border-radius: var(--raio-p); padding: 10px 12px;
+  font-size: 13px; margin-bottom: 12px; overflow-wrap: anywhere; }
+.qf-ok { background: var(--sucesso-suave); color: var(--sucesso); border-radius: var(--raio-p); padding: 10px 12px;
+  font-size: 13px; margin-bottom: 12px; }
+.qf-filtros { display: flex; flex-direction: column; gap: 8px; margin-bottom: 6px; }
+.qf-filtros .chips-colunas { display: flex; flex-wrap: wrap; gap: 6px; }
+.qf-filtros-linha { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+.qf-filtros-linha select { max-width: 230px; }
+.qf-regra { font-size: 12px; margin: 6px 0 10px; }
+.qf-grade { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 12px; }
+.qf-cartao { background: var(--superficie); border: 1px solid var(--borda); border-left: 4px solid var(--qf-cor);
+  border-radius: var(--raio); padding: 12px 14px; display: flex; flex-direction: column; gap: 8px; min-width: 0;
+  box-shadow: var(--sombra); }
+.qf-topo { display: flex; justify-content: space-between; align-items: flex-start; gap: 8px; }
+.qf-quem { display: flex; flex-direction: column; min-width: 0; }
+.qf-quem small { overflow-wrap: anywhere; }
+.qf-topo .etiqueta { white-space: nowrap; }
+.qf-meta { display: flex; flex-wrap: wrap; gap: 4px 10px; font-size: 12px; color: var(--texto-2); }
+.qf-sub { font-size: 11px; text-transform: uppercase; letter-spacing: .04em; color: var(--texto-2); margin-top: 2px; }
+.qf-ultimo p { margin: 3px 0; font-size: 13px; overflow-wrap: anywhere; }
+.qf-escopo summary { cursor: pointer; font-size: 13px; font-weight: 600; color: var(--primaria); }
+.qf-escopo ul { margin: 6px 0; padding-left: 18px; font-size: 13px; }
+.qf-escopo li { margin: 2px 0; overflow-wrap: anywhere; }
+.qf-ferr { font-size: 12px; margin: 3px 0; overflow-wrap: anywhere; }
+@media (max-width: 520px) {
+  .qf-grade { grid-template-columns: 1fr; }
+  .qf-filtros-linha .campo-busca, .qf-filtros-linha select { max-width: none; flex: 1 1 100%; min-width: 0; }
+}
