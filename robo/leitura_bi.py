@@ -57,6 +57,8 @@ GLOSSARIO = [
     (r"prazo|tempo|dias|anos", "Duração (dias/anos)", "Não negativa", "nao_negativo", "media"),
     (r"data|dt_|_em$|envio|admiss", "Data do evento", "Não pode estar no futuro nem antes de 2000", "data", None),
 ]
+METRICA_PRINCIPAL = [r"nps", r"csat|satisf", r"atraso", r"valor_lancado", r"venda|receita|faturamento", r"conversoes",
+                     r"investimento", r"salario", r"valor"]
 PAPEL_DA_REGRA = {"unico": ("id",), "data": ("data",)}
 SEGMENTO_PREFERIDO = r"curso|regiao|departamento|centro_de_custo|canal|transportadora|loja|segmento|categoria|modalidade"
 
@@ -114,6 +116,8 @@ def ler(df: pd.DataFrame, nome: str, origem: str) -> dict:
     regras += _regras_cruzadas(df)
     tema = _tema(list(df.columns))
     metricas = [c for c in colunas if c["papel"] == "numero" and c["agregacao"]]
+    # a métrica principal é a que responde à pergunta do tema (logística → atraso, não prazo)
+    metricas.sort(key=lambda c: next((i for i, p in enumerate(METRICA_PRINCIPAL) if re.search(p, c["coluna"])), 99))
     dims = [c for c in colunas if c["papel"] == "categoria"]
     datas = [c for c in colunas if c["papel"] == "data"]
     seg = next((d for d in dims if re.search(SEGMENTO_PREFERIDO, d["coluna"])), dims[0] if dims else None)

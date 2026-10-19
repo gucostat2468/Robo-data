@@ -142,10 +142,17 @@ const PB_PAPEL = { id: "identificador", data: "data", categoria: "categoria (dim
 
 function pbPlanilhas(lista) {
   if (!lista || !lista.length) return pbVazio("Nenhuma planilha lida ainda. Quando uma planilha for publicada em Bases-Tratadas (ou o laboratório gerar as sintéticas), a Bárbara lê aqui.");
+  // reais primeiro; entre as de treino, a pesquisa de satisfação (NPS) abre por padrão
+  lista = [...lista].sort((a, b) => (a.origem === "real" ? 0 : 1) - (b.origem === "real" ? 0 : 1) ||
+    (/nps/i.test(b.nome) ? 1 : 0) - (/nps/i.test(a.nome) ? 1 : 0));
   const i = Math.min(E.paineisPlanilha || 0, lista.length - 1), L = lista[i];
+  const aviso = L.origem === "real" ? "" : `<div class="pl-aviso"><b>⚠ Dados inventados para treino — não são números da sua empresa.</b>
+    O laboratório cria todo dia uma planilha falsa de cada área (pesquisa, vendas, RH, financeiro, marketing, logística), com erros
+    plantados de propósito, para a equipe praticar. Canais como Meta e TikTok aqui são só exemplo. Quando uma planilha sua for publicada
+    em Bases-Tratadas, ela aparece primeiro nesta lista, marcada como <b>real</b>.</div>`;
   const seletor = `<div class="pl-lista" role="tablist" aria-label="Planilhas lidas">${lista.map((x, k) => `<button role="tab" aria-selected="${k === i}"
-    class="pl-item${k === i ? " ativo" : ""}" data-acao="paineis-planilha" data-i="${k}"><b>${esc(x.nome.replace(/\.(xlsx|csv)$/i, "").replace(/^laboratorio_/, ""))}</b>
-    <small>${esc(x.tema.nome)}</small><span class="etiqueta ${x.origem === "real" ? "sucesso" : ""}">${x.origem === "real" ? "real" : "sintética"}</span></button>`).join("")}</div>`;
+    class="pl-item${k === i ? " ativo" : ""}" data-acao="paineis-planilha" data-i="${k}"><b>${x.origem === "real" ? "" : "Treino · "}${esc(x.nome.replace(/\.(xlsx|csv)$/i, "").replace(/^laboratorio_/, "").replace("educacao_nps", "pesquisa NPS"))}</b>
+    <small>${esc(x.tema.nome)}</small><span class="etiqueta ${x.origem === "real" ? "sucesso" : "alerta"}">${x.origem === "real" ? "real" : "inventada (treino)"}</span></button>`).join("")}</div>`;
   const kpis = `<div class="pb-kpis">${Object.entries(L.ancoras).map(([n, v]) => `<div class="pb-kpi"><span class="pb-kpi-rotulo">${esc(n)}</span>
     <strong class="pb-kpi-valor">${esc(/taxa/i.test(n) ? pbPct(v, 2) : pbNumBr(v))}</strong><small class="muted">número-âncora: o Power BI tem que mostrar este valor sem filtro</small></div>`).join("")}</div>`;
   const seg = L.por_segmento;
@@ -158,7 +165,7 @@ function pbPlanilhas(lista) {
       ["Preenchido", (r) => pbPct(r.preenchimento, 0)]]), true);
   const regras = pbCartao({ titulo: `Regras de negócio conferidas nos dados (${regrasOk} de ${L.regras.length} sem problema)`, sql: "cada regra contada linha a linha" },
     pbTabela({ linhas: L.regras }, [["Coluna", (r) => esc(r.coluna)], ["Regra", (r) => esc(r.regra)],
-      ["Resultado", (r) => `<span class="etiqueta ${r.nivel === "erro" ? "perigo" : r.nivel === "aviso" ? "alerta" : r.nivel === "ok" ? "sucesso" : ""}">${esc(r.texto)}</span>`]]]]), true);
+      ["Resultado", (r) => `<span class="etiqueta ${r.nivel === "erro" ? "perigo" : r.nivel === "aviso" ? "alerta" : r.nivel === "ok" ? "sucesso" : ""}">${esc(r.texto)}</span>`]]), true);
   const m = L.modelo;
   const estrela = pbCartao({ titulo: "Modelo estrela proposto", sql: "fato = métricas + chaves; dimensões = categorias; calendário = coluna de data" },
     `<div class="pl-estrela"><div class="pl-dims">${m.dimensoes.map((d) => `<div class="pl-caixa">${esc(d.tabela)}<small>${d.valores} valores</small></div>`).join("")}
@@ -170,11 +177,11 @@ function pbPlanilhas(lista) {
       <pre class="pl-dax">${esc(d.dax)}</pre><p>${esc(d.explicacao)}</p><p class="muted">${esc(d.contexto)}</p></details>`).join(""), true);
   const visuais = pbCartao({ titulo: "Visuais recomendados", sql: "pela pergunta de negócio" },
     pbTabela({ linhas: L.visuais }, [["Visual", (r) => `<b>${esc(r.visual)}</b>`], ["Responde", (r) => esc(r.pergunta)], ["Por quê", (r) => esc(r.porque)], ["Quando não usar", (r) => esc(r.nao_usar)]]), true);
-  const tema = `<div class="pl-tema"><div><span class="etiqueta ${L.origem === "real" ? "sucesso" : ""}">${L.origem === "real" ? "planilha real" : "dados sintéticos (laboratório)"}</span>
+  const tema = `<div class="pl-tema"><div><span class="etiqueta ${L.origem === "real" ? "sucesso" : "alerta"}">${L.origem === "real" ? "planilha real" : "dados inventados (treino)"}</span>
     <h2>${esc(L.tema.nome)}</h2><p>${esc(L.tema.descricao)}</p><small class="muted">${esc(L.nome)} · ${num(L.linhas)} linhas × ${L.colunas_qtd} colunas${L.tema.evidencia ? ` · reconhecido por: ${L.tema.evidencia.map(esc).join(", ")}` : ""}</small></div>
     ${L.tema.perguntas.length ? `<div><b>Perguntas que este painel responde</b><ul class="lista-ficha">${L.tema.perguntas.map((q) => `<li>${esc(q)}</li>`).join("")}</ul></div>` : ""}</div>`;
   const achados = `<div class="pb-achados">${L.achados.map((a) => /^Regra quebrada/.test(a) ? `<div class="alerta">⚠ ${esc(a)}</div>` : `<div>✔ ${esc(a)}</div>`).join("")}</div>`;
-  return seletor + tema + kpis + achados + `<div class="pb-grade-cartoes" style="margin-top:12px">${grafico}${dicionario}${regras}${estrela}${medidas}${visuais}</div>`;
+  return seletor + aviso + tema + kpis + achados + `<div class="pb-grade-cartoes" style="margin-top:12px">${grafico}${dicionario}${regras}${estrela}${medidas}${visuais}</div>`;
 }
 
 function renderPaineis() {
