@@ -6,7 +6,7 @@
 
 | Onde | O que guarda | Para quê |
 |---|---|---|
-| `logs/trabalho.db` (SQLite) | **Fonte de tudo**: a memória da empresa (40 tabelas abaixo) | Funciona sem internet e sem servidor; nada se apaga |
+| `logs/trabalho.db` (SQLite) | **Fonte de tudo**: a memória da empresa (45 tabelas abaixo) | Funciona sem internet e sem servidor; nada se apaga |
 | `logs/backups_sqlite/` | Cópia diária do `trabalho.db`, conferida (`integrity_check`) e com SHA-256 | Restaurar se o disco falhar; o 1º de cada mês fica para sempre |
 | PostgreSQL `robo_dados`, schema `robo` | Espelho de TODAS as tabelas (`memoria_<tabela>`) | Consultas em SQL, Power BI e Machine Learning |
 | PostgreSQL schemas `bruto` → `tratado` → `analitico` | As planilhas de negócio (ELT) | Análise e Power BI |
@@ -46,6 +46,7 @@
 | `arquivos` | Arquivos anexados às conversas e solicitações | um anexo | registro com situação (a situação muda; a linha nunca some) | entradas do trabalho |
 | `conversas` | Conversas com cada funcionário (e salas de reunião) | uma conversa | registro com situação (a situação muda; a linha nunca some) | contexto das perguntas do dono |
 | `mensagens` | Cada mensagem das conversas, com a natureza da resposta e a evidência | uma mensagem | só acrescenta (imutável: não altera nem apaga) | perguntas × respostas × natureza (base para avaliar respostas) |
+| `canal_mensagens` | Cada mensagem do canal da equipe (todos os campos) | uma mensagem | só acrescenta (imutável: não altera nem apaga) | o que cada pessoa comunica e quando; conversas por área |
 
 ### Conhecimento e aprendizado (lições, regras aprendidas, cadeia de integridade)
 
@@ -91,6 +92,10 @@
 | `erros_sistema` | Todo erro de programa (com traceback), agrupado por tipo, ligado a um handover da TI | um tipo de erro (repetição soma ocorrência) | registro com situação (a situação muda; a linha nunca some) | estabilidade do código por versão |
 | `auditorias` | Auditorias por amostragem dos heads (conferido por outro caminho) | uma auditoria | só acrescenta (imutável: não altera nem apaga) | confiança nos resultados publicados |
 | `backups_registro` | Cada backup (SQLite e PostgreSQL): arquivo, SHA-256, linhas e integridade | um backup | só acrescenta (imutável: não altera nem apaga) | prova de que dá para restaurar |
+| `logs_sistema` | Cada registro do log do sistema (robo.log e os girados), com nível e mensagem completa | um registro do log (com o traceback, se houver) | só acrescenta (imutável: não altera nem apaga) | série de eventos e erros por módulo e hora; prever falha antes de acontecer |
+| `arquivos_linhas` | Cada linha nova dos arquivos que só crescem (.jsonl, .csv): RH, conhecimento, histórico | uma linha de um arquivo, na ordem | só acrescenta (imutável: não altera nem apaga) | reconstruir qualquer arquivo da pasta de logs |
+| `arquivos_versoes` | Cada versão de arquivo reescrito (.json, .md, .yaml, .txt): atas, estado da TI, relatórios de erro, config.yaml sem senhas, equipe | uma versão de um arquivo | só acrescenta (imutável: não altera nem apaga) | como a configuração e os documentos mudaram ao longo do tempo |
+| `registro_cursores` | Até onde cada arquivo já foi lido pelo registro total | um arquivo (por geração) | estado atual (sobrescrito de propósito; a história fica em outra tabela) | controle interno: a história fica nas tabelas acima |
 | `acessos_celular` | Cada tentativa de entrar pelo celular (certa, errada ou bloqueada), com IP e aparelho | uma tentativa de entrada no acompanhamento pelo celular | só acrescenta (imutável: não altera nem apaga) | padrão de uso e detecção de acesso estranho (horário, IP, erros seguidos) |
 
 ## Colunas de cada tabela
@@ -98,10 +103,13 @@
 - **`acessos_celular`**: `id`, `data_hora`, `ip`, `evento`, `detalhe`, `navegador`
 - **`aprovacoes`**: `id`, `solicitacao_id`, `etapa_id`, `pedido`, `risco`, `solicitante`, `aprovador`, `estado`, `decidido_por`, `decidido_em`, `motivo`, `criada_em`
 - **`arquivos`**: `id`, `conversa_id`, `solicitacao_id`, `caminho`, `nome`, `criado_em`
+- **`arquivos_linhas`**: `id`, `arquivo`, `geracao`, `n_linha`, `conteudo`, `capturado_em`
+- **`arquivos_versoes`**: `id`, `arquivo`, `sha256`, `tamanho`, `modificado_em`, `conteudo`, `capturado_em`
 - **`artefatos`**: `id`, `solicitacao_id`, `etapa_id`, `caminho`, `tipo`, `descricao`, `criado_em`
 - **`auditorias`**: `id`, `data_hora`, `head`, `area`, `amostra`, `aprovada`, `achados`, `conferidos`
 - **`backups_registro`**: `id`, `data_hora`, `tipo`, `ok`, `arquivo`, `sha256`, `tamanho_mb`, `linhas`, `integridade`, `detalhe`
 - **`boas_praticas`**: `id`, `handover_id`, `andar`, `area`, `responsavel`, `problema`, `pratica`, `como_verificar`, `evidencia`, `criada_em`, `valida`, `invalidada_em`, `motivo_invalidacao`
+- **`canal_mensagens`**: `id`, `data_hora`, `canal`, `autor`, `nome`, `papel`, `tipo`, `texto`, `extra`, `capturado_em`
 - **`conversas`**: `id`, `funcionario`, `titulo`, `origem`, `criada_em`, `atualizada_em`, `contexto`, `arquivada`
 - **`decisoes`**: `id`, `criada_em`, `origem`, `reuniao_id`, `andar`, `texto`, `dono`, `prazo`, `criterio`, `vinculo_tipo`, `vinculo_id`, `registrada_por`, `estado`, `estado_em`, `evidencia`, `repactuacoes`
 - **`decisoes_eventos`**: `id`, `decisao_id`, `data_hora`, `tipo`, `de`, `para`, `quem`, `reuniao_id`, `detalhe`
@@ -117,10 +125,12 @@
 - **`licoes`**: `id`, `origem_tipo`, `origem_ref`, `versao`, `substitui`, `andar`, `publico`, `titulo`, `conteudo`, `pergunta`, `como_aplicar`, `autor`, `criada_em`, `arquivada`, `motivo_arquivo`
 - **`licoes_funcionario`**: `licao_id`, `funcionario`, `estado`, `atribuida_em`, `estudada_em`, `avaliada_em`, `aplicada_em`, `evidencia`, `tentativas`
 - **`licoes_uso`**: `id`, `licao_id`, `funcionario`, `data_hora`, `contexto`
+- **`logs_sistema`**: `id`, `data_hora`, `nivel`, `mensagem`, `arquivo`, `geracao`, `linha_inicial`, `capturado_em`
 - **`memoria`**: `id`, `tipo`, `chave`, `texto`, `origem`, `solicitacao_id`, `criada_em`
 - **`mensagens`**: `id`, `conversa_id`, `autor`, `texto`, `natureza`, `dados`, `solicitacao_id`, `criada_em`
 - **`propostas_regra`**: `id`, `criada_em`, `arquivo`, `arquivo_erros`, `padrao`, `tipo`, `coluna`, `valor`, `motivo`, `evidencia`, `alerta`, `autor`, `estado`, `decidido_por`, `decidido_em`, `motivo_decisao`, `comprovada_em`, `prova`, `para`
 - **`registro_conhecimento`**: `id`, `data_hora`, `tipo`, `ref`, `quem`, `dados`, `hash_anterior`, `hash`
+- **`registro_cursores`**: `chave`, `posicao`, `linhas`, `assinatura`, `atualizado_em`
 - **`regras_aprendidas`**: `id`, `proposta_id`, `padrao`, `tipo`, `coluna`, `valor`, `aprovada_por`, `aprovada_em`, `ativa`, `para`, `desativada_em`, `desativada_por`, `motivo_desativacao`
 - **`reunioes`**: `id`, `inicio`, `fim`, `data_hora`, `ata`, `arquivo`
 - **`rotinas_estado`**: `nome`, `ultima_verificacao`, `ultima_execucao`, `ultimo_status`, `detalhe`

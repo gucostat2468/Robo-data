@@ -86,12 +86,44 @@ def teste_primeiro_backup_de_cada_mes_nunca_e_apagado(cfg, monkeypatch):
     nomes = [f"trabalho_2026{m:02d}{d:02d}_030000.db.gz" for m in (8, 9, 10) for d in (1, 10, 20)]
     for n in nomes:
         (pasta / n).write_bytes(b"x")
-    monkeypatch.setitem(cfg.dados, "backup", {"manter_sqlite": 2})
+    monkeypatch.setitem(cfg.dados, "backup", {"manter_sqlite": 2, "manter_sqlite_horas": 0, "manter_sqlite_dias": 0})
     backup._rodizio_sqlite(cfg)
     ficaram = sorted(p.name for p in pasta.glob("*.db.gz"))
     assert ficaram == ["trabalho_20260801_030000.db.gz", "trabalho_20260901_030000.db.gz",
                        "trabalho_20261001_030000.db.gz", "trabalho_20261010_030000.db.gz",
                        "trabalho_20261020_030000.db.gz"]
+
+
+def teste_rodizio_de_hora_em_hora_guarda_48h_um_por_dia_e_o_mes(cfg, monkeypatch):
+    from datetime import datetime, timedelta
+    monkeypatch.setitem(cfg.dados, "backup", {"manter_sqlite": 1})  # isola as regras de 48 h, dia e mês
+    pasta = backup.pasta_sqlite(cfg)
+    pasta.mkdir(parents=True)
+    agora = datetime.now().replace(minute=0, second=0, microsecond=0)
+    horas = [agora - timedelta(hours=h) for h in range(0, 24 * 120, 6)]  # um backup a cada 6 h por 120 dias
+    for t in horas:
+        (pasta / f"trabalho_{t:%Y%m%d_%H%M%S}.db.gz").write_bytes(b"x")
+    backup._rodizio_sqlite(cfg)
+    ficaram = {p.name for p in pasta.glob("*.db.gz")}
+    nome = lambda t: f"trabalho_{t:%Y%m%d_%H%M%S}.db.gz"  # noqa: E731
+    assert all(nome(t) in ficaram for t in horas if agora - t <= timedelta(hours=48))       # tudo das últimas 48 h
+    for dia in {t.date() for t in horas if agora - t <= timedelta(days=89)}:                  # 1 por dia em 90 dias
+        assert nome(min(t for t in horas if t.date() == dia)) in ficaram
+    assert not any(nome(t) in ficaram for t in horas                                         # o resto sai…
+                   if timedelta(hours=49) < agora - t < timedelta(days=89) and t != min(x for x in horas if x.date() == t.date()))
+    for mes in {(t.year, t.month) for t in horas}:                                           # …menos o 1º do mês
+        assert nome(min(t for t in horas if (t.year, t.month) == mes)) in ficaram
+
+
+def teste_copia_extra_conferida(cfg, tmp_path, monkeypatch):
+    from robo import memoria
+    extra = tmp_path / "hd_externo"
+    monkeypatch.setitem(cfg.dados, "backup", {"copia_extra": str(extra)})
+    memoria.experiencia(cfg, "dba", "acerto", "algo para copiar", "teste", "")
+    r = backup.backup_sqlite(cfg)
+    assert r["ok"] and r["copia_extra"] is True
+    copiado = extra / "robo_planilhas" / "backups_sqlite" / r["arquivo"]
+    assert copiado.read_bytes() == (backup.pasta_sqlite(cfg) / r["arquivo"]).read_bytes()
 
 
 def teste_retencao_padrao_guarda_originais_para_sempre(cfg):

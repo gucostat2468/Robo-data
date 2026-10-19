@@ -106,6 +106,18 @@ TABELAS = {
                    IMUTAVEL, "confiança nos resultados publicados"),
     "backups_registro": ("operacao", "Cada backup (SQLite e PostgreSQL): arquivo, SHA-256, linhas e integridade",
                          "um backup", IMUTAVEL, "prova de que dá para restaurar"),
+    "logs_sistema": ("operacao", "Cada registro do log do sistema (robo.log e os girados), com nível e mensagem completa",
+                     "um registro do log (com o traceback, se houver)", IMUTAVEL,
+                     "série de eventos e erros por módulo e hora; prever falha antes de acontecer"),
+    "canal_mensagens": ("trabalho", "Cada mensagem do canal da equipe (todos os campos)", "uma mensagem", IMUTAVEL,
+                        "o que cada pessoa comunica e quando; conversas por área"),
+    "arquivos_linhas": ("operacao", "Cada linha nova dos arquivos que só crescem (.jsonl, .csv): RH, conhecimento, histórico",
+                        "uma linha de um arquivo, na ordem", IMUTAVEL, "reconstruir qualquer arquivo da pasta de logs"),
+    "arquivos_versoes": ("operacao", "Cada versão de arquivo reescrito (.json, .md, .yaml, .txt): atas, estado da TI, "
+                         "relatórios de erro, config.yaml sem senhas, equipe", "uma versão de um arquivo", IMUTAVEL,
+                         "como a configuração e os documentos mudaram ao longo do tempo"),
+    "registro_cursores": ("operacao", "Até onde cada arquivo já foi lido pelo registro total", "um arquivo (por geração)",
+                          ESTADO_ATUAL, "controle interno: a história fica nas tabelas acima"),
     "acessos_celular": ("operacao", "Cada tentativa de entrar pelo celular (certa, errada ou bloqueada), com IP e aparelho",
                         "uma tentativa de entrada no acompanhamento pelo celular", IMUTAVEL,
                         "padrão de uso e detecção de acesso estranho (horário, IP, erros seguidos)"),
@@ -116,13 +128,14 @@ COLUNAS_DE_DATA = ("data_hora", "criada_em", "criado_em", "inicio", "primeira", 
 
 def _todas_as_tabelas(cfg) -> None:
     """Garante que todo módulo criou o próprio esquema (para listar e documentar tudo)."""
-    from robo import aprendizado, auditoria, backup, decisoes, erros, interacoes, laboratorio, licoes, sala, treino
+    from robo import (aprendizado, auditoria, backup, decisoes, erros, interacoes, laboratorio, licoes, registro_total, sala,
+                      treino)
     from robo.painel import celular
     from robo.ferramentas import USO_ESQUEMA
     from robo.rotinas import ESQUEMA as ROTINAS
     from robo.trabalho import Trabalho
     Trabalho(cfg)
-    for m in (aprendizado, auditoria, erros, interacoes, laboratorio, licoes, sala, treino, decisoes, celular):
+    for m in (aprendizado, auditoria, erros, interacoes, laboratorio, licoes, sala, treino, decisoes, celular, registro_total):
         m._tb(cfg)
     from robo.trabalho import proteger
     with Trabalho(cfg).tx() as c:

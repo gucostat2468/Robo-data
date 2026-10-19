@@ -491,6 +491,10 @@ ESPELHO_EXTRA = {
     "propostas_regra": "atualiza", "regras_aprendidas": "atualiza", "uso_ferramentas": "imutavel",
     "sala_eventos": "imutavel", "salas_encerradas": "imutavel", "licoes_uso": "imutavel", "auditorias": "imutavel",
     "eventos": "imutavel", "mensagens": "imutavel", "laboratorio_medidas": "imutavel",
+    # registro total (robo/registro_total.py) e demais registros só de inserção
+    "logs_sistema": "imutavel", "canal_mensagens": "imutavel", "arquivos_linhas": "imutavel", "arquivos_versoes": "imutavel",
+    "treino_tentativas": "imutavel", "treino_niveis_eventos": "imutavel", "backups_registro": "imutavel",
+    "decisoes_eventos": "imutavel",
 }
 # Toda tabela do trabalho.db vai para o PostgreSQL (inclusive as criadas no futuro): a que não está acima é copiada
 # como "atualiza" (o estado mais novo substitui). "imutavel" = a cópia do banco nunca é sobrescrita.
@@ -538,19 +542,17 @@ def sincronizar_postgres(cfg) -> dict:
 
 
 def _espelhar_extras(conn, sql, schema: str, tb: Trabalho) -> dict:
-    """Copia as demais tabelas de registro com as colunas que elas têm no SQLite."""
+    """Copia as demais tabelas de registro com as colunas que elas têm no SQLite.
+    Tabela imutável com chave numérica única: INCREMENTAL (só as linhas com id maior que o maior já copiado) — assim a
+    cópia continua leve mesmo com milhões de linhas de log. As demais: todas as linhas, com o estado mais novo."""
     tipos = {"INTEGER": "BIGINT", "REAL": "DOUBLE PRECISION"}
     feitos = {}
     with tb.tx() as c:
         existentes = [r[0] for r in c.execute("SELECT name FROM sqlite_master WHERE type='table' AND name NOT LIKE 'sqlite_%' "
                                              "ORDER BY name")]
-        dados = {}
-        for nome in existentes:
-            if nome in TABELAS_PG:
-                continue
-            info = [(r[1], (r[2] or "TEXT").split()[0].upper(), r[5]) for r in c.execute(f"PRAGMA table_info({nome})")]
-            dados[nome] = (info, [tuple(r) for r in c.execute(f"SELECT {', '.join(i[0] for i in info)} FROM {nome}")])
-    for nome, (info, linhas) in dados.items():
+        estrutura = {nome: [(r[1], (r[2] or "TEXT").split()[0].upper(), r[5]) for r in c.execute(f"PRAGMA table_info({nome})")]
+                     for nome in existentes if nome not in TABELAS_PG}
+    for nome, info in estrutura.items():
         cols = [i[0] for i in info]
         pk = [i[0] for i in info if i[2]] or [cols[0]]
         tabela = sql.Identifier(schema, f"memoria_{nome}")
@@ -560,7 +562,17 @@ def _espelhar_extras(conn, sql, schema: str, tb: Trabalho) -> dict:
         for n, t, _ in info:  # tabela criada por uma versão anterior: acompanha as colunas novas (senão a cópia falha)
             conn.execute(sql.SQL("ALTER TABLE {} ADD COLUMN IF NOT EXISTS {} " + tipos.get(t, "TEXT")).format(
                 tabela, sql.Identifier(n)))
-        if ESPELHO_EXTRA.get(nome, "atualiza") == "imutavel" or not [x for x in cols if x not in pk]:
+        imutavel = ESPELHO_EXTRA.get(nome, "atualiza") == "imutavel" or not [x for x in cols if x not in pk]
+        incremental = imutavel and len(pk) == 1 and dict((n, t) for n, t, _ in info).get(pk[0]) == "INTEGER"
+        desde = None
+        if incremental:
+            desde = conn.execute(sql.SQL("SELECT MAX({}) FROM {}").format(sql.Identifier(pk[0]), tabela)).fetchone()[0]
+        with tb.tx() as c:
+            consulta = f"SELECT {', '.join(cols)} FROM {nome}"
+            linhas = [tuple(r) for r in (c.execute(consulta + f" WHERE {pk[0]} > ? ORDER BY {pk[0]}", (desde,))
+                                         if desde is not None else c.execute(consulta))]
+            total = c.execute(f"SELECT COUNT(*) FROM {nome}").fetchone()[0]
+        if imutavel:
             fim = sql.SQL("DO NOTHING")
         else:
             fim = sql.SQL("DO UPDATE SET ") + sql.SQL(", ").join(
@@ -568,9 +580,10 @@ def _espelhar_extras(conn, sql, schema: str, tb: Trabalho) -> dict:
         comando = sql.SQL("INSERT INTO {} ({}) VALUES ({}) ON CONFLICT ({}) ").format(
             tabela, sql.SQL(", ").join(map(sql.Identifier, cols)), sql.SQL(", ").join(sql.Placeholder() * len(cols)),
             sql.SQL(", ").join(map(sql.Identifier, pk))) + fim
-        with conn.cursor() as cur:
-            cur.executemany(comando, linhas)
-        feitos[nome] = len(linhas)
+        if linhas:
+            with conn.cursor() as cur:
+                cur.executemany(comando, linhas)
+        feitos[nome] = total  # linhas que a tabela tem (a cópia inclui todas; nesta rodada só subiram as novas)
     return feitos
 
 

@@ -166,6 +166,7 @@ class ControleRobo:
         if agora - getattr(self, "_ultimo_canal", 0) >= 60:
             self._ultimo_canal = agora
             rotinas.executar(cfg, "canal", rotinas.funcao(cfg, "canal"))
+            rotinas.executar(cfg, "registro", rotinas.funcao(cfg, "registro"))  # tudo que virou arquivo vai para o banco
         if str((cfg.dados.get("rotinas") or {}).get("agendador", "robo")).lower() == "airflow":
             return  # o Airflow agenda as rotinas (robo/orquestracao.py); a equipe de SLA vigia se ele está rodando
         # rotinas pesadas em segundo plano (avaliação, backup, estudo, reunião…): cada uma decide se está na hora
@@ -180,6 +181,16 @@ class ControleRobo:
                 finally:
                     self._estrategia_rodando = False
             threading.Thread(target=_rodar, name="robo-estrategia", daemon=True).start()
+        # cópia para o PostgreSQL a cada 10 min (incremental), numa linha própria
+        if agora - getattr(self, "_ultima_copia_pg", 0) >= 600 and not getattr(self, "_copia_pg_rodando", False):
+            self._ultima_copia_pg, self._copia_pg_rodando = agora, True
+
+            def _copia_pg():
+                try:
+                    rotinas.executar(cfg, "memoria_pg", rotinas.funcao(cfg, "memoria_pg"))
+                finally:
+                    self._copia_pg_rodando = False
+            threading.Thread(target=_copia_pg, name="robo-memoria-pg", daemon=True).start()
         # laboratório: treino contínuo (a própria rotina decide se já passou o intervalo); em linha própria
         if agora - getattr(self, "_ultimo_lab", 0) >= 60 and not getattr(self, "_lab_rodando", False):
             self._ultimo_lab, self._lab_rodando = agora, True

@@ -28,12 +28,14 @@ from pathlib import Path
 from robo.rotinas import ROTINAS
 
 # Rotina que fica sempre no robô: posta no canal a cada minuto (o Airflow não é feito para agendar de minuto em minuto)
-APENAS_NO_ROBO = {"canal"}
+APENAS_NO_ROBO = {"canal", "registro"}  # de minuto em minuto: ficam no robô
 
 FLUXOS = {
     "robo_horario": {"descricao": "Rotinas de gestão em sequência: cada uma decide se está na hora (backup diário, "
                                   "reunião semanal…)", "cron": "0 * * * *", "a_cada_min": 60, "limite_min": 120,
-                     "rotinas": ["estrategia", "backup", "memoria_pg", "pdca", "licoes", "estudo", "auditoria", "reuniao"]},
+                     "rotinas": ["estrategia", "backup", "pdca", "licoes", "estudo", "auditoria", "reuniao"]},
+    "robo_memoria": {"descricao": "Cópia incremental de toda a memória para o PostgreSQL", "cron": "*/10 * * * *",
+                     "a_cada_min": 10, "limite_min": 15, "rotinas": ["memoria_pg"]},
     "robo_treino": {"descricao": "Treino contínuo de todos os funcionários", "cron": "*/5 * * * *", "a_cada_min": 5,
                     "limite_min": 20, "rotinas": ["treino"]},
     "robo_laboratorio": {"descricao": "Laboratório de planilhas sintéticas", "cron": "*/10 * * * *", "a_cada_min": 10,

@@ -34,7 +34,12 @@ from datetime import datetime, timedelta
 from pathlib import Path
 
 log = logging.getLogger("robo")
-PADRAO = {"habilitado": True, "manter": 7, "intervalo_horas": 24, "manter_sqlite": 30}
+PADRAO = {"habilitado": True, "manter": 7, "intervalo_horas": 24, "manter_sqlite": 30,
+          # memória da empresa (SQLite): backup de hora em hora; guarda tudo das últimas 48 h, um por dia por 90 dias e
+          # o 1º de cada mês para sempre
+          "intervalo_sqlite_horas": 1, "manter_sqlite_horas": 48, "manter_sqlite_dias": 90,
+          # segundo lugar (HD externo, pendrive, outra pasta): cada backup novo é copiado e conferido lá também
+          "copia_extra": ""}
 SCHEMAS = ("bruto", "tratado", "analitico", "robo", "analise")
 
 
@@ -103,6 +108,7 @@ def fazer_backup(cfg) -> dict:
     (pasta(cfg) / "ultimo.json").write_text(json.dumps(resultado, ensure_ascii=False, indent=1), encoding="utf-8")
     if resultado["ok"]:
         _rodizio(cfg)
+        copiar_para_extra(cfg, sorted(p for p in destino.iterdir() if p.is_file()), f"backups_postgres/{destino.name}")
         log.info("Backup do PostgreSQL concluído (%s) em %s", resultado["metodo"], destino)
     return resultado
 
@@ -212,6 +218,9 @@ def backup_sqlite(cfg) -> dict:
                                                                     indent=1), encoding="utf-8")
         (destino / "ultimo.json").write_text(json.dumps(r, ensure_ascii=False, indent=1), encoding="utf-8")
         _rodizio_sqlite(cfg)
+        extra = copiar_para_extra(cfg, [final, destino / f"{nome}.manifesto.json"], "backups_sqlite")
+        if extra is not None:
+            r["copia_extra"] = extra.get("ok")
         log.info("Backup do SQLite concluído: %s (%s tabelas, %s linhas)", final.name, r["tabelas"], r["linhas"])
     except Exception as e:
         temp.unlink(missing_ok=True)
@@ -297,12 +306,55 @@ def restaurar_sqlite(cfg, arquivo: Path, substituir: bool = False) -> dict:
 
 
 def _rodizio_sqlite(cfg) -> None:
-    manter = max(1, int(_c(cfg)["manter_sqlite"]))
+    """Guarda: os 'manter_sqlite' mais novos; tudo das últimas 'manter_sqlite_horas'; o 1º de cada dia dos últimos
+    'manter_sqlite_dias'; o 1º de cada mês para sempre. O manifesto de TODOS fica (prova de que existiu)."""
+    c = _c(cfg)
     arquivos = sorted(p.name for p in pasta_sqlite(cfg).glob("trabalho_*.db.gz"))
-    fixos = _mensais(arquivos)
-    for n in arquivos[:-manter]:
-        if n not in fixos:
-            (pasta_sqlite(cfg) / n).unlink(missing_ok=True)  # o manifesto fica: prova de que o backup existiu
+    manter = set(arquivos[-max(1, int(c["manter_sqlite"])):]) | _mensais(arquivos)
+    agora = datetime.now()
+    dias_vistos: set[str] = set()
+    for n in arquivos:
+        try:
+            quando = datetime.strptime(n[len("trabalho_"):len("trabalho_") + 15], "%Y%m%d_%H%M%S")
+        except ValueError:
+            manter.add(n)  # nome fora do padrão: não arrisca
+            continue
+        if agora - quando <= timedelta(hours=float(c["manter_sqlite_horas"])):
+            manter.add(n)
+        dia = n[len("trabalho_"):len("trabalho_") + 8]
+        if dia not in dias_vistos:
+            dias_vistos.add(dia)
+            if agora - quando <= timedelta(days=float(c["manter_sqlite_dias"])):
+                manter.add(n)
+    for n in arquivos:
+        if n not in manter:
+            (pasta_sqlite(cfg) / n).unlink(missing_ok=True)
+
+
+def copiar_para_extra(cfg, arquivos: list[Path], subpasta: str) -> dict | None:
+    """Copia para o 2º lugar configurado (backup.copia_extra) e confere byte a byte (SHA-256). Nunca apaga lá."""
+    import hashlib
+    destino_base = str(_c(cfg).get("copia_extra") or "").strip()
+    if not destino_base:
+        return None
+    destino = Path(destino_base) / "robo_planilhas" / subpasta
+    sha = lambda p: hashlib.sha256(Path(p).read_bytes()).hexdigest()  # noqa: E731
+    try:
+        destino.mkdir(parents=True, exist_ok=True)
+        for a in arquivos:
+            alvo = destino / Path(a).name
+            tmp = alvo.with_name(alvo.name + ".parcial")
+            shutil.copy2(a, tmp)
+            if sha(tmp) != sha(a):
+                tmp.unlink(missing_ok=True)
+                raise RuntimeError(f"a cópia de {Path(a).name} não confere (SHA-256 diferente)")
+            tmp.replace(alvo)
+        r = {"ok": True, "arquivo": ",".join(Path(a).name for a in arquivos)[:300], "metodo": f"copia_extra:{destino}"}
+    except Exception as e:
+        r = {"ok": False, "motivo": f"cópia para {destino}: {type(e).__name__}: {e}"}
+        log.error("Cópia extra do backup falhou: %s", r["motivo"])
+    _registrar(cfg, "copia_extra", r)
+    return r
 
 
 def ultimo_sqlite(cfg) -> dict | None:
@@ -323,7 +375,7 @@ def rotina(cfg) -> dict | None:
     c = _c(cfg)
     if not c.get("habilitado", True):
         return None
-    if _vencido(ultimo_sqlite(cfg), float(c["intervalo_horas"])):
+    if _vencido(ultimo_sqlite(cfg), float(c["intervalo_sqlite_horas"])):
         rs = backup_sqlite(cfg)
         if not rs["ok"] and not rs.get("pulado"):
             try:
