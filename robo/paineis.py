@@ -416,7 +416,8 @@ def _registrar_planilhas(tb, leituras: list[dict]) -> None:
                       "ancoras, leitura) VALUES (?,?,?,?,?,?,?,?,?,?)",
                       (_agora(), le["nome"], le["origem"], le["assinatura"], le["tema"]["nome"], le["linhas"], le["colunas_qtd"],
                        sum(1 for r in le["regras"] if r["nivel"] == "erro" and r["violacoes"]),
-                       json.dumps(le["ancoras"], ensure_ascii=False, default=str), json.dumps(le, ensure_ascii=False, default=str)))
+                       json.dumps(le["ancoras"], ensure_ascii=False, default=str),
+                       json.dumps({k: v for k, v in le.items() if k != "amostra"}, ensure_ascii=False, default=str)))
 
 
 def atualizar_estrela(cfg) -> dict | None:

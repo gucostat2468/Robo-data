@@ -65,3 +65,20 @@ def teste_rotina_registra_cada_planilha_uma_vez(cfg_factory):
     n = c.execute("SELECT COUNT(*), COUNT(DISTINCT nome) FROM paineis_planilhas").fetchone()
     c.close()
     assert n[0] == n[1] >= 6 and len(paineis.publicado(cfg)["planilhas"]) >= 6
+
+
+def teste_amostra_do_relatorio_sem_identificador_e_registro_sem_linhas(cfg_factory):
+    import json
+    import sqlite3
+    from robo import paineis
+    le = lb.ler(_marketing(), "c.xlsx", "real")
+    a = le["amostra"]
+    assert "id" not in a["colunas"] and set(a["colunas"]) == {"canal", "investimento", "cliques", "conversoes"}
+    assert a["linhas"] == a["total"] == 4 and sum(a["colunas"]["investimento"]) == le["ancoras"]["Total Investimento"]
+    cfg = cfg_factory()
+    cfg.criar_pastas()
+    paineis.rotina(cfg)
+    c = sqlite3.connect(cfg.logs / "trabalho.db")
+    registro = json.loads(c.execute("SELECT leitura FROM paineis_planilhas LIMIT 1").fetchone()[0])
+    c.close()
+    assert "amostra" not in registro                                       # as linhas não são duplicadas no banco

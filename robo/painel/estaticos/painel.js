@@ -1612,7 +1612,7 @@ document.addEventListener("click", (ev) => {
   const el = ev.target.closest("[data-acao]");
   if (!el || el.disabled) return;
   const acao = ACOES[el.dataset.acao];
-  if (acao) { ev.preventDefault(); acao(el); }
+  if (acao) { ev.preventDefault(); acao(el, ev); }
 });
 $("#gaveta-fundo").addEventListener("click", fecharGaveta);
 document.addEventListener("keydown", (e) => {

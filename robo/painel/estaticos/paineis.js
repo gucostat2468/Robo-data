@@ -2,7 +2,7 @@
 // em hora; o Heitor (analista de BI) refaz as contas por outro caminho antes de publicar. Tudo vem de /api/paineis.
 // Gráficos em SVG puro (sem biblioteca externa): linha para tendência, barras para comparar, colunas para níveis.
 
-Object.assign(E, { paineis: null, paineisAba: "planilhas", paineisPlanilha: 0 });
+Object.assign(E, { paineis: null, paineisAba: "planilhas", paineisPlanilha: 0, paineisVista: "relatorio" });
 
 async function carregarPaineis() {
   try { E.paineis = await api("/api/paineis"); } catch (e) { avisar(e.message, "erro"); }
@@ -181,7 +181,13 @@ function pbPlanilhas(lista) {
     <h2>${esc(L.tema.nome)}</h2><p>${esc(L.tema.descricao)}</p><small class="muted">${esc(L.nome)} · ${num(L.linhas)} linhas × ${L.colunas_qtd} colunas${L.tema.evidencia ? ` · reconhecido por: ${L.tema.evidencia.map(esc).join(", ")}` : ""}</small></div>
     ${L.tema.perguntas.length ? `<div><b>Perguntas que este painel responde</b><ul class="lista-ficha">${L.tema.perguntas.map((q) => `<li>${esc(q)}</li>`).join("")}</ul></div>` : ""}</div>`;
   const achados = `<div class="pb-achados">${L.achados.map((a) => /^Regra quebrada/.test(a) ? `<div class="alerta">⚠ ${esc(a)}</div>` : `<div>✔ ${esc(a)}</div>`).join("")}</div>`;
-  return seletor + aviso + tema + kpis + achados + `<div class="pb-grade-cartoes" style="margin-top:12px">${grafico}${dicionario}${regras}${estrela}${medidas}${visuais}</div>`;
+  const vista = E.paineisVista === "tecnico" ? "tecnico" : "relatorio";
+  const seletorVista = `<div class="pl-vistas" role="tablist" aria-label="Como ver esta planilha">
+    <button role="tab" aria-selected="${vista === "relatorio"}" class="${vista === "relatorio" ? "ativa" : ""}" data-acao="paineis-vista" data-vista="relatorio">Relatório (como no Power BI)</button>
+    <button role="tab" aria-selected="${vista === "tecnico"}" class="${vista === "tecnico" ? "ativa" : ""}" data-acao="paineis-vista" data-vista="tecnico">Como montar no Power BI (dicionário, regras, modelo, DAX)</button></div>`;
+  if (vista === "relatorio" && typeof pbiRelatorio === "function")
+    return seletor + aviso + tema + seletorVista + achados + pbiRelatorio(L);
+  return seletor + aviso + tema + seletorVista + kpis + achados + `<div class="pb-grade-cartoes" style="margin-top:12px">${grafico}${dicionario}${regras}${estrela}${medidas}${visuais}</div>`;
 }
 
 function renderPaineis() {
@@ -213,6 +219,7 @@ Object.assign(PAGINAS, { paineis: { titulo: "Dashboards", render: renderPaineis,
 Object.assign(ACOES, {
   "paineis-aba": (el) => { E.paineisAba = el.dataset.aba; desenhar(); },
   "paineis-planilha": (el) => { E.paineisPlanilha = Number(el.dataset.i) || 0; desenhar(); },
+  "paineis-vista": (el) => { E.paineisVista = el.dataset.vista; desenhar(); },
   "paineis-atualizar": (el) => comCarregando(el, async () => {
     try {
       const r = await api("/api/paineis/atualizar", { corpo: {} });

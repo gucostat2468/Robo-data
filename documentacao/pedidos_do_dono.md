@@ -106,5 +106,11 @@ Legenda: ✅ feito e testado · 🟡 feito em parte · ⏳ pendente
 | 101 | Especialista de Power BI que monta e mantém os dashboards | ✅ | Bárbara (especialista) e Heitor (reconciliação), 3º andar: `robo/paineis.py`, tela Dashboards, rotina `paineis` de hora em hora, versões em `paineis_versoes` (imutável), modelo estrela refeito em `logs/paineis/estrela/` |
 | 102 | Kit Power BI (estrela, DAX, Power Query, telas) | ✅ | `powerbi/` com guia clique a clique; o .pbix não foi gerado porque o Power BI Desktop só roda no Windows |
 | 103 | Tudo registrado para ML/DL, nada se perde | ✅ | todo registro de treino, conversa, mentoria, RH, rotina e painel é só de inclusão (gatilho bloqueia UPDATE/DELETE), copiado para o PostgreSQL e com a versão do código em cada tentativa |
+| 104 | Especialista em Power BI analisando as planilhas (reais e sintéticas) | ✅ | `robo/leitura_bi.py`: tema pelos cabeçalhos, dicionário, regras de negócio conferidas, modelo estrela, DAX e números-âncora; Heitor confere por outro caminho; registro em `paineis_planilhas` |
+| 105 | Engenharia reversa completa do Power BI | 🟡 | feita pela documentação oficial (`documentacao/powerbi_engenharia_reversa.md`): o app do Power BI só roda no Windows e não pôde ser aberto daqui; o relatório interativo da aba Planilhas reproduz filtro cruzado, filtros, foco, tabela, CSV, ordenar, dicas e o tema |
+| 106 | Quem faz o quê / o que o 5º andar faz | ✅ | página "Quem faz o quê": escopo e último trabalho registrado de cada um, parados em destaque |
+| 107 | Toda ideia de funcionário chega até mim | ✅ | "Caixa do dono": ideias e pendências que só o dono decide; decisão registrada em `caixa_dono_eventos` |
+| 108 | Esteira ponta a ponta funcionando (Airflow) | ✅ | rotina `jornada`: planilha suja passa pelas 7 etapas num computador de teste e cada etapa é conferida |
+| 109 | Grupo de WhatsApp com os funcionários | ❌ | WhatsApp não tem grupo para robôs nem opção grátis oficial; alternativa grátis: grupo no Telegram com robô (precisa do token do @BotFather) |
 | 98 | Você acessar meu PC | 🟡 | esta sessão roda na nuvem e não alcança o seu PC; para eu operar no Windows: Claude Desktop ou `claude remote-control` na pasta do projeto |
 | 38 | IA opcional sem fingir | 🟡 | `robo/ia.py`: só modelo local, desligado; ainda não usado nas respostas |

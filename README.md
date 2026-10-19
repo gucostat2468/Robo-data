@@ -221,6 +221,13 @@ Com a habilidade **Classificar NPS**, você também ganha a coluna `grupo_nps` (
   Mentorias, Operação & Rotinas). A Bárbara (especialista em Power BI, 3º andar) monta do banco real de hora em hora
   (rotina `paineis`); o Heitor (analista de BI) refaz cada total por outro caminho e só então publica. Cada versão fica
   registrada para sempre em `paineis_versoes`. Para montar agora: `python -m robo rotina paineis`.
+- **Aba Planilhas** (Dashboards): a Bárbara lê cada planilha (as reais primeiro; as de treino vêm marcadas como
+  inventadas) e monta um **relatório no padrão do Power BI**: clique numa barra filtra a página (filtro cruzado), painel de
+  filtros à direita, modo foco, mostrar como tabela, exportar CSV, ordenar, dica de ferramenta e as cores do tema padrão.
+  Sem filtro, os cartões têm que bater com os números-âncora conferidos pelo Heitor (selo verde). A outra vista mostra
+  como montar no Power BI: dicionário dos cabeçalhos, regras de negócio conferidas, modelo estrela e medidas DAX.
+- **Engenharia reversa do Power BI** (documentada, com fonte oficial em cada item): `documentacao/powerbi_engenharia_reversa.md`
+  e `powerbi/catalogo_powerbi.json` (49 visuais nativos, 31 interações, paleta e fontes do tema padrão).
 - **Kit Power BI** (`powerbi/`): modelo estrela da empresa (schema `bi` no PostgreSQL/Neon + CSV/Excel em `powerbi/dados`),
   ~50 medidas DAX comentadas (`medidas.dax`), consultas do Power Query (`power_query.m`), tema de cores e as telas de
   referência. Passo a passo clique a clique: `powerbi/GUIA_CONSTRUCAO.md`. A cada publicação dos painéis, a Bárbara

@@ -135,8 +135,29 @@ def ler(df: pd.DataFrame, nome: str, origem: str) -> dict:
         "segmento": seg["coluna"] if seg else None, "medidas": medidas, "ancoras": ancoras,
         "por_segmento": _por_segmento(df, seg, metricas),
         "visuais": _visuais(tema, seg, metricas, datas),
+        "amostra": _amostra(df, dims, metricas, datas),
         "achados": _achados(tema, regras, ancoras, df, seg, metricas),
     }
+
+
+def _amostra(df, dims, metricas, datas, limite: int = 5000) -> dict:
+    """As linhas que o relatório interativo filtra no navegador (filtro cruzado, segmentação): só categorias, métricas e a
+    data — nunca identificador nem texto livre. Até 5.000 linhas; acima disso o painel avisa que é amostra."""
+    cols = [d["coluna"] for d in dims] + [m["coluna"] for m in metricas] + ([datas[0]["coluna"]] if datas else [])
+    parte = df[cols].head(limite)
+    saida = {}
+    for c in cols:
+        serie = parte[c]
+        if datas and c == datas[0]["coluna"]:
+            saida[c] = [None if pd.isna(v) else pd.Timestamp(v).strftime("%Y-%m-%d") for v in serie]
+        elif any(c == m["coluna"] for m in metricas):
+            saida[c] = [None if pd.isna(v) else float(v) for v in pd.to_numeric(serie, errors="coerce")]
+        else:
+            saida[c] = [None if pd.isna(v) else str(v) for v in serie]
+    return {"linhas": int(len(parte)), "total": int(len(df)), "colunas": saida,
+            "dimensoes": [{"coluna": d["coluna"], "rotulo": d["rotulo"]} for d in dims],
+            "medidas": [{"coluna": m["coluna"], "rotulo": m["rotulo"], "nome": _nome_medida(m), "agregacao": m["agregacao"]} for m in metricas],
+            "data": datas[0]["coluna"] if datas else None}
 
 
 def _significado_padrao(papel: str) -> str:
