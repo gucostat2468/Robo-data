@@ -6,7 +6,7 @@
 
 | Onde | O que guarda | Para quê |
 |---|---|---|
-| `logs/trabalho.db` (SQLite) | **Fonte de tudo**: a memória da empresa (40 tabelas abaixo) | Funciona sem internet e sem servidor; nada se apaga |
+| `logs/trabalho.db` (SQLite) | **Fonte de tudo**: a memória da empresa (41 tabelas abaixo) | Funciona sem internet e sem servidor; nada se apaga |
 | `logs/backups_sqlite/` | Cópia diária do `trabalho.db`, conferida (`integrity_check`) e com SHA-256 | Restaurar se o disco falhar; o 1º de cada mês fica para sempre |
 | PostgreSQL `robo_dados`, schema `robo` | Espelho de TODAS as tabelas (`memoria_<tabela>`) | Consultas em SQL, Power BI e Machine Learning |
 | PostgreSQL schemas `bruto` → `tratado` → `analitico` | As planilhas de negócio (ELT) | Análise e Power BI |
@@ -33,6 +33,7 @@
 | `boas_praticas` | O que o PDCA comprovou que funciona (e se depois foi invalidado) | uma prática nascida de um handover verificado | registro com situação (a situação muda; a linha nunca some) | efeito das correções ao longo do tempo |
 | `memoria` | Lembretes da empresa (correções do dono, estados de provas, conferências de cálculo) | um lembrete com tipo e chave | só acrescenta (imutável: não altera nem apaga) | contexto e decisões do dono |
 | `interacoes` | Conversas entre funcionários (pedido de ajuda, mentoria, cobrança) | uma interação entre duas pessoas | só acrescenta (imutável: não altera nem apaga) | rede de colaboração (quem ajuda quem) |
+| `mentorias` | Mentoria nascida de um erro de treino: quem ajudou quem, com qual lição, e se ajudou | um pedido de ajuda a um mentor escolhido pelos acertos registrados | registro com situação (a situação muda; a linha nunca some) | qualidade de cada mentor (taxa de 'ajudou') e efeito da mentoria no acerto seguinte |
 
 ### Trabalho (central de solicitações, conversas e entregas)
 
@@ -119,6 +120,7 @@
 - **`licoes_uso`**: `id`, `licao_id`, `funcionario`, `data_hora`, `contexto`
 - **`memoria`**: `id`, `tipo`, `chave`, `texto`, `origem`, `solicitacao_id`, `criada_em`
 - **`mensagens`**: `id`, `conversa_id`, `autor`, `texto`, `natureza`, `dados`, `solicitacao_id`, `criada_em`
+- **`mentorias`**: `id`, `data_hora`, `mentor`, `aprendiz`, `competencia`, `nivel`, `tentativa_erro_id`, `licao_id`, `situacao`, `fechada_em`, `tentativa_resultado_id`
 - **`propostas_regra`**: `id`, `criada_em`, `arquivo`, `arquivo_erros`, `padrao`, `tipo`, `coluna`, `valor`, `motivo`, `evidencia`, `alerta`, `autor`, `estado`, `decidido_por`, `decidido_em`, `motivo_decisao`, `comprovada_em`, `prova`, `para`
 - **`registro_conhecimento`**: `id`, `data_hora`, `tipo`, `ref`, `quem`, `dados`, `hash_anterior`, `hash`
 - **`regras_aprendidas`**: `id`, `proposta_id`, `padrao`, `tipo`, `coluna`, `valor`, `aprovada_por`, `aprovada_em`, `ativa`, `para`, `desativada_em`, `desativada_por`, `motivo_desativacao`
