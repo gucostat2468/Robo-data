@@ -25,7 +25,7 @@ def _banco(cfg):
 
 def teste_todo_funcionario_de_todo_andar_tem_o_que_treinar(cfg):
     eleg = treino.elegiveis(cfg)
-    assert len(eleg) >= 77 and not any(p["id"] in treino.EQUIPE_SALA for p in eleg)  # a Sala é avaliada pela certificação
+    assert len(eleg) >= 84 and treino.EQUIPE_SALA <= {p["id"] for p in eleg}  # a Sala também treina (revisão de casos)
     assert {p["andar"] for p in eleg} == {1, 2, 3, 4, 5}
     sem = [p["id"] for p in eleg if not treino.competencias_de(p["id"], cfg)]
     assert sem == []

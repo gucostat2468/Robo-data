@@ -63,6 +63,10 @@ FERRAMENTAS_PESSOA = {
     "ger_operacoes": ["organizacao"], "ger_ti": ["organizacao"], "excel_supervisor": ["diagnosticar_planilha"],
     "sec_senior": ["dados_pessoais"], "coord_devops": ["diagnosticar_planilha"],
 }
+# Sala de Casos (4º andar): a revisão independente de casos de treino é a ferramenta de trabalho de todos eles
+for _pid in ("head_casos", "casos_engenharia", "casos_analytics", "casos_governanca", "casos_ti", "casos_revisor",
+             "casos_planejamento"):
+    FERRAMENTAS_PESSOA.setdefault(_pid, []).append("revisar_caso")
 
 # Para quem cada tipo de ferramenta é encaminhado quando a pessoa não pode usá-la
 ENCAMINHAR = {
@@ -74,7 +78,7 @@ ENCAMINHAR = {
     "segmentacao": "cd_pleno_segmentos", "anomalias": "cd_junior_anomalias", "recrutamento": "rh_rs",
     "desenvolvimento": "rh_td", "desempenho": "rh_desempenho", "people_analytics": "rh_people", "raio_x": "dir_operacoes",
     "revisao_biblioteca": "head_python", "estrategia_python": "head_python", "laboratorio": "head_engenharia",
-    "conhecimento": "canal_nina", "historico": "canal_nina",
+    "conhecimento": "canal_nina", "historico": "canal_nina", "revisar_caso": "casos_revisor",
 }
 
 ENTRADAS = {
@@ -82,7 +86,7 @@ ENTRADAS = {
     "perfil_indicadores": "planilha ou base publicada", "consulta_sql": "id de uma consulta da biblioteca",
     "dados_pessoais": "planilha ou base publicada", "publicar_planilha": "planilha (com sua aprovação)",
     "resumo_executivo": "resultados das etapas anteriores", "ronda_ti": "nada (lê o próprio computador)",
-    "orquestracao": "nada (lê os registros das rotinas)",
+    "orquestracao": "nada (lê os registros das rotinas)", "revisar_caso": "caso de treino (arquivo, gabarito e semente)",
     "conhecimento": "pergunta em texto", "historico": "pergunta sobre o que aconteceu", "organizacao": "pergunta sobre a equipe",
 }
 SAIDAS = {
@@ -91,6 +95,7 @@ SAIDAS = {
     "dados_pessoais": "colunas que parecem dado pessoal", "publicar_planilha": "arquivo na fila de Bases-Limpeza",
     "resumo_executivo": "arquivo .md com o resumo executivo", "ronda_ti": "verificações de saúde do sistema",
     "orquestracao": "rotinas atrasadas, com erro ou lentas e o responsável",
+    "revisar_caso": "aprovado ou reprovado, com cada problema encontrado",
     "conhecimento": "resposta do conhecimento registrado", "historico": "execuções recentes",
     "organizacao": "quem faz o quê na empresa",
 }

@@ -130,13 +130,17 @@ def _sandbox(cfg, destino: Path, banco: bool = False):
 
 # =============================================================================== quem treina o quê
 def elegiveis(cfg) -> list[dict]:
-    """Todo funcionário, de todos os andares, exceto a Sala de Casos (ela é avaliada pela certificação)."""
-    return [p for p in organizacao.lista(cfg) if p["id"] not in EQUIPE_SALA]
+    """Todo funcionário, de todos os andares — inclusive a Sala de Casos, que treina a revisão de casos."""
+    return list(organizacao.lista(cfg))
 
 
 def competencias_de(pid: str, cfg) -> list[str]:
+    """A Sala de Casos treina SÓ a revisão de casos (o resto ela mesma produz e certifica); os demais, o contrato."""
     banco = bool((cfg.banco or {}).get("habilitado"))
-    return [c.id for c in CATALOGO.values() if organizacao.pode_usar(pid, c.ferramenta, cfg) and (banco or not c.requer_banco)]
+    comps = [c.id for c in CATALOGO.values() if organizacao.pode_usar(pid, c.ferramenta, cfg) and (banco or not c.requer_banco)]
+    if pid in EQUIPE_SALA:
+        return [c for c in comps if CATALOGO[c].ferramenta == "revisar_caso"]
+    return [c for c in comps if CATALOGO[c].ferramenta != "revisar_caso"]
 
 
 def nivel_atual(cfg, pid: str, comp: str, c=None) -> int:
@@ -230,23 +234,8 @@ def criar_caso(cfg, comp: str, nivel: int, semente: int | None = None, exame: bo
 
 def revisar(cfg, caso: dict, sha: str) -> dict:
     """Valéria (revisora, nunca a designer): 1) refaz pela semente e compara; 2) gabarito por outro caminho; 3) plantio."""
-    c = CATALOGO[caso["competencia"]]
-    problemas = []
-    copia = pasta(cfg) / "revisao" / caso["id"]
-    try:
-        shutil.rmtree(copia, ignore_errors=True)
-        copia.mkdir(parents=True)
-        de_novo = c.gerar(caso["nivel"], caso["semente"], copia, cfg)
-        if conteudo_hash(de_novo.get("arquivo"), de_novo["gabarito"]) != sha:
-            problemas.append("refeito pela mesma semente, o caso saiu diferente (não é reprodutível)")
-    except Exception as e:
-        problemas.append(f"não consegui refazer o caso: {type(e).__name__}: {e}")
-    finally:
-        shutil.rmtree(copia, ignore_errors=True)
-    try:
-        problemas += list(c.conferir(caso, cfg) or [])
-    except Exception as e:
-        problemas.append(f"a conferência independente quebrou: {type(e).__name__}: {e}")
+    from robo.treino_casos import revisao_independente  # a mesma revisão que a Sala treina (ferramenta revisar_caso)
+    problemas = revisao_independente(caso, cfg, sha, pasta(cfg) / "revisao" / caso["id"])["problemas"]
     revisao = {"ok": not problemas, "problemas": problemas, "revisor": SALA["revisor"], "data_hora": _agora()}
     with _tb(cfg).tx() as conn:
         conn.execute("UPDATE treino_casos SET estado=?, revisor=?, revisado_em=?, revisao=? WHERE id=?",
