@@ -34,6 +34,9 @@ NATUREZA = {"treino_tentativas": "treino (dados sintéticos)", "laboratorio_exer
 
 # (tabela, coluna de quem fez, coluna de quando, colunas para o texto, como escrever o texto)
 FONTES = [
+    ("aprendizados", "funcionario", "data_hora", "competencia, resultado, origem",
+     lambda r, n: f"{'Acertou' if r['resultado'] == 'acerto' else 'Errou' if r['resultado'] == 'erro' else 'Quase acertou'} em "
+                  f"{r['competencia']} ({r['origem']})"),
     ("jobs_etapas", "funcionario", "fim", "etapa, ok, job_id",
      lambda r, n: f"Etapa {r['etapa']} do job {r['job_id']}: {'feita' if r['ok'] else 'com falha'}"),
     ("treino_tentativas", "funcionario", "data_hora", "competencia, nivel, acertou",

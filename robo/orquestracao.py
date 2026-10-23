@@ -44,6 +44,8 @@ FLUXOS = {
                          "limite_min": 30, "rotinas": ["laboratorio"]},
     "robo_ronda_ti": {"descricao": "Ronda de TI (saúde do computador, segurança e SLA das rotinas)", "cron": "*/30 * * * *",
                       "a_cada_min": 30, "limite_min": 15, "rotinas": ["ronda_ti"]},
+    "robo_dialogo": {"descricao": "Conversas entre funcionários quando há fato e necessidade (e conferência dos compromissos)",
+                     "cron": "*/20 * * * *", "a_cada_min": 20, "limite_min": 15, "rotinas": ["dialogo"]},
     "robo_fabrica": {"descricao": "Fábrica de Planilhas: lote sintético na esteira (só com a fila real vazia) e conferência "
                                   "do resultado contra o gabarito", "cron": "*/30 * * * *", "a_cada_min": 30,
                      "limite_min": 25, "rotinas": ["fabrica"]},

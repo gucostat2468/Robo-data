@@ -234,6 +234,14 @@ def conferir_pendentes(cfg) -> list[dict]:
                                    "ok": not problemas, "detalhe": "; ".join(problemas) or "a esteira acertou tudo"}],
                                  "concluido", lote["arquivo"], resultado)
         _aprender(cfg, lote, j, problemas)
+        try:
+            from robo import aprendizados
+            aprendizados.registrar(cfg, "fab_coordenador", f"fabrica:{lote['regra']}", "erro" if problemas else "acerto",
+                                   acao=f"conferir {lote['arquivo']} contra o gabarito", causa="; ".join(problemas),
+                                   nivel=lote["nivel"], evidencia_id=j["id"], origem="laboratorio",
+                                   contexto={"regra": lote["regra"], "linhas": lote["linhas"]})
+        except Exception:
+            log.debug("Fábrica: aprendizado não registrado", exc_info=True)
         feitos.append({"lote": lote["id"], "arquivo": lote["arquivo"], "estado": estado, "problemas": problemas})
     return feitos
 

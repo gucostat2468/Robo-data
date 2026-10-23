@@ -329,6 +329,27 @@ planilha `TREINO_*` entra em `Bases-Limpeza/sintetico`, passa pela esteira de ve
 Ela nunca vai para o PostgreSQL de produção nem para o histórico real, e é conferida contra o gabarito. Com planilha
 real na fila, a fábrica espera. Detalhes em `MIGRACAO.md`.
 
+## 11b. Fala natural, conversas com fato e memória da empresa
+
+**Fala natural.** Cada funcionário fala no tom do cargo (diretor e head mais executivos, gerente e coordenador como
+líderes, especialista e sênior técnicos, júnior e estagiário como aprendizes), sem listas, sem `;`, `*` ou `#` e sem frases de robô. Primeiro o robô
+**apura** o fato (cálculo, consulta, registro) e só depois **redige**. A redação vem da voz determinística
+(`robo/voz.py`) ou, se você ligar, de um modelo de IA (`robo/ia.py`: Ollama local, API compatível ou Claude). A IA
+nunca calcula: se o texto dela citar um número que não está nos fatos, ele é descartado e a voz determinística
+responde. Toda frase de IA aparece marcada como **hipótese** com o nome do modelo. No canal, o botão
+**Testar conversa** mostra se há modelo ativo e por quê.
+
+**Conversas só quando precisa.** A rotina `dialogo` (`robo/dialogo.py`) lê os fatos do dia (`robo/fatos.py`): erro
+repetido no treino, rotina que falhou, planilha barrada, alerta da TI, fila travada, divergência na fábrica. Para cada
+fato, quem precisa fala com quem sabe (ou com o gestor) em 2 a 4 falas, e a conversa termina num **compromisso que dá
+para conferir** (refazer o caso, rodar a rotina, reenviar). Depois a rotina confere pelo número do registro se o
+compromisso foi cumprido. Sem fato, ninguém conversa, e o ciclo fica registrado como "sem assunto".
+
+**Memória da empresa.** Todo acerto e erro da esteira, da validação, do treino, do laboratório e da fábrica vira um
+**aprendizado** (`robo/aprendizados.py`), com causa e correção. Antes de ler uma planilha, a esteira consulta a memória
+e anota no relatório o que já deu errado em casos parecidos. A semente com 208 erros típicos entra com
+`python -m robo semear-aprendizado` e nunca conta como trabalho de ninguém.
+
 ## 12. Apache Airflow (opcional)
 
 O robô agenda as próprias rotinas. Se quiser vê-las no Airflow (com histórico, retentativas e tempo limite):

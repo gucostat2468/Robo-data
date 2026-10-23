@@ -114,5 +114,8 @@ Legenda: ✅ feito e testado · 🟡 feito em parte · ⏳ pendente
 | 109 | Grupo de WhatsApp com os funcionários | ❌ | WhatsApp não tem grupo para robôs nem opção grátis oficial; alternativa grátis: grupo no Telegram com robô (precisa do token do @BotFather) |
 | 110 | Status honesto: ninguém aparece trabalhando sem estar | ✅ | `robo/jobs.py`: trabalhando só com etapa de job aberta; rotina e ronda viram plantão; `/api/prova-de-trabalho`; topo do escritório com trabalho real agora e última planilha |
 | 111 | Fábrica de planilhas sintéticas como prioridade, para todos os andares treinarem | ✅ | `robo/fabrica.py` + `robo/regras_negocio.py`: 15 regras de negócio, 2 a 20 mil linhas, esteira real, gabarito conferido, separada do real; achou e corrigiu uma falha real da limpeza (nota fiscal duplicada) |
+| 112 | Funcionários conversam entre si só quando precisam, sem teatro | ✅ | `robo/fatos.py` + `robo/dialogo.py`: conversa só nasce de um fato registrado, 2 a 4 falas e um compromisso conferido depois; sem fato, o ciclo registra "sem assunto" |
+| 113 | Comunicação natural, sem cara de robô | ✅ | `robo/voz.py`: tom do cargo, sem listas e sem ; * #, sem repetir o mesmo parágrafo em 24 h |
+| 114 | A empresa aprende com cada erro e acerto | ✅ | `robo/aprendizados.py`: memória consultada antes de ler cada planilha; semente de 208 erros típicos (`python -m robo semear-aprendizado`); replay de erros antigos |
 | 98 | Você acessar meu PC | 🟡 | esta sessão roda na nuvem e não alcança o seu PC; para eu operar no Windows: Claude Desktop ou `claude remote-control` na pasta do projeto |
-| 38 | IA opcional sem fingir | 🟡 | `robo/ia.py`: só modelo local, desligado; ainda não usado nas respostas |
+| 38 | IA opcional sem fingir | ✅ | `robo/ia.py`: desligada por padrão; Ollama local, API compatível ou Claude; só redige, nunca calcula; texto com número fora dos fatos é descartado; frase de IA marcada como hipótese com o modelo |

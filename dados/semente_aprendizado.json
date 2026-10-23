@@ -1,0 +1,1874 @@
+[
+ {
+  "competencia": "habilidade:padronizar_texto",
+  "categoria": "Padronização",
+  "causa": "mesma categoria escrita de jeitos diferentes (SP, São Paulo, Sao Paulo)",
+  "correcao": "Mapear grafias para um valor só.",
+  "contexto": {
+   "coluna": "categoria"
+  }
+ },
+ {
+  "competencia": "habilidade:padronizar_texto",
+  "categoria": "Padronização",
+  "causa": "espaços sobrando no começo e no fim",
+  "correcao": "Aparar espaços antes de comparar ou agrupar.",
+  "contexto": {
+   "coluna": "texto"
+  }
+ },
+ {
+  "competencia": "habilidade:padronizar_texto",
+  "categoria": "Padronização",
+  "causa": "número no padrão americano (1,234.56)",
+  "correcao": "Detectar o separador decimal pela coluna inteira antes de converter.",
+  "contexto": {
+   "coluna": "valor"
+  }
+ },
+ {
+  "competencia": "habilidade:padronizar_texto",
+  "categoria": "Padronização",
+  "causa": "#REF! vindo de fórmula quebrada",
+  "correcao": "Tratar como vazio e avisar a área de origem.",
+  "contexto": {
+   "coluna": "celula"
+  }
+ },
+ {
+  "competencia": "habilidade:padronizar_texto",
+  "categoria": "Padronização",
+  "causa": "maiúsculas e minúsculas misturadas",
+  "correcao": "Padronizar a caixa antes de agrupar.",
+  "contexto": {
+   "coluna": "texto"
+  }
+ },
+ {
+  "competencia": "habilidade:padronizar_texto",
+  "categoria": "Padronização",
+  "causa": "valor com 'R$' e texto",
+  "correcao": "Remover o símbolo e converter para número com vírgula decimal.",
+  "contexto": {
+   "coluna": "valor"
+  }
+ },
+ {
+  "competencia": "habilidade:padronizar_texto",
+  "categoria": "Padronização",
+  "causa": "menos no fim do número (formato SAP: 1.234,56-)",
+  "correcao": "Reconhecer o sinal no fim e converter para negativo.",
+  "contexto": {
+   "coluna": "valor"
+  }
+ },
+ {
+  "competencia": "habilidade:padronizar_texto",
+  "categoria": "Padronização",
+  "causa": "'1,2 mil' escrito por extenso",
+  "correcao": "Converter 'mil' multiplicando por mil.",
+  "contexto": {
+   "coluna": "valor"
+  }
+ },
+ {
+  "competencia": "habilidade:mapear_valores",
+  "categoria": "Padronização",
+  "causa": "mesma categoria escrita de jeitos diferentes (SP, São Paulo, Sao Paulo)",
+  "correcao": "Mapear grafias para um valor só.",
+  "contexto": {
+   "coluna": "categoria"
+  }
+ },
+ {
+  "competencia": "habilidade:mapear_valores",
+  "categoria": "Padronização",
+  "causa": "espaços sobrando no começo e no fim",
+  "correcao": "Aparar espaços antes de comparar ou agrupar.",
+  "contexto": {
+   "coluna": "texto"
+  }
+ },
+ {
+  "competencia": "habilidade:mapear_valores",
+  "categoria": "Padronização",
+  "causa": "número no padrão americano (1,234.56)",
+  "correcao": "Detectar o separador decimal pela coluna inteira antes de converter.",
+  "contexto": {
+   "coluna": "valor"
+  }
+ },
+ {
+  "competencia": "habilidade:mapear_valores",
+  "categoria": "Padronização",
+  "causa": "#REF! vindo de fórmula quebrada",
+  "correcao": "Tratar como vazio e avisar a área de origem.",
+  "contexto": {
+   "coluna": "celula"
+  }
+ },
+ {
+  "competencia": "habilidade:mapear_valores",
+  "categoria": "Padronização",
+  "causa": "maiúsculas e minúsculas misturadas",
+  "correcao": "Padronizar a caixa antes de agrupar.",
+  "contexto": {
+   "coluna": "texto"
+  }
+ },
+ {
+  "competencia": "habilidade:mapear_valores",
+  "categoria": "Padronização",
+  "causa": "valor com 'R$' e texto",
+  "correcao": "Remover o símbolo e converter para número com vírgula decimal.",
+  "contexto": {
+   "coluna": "valor"
+  }
+ },
+ {
+  "competencia": "habilidade:mapear_valores",
+  "categoria": "Padronização",
+  "causa": "menos no fim do número (formato SAP: 1.234,56-)",
+  "correcao": "Reconhecer o sinal no fim e converter para negativo.",
+  "contexto": {
+   "coluna": "valor"
+  }
+ },
+ {
+  "competencia": "habilidade:mapear_valores",
+  "categoria": "Padronização",
+  "causa": "'1,2 mil' escrito por extenso",
+  "correcao": "Converter 'mil' multiplicando por mil.",
+  "contexto": {
+   "coluna": "valor"
+  }
+ },
+ {
+  "competencia": "habilidade:converter_tipo",
+  "categoria": "Padronização",
+  "causa": "mesma categoria escrita de jeitos diferentes (SP, São Paulo, Sao Paulo)",
+  "correcao": "Mapear grafias para um valor só.",
+  "contexto": {
+   "coluna": "categoria"
+  }
+ },
+ {
+  "competencia": "habilidade:converter_tipo",
+  "categoria": "Padronização",
+  "causa": "espaços sobrando no começo e no fim",
+  "correcao": "Aparar espaços antes de comparar ou agrupar.",
+  "contexto": {
+   "coluna": "texto"
+  }
+ },
+ {
+  "competencia": "habilidade:converter_tipo",
+  "categoria": "Padronização",
+  "causa": "número no padrão americano (1,234.56)",
+  "correcao": "Detectar o separador decimal pela coluna inteira antes de converter.",
+  "contexto": {
+   "coluna": "valor"
+  }
+ },
+ {
+  "competencia": "habilidade:converter_tipo",
+  "categoria": "Padronização",
+  "causa": "#REF! vindo de fórmula quebrada",
+  "correcao": "Tratar como vazio e avisar a área de origem.",
+  "contexto": {
+   "coluna": "celula"
+  }
+ },
+ {
+  "competencia": "habilidade:converter_tipo",
+  "categoria": "Padronização",
+  "causa": "maiúsculas e minúsculas misturadas",
+  "correcao": "Padronizar a caixa antes de agrupar.",
+  "contexto": {
+   "coluna": "texto"
+  }
+ },
+ {
+  "competencia": "habilidade:converter_tipo",
+  "categoria": "Padronização",
+  "causa": "valor com 'R$' e texto",
+  "correcao": "Remover o símbolo e converter para número com vírgula decimal.",
+  "contexto": {
+   "coluna": "valor"
+  }
+ },
+ {
+  "competencia": "habilidade:converter_tipo",
+  "categoria": "Padronização",
+  "causa": "menos no fim do número (formato SAP: 1.234,56-)",
+  "correcao": "Reconhecer o sinal no fim e converter para negativo.",
+  "contexto": {
+   "coluna": "valor"
+  }
+ },
+ {
+  "competencia": "habilidade:converter_tipo",
+  "categoria": "Padronização",
+  "causa": "'1,2 mil' escrito por extenso",
+  "correcao": "Converter 'mil' multiplicando por mil.",
+  "contexto": {
+   "coluna": "valor"
+  }
+ },
+ {
+  "competencia": "habilidade:arredondar",
+  "categoria": "Padronização",
+  "causa": "mesma categoria escrita de jeitos diferentes (SP, São Paulo, Sao Paulo)",
+  "correcao": "Mapear grafias para um valor só.",
+  "contexto": {
+   "coluna": "categoria"
+  }
+ },
+ {
+  "competencia": "habilidade:arredondar",
+  "categoria": "Padronização",
+  "causa": "espaços sobrando no começo e no fim",
+  "correcao": "Aparar espaços antes de comparar ou agrupar.",
+  "contexto": {
+   "coluna": "texto"
+  }
+ },
+ {
+  "competencia": "habilidade:arredondar",
+  "categoria": "Padronização",
+  "causa": "número no padrão americano (1,234.56)",
+  "correcao": "Detectar o separador decimal pela coluna inteira antes de converter.",
+  "contexto": {
+   "coluna": "valor"
+  }
+ },
+ {
+  "competencia": "habilidade:arredondar",
+  "categoria": "Padronização",
+  "causa": "#REF! vindo de fórmula quebrada",
+  "correcao": "Tratar como vazio e avisar a área de origem.",
+  "contexto": {
+   "coluna": "celula"
+  }
+ },
+ {
+  "competencia": "habilidade:arredondar",
+  "categoria": "Padronização",
+  "causa": "maiúsculas e minúsculas misturadas",
+  "correcao": "Padronizar a caixa antes de agrupar.",
+  "contexto": {
+   "coluna": "texto"
+  }
+ },
+ {
+  "competencia": "habilidade:arredondar",
+  "categoria": "Padronização",
+  "causa": "valor com 'R$' e texto",
+  "correcao": "Remover o símbolo e converter para número com vírgula decimal.",
+  "contexto": {
+   "coluna": "valor"
+  }
+ },
+ {
+  "competencia": "habilidade:arredondar",
+  "categoria": "Padronização",
+  "causa": "menos no fim do número (formato SAP: 1.234,56-)",
+  "correcao": "Reconhecer o sinal no fim e converter para negativo.",
+  "contexto": {
+   "coluna": "valor"
+  }
+ },
+ {
+  "competencia": "habilidade:arredondar",
+  "categoria": "Padronização",
+  "causa": "'1,2 mil' escrito por extenso",
+  "correcao": "Converter 'mil' multiplicando por mil.",
+  "contexto": {
+   "coluna": "valor"
+  }
+ },
+ {
+  "competencia": "habilidade:normalizar_documento",
+  "categoria": "Documentos e contato",
+  "causa": "telefone sem DDD",
+  "correcao": "Pedir o DDD na origem; não inventar.",
+  "contexto": {
+   "coluna": "telefone"
+  }
+ },
+ {
+  "competencia": "habilidade:normalizar_documento",
+  "categoria": "Documentos e contato",
+  "causa": "CEP com 7 dígitos (zero da frente perdido)",
+  "correcao": "Recolocar o zero à esquerda e validar 8 dígitos.",
+  "contexto": {
+   "coluna": "cep"
+  }
+ },
+ {
+  "competencia": "habilidade:normalizar_documento",
+  "categoria": "Documentos e contato",
+  "causa": "CNPJ com máscara misturada",
+  "correcao": "Tirar a máscara, validar o DV e guardar só dígitos.",
+  "contexto": {
+   "coluna": "cnpj"
+  }
+ },
+ {
+  "competencia": "habilidade:normalizar_documento",
+  "categoria": "Documentos e contato",
+  "causa": "e-mail sem domínio",
+  "correcao": "Marcar como inválido e devolver para correção.",
+  "contexto": {
+   "coluna": "email"
+  }
+ },
+ {
+  "competencia": "habilidade:normalizar_documento",
+  "categoria": "Documentos e contato",
+  "causa": "telefone com +55 e sem",
+  "correcao": "Normalizar para o mesmo padrão com DDD.",
+  "contexto": {
+   "coluna": "telefone"
+  }
+ },
+ {
+  "competencia": "habilidade:normalizar_documento",
+  "categoria": "Documentos e contato",
+  "causa": "documento lido como número (perde zeros)",
+  "correcao": "Ler a coluna como texto desde o começo.",
+  "contexto": {
+   "coluna": "documento"
+  }
+ },
+ {
+  "competencia": "habilidade:normalizar_documento",
+  "categoria": "Documentos e contato",
+  "causa": "dois telefones na mesma célula",
+  "correcao": "Separar e manter o principal.",
+  "contexto": {
+   "coluna": "telefone"
+  }
+ },
+ {
+  "competencia": "habilidade:normalizar_documento",
+  "categoria": "Documentos e contato",
+  "causa": "CPF de teste (111.111.111-11)",
+  "correcao": "Reprovar sequências repetidas.",
+  "contexto": {
+   "coluna": "cpf"
+  }
+ },
+ {
+  "competencia": "habilidade:validar_email",
+  "categoria": "Documentos e contato",
+  "causa": "telefone sem DDD",
+  "correcao": "Pedir o DDD na origem; não inventar.",
+  "contexto": {
+   "coluna": "telefone"
+  }
+ },
+ {
+  "competencia": "habilidade:validar_email",
+  "categoria": "Documentos e contato",
+  "causa": "CEP com 7 dígitos (zero da frente perdido)",
+  "correcao": "Recolocar o zero à esquerda e validar 8 dígitos.",
+  "contexto": {
+   "coluna": "cep"
+  }
+ },
+ {
+  "competencia": "habilidade:validar_email",
+  "categoria": "Documentos e contato",
+  "causa": "CNPJ com máscara misturada",
+  "correcao": "Tirar a máscara, validar o DV e guardar só dígitos.",
+  "contexto": {
+   "coluna": "cnpj"
+  }
+ },
+ {
+  "competencia": "habilidade:validar_email",
+  "categoria": "Documentos e contato",
+  "causa": "e-mail sem domínio",
+  "correcao": "Marcar como inválido e devolver para correção.",
+  "contexto": {
+   "coluna": "email"
+  }
+ },
+ {
+  "competencia": "habilidade:validar_email",
+  "categoria": "Documentos e contato",
+  "causa": "telefone com +55 e sem",
+  "correcao": "Normalizar para o mesmo padrão com DDD.",
+  "contexto": {
+   "coluna": "telefone"
+  }
+ },
+ {
+  "competencia": "habilidade:validar_email",
+  "categoria": "Documentos e contato",
+  "causa": "documento lido como número (perde zeros)",
+  "correcao": "Ler a coluna como texto desde o começo.",
+  "contexto": {
+   "coluna": "documento"
+  }
+ },
+ {
+  "competencia": "habilidade:validar_email",
+  "categoria": "Documentos e contato",
+  "causa": "dois telefones na mesma célula",
+  "correcao": "Separar e manter o principal.",
+  "contexto": {
+   "coluna": "telefone"
+  }
+ },
+ {
+  "competencia": "habilidade:validar_email",
+  "categoria": "Documentos e contato",
+  "causa": "CPF de teste (111.111.111-11)",
+  "correcao": "Reprovar sequências repetidas.",
+  "contexto": {
+   "coluna": "cpf"
+  }
+ },
+ {
+  "competencia": "habilidade:normalizar_telefone",
+  "categoria": "Documentos e contato",
+  "causa": "telefone sem DDD",
+  "correcao": "Pedir o DDD na origem; não inventar.",
+  "contexto": {
+   "coluna": "telefone"
+  }
+ },
+ {
+  "competencia": "habilidade:normalizar_telefone",
+  "categoria": "Documentos e contato",
+  "causa": "CEP com 7 dígitos (zero da frente perdido)",
+  "correcao": "Recolocar o zero à esquerda e validar 8 dígitos.",
+  "contexto": {
+   "coluna": "cep"
+  }
+ },
+ {
+  "competencia": "habilidade:normalizar_telefone",
+  "categoria": "Documentos e contato",
+  "causa": "CNPJ com máscara misturada",
+  "correcao": "Tirar a máscara, validar o DV e guardar só dígitos.",
+  "contexto": {
+   "coluna": "cnpj"
+  }
+ },
+ {
+  "competencia": "habilidade:normalizar_telefone",
+  "categoria": "Documentos e contato",
+  "causa": "e-mail sem domínio",
+  "correcao": "Marcar como inválido e devolver para correção.",
+  "contexto": {
+   "coluna": "email"
+  }
+ },
+ {
+  "competencia": "habilidade:normalizar_telefone",
+  "categoria": "Documentos e contato",
+  "causa": "telefone com +55 e sem",
+  "correcao": "Normalizar para o mesmo padrão com DDD.",
+  "contexto": {
+   "coluna": "telefone"
+  }
+ },
+ {
+  "competencia": "habilidade:normalizar_telefone",
+  "categoria": "Documentos e contato",
+  "causa": "documento lido como número (perde zeros)",
+  "correcao": "Ler a coluna como texto desde o começo.",
+  "contexto": {
+   "coluna": "documento"
+  }
+ },
+ {
+  "competencia": "habilidade:normalizar_telefone",
+  "categoria": "Documentos e contato",
+  "causa": "dois telefones na mesma célula",
+  "correcao": "Separar e manter o principal.",
+  "contexto": {
+   "coluna": "telefone"
+  }
+ },
+ {
+  "competencia": "habilidade:normalizar_telefone",
+  "categoria": "Documentos e contato",
+  "causa": "CPF de teste (111.111.111-11)",
+  "correcao": "Reprovar sequências repetidas.",
+  "contexto": {
+   "coluna": "cpf"
+  }
+ },
+ {
+  "competencia": "habilidade:normalizar_cep",
+  "categoria": "Documentos e contato",
+  "causa": "telefone sem DDD",
+  "correcao": "Pedir o DDD na origem; não inventar.",
+  "contexto": {
+   "coluna": "telefone"
+  }
+ },
+ {
+  "competencia": "habilidade:normalizar_cep",
+  "categoria": "Documentos e contato",
+  "causa": "CEP com 7 dígitos (zero da frente perdido)",
+  "correcao": "Recolocar o zero à esquerda e validar 8 dígitos.",
+  "contexto": {
+   "coluna": "cep"
+  }
+ },
+ {
+  "competencia": "habilidade:normalizar_cep",
+  "categoria": "Documentos e contato",
+  "causa": "CNPJ com máscara misturada",
+  "correcao": "Tirar a máscara, validar o DV e guardar só dígitos.",
+  "contexto": {
+   "coluna": "cnpj"
+  }
+ },
+ {
+  "competencia": "habilidade:normalizar_cep",
+  "categoria": "Documentos e contato",
+  "causa": "e-mail sem domínio",
+  "correcao": "Marcar como inválido e devolver para correção.",
+  "contexto": {
+   "coluna": "email"
+  }
+ },
+ {
+  "competencia": "habilidade:normalizar_cep",
+  "categoria": "Documentos e contato",
+  "causa": "telefone com +55 e sem",
+  "correcao": "Normalizar para o mesmo padrão com DDD.",
+  "contexto": {
+   "coluna": "telefone"
+  }
+ },
+ {
+  "competencia": "habilidade:normalizar_cep",
+  "categoria": "Documentos e contato",
+  "causa": "documento lido como número (perde zeros)",
+  "correcao": "Ler a coluna como texto desde o começo.",
+  "contexto": {
+   "coluna": "documento"
+  }
+ },
+ {
+  "competencia": "habilidade:normalizar_cep",
+  "categoria": "Documentos e contato",
+  "causa": "dois telefones na mesma célula",
+  "correcao": "Separar e manter o principal.",
+  "contexto": {
+   "coluna": "telefone"
+  }
+ },
+ {
+  "competencia": "habilidade:normalizar_cep",
+  "categoria": "Documentos e contato",
+  "causa": "CPF de teste (111.111.111-11)",
+  "correcao": "Reprovar sequências repetidas.",
+  "contexto": {
+   "coluna": "cpf"
+  }
+ },
+ {
+  "competencia": "habilidade:validar_regex",
+  "categoria": "Qualidade e validação",
+  "causa": "CPF com dígito verificador errado",
+  "correcao": "Validar o DV do CPF; registro com DV errado vai para Bases-Erros com a linha.",
+  "contexto": {
+   "coluna": "cpf"
+  }
+ },
+ {
+  "competencia": "habilidade:validar_regex",
+  "categoria": "Qualidade e validação",
+  "causa": "data em texto (ex.: '3 de março')",
+  "correcao": "Converter a data por padrão dd/mm/aaaa e conferir as que não convertem.",
+  "contexto": {
+   "coluna": "data"
+  }
+ },
+ {
+  "competencia": "habilidade:validar_regex",
+  "categoria": "Qualidade e validação",
+  "causa": "nota 99 usada como 'não sabe'",
+  "correcao": "Tratar 99 como não resposta e tirar da base do indicador.",
+  "contexto": {
+   "coluna": "nota_nps"
+  }
+ },
+ {
+  "competencia": "habilidade:validar_regex",
+  "categoria": "Qualidade e validação",
+  "causa": "coluna 100% vazia",
+  "correcao": "Avisar a área: coluna vazia costuma ser erro de exportação.",
+  "contexto": {
+   "coluna": "coluna"
+  }
+ },
+ {
+  "competencia": "habilidade:validar_regex",
+  "categoria": "Qualidade e validação",
+  "causa": "outlier por IQR (valor 30 vezes a mediana)",
+  "correcao": "Marcar como fora do padrão e confirmar com a área antes de excluir.",
+  "contexto": {
+   "coluna": "valor"
+  }
+ },
+ {
+  "competencia": "habilidade:validar_regex",
+  "categoria": "Qualidade e validação",
+  "causa": "e-mail no meio de texto livre",
+  "correcao": "Extrair o e-mail e tratar como dado pessoal (LGPD).",
+  "contexto": {
+   "coluna": "email"
+  }
+ },
+ {
+  "competencia": "habilidade:validar_regex",
+  "categoria": "Qualidade e validação",
+  "causa": "duplicata pela chave",
+  "correcao": "Remover a cópia exata pela chave e registrar quantas foram removidas.",
+  "contexto": {
+   "coluna": "id"
+  }
+ },
+ {
+  "competencia": "habilidade:validar_regex",
+  "categoria": "Qualidade e validação",
+  "causa": "linha de Total no meio da tabela",
+  "correcao": "Remover linhas de Total e Subtotal antes de somar.",
+  "contexto": {
+   "coluna": "linha"
+  }
+ },
+ {
+  "competencia": "habilidade:validar_datas",
+  "categoria": "Qualidade e validação",
+  "causa": "CPF com dígito verificador errado",
+  "correcao": "Validar o DV do CPF; registro com DV errado vai para Bases-Erros com a linha.",
+  "contexto": {
+   "coluna": "cpf"
+  }
+ },
+ {
+  "competencia": "habilidade:validar_datas",
+  "categoria": "Qualidade e validação",
+  "causa": "data em texto (ex.: '3 de março')",
+  "correcao": "Converter a data por padrão dd/mm/aaaa e conferir as que não convertem.",
+  "contexto": {
+   "coluna": "data"
+  }
+ },
+ {
+  "competencia": "habilidade:validar_datas",
+  "categoria": "Qualidade e validação",
+  "causa": "nota 99 usada como 'não sabe'",
+  "correcao": "Tratar 99 como não resposta e tirar da base do indicador.",
+  "contexto": {
+   "coluna": "nota_nps"
+  }
+ },
+ {
+  "competencia": "habilidade:validar_datas",
+  "categoria": "Qualidade e validação",
+  "causa": "coluna 100% vazia",
+  "correcao": "Avisar a área: coluna vazia costuma ser erro de exportação.",
+  "contexto": {
+   "coluna": "coluna"
+  }
+ },
+ {
+  "competencia": "habilidade:validar_datas",
+  "categoria": "Qualidade e validação",
+  "causa": "outlier por IQR (valor 30 vezes a mediana)",
+  "correcao": "Marcar como fora do padrão e confirmar com a área antes de excluir.",
+  "contexto": {
+   "coluna": "valor"
+  }
+ },
+ {
+  "competencia": "habilidade:validar_datas",
+  "categoria": "Qualidade e validação",
+  "causa": "e-mail no meio de texto livre",
+  "correcao": "Extrair o e-mail e tratar como dado pessoal (LGPD).",
+  "contexto": {
+   "coluna": "email"
+  }
+ },
+ {
+  "competencia": "habilidade:validar_datas",
+  "categoria": "Qualidade e validação",
+  "causa": "duplicata pela chave",
+  "correcao": "Remover a cópia exata pela chave e registrar quantas foram removidas.",
+  "contexto": {
+   "coluna": "id"
+  }
+ },
+ {
+  "competencia": "habilidade:validar_datas",
+  "categoria": "Qualidade e validação",
+  "causa": "linha de Total no meio da tabela",
+  "correcao": "Remover linhas de Total e Subtotal antes de somar.",
+  "contexto": {
+   "coluna": "linha"
+  }
+ },
+ {
+  "competencia": "habilidade:checar_duplicados",
+  "categoria": "Qualidade e validação",
+  "causa": "CPF com dígito verificador errado",
+  "correcao": "Validar o DV do CPF; registro com DV errado vai para Bases-Erros com a linha.",
+  "contexto": {
+   "coluna": "cpf"
+  }
+ },
+ {
+  "competencia": "habilidade:checar_duplicados",
+  "categoria": "Qualidade e validação",
+  "causa": "data em texto (ex.: '3 de março')",
+  "correcao": "Converter a data por padrão dd/mm/aaaa e conferir as que não convertem.",
+  "contexto": {
+   "coluna": "data"
+  }
+ },
+ {
+  "competencia": "habilidade:checar_duplicados",
+  "categoria": "Qualidade e validação",
+  "causa": "nota 99 usada como 'não sabe'",
+  "correcao": "Tratar 99 como não resposta e tirar da base do indicador.",
+  "contexto": {
+   "coluna": "nota_nps"
+  }
+ },
+ {
+  "competencia": "habilidade:checar_duplicados",
+  "categoria": "Qualidade e validação",
+  "causa": "coluna 100% vazia",
+  "correcao": "Avisar a área: coluna vazia costuma ser erro de exportação.",
+  "contexto": {
+   "coluna": "coluna"
+  }
+ },
+ {
+  "competencia": "habilidade:checar_duplicados",
+  "categoria": "Qualidade e validação",
+  "causa": "outlier por IQR (valor 30 vezes a mediana)",
+  "correcao": "Marcar como fora do padrão e confirmar com a área antes de excluir.",
+  "contexto": {
+   "coluna": "valor"
+  }
+ },
+ {
+  "competencia": "habilidade:checar_duplicados",
+  "categoria": "Qualidade e validação",
+  "causa": "e-mail no meio de texto livre",
+  "correcao": "Extrair o e-mail e tratar como dado pessoal (LGPD).",
+  "contexto": {
+   "coluna": "email"
+  }
+ },
+ {
+  "competencia": "habilidade:checar_duplicados",
+  "categoria": "Qualidade e validação",
+  "causa": "duplicata pela chave",
+  "correcao": "Remover a cópia exata pela chave e registrar quantas foram removidas.",
+  "contexto": {
+   "coluna": "id"
+  }
+ },
+ {
+  "competencia": "habilidade:checar_duplicados",
+  "categoria": "Qualidade e validação",
+  "causa": "linha de Total no meio da tabela",
+  "correcao": "Remover linhas de Total e Subtotal antes de somar.",
+  "contexto": {
+   "coluna": "linha"
+  }
+ },
+ {
+  "competencia": "habilidade:completude_minima",
+  "categoria": "Qualidade e validação",
+  "causa": "CPF com dígito verificador errado",
+  "correcao": "Validar o DV do CPF; registro com DV errado vai para Bases-Erros com a linha.",
+  "contexto": {
+   "coluna": "cpf"
+  }
+ },
+ {
+  "competencia": "habilidade:completude_minima",
+  "categoria": "Qualidade e validação",
+  "causa": "data em texto (ex.: '3 de março')",
+  "correcao": "Converter a data por padrão dd/mm/aaaa e conferir as que não convertem.",
+  "contexto": {
+   "coluna": "data"
+  }
+ },
+ {
+  "competencia": "habilidade:completude_minima",
+  "categoria": "Qualidade e validação",
+  "causa": "nota 99 usada como 'não sabe'",
+  "correcao": "Tratar 99 como não resposta e tirar da base do indicador.",
+  "contexto": {
+   "coluna": "nota_nps"
+  }
+ },
+ {
+  "competencia": "habilidade:completude_minima",
+  "categoria": "Qualidade e validação",
+  "causa": "coluna 100% vazia",
+  "correcao": "Avisar a área: coluna vazia costuma ser erro de exportação.",
+  "contexto": {
+   "coluna": "coluna"
+  }
+ },
+ {
+  "competencia": "habilidade:completude_minima",
+  "categoria": "Qualidade e validação",
+  "causa": "outlier por IQR (valor 30 vezes a mediana)",
+  "correcao": "Marcar como fora do padrão e confirmar com a área antes de excluir.",
+  "contexto": {
+   "coluna": "valor"
+  }
+ },
+ {
+  "competencia": "habilidade:completude_minima",
+  "categoria": "Qualidade e validação",
+  "causa": "e-mail no meio de texto livre",
+  "correcao": "Extrair o e-mail e tratar como dado pessoal (LGPD).",
+  "contexto": {
+   "coluna": "email"
+  }
+ },
+ {
+  "competencia": "habilidade:completude_minima",
+  "categoria": "Qualidade e validação",
+  "causa": "duplicata pela chave",
+  "correcao": "Remover a cópia exata pela chave e registrar quantas foram removidas.",
+  "contexto": {
+   "coluna": "id"
+  }
+ },
+ {
+  "competencia": "habilidade:completude_minima",
+  "categoria": "Qualidade e validação",
+  "causa": "linha de Total no meio da tabela",
+  "correcao": "Remover linhas de Total e Subtotal antes de somar.",
+  "contexto": {
+   "coluna": "linha"
+  }
+ },
+ {
+  "competencia": "habilidade:outliers",
+  "categoria": "Qualidade e validação",
+  "causa": "CPF com dígito verificador errado",
+  "correcao": "Validar o DV do CPF; registro com DV errado vai para Bases-Erros com a linha.",
+  "contexto": {
+   "coluna": "cpf"
+  }
+ },
+ {
+  "competencia": "habilidade:outliers",
+  "categoria": "Qualidade e validação",
+  "causa": "data em texto (ex.: '3 de março')",
+  "correcao": "Converter a data por padrão dd/mm/aaaa e conferir as que não convertem.",
+  "contexto": {
+   "coluna": "data"
+  }
+ },
+ {
+  "competencia": "habilidade:outliers",
+  "categoria": "Qualidade e validação",
+  "causa": "nota 99 usada como 'não sabe'",
+  "correcao": "Tratar 99 como não resposta e tirar da base do indicador.",
+  "contexto": {
+   "coluna": "nota_nps"
+  }
+ },
+ {
+  "competencia": "habilidade:outliers",
+  "categoria": "Qualidade e validação",
+  "causa": "coluna 100% vazia",
+  "correcao": "Avisar a área: coluna vazia costuma ser erro de exportação.",
+  "contexto": {
+   "coluna": "coluna"
+  }
+ },
+ {
+  "competencia": "habilidade:outliers",
+  "categoria": "Qualidade e validação",
+  "causa": "outlier por IQR (valor 30 vezes a mediana)",
+  "correcao": "Marcar como fora do padrão e confirmar com a área antes de excluir.",
+  "contexto": {
+   "coluna": "valor"
+  }
+ },
+ {
+  "competencia": "habilidade:outliers",
+  "categoria": "Qualidade e validação",
+  "causa": "e-mail no meio de texto livre",
+  "correcao": "Extrair o e-mail e tratar como dado pessoal (LGPD).",
+  "contexto": {
+   "coluna": "email"
+  }
+ },
+ {
+  "competencia": "habilidade:outliers",
+  "categoria": "Qualidade e validação",
+  "causa": "duplicata pela chave",
+  "correcao": "Remover a cópia exata pela chave e registrar quantas foram removidas.",
+  "contexto": {
+   "coluna": "id"
+  }
+ },
+ {
+  "competencia": "habilidade:outliers",
+  "categoria": "Qualidade e validação",
+  "causa": "linha de Total no meio da tabela",
+  "correcao": "Remover linhas de Total e Subtotal antes de somar.",
+  "contexto": {
+   "coluna": "linha"
+  }
+ },
+ {
+  "competencia": "habilidade:filtrar_linhas",
+  "categoria": "Qualidade e validação",
+  "causa": "CPF com dígito verificador errado",
+  "correcao": "Validar o DV do CPF; registro com DV errado vai para Bases-Erros com a linha.",
+  "contexto": {
+   "coluna": "cpf"
+  }
+ },
+ {
+  "competencia": "habilidade:filtrar_linhas",
+  "categoria": "Qualidade e validação",
+  "causa": "data em texto (ex.: '3 de março')",
+  "correcao": "Converter a data por padrão dd/mm/aaaa e conferir as que não convertem.",
+  "contexto": {
+   "coluna": "data"
+  }
+ },
+ {
+  "competencia": "habilidade:filtrar_linhas",
+  "categoria": "Qualidade e validação",
+  "causa": "nota 99 usada como 'não sabe'",
+  "correcao": "Tratar 99 como não resposta e tirar da base do indicador.",
+  "contexto": {
+   "coluna": "nota_nps"
+  }
+ },
+ {
+  "competencia": "habilidade:filtrar_linhas",
+  "categoria": "Qualidade e validação",
+  "causa": "coluna 100% vazia",
+  "correcao": "Avisar a área: coluna vazia costuma ser erro de exportação.",
+  "contexto": {
+   "coluna": "coluna"
+  }
+ },
+ {
+  "competencia": "habilidade:filtrar_linhas",
+  "categoria": "Qualidade e validação",
+  "causa": "outlier por IQR (valor 30 vezes a mediana)",
+  "correcao": "Marcar como fora do padrão e confirmar com a área antes de excluir.",
+  "contexto": {
+   "coluna": "valor"
+  }
+ },
+ {
+  "competencia": "habilidade:filtrar_linhas",
+  "categoria": "Qualidade e validação",
+  "causa": "e-mail no meio de texto livre",
+  "correcao": "Extrair o e-mail e tratar como dado pessoal (LGPD).",
+  "contexto": {
+   "coluna": "email"
+  }
+ },
+ {
+  "competencia": "habilidade:filtrar_linhas",
+  "categoria": "Qualidade e validação",
+  "causa": "duplicata pela chave",
+  "correcao": "Remover a cópia exata pela chave e registrar quantas foram removidas.",
+  "contexto": {
+   "coluna": "id"
+  }
+ },
+ {
+  "competencia": "habilidade:filtrar_linhas",
+  "categoria": "Qualidade e validação",
+  "causa": "linha de Total no meio da tabela",
+  "correcao": "Remover linhas de Total e Subtotal antes de somar.",
+  "contexto": {
+   "coluna": "linha"
+  }
+ },
+ {
+  "competencia": "habilidade:preencher_vazios",
+  "categoria": "Enriquecimento",
+  "causa": "faixa etária com limites sobrepostos",
+  "correcao": "Definir faixas sem sobreposição (18-24, 25-34…).",
+  "contexto": {
+   "coluna": "faixa"
+  }
+ },
+ {
+  "competencia": "habilidade:preencher_vazios",
+  "categoria": "Enriquecimento",
+  "causa": "coluna calculada dividindo por zero",
+  "correcao": "Proteger a divisão e deixar vazio quando o divisor é zero.",
+  "contexto": {
+   "coluna": "coluna"
+  }
+ },
+ {
+  "competencia": "habilidade:preencher_vazios",
+  "categoria": "Enriquecimento",
+  "causa": "data extraída no formato errado",
+  "correcao": "Conferir dia e mês invertidos antes de extrair.",
+  "contexto": {
+   "coluna": "data"
+  }
+ },
+ {
+  "competencia": "habilidade:preencher_vazios",
+  "categoria": "Enriquecimento",
+  "causa": "junção de colunas com separador ambíguo",
+  "correcao": "Usar separador que não aparece nos dados.",
+  "contexto": {
+   "coluna": "coluna"
+  }
+ },
+ {
+  "competencia": "habilidade:preencher_vazios",
+  "categoria": "Enriquecimento",
+  "causa": "divisão de coluna com quantidade variável de partes",
+  "correcao": "Tratar a falta de partes como vazio.",
+  "contexto": {
+   "coluna": "coluna"
+  }
+ },
+ {
+  "competencia": "habilidade:preencher_vazios",
+  "categoria": "Enriquecimento",
+  "causa": "preenchimento de vazios com média em dado categórico",
+  "correcao": "Preencher categórico com 'não informado'.",
+  "contexto": {
+   "coluna": "coluna"
+  }
+ },
+ {
+  "competencia": "habilidade:preencher_vazios",
+  "categoria": "Enriquecimento",
+  "causa": "categoria criada por palavra-chave muito genérica",
+  "correcao": "Usar palavras-chave específicas e revisar amostra.",
+  "contexto": {
+   "coluna": "texto"
+  }
+ },
+ {
+  "competencia": "habilidade:preencher_vazios",
+  "categoria": "Enriquecimento",
+  "causa": "arredondamento antes de somar",
+  "correcao": "Somar primeiro e arredondar só no fim.",
+  "contexto": {
+   "coluna": "valor"
+  }
+ },
+ {
+  "competencia": "habilidade:coluna_calculada",
+  "categoria": "Enriquecimento",
+  "causa": "faixa etária com limites sobrepostos",
+  "correcao": "Definir faixas sem sobreposição (18-24, 25-34…).",
+  "contexto": {
+   "coluna": "faixa"
+  }
+ },
+ {
+  "competencia": "habilidade:coluna_calculada",
+  "categoria": "Enriquecimento",
+  "causa": "coluna calculada dividindo por zero",
+  "correcao": "Proteger a divisão e deixar vazio quando o divisor é zero.",
+  "contexto": {
+   "coluna": "coluna"
+  }
+ },
+ {
+  "competencia": "habilidade:coluna_calculada",
+  "categoria": "Enriquecimento",
+  "causa": "data extraída no formato errado",
+  "correcao": "Conferir dia e mês invertidos antes de extrair.",
+  "contexto": {
+   "coluna": "data"
+  }
+ },
+ {
+  "competencia": "habilidade:coluna_calculada",
+  "categoria": "Enriquecimento",
+  "causa": "junção de colunas com separador ambíguo",
+  "correcao": "Usar separador que não aparece nos dados.",
+  "contexto": {
+   "coluna": "coluna"
+  }
+ },
+ {
+  "competencia": "habilidade:coluna_calculada",
+  "categoria": "Enriquecimento",
+  "causa": "divisão de coluna com quantidade variável de partes",
+  "correcao": "Tratar a falta de partes como vazio.",
+  "contexto": {
+   "coluna": "coluna"
+  }
+ },
+ {
+  "competencia": "habilidade:coluna_calculada",
+  "categoria": "Enriquecimento",
+  "causa": "preenchimento de vazios com média em dado categórico",
+  "correcao": "Preencher categórico com 'não informado'.",
+  "contexto": {
+   "coluna": "coluna"
+  }
+ },
+ {
+  "competencia": "habilidade:coluna_calculada",
+  "categoria": "Enriquecimento",
+  "causa": "categoria criada por palavra-chave muito genérica",
+  "correcao": "Usar palavras-chave específicas e revisar amostra.",
+  "contexto": {
+   "coluna": "texto"
+  }
+ },
+ {
+  "competencia": "habilidade:coluna_calculada",
+  "categoria": "Enriquecimento",
+  "causa": "arredondamento antes de somar",
+  "correcao": "Somar primeiro e arredondar só no fim.",
+  "contexto": {
+   "coluna": "valor"
+  }
+ },
+ {
+  "competencia": "habilidade:classificar_faixas",
+  "categoria": "Enriquecimento",
+  "causa": "faixa etária com limites sobrepostos",
+  "correcao": "Definir faixas sem sobreposição (18-24, 25-34…).",
+  "contexto": {
+   "coluna": "faixa"
+  }
+ },
+ {
+  "competencia": "habilidade:classificar_faixas",
+  "categoria": "Enriquecimento",
+  "causa": "coluna calculada dividindo por zero",
+  "correcao": "Proteger a divisão e deixar vazio quando o divisor é zero.",
+  "contexto": {
+   "coluna": "coluna"
+  }
+ },
+ {
+  "competencia": "habilidade:classificar_faixas",
+  "categoria": "Enriquecimento",
+  "causa": "data extraída no formato errado",
+  "correcao": "Conferir dia e mês invertidos antes de extrair.",
+  "contexto": {
+   "coluna": "data"
+  }
+ },
+ {
+  "competencia": "habilidade:classificar_faixas",
+  "categoria": "Enriquecimento",
+  "causa": "junção de colunas com separador ambíguo",
+  "correcao": "Usar separador que não aparece nos dados.",
+  "contexto": {
+   "coluna": "coluna"
+  }
+ },
+ {
+  "competencia": "habilidade:classificar_faixas",
+  "categoria": "Enriquecimento",
+  "causa": "divisão de coluna com quantidade variável de partes",
+  "correcao": "Tratar a falta de partes como vazio.",
+  "contexto": {
+   "coluna": "coluna"
+  }
+ },
+ {
+  "competencia": "habilidade:classificar_faixas",
+  "categoria": "Enriquecimento",
+  "causa": "preenchimento de vazios com média em dado categórico",
+  "correcao": "Preencher categórico com 'não informado'.",
+  "contexto": {
+   "coluna": "coluna"
+  }
+ },
+ {
+  "competencia": "habilidade:classificar_faixas",
+  "categoria": "Enriquecimento",
+  "causa": "categoria criada por palavra-chave muito genérica",
+  "correcao": "Usar palavras-chave específicas e revisar amostra.",
+  "contexto": {
+   "coluna": "texto"
+  }
+ },
+ {
+  "competencia": "habilidade:classificar_faixas",
+  "categoria": "Enriquecimento",
+  "causa": "arredondamento antes de somar",
+  "correcao": "Somar primeiro e arredondar só no fim.",
+  "contexto": {
+   "coluna": "valor"
+  }
+ },
+ {
+  "competencia": "habilidade:extrair_data",
+  "categoria": "Enriquecimento",
+  "causa": "faixa etária com limites sobrepostos",
+  "correcao": "Definir faixas sem sobreposição (18-24, 25-34…).",
+  "contexto": {
+   "coluna": "faixa"
+  }
+ },
+ {
+  "competencia": "habilidade:extrair_data",
+  "categoria": "Enriquecimento",
+  "causa": "coluna calculada dividindo por zero",
+  "correcao": "Proteger a divisão e deixar vazio quando o divisor é zero.",
+  "contexto": {
+   "coluna": "coluna"
+  }
+ },
+ {
+  "competencia": "habilidade:extrair_data",
+  "categoria": "Enriquecimento",
+  "causa": "data extraída no formato errado",
+  "correcao": "Conferir dia e mês invertidos antes de extrair.",
+  "contexto": {
+   "coluna": "data"
+  }
+ },
+ {
+  "competencia": "habilidade:extrair_data",
+  "categoria": "Enriquecimento",
+  "causa": "junção de colunas com separador ambíguo",
+  "correcao": "Usar separador que não aparece nos dados.",
+  "contexto": {
+   "coluna": "coluna"
+  }
+ },
+ {
+  "competencia": "habilidade:extrair_data",
+  "categoria": "Enriquecimento",
+  "causa": "divisão de coluna com quantidade variável de partes",
+  "correcao": "Tratar a falta de partes como vazio.",
+  "contexto": {
+   "coluna": "coluna"
+  }
+ },
+ {
+  "competencia": "habilidade:extrair_data",
+  "categoria": "Enriquecimento",
+  "causa": "preenchimento de vazios com média em dado categórico",
+  "correcao": "Preencher categórico com 'não informado'.",
+  "contexto": {
+   "coluna": "coluna"
+  }
+ },
+ {
+  "competencia": "habilidade:extrair_data",
+  "categoria": "Enriquecimento",
+  "causa": "categoria criada por palavra-chave muito genérica",
+  "correcao": "Usar palavras-chave específicas e revisar amostra.",
+  "contexto": {
+   "coluna": "texto"
+  }
+ },
+ {
+  "competencia": "habilidade:extrair_data",
+  "categoria": "Enriquecimento",
+  "causa": "arredondamento antes de somar",
+  "correcao": "Somar primeiro e arredondar só no fim.",
+  "contexto": {
+   "coluna": "valor"
+  }
+ },
+ {
+  "competencia": "habilidade:dividir_coluna",
+  "categoria": "Enriquecimento",
+  "causa": "faixa etária com limites sobrepostos",
+  "correcao": "Definir faixas sem sobreposição (18-24, 25-34…).",
+  "contexto": {
+   "coluna": "faixa"
+  }
+ },
+ {
+  "competencia": "habilidade:dividir_coluna",
+  "categoria": "Enriquecimento",
+  "causa": "coluna calculada dividindo por zero",
+  "correcao": "Proteger a divisão e deixar vazio quando o divisor é zero.",
+  "contexto": {
+   "coluna": "coluna"
+  }
+ },
+ {
+  "competencia": "habilidade:dividir_coluna",
+  "categoria": "Enriquecimento",
+  "causa": "data extraída no formato errado",
+  "correcao": "Conferir dia e mês invertidos antes de extrair.",
+  "contexto": {
+   "coluna": "data"
+  }
+ },
+ {
+  "competencia": "habilidade:dividir_coluna",
+  "categoria": "Enriquecimento",
+  "causa": "junção de colunas com separador ambíguo",
+  "correcao": "Usar separador que não aparece nos dados.",
+  "contexto": {
+   "coluna": "coluna"
+  }
+ },
+ {
+  "competencia": "habilidade:dividir_coluna",
+  "categoria": "Enriquecimento",
+  "causa": "divisão de coluna com quantidade variável de partes",
+  "correcao": "Tratar a falta de partes como vazio.",
+  "contexto": {
+   "coluna": "coluna"
+  }
+ },
+ {
+  "competencia": "habilidade:dividir_coluna",
+  "categoria": "Enriquecimento",
+  "causa": "preenchimento de vazios com média em dado categórico",
+  "correcao": "Preencher categórico com 'não informado'.",
+  "contexto": {
+   "coluna": "coluna"
+  }
+ },
+ {
+  "competencia": "habilidade:dividir_coluna",
+  "categoria": "Enriquecimento",
+  "causa": "categoria criada por palavra-chave muito genérica",
+  "correcao": "Usar palavras-chave específicas e revisar amostra.",
+  "contexto": {
+   "coluna": "texto"
+  }
+ },
+ {
+  "competencia": "habilidade:dividir_coluna",
+  "categoria": "Enriquecimento",
+  "causa": "arredondamento antes de somar",
+  "correcao": "Somar primeiro e arredondar só no fim.",
+  "contexto": {
+   "coluna": "valor"
+  }
+ },
+ {
+  "competencia": "habilidade:juntar_colunas",
+  "categoria": "Enriquecimento",
+  "causa": "faixa etária com limites sobrepostos",
+  "correcao": "Definir faixas sem sobreposição (18-24, 25-34…).",
+  "contexto": {
+   "coluna": "faixa"
+  }
+ },
+ {
+  "competencia": "habilidade:juntar_colunas",
+  "categoria": "Enriquecimento",
+  "causa": "coluna calculada dividindo por zero",
+  "correcao": "Proteger a divisão e deixar vazio quando o divisor é zero.",
+  "contexto": {
+   "coluna": "coluna"
+  }
+ },
+ {
+  "competencia": "habilidade:juntar_colunas",
+  "categoria": "Enriquecimento",
+  "causa": "data extraída no formato errado",
+  "correcao": "Conferir dia e mês invertidos antes de extrair.",
+  "contexto": {
+   "coluna": "data"
+  }
+ },
+ {
+  "competencia": "habilidade:juntar_colunas",
+  "categoria": "Enriquecimento",
+  "causa": "junção de colunas com separador ambíguo",
+  "correcao": "Usar separador que não aparece nos dados.",
+  "contexto": {
+   "coluna": "coluna"
+  }
+ },
+ {
+  "competencia": "habilidade:juntar_colunas",
+  "categoria": "Enriquecimento",
+  "causa": "divisão de coluna com quantidade variável de partes",
+  "correcao": "Tratar a falta de partes como vazio.",
+  "contexto": {
+   "coluna": "coluna"
+  }
+ },
+ {
+  "competencia": "habilidade:juntar_colunas",
+  "categoria": "Enriquecimento",
+  "causa": "preenchimento de vazios com média em dado categórico",
+  "correcao": "Preencher categórico com 'não informado'.",
+  "contexto": {
+   "coluna": "coluna"
+  }
+ },
+ {
+  "competencia": "habilidade:juntar_colunas",
+  "categoria": "Enriquecimento",
+  "causa": "categoria criada por palavra-chave muito genérica",
+  "correcao": "Usar palavras-chave específicas e revisar amostra.",
+  "contexto": {
+   "coluna": "texto"
+  }
+ },
+ {
+  "competencia": "habilidade:juntar_colunas",
+  "categoria": "Enriquecimento",
+  "causa": "arredondamento antes de somar",
+  "correcao": "Somar primeiro e arredondar só no fim.",
+  "contexto": {
+   "coluna": "valor"
+  }
+ },
+ {
+  "competencia": "habilidade:classificar_nps",
+  "categoria": "Pesquisa e Customer Insights",
+  "causa": "escala invertida (1 = melhor)",
+  "correcao": "Confirmar a escala no questionário antes de calcular.",
+  "contexto": {
+   "coluna": "nota"
+  }
+ },
+ {
+  "competencia": "habilidade:classificar_nps",
+  "categoria": "Pesquisa e Customer Insights",
+  "causa": "base pequena (n < 30) virando conclusão",
+  "correcao": "Sinalizar base pequena e não destacar o resultado.",
+  "contexto": {
+   "coluna": "segmento"
+  }
+ },
+ {
+  "competencia": "habilidade:classificar_nps",
+  "categoria": "Pesquisa e Customer Insights",
+  "causa": "NPS calculado com neutros fora da base",
+  "correcao": "Neutros entram no denominador; só não somam nem subtraem.",
+  "contexto": {
+   "coluna": "nps"
+  }
+ },
+ {
+  "competencia": "habilidade:classificar_nps",
+  "categoria": "Pesquisa e Customer Insights",
+  "causa": "CSAT top-2-box calculado com escala errada",
+  "correcao": "Usar as duas notas mais altas da escala do questionário.",
+  "contexto": {
+   "coluna": "csat"
+  }
+ },
+ {
+  "competencia": "habilidade:classificar_nps",
+  "categoria": "Pesquisa e Customer Insights",
+  "causa": "comentário aberto em coluna de nota",
+  "correcao": "Separar texto livre da nota numérica.",
+  "contexto": {
+   "coluna": "nota"
+  }
+ },
+ {
+  "competencia": "habilidade:classificar_nps",
+  "categoria": "Pesquisa e Customer Insights",
+  "causa": "resposta duplicada do mesmo respondente",
+  "correcao": "Manter a mais recente pela chave do respondente.",
+  "contexto": {
+   "coluna": "id"
+  }
+ },
+ {
+  "competencia": "habilidade:classificar_nps",
+  "categoria": "Pesquisa e Customer Insights",
+  "causa": "diferença entre segmentos sem teste de significância",
+  "correcao": "Testar a diferença (com correção de Holm).",
+  "contexto": {
+   "coluna": "segmento"
+  }
+ },
+ {
+  "competencia": "habilidade:classificar_nps",
+  "categoria": "Pesquisa e Customer Insights",
+  "causa": "nota fora de 0 a 10",
+  "correcao": "Barrar a nota fora da escala; não forçar a passagem.",
+  "contexto": {
+   "coluna": "nota_nps"
+  }
+ },
+ {
+  "competencia": "habilidade:classificar_csat",
+  "categoria": "Pesquisa e Customer Insights",
+  "causa": "escala invertida (1 = melhor)",
+  "correcao": "Confirmar a escala no questionário antes de calcular.",
+  "contexto": {
+   "coluna": "nota"
+  }
+ },
+ {
+  "competencia": "habilidade:classificar_csat",
+  "categoria": "Pesquisa e Customer Insights",
+  "causa": "base pequena (n < 30) virando conclusão",
+  "correcao": "Sinalizar base pequena e não destacar o resultado.",
+  "contexto": {
+   "coluna": "segmento"
+  }
+ },
+ {
+  "competencia": "habilidade:classificar_csat",
+  "categoria": "Pesquisa e Customer Insights",
+  "causa": "NPS calculado com neutros fora da base",
+  "correcao": "Neutros entram no denominador; só não somam nem subtraem.",
+  "contexto": {
+   "coluna": "nps"
+  }
+ },
+ {
+  "competencia": "habilidade:classificar_csat",
+  "categoria": "Pesquisa e Customer Insights",
+  "causa": "CSAT top-2-box calculado com escala errada",
+  "correcao": "Usar as duas notas mais altas da escala do questionário.",
+  "contexto": {
+   "coluna": "csat"
+  }
+ },
+ {
+  "competencia": "habilidade:classificar_csat",
+  "categoria": "Pesquisa e Customer Insights",
+  "causa": "comentário aberto em coluna de nota",
+  "correcao": "Separar texto livre da nota numérica.",
+  "contexto": {
+   "coluna": "nota"
+  }
+ },
+ {
+  "competencia": "habilidade:classificar_csat",
+  "categoria": "Pesquisa e Customer Insights",
+  "causa": "resposta duplicada do mesmo respondente",
+  "correcao": "Manter a mais recente pela chave do respondente.",
+  "contexto": {
+   "coluna": "id"
+  }
+ },
+ {
+  "competencia": "habilidade:classificar_csat",
+  "categoria": "Pesquisa e Customer Insights",
+  "causa": "diferença entre segmentos sem teste de significância",
+  "correcao": "Testar a diferença (com correção de Holm).",
+  "contexto": {
+   "coluna": "segmento"
+  }
+ },
+ {
+  "competencia": "habilidade:classificar_csat",
+  "categoria": "Pesquisa e Customer Insights",
+  "causa": "nota fora de 0 a 10",
+  "correcao": "Barrar a nota fora da escala; não forçar a passagem.",
+  "contexto": {
+   "coluna": "nota_nps"
+  }
+ },
+ {
+  "competencia": "habilidade:categorizar_texto",
+  "categoria": "Pesquisa e Customer Insights",
+  "causa": "escala invertida (1 = melhor)",
+  "correcao": "Confirmar a escala no questionário antes de calcular.",
+  "contexto": {
+   "coluna": "nota"
+  }
+ },
+ {
+  "competencia": "habilidade:categorizar_texto",
+  "categoria": "Pesquisa e Customer Insights",
+  "causa": "base pequena (n < 30) virando conclusão",
+  "correcao": "Sinalizar base pequena e não destacar o resultado.",
+  "contexto": {
+   "coluna": "segmento"
+  }
+ },
+ {
+  "competencia": "habilidade:categorizar_texto",
+  "categoria": "Pesquisa e Customer Insights",
+  "causa": "NPS calculado com neutros fora da base",
+  "correcao": "Neutros entram no denominador; só não somam nem subtraem.",
+  "contexto": {
+   "coluna": "nps"
+  }
+ },
+ {
+  "competencia": "habilidade:categorizar_texto",
+  "categoria": "Pesquisa e Customer Insights",
+  "causa": "CSAT top-2-box calculado com escala errada",
+  "correcao": "Usar as duas notas mais altas da escala do questionário.",
+  "contexto": {
+   "coluna": "csat"
+  }
+ },
+ {
+  "competencia": "habilidade:categorizar_texto",
+  "categoria": "Pesquisa e Customer Insights",
+  "causa": "comentário aberto em coluna de nota",
+  "correcao": "Separar texto livre da nota numérica.",
+  "contexto": {
+   "coluna": "nota"
+  }
+ },
+ {
+  "competencia": "habilidade:categorizar_texto",
+  "categoria": "Pesquisa e Customer Insights",
+  "causa": "resposta duplicada do mesmo respondente",
+  "correcao": "Manter a mais recente pela chave do respondente.",
+  "contexto": {
+   "coluna": "id"
+  }
+ },
+ {
+  "competencia": "habilidade:categorizar_texto",
+  "categoria": "Pesquisa e Customer Insights",
+  "causa": "diferença entre segmentos sem teste de significância",
+  "correcao": "Testar a diferença (com correção de Holm).",
+  "contexto": {
+   "coluna": "segmento"
+  }
+ },
+ {
+  "competencia": "habilidade:categorizar_texto",
+  "categoria": "Pesquisa e Customer Insights",
+  "causa": "nota fora de 0 a 10",
+  "correcao": "Barrar a nota fora da escala; não forçar a passagem.",
+  "contexto": {
+   "coluna": "nota_nps"
+  }
+ },
+ {
+  "competencia": "habilidade:selecionar_colunas",
+  "categoria": "Estrutura",
+  "causa": "cabeçalho em duas linhas",
+  "correcao": "Juntar as linhas de cabeçalho antes de ler.",
+  "contexto": {
+   "coluna": "cabecalho"
+  }
+ },
+ {
+  "competencia": "habilidade:selecionar_colunas",
+  "categoria": "Estrutura",
+  "causa": "título acima do cabeçalho",
+  "correcao": "Detectar a linha real do cabeçalho.",
+  "contexto": {
+   "coluna": "cabecalho"
+  }
+ },
+ {
+  "competencia": "habilidade:selecionar_colunas",
+  "categoria": "Estrutura",
+  "causa": "coluna renomeada entre meses",
+  "correcao": "Propor sinônimo para o dono aprovar.",
+  "contexto": {
+   "coluna": "coluna"
+  }
+ },
+ {
+  "competencia": "habilidade:selecionar_colunas",
+  "categoria": "Estrutura",
+  "causa": "coluna obrigatória faltando",
+  "correcao": "Barrar e avisar a área com o nome esperado.",
+  "contexto": {
+   "coluna": "coluna"
+  }
+ },
+ {
+  "competencia": "habilidade:selecionar_colunas",
+  "categoria": "Estrutura",
+  "causa": "abas empilhadas com cabeçalhos diferentes",
+  "correcao": "Ler aba por aba e alinhar pelas colunas comuns.",
+  "contexto": {
+   "coluna": "aba"
+  }
+ },
+ {
+  "competencia": "habilidade:selecionar_colunas",
+  "categoria": "Estrutura",
+  "causa": "rodapé de sistema no fim da planilha",
+  "correcao": "Remover rodapé (linhas sem dados nas colunas-chave).",
+  "contexto": {
+   "coluna": "linha"
+  }
+ },
+ {
+  "competencia": "habilidade:selecionar_colunas",
+  "categoria": "Estrutura",
+  "causa": "coluna vazia no meio da tabela",
+  "correcao": "Ignorar coluna sem cabeçalho e sem dados.",
+  "contexto": {
+   "coluna": "coluna"
+  }
+ },
+ {
+  "competencia": "habilidade:selecionar_colunas",
+  "categoria": "Estrutura",
+  "causa": "células mescladas no cabeçalho",
+  "correcao": "Repetir o valor mesclado nas colunas que ele cobre.",
+  "contexto": {
+   "coluna": "cabecalho"
+  }
+ },
+ {
+  "competencia": "habilidade:renomear_colunas",
+  "categoria": "Estrutura",
+  "causa": "cabeçalho em duas linhas",
+  "correcao": "Juntar as linhas de cabeçalho antes de ler.",
+  "contexto": {
+   "coluna": "cabecalho"
+  }
+ },
+ {
+  "competencia": "habilidade:renomear_colunas",
+  "categoria": "Estrutura",
+  "causa": "título acima do cabeçalho",
+  "correcao": "Detectar a linha real do cabeçalho.",
+  "contexto": {
+   "coluna": "cabecalho"
+  }
+ },
+ {
+  "competencia": "habilidade:renomear_colunas",
+  "categoria": "Estrutura",
+  "causa": "coluna renomeada entre meses",
+  "correcao": "Propor sinônimo para o dono aprovar.",
+  "contexto": {
+   "coluna": "coluna"
+  }
+ },
+ {
+  "competencia": "habilidade:renomear_colunas",
+  "categoria": "Estrutura",
+  "causa": "coluna obrigatória faltando",
+  "correcao": "Barrar e avisar a área com o nome esperado.",
+  "contexto": {
+   "coluna": "coluna"
+  }
+ },
+ {
+  "competencia": "habilidade:renomear_colunas",
+  "categoria": "Estrutura",
+  "causa": "abas empilhadas com cabeçalhos diferentes",
+  "correcao": "Ler aba por aba e alinhar pelas colunas comuns.",
+  "contexto": {
+   "coluna": "aba"
+  }
+ },
+ {
+  "competencia": "habilidade:renomear_colunas",
+  "categoria": "Estrutura",
+  "causa": "rodapé de sistema no fim da planilha",
+  "correcao": "Remover rodapé (linhas sem dados nas colunas-chave).",
+  "contexto": {
+   "coluna": "linha"
+  }
+ },
+ {
+  "competencia": "habilidade:renomear_colunas",
+  "categoria": "Estrutura",
+  "causa": "coluna vazia no meio da tabela",
+  "correcao": "Ignorar coluna sem cabeçalho e sem dados.",
+  "contexto": {
+   "coluna": "coluna"
+  }
+ },
+ {
+  "competencia": "habilidade:renomear_colunas",
+  "categoria": "Estrutura",
+  "causa": "células mescladas no cabeçalho",
+  "correcao": "Repetir o valor mesclado nas colunas que ele cobre.",
+  "contexto": {
+   "coluna": "cabecalho"
+  }
+ },
+ {
+  "competencia": "habilidade:anonimizar",
+  "categoria": "Privacidade (LGPD)",
+  "causa": "CPF completo exposto na saída",
+  "correcao": "Anonimizar antes de publicar.",
+  "contexto": {
+   "coluna": "cpf"
+  }
+ },
+ {
+  "competencia": "habilidade:anonimizar",
+  "categoria": "Privacidade (LGPD)",
+  "causa": "e-mail pessoal em base de análise",
+  "correcao": "Remover ou mascarar dados pessoais que a análise não precisa.",
+  "contexto": {
+   "coluna": "email"
+  }
+ },
+ {
+  "competencia": "habilidade:anonimizar",
+  "categoria": "Privacidade (LGPD)",
+  "causa": "nome completo junto com nota de pesquisa",
+  "correcao": "Separar identificação da resposta.",
+  "contexto": {
+   "coluna": "nome"
+  }
+ },
+ {
+  "competencia": "habilidade:anonimizar",
+  "categoria": "Privacidade (LGPD)",
+  "causa": "telefone em relatório executivo",
+  "correcao": "Nunca levar dado pessoal para relatório executivo.",
+  "contexto": {
+   "coluna": "telefone"
+  }
+ },
+ {
+  "competencia": "habilidade:anonimizar",
+  "categoria": "Privacidade (LGPD)",
+  "causa": "dado sensível (saúde) sem base legal",
+  "correcao": "Barrar e perguntar ao dono a base legal.",
+  "contexto": {
+   "coluna": "coluna"
+  }
+ },
+ {
+  "competencia": "habilidade:anonimizar",
+  "categoria": "Privacidade (LGPD)",
+  "causa": "arquivo com dados pessoais na pasta pública",
+  "correcao": "Mover para pasta restrita e avisar a governança.",
+  "contexto": {
+   "coluna": "arquivo"
+  }
+ },
+ {
+  "competencia": "habilidade:anonimizar",
+  "categoria": "Privacidade (LGPD)",
+  "causa": "chave de pseudonimização guardada junto",
+  "correcao": "Guardar a chave separada dos dados.",
+  "contexto": {
+   "coluna": "chave"
+  }
+ },
+ {
+  "competencia": "habilidade:anonimizar",
+  "categoria": "Privacidade (LGPD)",
+  "causa": "exportação para fora sem anonimizar",
+  "correcao": "Anonimizar antes de qualquer envio.",
+  "contexto": {
+   "coluna": "arquivo"
+  }
+ }
+]

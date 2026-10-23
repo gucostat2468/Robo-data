@@ -130,6 +130,19 @@ TABELAS = {
                     "trabalhando agora (etapa aberta nos últimos 15 minutos)", "uma etapa de um job",
                     "só de inclusão; uma etapa fechada nunca muda (gatilho)",
                     "tempo por etapa e por pessoa; gargalos da esteira; prova auditável de trabalho"),
+    "aprendizados": ("conhecimento", "Memória de acertos e erros: cada decisão (esteira, fábrica, treino, laboratório, conversa) "
+                     "com quem, competência, resultado, causa, correção, evidência e origem; a semente fica com origem "
+                     "'semente' e nunca conta como acerto real", "uma decisão de um funcionário", IMUTAVEL,
+                     "rótulo supervisionado (acertou/errou) por competência, nível e versão; reincidência de erro"),
+    "aprendizados_uso": ("conhecimento", "Cada vez que a memória foi consultada antes de agir (onde e por quem)",
+                         "uma consulta à memória", IMUTAVEL, "quanto a memória é usada e se o uso reduz o erro"),
+    "aprendizados_replay": ("conhecimento", "Cada erro antigo refeito como teste de regressão: o mesmo motivo ainda barra?",
+                            "um erro refeito", IMUTAVEL, "taxa de reincidência por competência e por versão do código"),
+    "dialogo_conversas": ("conhecimento", "Cada conversa entre funcionários nascida de um fato (pedido de ajuda, cobrança, aviso), "
+                          "com o compromisso verificável e se ele foi cumprido (com a prova)", "uma conversa", SITUACAO,
+                          "quais conversas resolvem; tempo até cumprir; quem ajuda quem"),
+    "dialogo_ciclos": ("operacao", "Cada ciclo das conversas: quantos fatos avaliados, quantas conversas e se não houve assunto",
+                       "um ciclo", IMUTAVEL, "quanto silêncio é falta de assunto e não de gente"),
     "voz_falas": ("conhecimento", "Cada fala composta pela voz de um funcionário: quem, ato de fala, molde usado, hash do texto e "
                   "se veio de regra ou de IA (garante variação sem repetir parágrafo em 24 h e permite auditar)",
                   "uma fala", IMUTAVEL, "estilo e variação de cada voz; quanto a IA redige versus a regra"),
@@ -182,7 +195,7 @@ def _todas_as_tabelas(cfg) -> None:
     """Garante que todo módulo criou o próprio esquema (para listar e documentar tudo)."""
     from robo import (alcadas, aprendizado, auditoria, backup, decisoes, erros, interacoes, laboratorio, licoes,
                       registro_total, rh_desempenho, sala, treino, vigia)
-    from robo import caixa_dono, fabrica, ideias, jobs, jornada, paineis, voz
+    from robo import aprendizados, caixa_dono, dialogo, fabrica, ideias, jobs, jornada, paineis, voz
     from robo.painel import celular
     from robo.ferramentas import USO_ESQUEMA
     from robo.rotinas import ESQUEMA as ROTINAS
@@ -196,6 +209,8 @@ def _todas_as_tabelas(cfg) -> None:
     jobs._tb(cfg)
     fabrica._tb(cfg)
     voz._tb(cfg)
+    aprendizados._tb(cfg)
+    dialogo._tb(cfg)
     caixa_dono._tb(cfg)
     jornada._tb(cfg)
     from robo.trabalho import proteger

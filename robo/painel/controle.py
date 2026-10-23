@@ -211,6 +211,16 @@ class ControleRobo:
                 finally:
                     self._fabrica_rodando = False
             threading.Thread(target=_fabrica, name="robo-fabrica", daemon=True).start()
+        # conversas entre funcionários quando há fato e necessidade (a rotina decide o intervalo)
+        if agora - getattr(self, "_ultimo_dialogo", 0) >= 60 and not getattr(self, "_dialogo_rodando", False):
+            self._ultimo_dialogo, self._dialogo_rodando = agora, True
+
+            def _dialogo():
+                try:
+                    rotinas.executar(cfg, "dialogo", rotinas.funcao(cfg, "dialogo"))
+                finally:
+                    self._dialogo_rodando = False
+            threading.Thread(target=_dialogo, name="robo-dialogo", daemon=True).start()
         # treino contínuo: todos os funcionários trabalhando em casos com gabarito, no nível de cada um (robo/treino.py)
         if agora - getattr(self, "_ultimo_treino", 0) >= 30 and not getattr(self, "_treino_rodando", False):
             self._ultimo_treino, self._treino_rodando = agora, True

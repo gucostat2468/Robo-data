@@ -6,7 +6,7 @@
 
 | Onde | O que guarda | Para quê |
 |---|---|---|
-| `logs/trabalho.db` (SQLite) | **Fonte de tudo**: a memória da empresa (63 tabelas abaixo) | Funciona sem internet e sem servidor; nada se apaga |
+| `logs/trabalho.db` (SQLite) | **Fonte de tudo**: a memória da empresa (68 tabelas abaixo) | Funciona sem internet e sem servidor; nada se apaga |
 | `logs/backups_sqlite/` | Cópia diária do `trabalho.db`, conferida (`integrity_check`) e com SHA-256 | Restaurar se o disco falhar; o 1º de cada mês fica para sempre |
 | PostgreSQL `robo_dados`, schema `robo` | Espelho de TODAS as tabelas (`memoria_<tabela>`) | Consultas em SQL, Power BI e Machine Learning |
 | PostgreSQL schemas `bruto` → `tratado` → `analitico` | As planilhas de negócio (ELT) | Análise e Power BI |
@@ -66,6 +66,10 @@
 | `ideias_registro` | Cada ideia da Iara (ideias e expansão), com o dado que a originou e o dono | uma ideia registrada num dia | só acrescenta (imutável: não altera nem apaga) | quais problemas mais geram ideias e quanto tempo levam para sumir |
 | `caixa_dono_eventos` | Cada decisão do dono na Caixa do dono (ideia, sugestão, regra, RH ou aprovação): aprovada ou recusada, com a nota e o número que motivou | uma decisão do dono | só acrescenta (imutável: não altera nem apaga) | que tipo de ideia o dono aprova; tempo até decidir |
 | `caixa_dono_sugestoes` | Sugestões que os funcionários fazem a partir de fatos registrados (erros repetidos no treino, rotinas com erro) | uma sugestão registrada | só acrescenta (imutável: não altera nem apaga) | de onde vêm as melhores ideias; problemas recorrentes |
+| `aprendizados` | Memória de acertos e erros: cada decisão (esteira, fábrica, treino, laboratório, conversa) com quem, competência, resultado, causa, correção, evidência e origem; a semente fica com origem 'semente' e nunca conta como acerto real | uma decisão de um funcionário | só acrescenta (imutável: não altera nem apaga) | rótulo supervisionado (acertou/errou) por competência, nível e versão; reincidência de erro |
+| `aprendizados_uso` | Cada vez que a memória foi consultada antes de agir (onde e por quem) | uma consulta à memória | só acrescenta (imutável: não altera nem apaga) | quanto a memória é usada e se o uso reduz o erro |
+| `aprendizados_replay` | Cada erro antigo refeito como teste de regressão: o mesmo motivo ainda barra? | um erro refeito | só acrescenta (imutável: não altera nem apaga) | taxa de reincidência por competência e por versão do código |
+| `dialogo_conversas` | Cada conversa entre funcionários nascida de um fato (pedido de ajuda, cobrança, aviso), com o compromisso verificável e se ele foi cumprido (com a prova) | uma conversa | registro com situação (a situação muda; a linha nunca some) | quais conversas resolvem; tempo até cumprir; quem ajuda quem |
 | `voz_falas` | Cada fala composta pela voz de um funcionário: quem, ato de fala, molde usado, hash do texto e se veio de regra ou de IA (garante variação sem repetir parágrafo em 24 h e permite auditar) | uma fala | só acrescenta (imutável: não altera nem apaga) | estilo e variação de cada voz; quanto a IA redige versus a regra |
 | `fabrica_lotes` | Cada planilha sintética da Fábrica: regra de negócio, semente, linhas, nível de sujeira, quem gerou, conferiu e revisou, o gabarito e a conferência final contra a saída da esteira | um lote (uma planilha TREINO_) | registro com situação (a situação muda; a linha nunca some) | acerto da esteira por regra de negócio e por nível de sujeira; regressões entre versões do código |
 | `paineis_planilhas` | Cada planilha lida pela Bárbara: tema, papel e regra de cada cabeçalho, regras quebradas, medidas DAX e números-âncora (leitura completa em JSON) | uma planilha com um conteúdo | só acrescenta (imutável: não altera nem apaga) | aprender a reconhecer tema e regra de negócio pelo cabeçalho (rótulo supervisionado) |
@@ -108,6 +112,7 @@
 | `paineis_versoes` | Cada montagem dos painéis (Bárbara) e a conferência do Heitor: situação, indicadores e divergências | uma versão dos painéis | só acrescenta (imutável: não altera nem apaga) | evolução de cada indicador no tempo; qualidade dos painéis |
 | `jobs` | Prova de trabalho: cada processamento real (planilha real ou sintética, rodada de treino, exercício do laboratório, rotina que fez algo), com início, fim, estado, responsável, evidência e hash da saída | um processamento | só de inclusão; um job fechado nunca muda (gatilho) | carga real de trabalho por pessoa e por tipo; tempo de ciclo; taxa de falha da esteira |
 | `jobs_etapas` | Cada etapa de um job, com QUEM fez, início, fim, ok e evidência — é o que define quem está trabalhando agora (etapa aberta nos últimos 15 minutos) | uma etapa de um job | só de inclusão; uma etapa fechada nunca muda (gatilho) | tempo por etapa e por pessoa; gargalos da esteira; prova auditável de trabalho |
+| `dialogo_ciclos` | Cada ciclo das conversas: quantos fatos avaliados, quantas conversas e se não houve assunto | um ciclo | só acrescenta (imutável: não altera nem apaga) | quanto silêncio é falta de assunto e não de gente |
 | `vigia_eventos` | Cada vez que o vigia achou o robô parado (e religou) ou sem responder | um evento do vigia | só acrescenta (imutável: não altera nem apaga) | disponibilidade real: quedas por dia e tempo até voltar |
 | `logs_sistema` | Cada registro do log do sistema (robo.log e os girados), com nível e mensagem completa | um registro do log (com o traceback, se houver) | só acrescenta (imutável: não altera nem apaga) | série de eventos e erros por módulo e hora; prever falha antes de acontecer |
 | `arquivos_linhas` | Cada linha nova dos arquivos que só crescem (.jsonl, .csv): RH, conhecimento, histórico | uma linha de um arquivo, na ordem | só acrescenta (imutável: não altera nem apaga) | reconstruir qualquer arquivo da pasta de logs |
@@ -120,6 +125,9 @@
 
 - **`acessos_celular`**: `id`, `data_hora`, `ip`, `evento`, `detalhe`, `navegador`
 - **`alcadas_decisoes`**: `id`, `data_hora`, `item_tipo`, `item_id`, `decisor`, `validador`, `decisao`, `motivo`, `evidencia`, `reversivel_ate`, `ref`
+- **`aprendizados`**: `id`, `data_hora`, `funcionario`, `competencia`, `nivel`, `contexto`, `acao`, `resultado`, `causa`, `correcao`, `evidencia_id`, `origem`, `reaproveitado_em`, `vezes`
+- **`aprendizados_replay`**: `id`, `data_hora`, `aprendizado_id`, `arquivo`, `reincidiu`, `detalhe`
+- **`aprendizados_uso`**: `id`, `data_hora`, `aprendizado_id`, `onde`, `quem`
 - **`aprovacoes`**: `id`, `solicitacao_id`, `etapa_id`, `pedido`, `risco`, `solicitante`, `aprovador`, `estado`, `decidido_por`, `decidido_em`, `motivo`, `criada_em`
 - **`arquivos`**: `id`, `conversa_id`, `solicitacao_id`, `caminho`, `nome`, `criado_em`
 - **`arquivos_linhas`**: `id`, `arquivo`, `geracao`, `n_linha`, `conteudo`, `capturado_em`
@@ -134,6 +142,8 @@
 - **`conversas`**: `id`, `funcionario`, `titulo`, `origem`, `criada_em`, `atualizada_em`, `contexto`, `arquivada`
 - **`decisoes`**: `id`, `criada_em`, `origem`, `reuniao_id`, `andar`, `texto`, `dono`, `prazo`, `criterio`, `vinculo_tipo`, `vinculo_id`, `registrada_por`, `estado`, `estado_em`, `evidencia`, `repactuacoes`
 - **`decisoes_eventos`**: `id`, `decisao_id`, `data_hora`, `tipo`, `de`, `para`, `quem`, `reuniao_id`, `detalhe`
+- **`dialogo_ciclos`**: `id`, `data_hora`, `fatos_avaliados`, `conversas`, `sem_assunto`, `compromissos_verificados`
+- **`dialogo_conversas`**: `id`, `data_hora`, `fato_id`, `tipo`, `de`, `para`, `turnos`, `compromisso`, `situacao`, `verificado_em`, `prova`
 - **`dono_presenca`**: `origem`, `ultima`
 - **`erros_sistema`**: `id`, `impressao`, `primeira`, `ultima`, `ocorrencias`, `modulo`, `funcao`, `tipo`, `mensagem`, `traceback_primeiro`, `traceback_ultimo`, `handover_id`, `estado`
 - **`etapas`**: `id`, `solicitacao_id`, `ordem`, `titulo`, `funcionario`, `ferramenta`, `parametros`, `depende`, `risco`, `precisa_aprovacao`, `estado`, `natureza`, `resultado`, `tentativas`, `inicio`, `fim`
@@ -143,7 +153,7 @@
 - **`handover_eventos`**: `id`, `handover_id`, `data_hora`, `tipo`, `de`, `para`, `quem`, `detalhe`
 - **`handovers`**: `id`, `chave`, `andar`, `area`, `responsavel`, `detectado_por`, `erro`, `causa`, `regra`, `como_verificar`, `exemplo`, `recorrencias`, `estado`, `backlog_id`, `criado_em`, `ultima_ocorrencia`, `atualizado_em`
 - **`ideias_registro`**: `id`, `data_hora`, `titulo`, `motivo`, `primeiro_passo`, `dono`, `impacto`, `chave`
-- **`interacoes`**: `id`, `data_hora`, `de`, `para`, `tipo`, `texto`, `ref`
+- **`interacoes`**: `id`, `data_hora`, `de`, `para`, `tipo`, `texto`, `ref`, `dados`
 - **`jobs`**: `id`, `tipo`, `origem`, `arquivo`, `inicio`, `fim`, `estado`, `funcionario`, `evidencia`, `hash_saida`
 - **`jobs_etapas`**: `id`, `job_id`, `etapa`, `funcionario`, `inicio`, `fim`, `ok`, `detalhe`, `evidencia`
 - **`jornada_execucoes`**: `id`, `data_hora`, `area`, `semente`, `linhas_esperadas`, `linhas_saida`, `ok`, `etapa_falhou`, `etapas`, `tempos`, `segundos`, `versao_codigo`

@@ -126,6 +126,12 @@ def gerar(area: str, semente: int) -> dict:
     raise ValueError(area)
 
 
+def _etapa_base_lab(etapa: str) -> str:
+    """'Revisão da biblioteca numpy 2.5.3' → 'Revisão da biblioteca numpy' (a versão muda; o assunto não)."""
+    import re
+    return re.sub(r"\s+\d+(\.\d+)+\S*$", "", str(etapa).strip())
+
+
 def aplicar_nivel(caso: dict, nivel: int, semente: int) -> dict:
     """Planta a sujeira do nível e ajusta a VERDADE (ex.: célula com '-' vira vazio na resposta certa)."""
     caso = {**caso, "nivel": nivel, "rotulos": {k: np.array(v, dtype=object) if k == caso["metrica"] else v
@@ -398,6 +404,15 @@ def exercicio(cfg, area: str | None = None, semente: int | None = None, gravar: 
                                    "evidencia": {"segundos": x["segundos"]}} for x in resultados],
                                  "concluido" if all(x["ok"] for x in resultados) else "falhou", rodada,
                                  {"area": area, "nivel": nivel, "semente": semente})
+    except Exception:
+        pass
+    try:
+        from robo import aprendizados
+        for x in resultados:
+            aprendizados.registrar(cfg, x["responsavel"], f"laboratorio:{_etapa_base_lab(x['etapa'])}",
+                                   "acerto" if x["ok"] else "erro", acao=f"{area} nível {nivel}",
+                                   causa="" if x["ok"] else x["detalhe"][:500], nivel=nivel, evidencia_id=rodada,
+                                   origem="laboratorio", contexto={"area": area, "semente": semente})
     except Exception:
         pass
     for x in resultados:

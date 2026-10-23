@@ -184,6 +184,7 @@ def principal(argv: list[str] | None = None) -> int:
     sib.add_argument("--superusuario", default="postgres", help="o usuário administrador criado na instalação do PostgreSQL")
     sib.add_argument("--sem-setx", action="store_true", help="não gravar as senhas nas variáveis do Windows")
     sub.add_parser("banco-doc", help="regera documentacao/banco_de_dados.md a partir do dicionário de dados do código")
+    sub.add_parser("semear-aprendizado", help="importa a semente de ~200 lições (origem 'semente', nunca conta como acerto real)")
     sro = sub.add_parser("rotina", help="roda UMA rotina da empresa agora e registra (é o que o Airflow chama). "
                                         "Saída: 0 fez/em dia, 1 erro, 99 já rodando em outro programa")
     sro.add_argument("nome", nargs="?", help="nome da rotina (sem nome: lista todas)")
@@ -337,6 +338,13 @@ def principal(argv: list[str] | None = None) -> int:
         for campo, valor in r["app"].items():
             print(f"  {campo:9s} {valor}")
         print("\nO usuário robo_leitura só lê: pelo celular ninguém altera nem apaga nada. Nunca abra a porta no roteador.")
+        return 0
+
+    if args.comando == "semear-aprendizado":
+        from robo import aprendizados
+        cfg = carregar_config(Path(args.config) if args.config else None)
+        n = aprendizados.semear(cfg)
+        print(f"Semente importada: {n} lição(ões) nova(s) com origem 'semente' (não contam como acerto real).")
         return 0
 
     if args.comando == "banco-doc":

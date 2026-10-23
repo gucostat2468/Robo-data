@@ -36,6 +36,9 @@ def _tb(cfg) -> Trabalho:
     tb = Trabalho(cfg)
     with tb.tx() as c:
         c.executescript(ESQUEMA)
+        # toda conversa cita a evidência (fonte e id). Linhas de antes desta coluna recebem um valor que diz isso.
+        if "dados" not in {r[1] for r in c.execute("PRAGMA table_info(interacoes)")}:
+            c.execute("ALTER TABLE interacoes ADD COLUMN dados TEXT DEFAULT '{\"fonte\": \"registro anterior a 23/10/2026\"}'")
         from robo.trabalho import proteger
         proteger(c)
     return tb
@@ -51,11 +54,15 @@ def balao(etapa: str, texto: str, **extra) -> None:
             pass
 
 
-def falar(cfg, de: str, para: str | None, texto: str, tipo: str, ref: str = "", postar: bool = True) -> None:
+def falar(cfg, de: str, para: str | None, texto: str, tipo: str, ref: str = "", postar: bool = True,
+          dados: dict | None = None) -> None:
+    """Grava a fala COMPLETA (sem cortar) com a evidência em `dados` (fonte e id do fato)."""
+    import json
     tb = _tb(cfg)
     with tb.tx() as c:
-        c.execute("INSERT INTO interacoes (data_hora, de, para, tipo, texto, ref) VALUES (?,?,?,?,?,?)",
-                  (_agora(), de, para, tipo, texto[:2000], ref))
+        c.execute("INSERT INTO interacoes (data_hora, de, para, tipo, texto, ref, dados) VALUES (?,?,?,?,?,?,?)",
+                  (_agora(), de, para, tipo, texto, ref,
+                   json.dumps(dados or {"fonte": tipo, "ref": ref}, ensure_ascii=False, default=str)))
     gente = organizacao.por_id(cfg)
     if postar:
         try:

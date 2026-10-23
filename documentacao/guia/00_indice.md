@@ -1,7 +1,7 @@
 # Guia completo do Robô de Planilhas
 
 Este guia explica o projeto **arquivo por arquivo e função por função**, com o intervalo de linhas de cada trecho,
-em linguagem para quem está começando em programação. São cerca de 5.400 linhas, divididas em 5 partes:
+em linguagem para quem está começando em programação. São cerca de 5.400 linhas, divididas em 6 partes:
 
 | Parte | Arquivo | O que cobre |
 |---|---|---|
@@ -10,6 +10,7 @@ em linguagem para quem está começando em programação. São cerca de 5.400 li
 | 3 | [03_equipe_e_organizacao.md](03_equipe_e_organizacao.md) | Agentes, as 26 habilidades, RH e provas técnicas, quadro de pessoal, contratação, TI, treinamento e estratégia |
 | 4 | [04_analise_excel_canal.md](04_analise_excel_canal.md) | Análise estatística (2º andar), Sala Excel (3º andar), canal da equipe, calculadora e central de dados |
 | 5 | [05_painel_3d_windows_testes.md](05_painel_3d_windows_testes.md) | Painel, escritório 3D, instalação no Windows e testes automáticos |
+| 6 | [06_fala_memoria_status_fabrica.md](06_fala_memoria_status_fabrica.md) | Fala natural e IA opcional, conversas só com fato, memória da empresa, status honesto (jobs) e fábrica de planilhas sintéticas |
 
 ## Como ler
 - Comece pela Parte 1. Ela segue uma planilha desde que cai em Bases-Limpeza até ser publicada; o resto encaixa nela.

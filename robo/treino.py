@@ -326,6 +326,14 @@ def tentar(cfg, pid: str, comp: str, caso: dict, rodada: str = "") -> dict:
                         f"{caso['id']}#T{tid}")
     if not acertou:
         _aprender_com_o_erro(cfg, pid, p, c, caso, tipo, detalhe)
+    try:
+        from robo import aprendizados
+        aprendizados.registrar(cfg, pid, f"treino:{comp}", "acerto" if acertou else "erro", acao=f"caso {caso['id']}",
+                               causa="" if acertou else (tipo or "erro sem tipo") + (f": {detalhe[:300]}" if detalhe else ""),
+                               nivel=caso["nivel"], evidencia_id=f"T{tid}", origem="treino",
+                               contexto={"competencia": comp, "tipo_erro": tipo or ""})
+    except Exception:
+        log.debug("Aprendizado do treino não registrado", exc_info=True)
     mudanca = ajustar_nivel(cfg, pid, comp)
     r = {"tentativa": tid, "funcionario": pid, "competencia": comp, "nivel": caso["nivel"], "acertou": bool(acertou),
          "nota": nota, "tipo_erro": tipo, "detalhe": detalhe, "segundos": seg, "mudanca_nivel": mudanca}

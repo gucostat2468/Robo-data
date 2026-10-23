@@ -297,6 +297,15 @@ def _tratar(caminho: Path, cfg: Config, rel: Relatorio, ao_etapa=None) -> _Trata
     if caminho.suffix.lower() not in EXTENSOES_SUPORTADAS:
         rel.erro(f"Formato '{caminho.suffix}' não suportado. Envie .xlsx, .xlsm, .xls, .csv ou .txt")
         return t
+    try:  # antes de agir: o que já se errou com esse mesmo arquivo (memória de acertos e erros)
+        from robo import aprendizados
+        for x in aprendizados.consultar(cfg, "esteira:validacao", {"arquivo": caminho.name}, n=3, onde="esteira",
+                                        quem="validacao"):
+            if json.loads(x["contexto"] or "{}").get("arquivo") == caminho.name:
+                rel.info(f"Memória: este arquivo já foi barrado por: {x['causa'][:200]}"
+                         + (f" Como evitar: {x['correcao']}" if x["correcao"] else ""))
+    except Exception:
+        log.debug("Consulta à memória falhou", exc_info=True)
     _sinal(ao_etapa, "leitura", caminho.name)
     try:
         t.brutas = ler_arquivo(caminho, abas=t.regra.get("abas", cfg.leitura["abas"]),
@@ -441,6 +450,11 @@ def processar_arquivo(caminho: str | Path, cfg: Config, gravar: bool = True, ao_
                  "execucao": r.id, "erros": len(r.relatorio.erros), "motivo_adiamento": r.motivo_adiamento or None}
     estado = "concluido" if r.status == SUCESSO else ("adiado" if r.status == ADIADO else "falhou")
     jobs.fechar(cfg, jid, estado, evidencia, jobs.hash_arquivo(saidas[0]) if saidas else None)
+    try:  # memória de acertos e erros: quem barrou, por quê e como corrigir (robo/aprendizados.py)
+        from robo import aprendizados
+        aprendizados.da_esteira(cfg, r, jid)
+    except Exception:
+        log.debug("Aprendizado da esteira não registrado", exc_info=True)
     return r
 
 

@@ -312,6 +312,20 @@ def colher(cfg) -> dict:
                  f"{etapa} {f['area']}", f"refazer o último caso que falhou ({f['area']}) e a etapa passar",
                  (gente.get(f["responsavel"]) or {}).get("andar"), f["responsavel"]):
             novas["laboratorio"] += 1
+    try:  # erros REAIS da esteira (memória de acertos e erros): uma lição por (competência, causa)
+        with tb.tx() as c:
+            esteira = [dict(r) for r in c.execute(
+                "SELECT competencia, causa, MAX(correcao) correcao, MAX(funcionario) funcionario, COUNT(*) n FROM aprendizados "
+                "WHERE resultado='erro' AND origem='pipeline' AND causa <> '' GROUP BY competencia, causa")]
+    except Exception:
+        esteira = []
+    for e in esteira:
+        ref = f"{e['competencia']}:{e['causa'][:120]}"
+        if criar(cfg, "esteira", ref, f"Esteira barrou: {e['causa'][:160]}",
+                 f"O que barrou ({e['n']} vez(es)): {e['causa']}\nComo corrigir: {e['correcao'] or 'ver o relatório do arquivo'}",
+                 e["causa"][:200], "o mesmo motivo não barrar de novo (replay da memória)",
+                 (gente.get(e["funcionario"]) or {}).get("andar"), e["funcionario"]):
+            novas["laboratorio"] += 1
     for m in tb.memorias("correcao", limite=100_000):
         if criar(cfg, "correcao", f"{m['chave']}|{m['id']}", f"Correção do dono: {m['chave']}", m["texto"], m["chave"],
                  "usar a correção nas próximas respostas", None, None, "todos", "dono"):
