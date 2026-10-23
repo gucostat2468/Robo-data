@@ -196,7 +196,9 @@ def _esteira(monitor) -> int:
         return 0
 
 
-def turno(cfg, minutos: float = 20, salvar_a_cada_min: float = 10, pausa_s: float = 15) -> dict:
+def turno(cfg, minutos: float = 20, salvar_a_cada_min: float = 10, pausa_s: float = 15, parar=None) -> dict:
+    """parar: threading.Event opcional. Quando é ligado (SIGTERM do Cloud Run, Ctrl+C), o turno sai do laço e SALVA
+    a memória antes de devolver (encerramento gracioso: nada do que foi feito se perde)."""
     from robo import rotinas
     from robo.monitor import Monitor
     inicio = time.monotonic()
@@ -213,7 +215,7 @@ def turno(cfg, minutos: float = 20, salvar_a_cada_min: float = 10, pausa_s: floa
     planilhas = _esteira(monitor)
     ultimo_salvo = time.monotonic()
     voltas = 0
-    while time.monotonic() < fim:
+    while time.monotonic() < fim and not (parar is not None and parar.is_set()):
         voltas += 1
         for nome in ("canal", "registro", "treino", "laboratorio", "fabrica", "demandas", "telegram"):
             rotinas.executar(cfg, nome, rotinas.funcao(cfg, nome))
@@ -222,7 +224,11 @@ def turno(cfg, minutos: float = 20, salvar_a_cada_min: float = 10, pausa_s: floa
         if time.monotonic() - ultimo_salvo >= salvar_a_cada_min * 60:
             salvar(cfg)
             ultimo_salvo = time.monotonic()
-        time.sleep(max(0.0, min(pausa_s, fim - time.monotonic())))
+        espera = max(0.0, min(pausa_s, fim - time.monotonic()))
+        if parar is not None:
+            parar.wait(espera)
+        else:
+            time.sleep(espera)
     planilhas += _esteira(monitor)
     for nome in ("fabrica", "ronda_ti", "rh_desempenho", "alcadas"):  # fecham o turno (a fábrica confere o gabarito)
         if nome in rotinas.ROTINAS:

@@ -109,3 +109,66 @@ def teste_servico_sem_banco_nao_sobe(monkeypatch, tmp_path):
     for v in ("ROBO_PG_URL", "DB_USER", "DB_PASS", "DB_NAME", "INSTANCE_CONNECTION_NAME"):
         monkeypatch.delenv(v, raising=False)
     assert servico.principal(str(tmp_path), voltas=1) == 1
+
+
+# ----------------------------------------------------------------------------------------------- operação 24 h
+def _get(porta, rota):
+    try:
+        with urllib.request.urlopen(f"http://127.0.0.1:{porta}{rota}", timeout=10) as r:
+            return r.status, json.loads(r.read())
+    except urllib.error.HTTPError as e:
+        return e.code, json.loads(e.read())
+
+
+def teste_healthz_diz_503_com_banco_fora_e_nao_vaza_endereco(tmp_path, monkeypatch):
+    cfg = nuvem.config_da_nuvem(tmp_path, "postgresql://u:" + "segredo123@127.0.0.1:1/x")  # porta 1: ninguém escuta (montado em 2 partes)
+    monkeypatch.setitem(servico._BANCO, "cfg", cfg)
+    monkeypatch.setitem(servico._BANCO, "quando", 0.0)
+    srv = servico.iniciar_saude(0)
+    try:
+        codigo, corpo = _get(srv.server_address[1], "/healthz")
+        assert codigo == 503 and corpo["banco"]["ok"] is False and corpo["processo"] == "vivo"
+        assert "segredo123" not in json.dumps(corpo) and "127.0.0.1" not in json.dumps(corpo)
+    finally:
+        srv.shutdown()
+
+
+DSN = __import__("os").environ.get("ROBO_TESTE_PG")
+
+
+@pytest.mark.skipif(not DSN, reason="defina ROBO_TESTE_PG para testar com PostgreSQL")
+def teste_healthz_200_com_banco_no_ar(tmp_path, monkeypatch):
+    d = dict(p.split("=", 1) for p in DSN.split())
+    cfg = nuvem.config_da_nuvem(tmp_path, f"postgresql://{d.get('user', 'postgres')}@{d.get('host')}:{d.get('port')}/postgres")
+    monkeypatch.setitem(servico._BANCO, "cfg", cfg)
+    monkeypatch.setitem(servico._BANCO, "quando", 0.0)
+    srv = servico.iniciar_saude(0)
+    try:
+        codigo, corpo = _get(srv.server_address[1], "/healthz")
+        assert codigo == 200 and corpo["banco"]["ok"] is True
+    finally:
+        srv.shutdown()
+
+
+def teste_sinal_de_parada_encerra_o_turno_salvando(tmp_path, monkeypatch):
+    """SIGTERM liga PARAR: o turno sai do laço logo e ainda passa por salvar() (nada do que foi feito se perde)."""
+    import threading
+    import time as _t
+    from robo import rotinas
+    chamadas = []
+    monkeypatch.setattr(nuvem, "restaurar", lambda cfg: {"origem": "teste"})
+    monkeypatch.setattr(nuvem, "garantir_leitura", lambda cfg: True)
+    monkeypatch.setattr(nuvem, "salvar", lambda cfg: chamadas.append("salvar") or {"ok": True})
+    monkeypatch.setattr(nuvem, "tamanho_mb", lambda cfg: 1.0)
+    monkeypatch.setattr(nuvem, "_esteira", lambda m: 0)
+    monkeypatch.setattr(rotinas, "executar", lambda *a, **k: None)
+    monkeypatch.setattr(rotinas, "funcao", lambda *a, **k: None)
+    monkeypatch.setattr(rotinas, "abrir_sessao", lambda cfg: {"sessao": 1})
+    monkeypatch.setattr(rotinas, "batimento", lambda *a, **k: None)
+    cfg = nuvem.config_da_nuvem(tmp_path, "postgresql://u:p@127.0.0.1:1/x")
+    parar = threading.Event()
+    threading.Timer(0.5, parar.set).start()
+    inicio = _t.monotonic()
+    r = nuvem.turno(cfg, minutos=10, pausa_s=60, parar=parar)
+    assert _t.monotonic() - inicio < 10   # não esperou os 10 minutos
+    assert chamadas == ["salvar"] and r["voltas"] >= 1

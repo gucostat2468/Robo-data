@@ -14,6 +14,9 @@ existe. O que foi feito é o projeto ficar **pronto** para rodar lá no dia em q
 | O que fica fora da imagem | `.dockerignore` | `config.yaml`, `logs/`, `.git`, testes, memória local |
 | Banco por variáveis | `robo/nuvem.py` → `url_do_ambiente` | `DB_USER`, `DB_PASS`, `DB_NAME` + `INSTANCE_CONNECTION_NAME` → conecta pelo Unix socket `/cloudsql/<instância>` (sem IP público). Sem a instância, usa `DB_HOST`/`DB_PORT`. Continua aceitando `ROBO_PG_URL` (o caminho grátis de hoje) |
 | Modo servidor | `robo/servico.py` → `python -m robo servico` | turnos um atrás do outro + `GET /saude` somente leitura na porta `PORT` |
+| Saúde do banco | `robo/servico.py` → `GET /healthz` | `SELECT 1` com limite de 3 s, guardado por 15 s: 200 com banco no ar, 503 fora (sem mostrar endereço nem senha). `/saude` e `/status` mostram o último turno |
+| Encerramento gracioso | `robo/servico.py` | SIGTERM/SIGINT param o turno, **salvam a memória** e soltam a trava (medido: 6 s; o Cloud Run dá 10 s) |
+| Banco fora do ar | `robo/servico.py` | não derruba o serviço: tenta de novo com espera crescente (1, 2, 4… até 10 min) e refaz a trava se a conexão cair |
 | Instância única | `robo/servico.py` | trava no PostgreSQL (`pg_try_advisory_lock`): uma segunda instância fica em espera e não trabalha |
 | Vigilância | Heloísa (Head de AWS) | a cada ronda confere: Dockerfile existe, não roda como root, porta por variável, `config.yaml` fora do repositório, dependências com versão |
 
@@ -83,3 +86,33 @@ Depois abra `http://localhost:8080/saude`.
 
 Se algo der errado no Google: apague o serviço do Cloud Run (`gcloud run services delete flexible-app`) e reative o
 workflow do GitHub. A memória está no PostgreSQL e o próximo turno continua do último instantâneo: nada se perde.
+
+## 7. Análise do segundo desenho (MLOps: Pub/Sub → Cloud Run → BigQuery + Vertex AI + avaliador)
+
+O que o desenho mostra: `interaction-events` (Pub/Sub) → `interaction-processor` (Cloud Run) → três saídas:
+`interaction_data` (BigQuery), `mlops-agent` (Vertex AI) e `model-evaluator` (Cloud Run).
+
+**O que está certo:** separar ingestão, processamento, histórico, modelo e avaliação é a arquitetura de referência.
+
+**Onde não se aplica a nós (com números):**
+1. **Não existe fonte de eventos externa.** Pub/Sub serve para receber muitos eventos de usuários e sistemas. Aqui quem
+   gera tudo é a própria empresa, e já grava cada linha no SQLite e no espelho `robo.memoria_*` do PostgreSQL. Um
+   tópico no meio só acrescenta custo e um ponto de falha.
+2. **Volume pequeno.** São milhares de linhas (ex.: 336 tentativas de treino na memória da nuvem; 41 MB no banco local).
+   BigQuery brilha com bilhões. O PostgreSQL que já temos é o nosso "data warehouse" e cabe no plano grátis.
+3. **O avaliador está ligado no lugar errado.** No desenho ele recebe do processador, evento a evento. Avaliação de
+   modelo se faz sobre o HISTÓRICO (dados que o modelo não viu, separados por data), não sobre o fluxo ao vivo.
+4. **Falta a peça de treino.** "Agent Engine" do Vertex AI é para agentes com IA generativa, não para treinar um
+   modelo de previsão. O treino contínuo seria Vertex AI Pipelines + Model Registry, que o desenho não tem.
+5. **Falta fila de mensagens com erro** (dead-letter topic): uma mensagem que sempre falha ficaria voltando para sempre.
+6. **Custo:** endpoint do Vertex AI fica ligado 24 h e cobra por hora de máquina, mais Cloud Run sempre ligado e
+   BigQuery por consulta. Soma-se ao desenho anterior. Confira na calculadora oficial antes de qualquer decisão.
+
+**O equivalente grátis (próxima etapa):** o mesmo ciclo de MLOps dentro do que já temos:
+memória no PostgreSQL → experimento com scikit-learn no turno do GitHub Actions → tabela de experimentos e versões de
+modelo no próprio banco (o "Model Registry") → avaliação semanal sobre dados novos, separados por data, feita por
+outra pessoa (independência) → o modelo só é promovido se for melhor que o atual.
+
+**Sobre o comando colado (`--max-instances=10` e `--allow-unauthenticated`):** continuo recomendando 1 instância
+(senão duas gravam a memória ao mesmo tempo) e sem acesso público (`--no-allow-unauthenticated`): a saúde não precisa
+ser pública e o painel nunca deve ser.
