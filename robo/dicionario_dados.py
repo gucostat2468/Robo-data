@@ -143,6 +143,10 @@ TABELAS = {
                           "quais conversas resolvem; tempo até cumprir; quem ajuda quem"),
     "dialogo_ciclos": ("operacao", "Cada ciclo das conversas: quantos fatos avaliados, quantas conversas e se não houve assunto",
                        "um ciclo", IMUTAVEL, "quanto silêncio é falta de assunto e não de gente"),
+    "cobertura_persistencia": ("operacao", "Cada levantamento de cobertura do banco: tabela por tabela (SQLite e PostgreSQL), "
+                               "linhas, natureza (real, sintético, operação, controle) e a causa de cada tabela vazia",
+                               "uma tabela num levantamento", IMUTAVEL,
+                               "evolução da cobertura no tempo; quais partes da operação ainda não gravam nada"),
     "voz_falas": ("conhecimento", "Cada fala composta pela voz de um funcionário: quem, ato de fala, molde usado, hash do texto e "
                   "se veio de regra ou de IA (garante variação sem repetir parágrafo em 24 h e permite auditar)",
                   "uma fala", IMUTAVEL, "estilo e variação de cada voz; quanto a IA redige versus a regra"),
@@ -213,6 +217,8 @@ def _todas_as_tabelas(cfg) -> None:
     dialogo._tb(cfg)
     caixa_dono._tb(cfg)
     jornada._tb(cfg)
+    from robo import cobertura_banco
+    cobertura_banco._tb(cfg)
     from robo.trabalho import proteger
     with Trabalho(cfg).tx() as c:
         c.executescript(USO_ESQUEMA + ROTINAS + backup.ESQUEMA_REGISTRO)

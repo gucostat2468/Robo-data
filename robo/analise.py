@@ -620,14 +620,21 @@ def _gravar_banco(cfg, lote_id: str, a: Analise, planilhas: dict):
              "base_pequena": "boolean", "significativo": "boolean"}
     numericas = {"valor", "margem", "media", "pct_promotores", "pct_neutros", "pct_detratores", "valor_grupo",
                  "valor_restante", "diferenca", "z", "p_valor", "pct_preenchido", "mediana", "desvio"}
+    esquema = banco.schemas.get("analise", "analise")  # planilha sintética: schema treino (pipeline.SCHEMAS_SINTETICOS)
+    from robo.pipeline import teto_treino
+    with banco.conectar() as conn:
+        if teto_treino(cfg, conn)[0]:  # teto dos schemas sintéticos: a análise fica no arquivo, não sobe ao banco
+            log.info("Análise sintética de %s não foi ao PostgreSQL: teto de espaço do treino atingido", a.arquivo)
+            return
     with banco.conectar() as conn, conn.transaction():
-        conn.execute("CREATE SCHEMA IF NOT EXISTS analise")
+        conn.execute(sql.SQL("CREATE SCHEMA IF NOT EXISTS {}").format(sql.Identifier(esquema)))
         for nome, cols in colunas.items():
             df = planilhas.get(nome)
             definicao = ", ".join(f"{c} {tipos.get(c, 'double precision' if c in numericas else 'text')}" for c in cols)
-            conn.execute(f"CREATE TABLE IF NOT EXISTS analise.{nome} (lote_id text, base text, arquivo text, "
-                         f"analisado_em timestamptz DEFAULT now(), {definicao})")
-            conn.execute(sql.SQL("DELETE FROM {} WHERE lote_id = %s").format(sql.Identifier("analise", nome)), (lote_id,))
+            conn.execute(sql.SQL("CREATE TABLE IF NOT EXISTS {} (lote_id text, base text, arquivo text, "
+                                 "analisado_em timestamptz DEFAULT now(), {})").format(
+                sql.Identifier(esquema, nome), sql.SQL(definicao)))
+            conn.execute(sql.SQL("DELETE FROM {} WHERE lote_id = %s").format(sql.Identifier(esquema, nome)), (lote_id,))
             if df is None or df.empty:
                 continue
             linhas = []
@@ -649,5 +656,5 @@ def _gravar_banco(cfg, lote_id: str, a: Analise, planilhas: dict):
                 linhas.append((lote_id, a.base, a.arquivo, *valores))
             with conn.cursor() as cur:
                 cur.executemany(sql.SQL("INSERT INTO {} (lote_id, base, arquivo, {}) VALUES ({})").format(
-                    sql.Identifier("analise", nome), sql.SQL(", ").join(sql.Identifier(c) for c in cols),
+                    sql.Identifier(esquema, nome), sql.SQL(", ").join(sql.Identifier(c) for c in cols),
                     sql.SQL(", ").join([sql.Placeholder()] * (len(cols) + 3))), linhas)

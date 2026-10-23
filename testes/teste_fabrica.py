@@ -90,14 +90,19 @@ def teste_copia_exata_com_chave_de_negocio_e_removida(cfg_factory):
     assert all(_eh_identificador(c, padroes) for c in ("nota_fiscal", "pedido", "titulo", "protocolo", "sku"))
 
 
-def teste_sintetico_nao_vai_para_o_postgres():
+def teste_sintetico_vai_so_para_os_schemas_de_treino():
+    """Regra mudada em 23/10/2026 (cobertura do banco): a planilha sintética vai ao PostgreSQL, mas SÓ para laboratorio e
+    treino. Nenhum schema de produção (bruto, tratado, analitico, analise, robo) pode aparecer no destino."""
     from robo.pipeline import cfg_de_treino
 
     class C:
         dados = {"banco": {"habilitado": True}}
         tratadas = erros = originais = relatorios = "/x"
     t = cfg_de_treino(C())
-    assert t.dados["banco"]["habilitado"] is False and str(t.tratadas).endswith("_treino")
+    b = t.dados["banco"]
+    assert b["sintetico"] is True and str(t.tratadas).endswith("_treino")
+    assert set(b["schemas"].values()) == {"laboratorio", "treino"}
+    assert not set(b["schemas"].values()) & {"bruto", "tratado", "analitico", "analise", "robo"}
 
 
 def teste_desligada_nao_faz_nada(cfg_factory):

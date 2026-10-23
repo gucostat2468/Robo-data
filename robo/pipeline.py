@@ -17,6 +17,7 @@ from __future__ import annotations
 import json
 import logging
 import os
+import re
 import shutil
 import time
 from dataclasses import dataclass, field
@@ -361,16 +362,41 @@ def _resumo_tabelas(tabelas: dict) -> list[dict]:
             for n, df in tabelas.items()]
 
 
+def _mb_dos_schemas(conn, schemas: set[str]) -> float:
+    linha = conn.execute("SELECT coalesce(sum(pg_total_relation_size(c.oid)), 0) FROM pg_class c "
+                         "JOIN pg_namespace n ON n.oid = c.relnamespace WHERE c.relkind = 'r' AND n.nspname = ANY(%s)",
+                         (sorted(schemas),)).fetchone()
+    return float(linha[0]) / 1024 ** 2
+
+
+def teto_treino(cfg, conn) -> tuple[bool, float, float]:
+    """(atingido, MB usados, teto) dos schemas sintéticos. Só vale para a config de treino (cfg_de_treino)."""
+    if not cfg.banco.get("sintetico"):
+        return False, 0.0, 0.0
+    mb = _mb_dos_schemas(conn, set(SCHEMAS_SINTETICOS.values()))
+    teto = float(cfg.banco.get("treino_mb_max", PG_TREINO_MB_MAX))
+    return mb >= teto, mb, teto
+
+
 def _carregar_banco(cfg: Config, caminho: Path, t: _Tratamento, rel: Relatorio, lote_id: str, aprovado: bool,
-                    ao_etapa=None) -> list[str]:
-    """Uma transação por arquivo. Levanta ErroBancoIndisponivel (adiar) ou registra erro no relatório (reprovar)."""
+                    ao_etapa=None) -> list[str] | None:
+    """Uma transação por arquivo. Levanta ErroBancoIndisponivel (adiar) ou registra erro no relatório (reprovar).
+    None = não carregou DE PROPÓSITO (planilha sintética com o teto de espaço atingido): não é falha da planilha."""
     from robo.banco import Banco, ErroCargaDados
 
     banco = Banco(cfg.banco, cfg.base)
     banco.criar_banco_se_preciso()
     gravadas: list[str] = []
-    base = nome_base_tabela(caminho, t.regra)
+    sintetico = bool(cfg.banco.get("sintetico"))
+    base = base_sintetica(caminho) if sintetico else nome_base_tabela(caminho, t.regra)
     with banco.conectar() as conn:
+        if sintetico:
+            atingido, mb, teto = teto_treino(cfg, conn)
+            if atingido:
+                rel.aviso(f"Planilha sintética NÃO carregada no PostgreSQL: os schemas laboratorio e treino já têm "
+                          f"{mb:.0f} MB (teto {teto:.0f} MB, fabrica.pg_treino_mb_max). Nada foi apagado; a planilha "
+                          f"tratada está em Bases-Tratadas/_treino.")
+                return None
         try:
             with conn.transaction():
                 banco.inicializar(conn)
@@ -382,7 +408,7 @@ def _carregar_banco(cfg: Config, caminho: Path, t: _Tratamento, rel: Relatorio, 
                     _sinal(ao_etapa, "dba", caminho.name)
                     conferidos = banco.reconciliar(conn, lote_id, getattr(banco, "esperado_bruto", {}))
                     rel.info(f"DBA conferiu no PostgreSQL antes do commit: {', '.join(conferidos)}")
-                    modelos = banco.executar_modelos(conn)
+                    modelos = [] if sintetico else banco.executar_modelos(conn)  # modelos leem só o real
                     if modelos:
                         rel.info(f"Modelos SQL executados na camada analítica: {', '.join(modelos)}")
                 banco.registrar_lote(conn, _dados_lote(caminho, lote_id, rel, t, gravadas, aprovado))
@@ -458,12 +484,32 @@ def processar_arquivo(caminho: str | Path, cfg: Config, gravar: bool = True, ao_
     return r
 
 
+# Planilha sintética no PostgreSQL: nunca nos schemas de produção (bruto, tratado, analitico, analise, robo).
+# laboratorio = a cópia bruta (texto, como chegou); treino = tratado, controle (lotes, ocorrências) e análise.
+SCHEMAS_SINTETICOS = {"bruto": "laboratorio", "tratado": "treino", "analitico": "treino", "controle": "treino",
+                      "analise": "treino"}
+PG_TREINO_MB_MAX = 100  # teto dos schemas laboratorio + treino: chegou nele, para de carregar (não apaga nada)
+RE_SINTETICO = re.compile(r"^TREINO_(.+?)_\d{8}_\d{6}", re.IGNORECASE)
+
+
+def base_sintetica(caminho: Path) -> str:
+    """TREINO_nps_20261023_042837_17916.xlsx → treino_nps. Uma tabela por regra de negócio (e não uma por lote), para
+    o schema não crescer em número de tabelas; cada lote continua identificado por _arquivo_origem e _lote_id."""
+    m = RE_SINTETICO.match(Path(caminho).stem)
+    return normalizar_nome_coluna("treino_" + (m.group(1) if m else Path(caminho).stem))
+
+
 def cfg_de_treino(cfg: Config) -> Config:
     """Planilha sintética (TREINO_*) passa pela MESMA esteira, mas tudo que ela produz fica separado: saída em
-    Bases-Tratadas/_treino, originais/erros/relatórios em _treino, e NADA vai para o PostgreSQL de produção."""
+    Bases-Tratadas/_treino, originais/erros/relatórios em _treino e, com o PostgreSQL ligado, só nos schemas
+    laboratorio e treino (SCHEMAS_SINTETICOS). Nada vai para os schemas de produção nem roda os modelos SQL reais."""
     import copy
     t = copy.copy(cfg)
-    t.dados = {**cfg.dados, "banco": {**(cfg.dados.get("banco") or {}), "habilitado": False}}
+    banco = dict(cfg.dados.get("banco") or {})
+    teto = (cfg.dados.get("fabrica") or {}).get("pg_treino_mb_max")
+    banco.update({"sintetico": True, "schemas": dict(SCHEMAS_SINTETICOS),
+                  "treino_mb_max": float(PG_TREINO_MB_MAX if teto is None else teto)})
+    t.dados = {**cfg.dados, "banco": banco}
     for attr in ("tratadas", "erros", "originais", "relatorios"):
         setattr(t, attr, Path(getattr(cfg, attr)) / "_treino")
     return t
@@ -520,11 +566,14 @@ def _processar_arquivo(caminho: str | Path, cfg: Config, gravar: bool = True, ao
         return _adiar(r, inicio, f"o arquivo de saída {aberta.name} está aberto (feche o Excel/Power BI)")
 
     # ---- carga no banco (antes dos arquivos: se o banco recusar, o arquivo não é publicado)
-    if cfg.banco.get("habilitado"):
+    banco_ligado = bool(cfg.banco.get("habilitado"))
+    if banco_ligado:
         from robo.banco import ErroBancoIndisponivel
         _sinal(ao_etapa, "banco", caminho.name)
         try:
-            r.tabelas_banco = _carregar_banco(cfg, caminho, t, rel, r.id, aprovado=not rel.tem_erros, ao_etapa=ao_etapa)
+            carga = _carregar_banco(cfg, caminho, t, rel, r.id, aprovado=not rel.tem_erros, ao_etapa=ao_etapa)
+            banco_ligado = carga is not None  # teto da fábrica: para o checklist, o banco não se aplica a esta planilha
+            r.tabelas_banco = carga or []
         except ErroBancoIndisponivel as e:
             _sinal(ao_etapa, "adiado", caminho.name)
             return _adiar(r, inicio, f"PostgreSQL indisponível: {e}")
@@ -538,8 +587,8 @@ def _processar_arquivo(caminho: str | Path, cfg: Config, gravar: bool = True, ao
     r.checklist = None
     if not rel.tem_erros:
         _sinal(ao_etapa, "coord_engenharia", caminho.name)
-        r.checklist = producao.checklist_engenharia(rel, conferencias, obter_equipe(cfg), bool(cfg.banco.get("habilitado")),
-                                                    bool(r.tabelas_banco) if cfg.banco.get("habilitado") else None,
+        r.checklist = producao.checklist_engenharia(rel, conferencias, obter_equipe(cfg), banco_ligado,
+                                                    bool(r.tabelas_banco) if banco_ligado else None,
                                                     equipe_quadro=r.quadro)
         if not r.checklist["liberado"]:
             for i in r.checklist["itens"]:

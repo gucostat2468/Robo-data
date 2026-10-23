@@ -11,8 +11,11 @@ Como funciona um turno (o arquivo .github/workflows/empresa_nuvem.yml chama de 2
      as tabelas para o schema robo. A ordem garante que, se a máquina do GitHub cair no meio, nada que já foi salvo
      se perde e nada fica com número repetido (o próximo turno continua do último instantâneo).
 
+A ESTEIRA também roda na nuvem: a fábrica gera planilhas sintéticas (TREINO_*) e o monitor as processa como se fossem
+reais. Elas vão só para os schemas laboratorio e treino do PostgreSQL (nunca para bruto, tratado, analitico ou analise).
+
 O que NÃO roda na nuvem: o backup com pg_dump (o próprio PostgreSQL gratuito guarda o histórico, e os instantâneos
-ficam lá dentro) e a pasta de entrada de planilhas (na nuvem não chegam planilhas suas).
+ficam lá dentro). Planilhas suas não chegam à nuvem: a pasta de entrada da nuvem só recebe as da fábrica.
 
 Variáveis (Secrets do GitHub — nunca no código, nunca no log):
   ROBO_PG_URL            postgresql://usuario:senha@host/banco?sslmode=require (copiada do painel do Neon)
@@ -54,7 +57,9 @@ def config_da_nuvem(pasta: Path, url: str, senha_leitura: str = ""):
              "usuario_leitura": "robo_leitura", "senha_leitura": senha_leitura, "tempo_limite_conexao": 20}
     return carregar_config(pasta / "config_nuvem_inexistente.yaml", sobrescrever={
         "pastas": {k: str(pasta / k) for k in ("entrada", "logs", "agentes", "habilidades")},
-        "banco": banco, "rotinas": {"agendador": "robo"}, "backup": {"copia_extra": "", "postgres": False}})
+        "banco": banco, "rotinas": {"agendador": "robo"}, "backup": {"copia_extra": "", "postgres": False},
+        # lotes menores na nuvem: cabem no turno de 20 min e no plano gratuito do banco
+        "fabrica": {"linhas_min": 1000, "linhas_max": 5000}})
 
 
 def _conectar(cfg):
@@ -145,16 +150,30 @@ def tamanho_mb(cfg) -> float:
 # =============================================================================== o turno
 def salvar(cfg) -> dict:
     """Registro total → instantâneo → cópia incremental (essa ordem nunca deixa número repetido para trás)."""
-    from robo import memoria, registro_total, rotinas
+    from robo import cobertura_banco, memoria, registro_total, rotinas
     rotinas.executar(cfg, "registro", lambda: registro_total.capturar(cfg))
+    try:  # quais tabelas têm dados e por que as vazias estão vazias (vai junto no instantâneo e no espelho)
+        cobertura_banco.salvar_relatorio(cfg, cobertura_banco.levantar(cfg))
+    except Exception:
+        log.exception("Turno na nuvem: levantamento de cobertura falhou")
     inst = salvar_instantaneo(cfg)
     rotinas.executar(cfg, "memoria_pg", lambda: memoria.sincronizar_postgres(cfg))
     garantir_leitura(cfg)  # tabelas novas também ficam legíveis no celular
     return inst
 
 
+def _esteira(monitor) -> int:
+    """Uma passada do monitor na pasta de entrada da nuvem (planilhas da fábrica). Falha aqui não derruba o turno."""
+    try:
+        return len(monitor.ciclo(forcar=True))
+    except Exception:
+        log.exception("Turno na nuvem: a esteira falhou nesta volta")
+        return 0
+
+
 def turno(cfg, minutos: float = 20, salvar_a_cada_min: float = 10, pausa_s: float = 15) -> dict:
     from robo import rotinas
+    from robo.monitor import Monitor
     inicio = time.monotonic()
     fim = inicio + minutos * 60
     origem = restaurar(cfg)
@@ -164,18 +183,22 @@ def turno(cfg, minutos: float = 20, salvar_a_cada_min: float = 10, pausa_s: floa
     for nome in rotinas.ROTINAS:  # cada uma decide se está na hora (backup diário, reunião semanal…)
         if nome not in NAO_RODAM_NA_NUVEM:
             rotinas.executar(cfg, nome, rotinas.funcao(cfg, nome))
+    monitor = Monitor(cfg)
+    planilhas = _esteira(monitor)
     ultimo_salvo = time.monotonic()
     voltas = 0
     while time.monotonic() < fim:
         voltas += 1
-        for nome in ("canal", "registro", "treino", "laboratorio"):
+        for nome in ("canal", "registro", "treino", "laboratorio", "fabrica"):
             rotinas.executar(cfg, nome, rotinas.funcao(cfg, nome))
+        planilhas += _esteira(monitor)
         rotinas.batimento(cfg, sessao)
         if time.monotonic() - ultimo_salvo >= salvar_a_cada_min * 60:
             salvar(cfg)
             ultimo_salvo = time.monotonic()
         time.sleep(max(0.0, min(pausa_s, fim - time.monotonic())))
-    for nome in ("ronda_ti", "rh_desempenho", "alcadas"):  # fecham o turno com os números do turno
+    planilhas += _esteira(monitor)
+    for nome in ("fabrica", "ronda_ti", "rh_desempenho", "alcadas"):  # fecham o turno (a fábrica confere o gabarito)
         if nome in rotinas.ROTINAS:
             rotinas.executar(cfg, nome, rotinas.funcao(cfg, nome))
     inst = salvar(cfg)
@@ -190,6 +213,7 @@ def turno(cfg, minutos: float = 20, salvar_a_cada_min: float = 10, pausa_s: floa
         except Exception:
             pass
     return {"origem": origem["origem"], "minutos": round((time.monotonic() - inicio) / 60, 1), "voltas": voltas,
+            "planilhas_processadas": planilhas,
             "memoria": inst, "banco_mb": mb, "limite_mb": limite, "alerta_espaco": alerta}
 
 

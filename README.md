@@ -350,6 +350,23 @@ compromisso foi cumprido. Sem fato, ninguém conversa, e o ciclo fica registrado
 e anota no relatório o que já deu errado em casos parecidos. A semente com 208 erros típicos entra com
 `python -m robo semear-aprendizado` e nunca conta como trabalho de ninguém.
 
+## 11c. Por que uma tabela do banco está vazia?
+
+Rode `python -m robo cobertura-banco`. Ele conta as linhas de cada tabela do SQLite e do PostgreSQL e, para cada
+tabela vazia, diz **por quê** e **o que a enche**. Exemplos: "só nasce quando o dono faz um pedido", "implementada, mas
+nada a chama" ou "sem causa conhecida (investigar)". O relatório completo fica em `logs/cobertura_banco.md`. Nada é
+preenchido para parecer cheio.
+
+Onde fica cada tipo de dado no PostgreSQL:
+
+| Schema | Natureza | O que tem |
+|---|---|---|
+| `bruto`, `tratado`, `analitico`, `analise` | real | só planilhas suas |
+| `laboratorio`, `treino` | sintético | planilhas da Fábrica (TREINO_*), com teto de 100 MB (`fabrica.pg_treino_mb_max`) |
+| `robo` | operação | memória da empresa (`robo.memoria_*`), lotes e ocorrências reais |
+
+O diagnóstico completo da reestruturação está em `documentacao/diagnostico_reestruturacao.md`.
+
 ## 12. Apache Airflow (opcional)
 
 O robô agenda as próprias rotinas. Se quiser vê-las no Airflow (com histórico, retentativas e tempo limite):

@@ -80,3 +80,22 @@ Comando novo: `python -m robo diagnostico-celular` (só lê; `--salvar-qr` grava
 painel: `GET /api/celular/diagnostico`. Pacote novo em `requisitos.txt`: `segno` (QR code, só Python). Sem ele, o
 endereço aparece por escrito. Rode `instalar.bat` de novo para instalar.
 
+## Cobertura do banco e dado sintético no PostgreSQL (23/10/2026)
+
+| Onde | O que muda | Regra |
+|---|---|---|
+| SQLite `cobertura_persistencia` | tabela nova: cada levantamento de cobertura, tabela por tabela, com a causa de cada vazia | só de inclusão (gatilho bloqueia UPDATE) |
+| PostgreSQL `laboratorio` | passa a receber a cópia bruta das planilhas da fábrica: `laboratorio.treino_<regra>` | só dado sintético, marcado por `_arquivo_origem` (TREINO_*) e `_lote_id` |
+| PostgreSQL `treino` | passa a receber o tratado (`treino.treino_<regra>`), `treino.lotes`, `treino.ocorrencias` e a análise (`treino.resumo`, `indicadores`, `destaques`, `alertas`, `perfil`) | só dado sintético |
+
+Os schemas já existiam (criados pelo instalador) e estavam vazios: **nada é apagado nem alterado** nos schemas de
+produção (`bruto`, `tratado`, `analitico`, `analise`, `robo`). Os modelos SQL (`modelos_sql/`) continuam rodando só
+sobre o real. Reverter: `fabrica: {pg_treino_mb_max: 0}` no `config.yaml` para de carregar dado sintético (a planilha
+continua tratada em `Bases-Tratadas/_treino`).
+
+Configuração nova (opcional): `fabrica.pg_treino_mb_max` (padrão 100). Ao atingir, a planilha sintética deixa de subir
+ao banco, com aviso no relatório de qualidade. Nada é apagado para abrir espaço.
+
+Comando novo: `python -m robo cobertura-banco` (só conta; gera `logs/cobertura_banco.md` e `.json`).
+Turno da nuvem: agora roda a esteira (planilhas da fábrica) e grava o levantamento de cobertura a cada salvamento.
+

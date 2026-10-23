@@ -122,6 +122,29 @@ def _comando_rotina(args) -> int:
     return 1 if est.get("ultimo_status") == "erro" else 0
 
 
+def _cobertura_banco(args) -> int:
+    from robo import cobertura_banco
+    try:
+        cfg = carregar_config(Path(args.config) if args.config else None)
+    except ErroConfig as e:
+        print(f"Configuração com problema: {e}", file=sys.stderr)
+        return 1
+    r = cobertura_banco.levantar(cfg)
+    destino = cobertura_banco.salvar_relatorio(cfg, r)
+    for onde, s in r["resumo"].items():
+        vazias = ", ".join(f"{v} {k.replace('vazia: ', '')}" for k, v in s["vazias"].items())
+        print(f" {onde}: {s['com_dados']} de {s['tabelas']} com dados" + (f" | vazias: {vazias}" if vazias else ""))
+    if r["erro_postgres"]:
+        print(f" PostgreSQL não conferido: {r['erro_postgres']}")
+    elif not (cfg.banco or {}).get("habilitado"):
+        print(" PostgreSQL desligado no config.yaml: só o SQLite foi conferido.")
+    sem_causa = [i for i in r["itens"] if i["situacao"] == cobertura_banco.SEM_CAUSA]
+    for i in sem_causa:
+        print(f" ! sem causa conhecida: {i['onde']} {i['schema'] or ''} {i['tabela']}")
+    print(f"\nRelatório completo (tabela por tabela, com a causa de cada vazia): {destino}")
+    return 0
+
+
 def _diagnostico_celular(args) -> int:
     from robo import diagnostico_celular as dc
     try:
@@ -244,6 +267,8 @@ def principal(argv: list[str] | None = None) -> int:
     sim.add_argument("arquivo")
     sim.add_argument("--substituir", action="store_true", help="trocar mesmo se este computador já tiver história "
                                                                 "(a memória atual é guardada antes)")
+    sub.add_parser("cobertura-banco", help="conta as linhas de cada tabela (SQLite e PostgreSQL) e diz por que cada "
+                                           "vazia está vazia — só conta, não inventa dado")
     sdc = sub.add_parser("diagnostico-celular", help="confere passo a passo por que o celular abre ou não abre o robô e "
                                                     "mostra o QR code do endereço — só lê, não altera nada")
     sdc.add_argument("--salvar-qr", action="store_true", help="salva o QR code em logs/celular_qr.svg")
@@ -325,6 +350,8 @@ def principal(argv: list[str] | None = None) -> int:
         atencoes = sum(i["situacao"] == "atencao" for i in itens)
         print(f"\nResultado: {falhas} falha(s), {atencoes} ponto(s) de atenção." + (" Tudo certo." if not falhas and not atencoes else ""))
         return 1 if falhas else 0
+    if args.comando == "cobertura-banco":
+        return _cobertura_banco(args)
     if args.comando == "diagnostico-celular":
         return _diagnostico_celular(args)
     if args.comando == "importar-memoria":
