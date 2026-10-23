@@ -117,3 +117,23 @@ Mudanças de comportamento:
 Configuração nova (opcional): `demandas: {habilitada: true, intervalo_minutos: 30, por_ciclo: 6, por_dia: 150,
 por_pessoa_horas: 24}`. Desligar: `demandas: {habilitada: false}`.
 
+## Equipe de demandas e níveis (23/10/2026)
+
+| Tabela | O que é | Regra |
+|---|---|---|
+| `demandas_registro` (nova) | cada decisão da distribuição sobre uma pessoa: atribuída, treinamento, pulada, bloqueada, reatribuída ou sem trabalho, com nível, motivo e quem decidiu | só de inclusão |
+| `demandas_avaliacoes` (nova) | avaliação independente (Bento) de uma demanda concluída, com veredito e achados | só de inclusão; uma por demanda |
+| `jobs` | novo tipo `ciclo_demandas` (uma por ciclo, com uma etapa de cada função) | job fechado não muda |
+
+Funcionários novos (5, 4º andar): `dem_coordenador`, `dem_gerador`, `dem_distribuidor`, `dem_cobertura`,
+`dem_avaliador`. O quadro passou de 93 para 98. A rotina `demandas` passou da Planejadora de Treino para a
+Coordenadora de Demandas.
+
+Mudanças de comportamento:
+- demanda pode ter várias etapas (níveis médio a profissional), com dependências e repasse registrado;
+- demanda bloqueada vira demanda de treinamento (consulta ao conhecimento da área), com o bloqueio registrado;
+- demanda aberta há mais de 6 h é cancelada pela Cobertura, com o motivo, e a pessoa volta para a fila.
+
+Configuração (opcional): `demandas: {horas_sem_atividade: 48, horas_abandono: 6, avaliacoes_por_ciclo: 3}`.
+Comando novo: `python -m robo cobertura-demandas [--dias 7]` (sai com código 1 se a cobertura estiver incompleta).
+

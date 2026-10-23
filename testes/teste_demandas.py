@@ -106,14 +106,20 @@ def teste_demanda_aberta_bloqueia_outra(cfg_factory, monkeypatch):
     assert puladas[dono] == "já tem uma demanda aberta"
 
 
-def teste_demanda_sem_condicao_nao_vira_tarefa(cfg_factory, monkeypatch):
+def teste_demanda_sem_condicao_nao_vira_tarefa_e_vira_treinamento(cfg_factory, monkeypatch):
+    """Item 4 do pedido: sem demanda de trabalho adequada, a pessoa recebe treinamento compatível (e o bloqueio fica
+    registrado com o motivo). Nunca uma tarefa de trabalho de mentira."""
     cfg = _cfg(cfg_factory, por_ciclo=3)  # sem planilha sintética: as demandas de dados ficam bloqueadas
     monkeypatch.setattr(demandas, "escolher_ferramenta", lambda cfg, p: "perfil_indicadores")
     r = demandas.rotina(cfg)
-    assert r["atribuidas"] == 0 and r["bloqueadas"] > 0
-    assert all("Bases-Tratadas/_treino" in b["motivo"] for b in _ultimo_ciclo(cfg)["bloqueadas"])
+    assert r["bloqueadas"] == 3 and r["atribuidas"] == 3
     with Trabalho(cfg).tx() as c:
-        assert c.execute("SELECT COUNT(*) FROM solicitacoes").fetchone()[0] == 0  # nada de tarefa de mentira
+        planos = [json.loads(x[0]) for x in c.execute("SELECT plano FROM solicitacoes WHERE origem=?", (demandas.ORIGEM,))]
+        reg = [dict(x) for x in c.execute("SELECT evento, ferramenta, motivo FROM demandas_registro")]
+    assert planos and all(p["tipo_demanda"] == "treinamento" for p in planos)  # nenhuma de trabalho
+    bloq = [x for x in reg if x["evento"] == "bloqueada"]
+    assert len(bloq) == 3 and all("Bases-Tratadas/_treino" in x["motivo"] for x in bloq)
+    assert sum(x["evento"] == "treinamento" for x in reg) == 3
 
 
 def teste_intervalo_entre_ciclos(cfg_factory, ferramenta_ok):

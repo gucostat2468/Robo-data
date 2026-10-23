@@ -317,6 +317,11 @@ class Api:
                     "descricao": "; ".join(p["escopo"]), "nativo": True, "aceita_habilidades": False, "habilidades": [],
                     "ativo": True, "ronda": False, "prontidao": "",
                     "ficha": _ficha_curta(rh.ficha({"id": p["id"], "habilidades": []}))} for p in EQUIPE_FABRICA]
+        from robo.demandas import EQUIPE_DEMANDAS
+        equipe += [{"id": p["id"], "nome": p["nome"], "papel": p["cargo"].split(" — ")[0], "cor": p["cor"], "andar": p["andar"],
+                    "descricao": "; ".join(p["escopo"]), "nativo": True, "aceita_habilidades": False, "habilidades": [],
+                    "ativo": True, "ronda": False, "prontidao": "",
+                    "ficha": _ficha_curta(rh.ficha({"id": p["id"], "habilidades": []}))} for p in EQUIPE_DEMANDAS]
         from robo import lideranca
         equipe += [{"id": p["id"], "nome": p["nome"], "papel": p["papel"], "cor": p["cor"], "andar": p["andar"],
                     "descricao": p["descricao"], "nativo": True, "aceita_habilidades": False, "habilidades": [], "ativo": True,

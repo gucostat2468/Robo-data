@@ -122,6 +122,30 @@ def _comando_rotina(args) -> int:
     return 1 if est.get("ultimo_status") == "erro" else 0
 
 
+def _cobertura_demandas(args) -> int:
+    from robo import demandas, organizacao
+    try:
+        cfg = carregar_config(Path(args.config) if args.config else None)
+    except ErroConfig as e:
+        print(f"Configuração com problema: {e}", file=sys.stderr)
+        return 1
+    cob = demandas.cobertura(cfg, dias=args.dias)
+    nomes = {p["id"]: p["nome"] for p in organizacao.lista(cfg)}
+    print(f"Cobertura de demandas nos últimos {args.dias} dia(s):\n")
+    for titulo, grupo in (("Por andar", cob["andares"]), ("Por área", cob["areas"])):
+        print(titulo)
+        for chave, g in sorted(grupo.items(), key=lambda x: str(x[0])):
+            rotulo = f"{chave}º andar" if titulo == "Por andar" else chave
+            print(f" {'✔' if g['completa'] else '✘'} {rotulo}: {g['com_demanda']} de {g['elegiveis']} elegíveis com demanda, "
+                  f"{g['concluidas']} concluída(s), {g['com_problema']} com problema"
+                  + (f", {len(g['justificados'])} com motivo registrado" if g["justificados"] else ""))
+            if g["sem_demanda"]:
+                print("     sem demanda e sem motivo: " + ", ".join(nomes.get(x, x) for x in g["sem_demanda"]))
+        print()
+    print("Cobertura completa." if cob["completa"] else "Cobertura INCOMPLETA: há elegível sem demanda e sem motivo registrado.")
+    return 0 if cob["completa"] else 1
+
+
 def _cobertura_banco(args) -> int:
     from robo import cobertura_banco
     try:
@@ -267,6 +291,9 @@ def principal(argv: list[str] | None = None) -> int:
     sim.add_argument("arquivo")
     sim.add_argument("--substituir", action="store_true", help="trocar mesmo se este computador já tiver história "
                                                                 "(a memória atual é guardada antes)")
+    scd = sub.add_parser("cobertura-demandas", help="quem recebeu demanda, por andar e por área, e quem ficou sem e por "
+                                                    "quê — só lê")
+    scd.add_argument("--dias", type=int, default=7)
     sub.add_parser("cobertura-banco", help="conta as linhas de cada tabela (SQLite e PostgreSQL) e diz por que cada "
                                            "vazia está vazia — só conta, não inventa dado")
     sdc = sub.add_parser("diagnostico-celular", help="confere passo a passo por que o celular abre ou não abre o robô e "
@@ -350,6 +377,8 @@ def principal(argv: list[str] | None = None) -> int:
         atencoes = sum(i["situacao"] == "atencao" for i in itens)
         print(f"\nResultado: {falhas} falha(s), {atencoes} ponto(s) de atenção." + (" Tudo certo." if not falhas and not atencoes else ""))
         return 1 if falhas else 0
+    if args.comando == "cobertura-demandas":
+        return _cobertura_demandas(args)
     if args.comando == "cobertura-banco":
         return _cobertura_banco(args)
     if args.comando == "diagnostico-celular":

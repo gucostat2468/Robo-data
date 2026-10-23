@@ -44,8 +44,9 @@ ROTINAS = {
                 "limpeza, validação, saída, histórico e análise) num computador de teste; cada etapa conferida", 1),
     "caixa_dono": ("ger_operacoes", "Caixa do dono: sugestões da equipe tiradas dos fatos (erros repetidos no treino, rotinas "
                    "com erro) chegam ao dono junto com as ideias e pendências", 1),
-    "demandas": ("casos_planejamento", "Demandas: cada funcionário recebe trabalho real com a própria ferramenta, critérios "
-                 "de aceitação e revisão independente; quem está há mais tempo sem demanda recebe primeiro", 0.5),
+    "demandas": ("dem_coordenador", "Demandas (Aurora, Vicente, Isadora, Renan e Bento): cada funcionário recebe trabalho "
+                 "real com a própria ferramenta, no nível do cargo (básico a profissional), com critérios de aceitação, "
+                 "revisão independente e avaliação por amostragem; ninguém fica para trás", 0.5),
     "dialogo": ("ger_operacoes", "Conversas entre funcionários só quando há fato e necessidade: pedido de ajuda, cobrança do "
                 "superior, aviso técnico; fecha cada conversa com um compromisso verificável e confere depois", 1 / 3),
     "fabrica": ("fab_coordenador", "Fábrica de Planilhas: Joana gera, Ruan confere, Celina revisa; a planilha TREINO_ "

@@ -81,14 +81,20 @@ def _pasta_artefatos(cfg, ref: str) -> Path:
 
 
 # ----------------------------------------------------------------------------- ferramentas
-def f_conhecimento(cfg, pergunta: str = "", quem: str | None = None, registrar_uso: bool = True, **_) -> dict:
+def f_conhecimento(cfg, pergunta: str = "", quem: str | None = None, registrar_uso: bool = True, especifico: bool = False,
+                   **_) -> dict:
     """registrar_uso=False: prova de recuperação do treino — achar a lição não é o mesmo que usá-la no trabalho, então
-    não conta como 'aplicada' no caderno."""
+    não conta como 'aplicada' no caderno. especifico=True (demandas): a abertura geral de um manual não serve como
+    resposta; procura nas outras fontes e, se nada específico existir, diz que não sabe (lacuna real da empresa)."""
     from robo import canal
     t = canal.normalizar(pergunta)
     pont = [(canal._pontuar(t, v["chaves"]), i) for i, v in enumerate(canal.CONHECIMENTO)]
     melhor = max(pont) if pont else (0, -1)
     pontos_md, secao = canal._buscar_markdown(cfg, t)
+    if secao and especifico:
+        from robo.demandas import secoes_genericas
+        if secao["titulo"] in secoes_genericas():
+            secao = None
     if secao and pontos_md >= 3 and pontos_md > melhor[0]:
         from robo import licoes
         if registrar_uso:

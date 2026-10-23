@@ -179,26 +179,31 @@ def criar(cfg, pedido: str, funcionario: str | None = None, conversa_id: str | N
     return sid
 
 
-def criar_demanda(cfg, titulo: str, pedido: str, funcionario: str, ferramenta: str, params: dict, revisor: str,
+def criar_demanda(cfg, titulo: str, pedido: str, funcionario: str, etapas: list[dict], revisor: str,
                   plano_extra: dict | None = None, origem: str = "demanda_sintetica") -> str:
-    """Tarefa de uma etapa só, para uma pessoa e uma ferramenta do contrato dela (robo/demandas.py). Passa pela mesma
-    máquina de estados, execução e revisão independente das tarefas pedidas pelo dono. Não executa (quem chama decide)."""
+    """Tarefa montada por robo/demandas.py: etapas com responsável, ferramenta, parâmetros e dependências (índices
+    1..n). Passa pela mesma máquina de estados, execução, encaminhamento e revisão independente das tarefas pedidas
+    pelo dono. Não executa (quem chama decide)."""
     tb = Trabalho(cfg)
     pessoa = organizacao.por_id(cfg).get(funcionario) or {}
-    f = ferramentas.REGISTRO.get(ferramenta)
     sid = tb.criar_solicitacao("tarefa", titulo, pedido, origem, funcionario, pessoa.get("andar"), "media",
-                               modelo=f"demanda:{ferramenta}")
-    tb.mudar_estado(sid, "em_triagem", "casos_planejamento", f"Demanda para {pessoa.get('nome', funcionario)}")
-    tb.criar_etapas(sid, [{"titulo": titulo, "ferramenta": ferramenta, "funcionario": funcionario, "parametros": params,
-                           "risco": f.risco if f else "baixo", "precisa_aprovacao": bool(f and f.altera_dados)}])
-    if revisor in (funcionario, organizacao.DONO):
+                               modelo=f"demanda:{etapas[0]['ferramenta']}")
+    tb.mudar_estado(sid, "em_triagem", "dem_gerador", f"Demanda para {pessoa.get('nome', funcionario)}")
+    completas = []
+    for e in etapas:
+        f = ferramentas.REGISTRO.get(e["ferramenta"])
+        completas.append({**e, "risco": f.risco if f else "baixo", "precisa_aprovacao": bool(f and f.altera_dados),
+                          "depende": e.get("depende") or []})
+    tb.criar_etapas(sid, completas)
+    executores = {e["funcionario"] for e in etapas}
+    if revisor in executores or revisor == organizacao.DONO:
         # quem executa não revisa; e a conferência automática não pode sair no nome do dono, que não a fez:
         # vai para a Revisora Independente de Casos (Sala de Casos), que existe para isso
-        revisor = "casos_revisor" if funcionario != "casos_revisor" else organizacao.revisor_de("head_casos", cfg)
-    plano = {"modelo": f"demanda:{ferramenta}", "etapas": 1, "revisor": revisor, **(plano_extra or {})}
-    tb.mudar_estado(sid, "planejada", "casos_planejamento", f"Demanda com 1 etapa; revisão independente de {revisor}",
+        revisor = "casos_revisor" if "casos_revisor" not in executores else organizacao.revisor_de("head_casos", cfg)
+    plano = {"modelo": f"demanda:{etapas[0]['ferramenta']}", "etapas": len(etapas), "revisor": revisor, **(plano_extra or {})}
+    tb.mudar_estado(sid, "planejada", "dem_gerador", f"Demanda com {len(etapas)} etapa(s); revisão independente de {revisor}",
                     plano=plano, revisor=revisor)
-    tb.mudar_estado(sid, "na_fila", "casos_planejamento")
+    tb.mudar_estado(sid, "na_fila", "dem_distribuidor")
     return sid
 
 
@@ -345,11 +350,12 @@ def _revisar(cfg, sid: str) -> str:
             de_novo = ferramentas.executar("calcular", cfg, **e["parametros"])
             if de_novo["texto"] != r.get("texto"):
                 achados.append("O recálculo independente deu resultado diferente")
-    criterios = (s.get("plano") or {}).get("criterios")
-    if criterios:  # critérios de aceitação da demanda (robo/demandas.py), conferidos sem IA
+    criterios = (s.get("plano") or {}).get("criterios_por_etapa") or {}
+    if criterios:  # critérios de aceitação de cada etapa da demanda (robo/demandas.py), conferidos sem IA
         from robo.demandas import conferir_criterios
         for e in concluidas:
-            achados += [f"Critério não atendido em “{e['titulo']}”: {x}" for x in conferir_criterios(e["resultado"], criterios)]
+            achados += [f"Critério não atendido em “{e['titulo']}”: {x}"
+                        for x in conferir_criterios(e["resultado"], criterios.get(str(e["ordem"])))]
     revisao = {"revisor": revisor, "achados": achados, "data_hora": datetime.now().isoformat(timespec="seconds"),
                "conferido": [e["titulo"] for e in concluidas], "criterios": criterios or []}
     if achados:

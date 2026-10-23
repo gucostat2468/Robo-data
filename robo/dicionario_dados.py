@@ -145,6 +145,14 @@ TABELAS = {
                         "e, no detalhe, quem foi pulado e por quê (estagiário, demanda aberta, recebeu há pouco)",
                         "um ciclo da rotina demandas", IMUTAVEL,
                         "cobertura de trabalho por pessoa e andar; quem ficou sem demanda e por quê"),
+    "demandas_registro": ("operacao", "Cada decisão da distribuição sobre uma pessoa: atribuída, treinamento, pulada, "
+                          "bloqueada, reatribuída ou sem trabalho, com nível, ferramenta, motivo e quem decidiu",
+                          "um evento de distribuição", IMUTAVEL,
+                          "cobertura por andar e área; quem nunca recebe trabalho e por quê; justiça da distribuição"),
+    "demandas_avaliacoes": ("conhecimento", "Avaliação independente (Bento) de uma demanda concluída: critérios conferidos "
+                            "de novo, revisor independente, arquivos e a conta refeita do arquivo; veredito e achados",
+                            "uma demanda avaliada", IMUTAVEL,
+                            "qualidade real das entregas por nível e ferramenta; quanto a revisão de 1ª linha deixa passar"),
     "dialogo_ciclos": ("operacao", "Cada ciclo das conversas: quantos fatos avaliados, quantas conversas e se não houve assunto",
                        "um ciclo", IMUTAVEL, "quanto silêncio é falta de assunto e não de gente"),
     "cobertura_persistencia": ("operacao", "Cada levantamento de cobertura do banco: tabela por tabela (SQLite e PostgreSQL), "

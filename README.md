@@ -386,6 +386,29 @@ Como a distribuição funciona:
 Onde ver: tela **Solicitações** (origem "demanda_sintetica"), tabela `demandas_ciclos` (quem recebeu, quem foi pulado e
 por quê) e `jobs` do tipo `demanda` (prova de trabalho).
 
+**A equipe de demandas (4º andar, Treinamento e Avaliação).** Cinco funcionários fazem a distribuição de verdade, cada
+um registrando o que fez numa etapa do job do ciclo:
+
+| Quem | Faz | Gestor |
+|---|---|---|
+| Aurora, Coordenadora de Demandas | responde pela rotina e assina cada ciclo | Head da Sala de Casos |
+| Vicente, Sênior de Geração | monta a demanda no nível certo e bloqueia, com motivo, a que não tem condição | Aurora |
+| Isadora, Pleno de Distribuição | escolhe quem recebe: sem atividade há mais tempo primeiro, menor carga, alternando andares | Aurora |
+| Renan, Pleno de Cobertura | encerra demanda abandonada (mais de 6 h) e devolve a pessoa à fila; dá treinamento a quem ficou sem demanda adequada | Aurora |
+| Bento, Avaliador Independente | reavalia uma amostra das aprovadas por outro caminho (refaz a conta a partir do arquivo) | Head da Sala de Casos |
+
+Os níveis mudam o trabalho, não só o nome:
+
+| Nível | O que a demanda tem | Quem chega |
+|---|---|---|
+| básico | 1 etapa: a ferramenta da pessoa | todos começam aqui |
+| médio | + resumo executivo em arquivo `.md` (quem não tem a ferramenta repassa a quem tem) | júnior não passa do básico |
+| difícil | + consulta ao conhecimento da empresa sobre a própria área | sênior, especialista, coordenador |
+| profissional | + conferência cruzada por um colega de outra área (LGPD na mesma base, ou a situação do andar) | gerente, head, diretor |
+
+Sobe um nível com 2 demandas concluídas seguidas; desce um nível depois de uma falha; nunca passa do teto do cargo.
+Para ver quem recebeu, por andar e por área: `python -m robo cobertura-demandas`.
+
 ## 12. Apache Airflow (opcional)
 
 O robô agenda as próprias rotinas. Se quiser vê-las no Airflow (com histórico, retentativas e tempo limite):

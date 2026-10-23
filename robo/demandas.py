@@ -37,7 +37,63 @@ from typing import Callable
 from robo.trabalho import FINAIS, Trabalho, _agora
 
 ORIGEM = "demanda_sintetica"
-PADRAO = {"habilitada": True, "intervalo_minutos": 30, "por_ciclo": 6, "por_dia": 150, "por_pessoa_horas": 24}
+PADRAO = {"habilitada": True, "intervalo_minutos": 30, "por_ciclo": 6, "por_dia": 150, "por_pessoa_horas": 24,
+          "horas_sem_atividade": 48, "horas_abandono": 6, "avaliacoes_por_ciclo": 3}
+
+# =============================================================================== a equipe de demandas (4º andar)
+# Cinco funções complementares. A Sala de Casos (head_casos) planeja os CASOS DE TREINO com gabarito; esta equipe
+# planeja as DEMANDAS de trabalho com as ferramentas do contrato. O avaliador responde ao head_casos, e não à
+# coordenadora, para que quem avalia não seja subordinado a quem distribui.
+EQUIPE_DEMANDAS = [
+    {"id": "dem_coordenador", "nome": "Aurora", "cargo": "Coordenadora de Demandas", "nivel": "coordenador", "andar": 4,
+     "cor": "#7C3AED", "area": "Treinamento e Avaliação",
+     "escopo": ["Responde pela rotina de demandas: quando distribuir, quantas por ciclo e por dia, e quando parar",
+                "Garante que ninguém fique para trás nem sobrecarregado e que nenhuma demanda use dado real",
+                "Assina cada ciclo, com quem recebeu, quem foi pulado e por quê"],
+     "criterios": ["Nenhum elegível sem demanda sem motivo registrado", "Teto por ciclo e por dia respeitado",
+                   "Estagiário em observação"],
+     "metodologias": ["Planejamento de capacidade", "Fila justa (quem espera há mais tempo primeiro)"]},
+    {"id": "dem_gerador", "nome": "Vicente", "cargo": "Analista Sênior de Geração de Demandas", "nivel": "senior",
+     "andar": 4, "cor": "#8B5CF6", "area": "Treinamento e Avaliação",
+     "escopo": ["Monta cada demanda no nível certo (básico, médio, difícil, profissional) para o cargo e o histórico",
+                "Define objetivo, evidência esperada e critérios de aceitação verificáveis de cada etapa",
+                "Bloqueia, com o motivo, a demanda que não tem condição de rodar"],
+     "criterios": ["Nível nunca acima do teto do cargo", "Todo critério conferível sem IA",
+                   "Demanda sem condição não vira tarefa"],
+     "metodologias": ["Dificuldade progressiva (sobe com acertos, desce com falha)", "Critérios de aceitação mensuráveis"]},
+    {"id": "dem_distribuidor", "nome": "Isadora", "cargo": "Analista Pleno de Distribuição de Demandas", "nivel": "pleno",
+     "andar": 4, "cor": "#A78BFA", "area": "Treinamento e Avaliação",
+     "escopo": ["Escolhe quem recebe em cada ciclo: sem atividade há mais tempo primeiro, depois menor carga",
+                "Alterna os andares para que nenhum fique para trás",
+                "Registra o motivo de cada atribuição"],
+     "criterios": ["Ninguém com duas demandas abertas", "Andares alternados no ciclo", "Motivo registrado"],
+     "metodologias": ["Round-robin por andar", "Balanceamento de carga"]},
+    {"id": "dem_cobertura", "nome": "Renan", "cargo": "Analista Pleno de Cobertura de Demandas", "nivel": "pleno",
+     "andar": 4, "cor": "#6D28D9", "area": "Treinamento e Avaliação",
+     "escopo": ["Mede a cobertura por andar e por área: elegíveis, com demanda, concluídas, bloqueadas e sem trabalho",
+                "Encerra com o motivo a demanda abandonada e devolve a pessoa para a fila",
+                "Quem ficou sem demanda adequada recebe uma demanda de treinamento ou o motivo fica registrado"],
+     "criterios": ["Cobertura completa só com todos os elegíveis atendidos ou justificados",
+                   "Abandono encerrado com motivo, nunca apagado"],
+     "metodologias": ["Indicadores de cobertura por andar", "Gestão de exceções"]},
+    {"id": "dem_avaliador", "nome": "Bento", "cargo": "Avaliador Independente de Demandas", "nivel": "especialista",
+     "andar": 4, "cor": "#5B21B6", "area": "Treinamento e Avaliação",
+     "escopo": ["Reavalia uma amostra das demandas aprovadas por outro caminho: critérios, revisor independente, "
+                "artefatos e a conta refeita a partir do arquivo",
+                "Registra confirmação ou divergência; divergência vira aprendizado do executor"],
+     "criterios": ["Nunca avalia demanda que executou ou revisou", "Divergência sempre registrada"],
+     "metodologias": ["Auditoria por amostragem", "Segunda linha de defesa"]},
+]
+POR_ID = {p["id"]: p for p in EQUIPE_DEMANDAS}
+GESTORES = {"dem_coordenador": "head_casos", "dem_gerador": "dem_coordenador", "dem_distribuidor": "dem_coordenador",
+            "dem_cobertura": "dem_coordenador", "dem_avaliador": "head_casos"}
+RESPONSAVEL = "dem_coordenador"
+
+# níveis de dificuldade: o que muda é o TRABALHO (mais etapas, colega de outra área, arquivo entregue), não o rótulo
+NIVEIS = ("basico", "medio", "dificil", "profissional")
+TETO_DO_CARGO = {"junior": "basico", "pleno": "medio", "senior": "dificil", "especialista": "dificil",
+                 "coordenador": "dificil", "gerente": "profissional", "head": "profissional", "diretor": "profissional"}
+SOBE_COM = 2  # demandas concluídas seguidas no nível atual para subir um nível
 NIVEIS_SEM_DEMANDA = {"estagiario": "estagiário fica em modo de observação (regra do dono)"}
 # ferramentas que não entram na distribuição automática, e por quê (registrado no ciclo)
 FORA_DA_DISTRIBUICAO = {
@@ -52,6 +108,17 @@ CREATE TABLE IF NOT EXISTS demandas_ciclos (
   atribuidas INTEGER, concluidas INTEGER, bloqueadas INTEGER, detalhe TEXT);
 CREATE TRIGGER IF NOT EXISTS demandas_ciclos_imutavel BEFORE UPDATE ON demandas_ciclos
 BEGIN SELECT RAISE(ABORT, 'ciclo de demandas é permanente: não se altera'); END;
+CREATE TABLE IF NOT EXISTS demandas_registro (
+  id INTEGER PRIMARY KEY AUTOINCREMENT, data_hora TEXT NOT NULL, ciclo TEXT, funcionario TEXT NOT NULL, andar INTEGER,
+  area TEXT, evento TEXT NOT NULL, nivel TEXT, ferramenta TEXT, solicitacao TEXT, motivo TEXT, responsavel TEXT);
+CREATE INDEX IF NOT EXISTS ix_demreg_func ON demandas_registro(funcionario, data_hora);
+CREATE TRIGGER IF NOT EXISTS demandas_registro_imutavel BEFORE UPDATE ON demandas_registro
+BEGIN SELECT RAISE(ABORT, 'registro de demanda é permanente: não se altera'); END;
+CREATE TABLE IF NOT EXISTS demandas_avaliacoes (
+  id INTEGER PRIMARY KEY AUTOINCREMENT, data_hora TEXT NOT NULL, solicitacao TEXT NOT NULL UNIQUE, avaliador TEXT,
+  executores TEXT, revisor TEXT, nivel TEXT, veredito TEXT NOT NULL, achados TEXT);
+CREATE TRIGGER IF NOT EXISTS demandas_avaliacoes_imutavel BEFORE UPDATE ON demandas_avaliacoes
+BEGIN SELECT RAISE(ABORT, 'avaliação independente é permanente: não se altera'); END;
 """
 
 
@@ -193,6 +260,26 @@ def _pergunta_da_area(cfg, pessoa):
     return ({"pergunta": f"boas práticas de {area}"}, [])
 
 
+def _pergunta_da_ferramenta(cfg, ferramenta: str) -> dict:
+    """A pergunta do nível difícil é sobre o TRABALHO da pessoa (a ferramenta), não genérica: assim a resposta ou é
+    específica ou é um 'não sei' honesto, que mostra uma lacuna real no conhecimento da empresa."""
+    from robo import ferramentas
+    f = ferramentas.REGISTRO.get(ferramenta)
+    return {"pergunta": f"{f.nome}: {f.descricao}" if f else ferramenta, "especifico": True}
+
+
+def secoes_genericas() -> set[str]:
+    """Títulos de abertura dos manuais (o '# Título' de cada .md): falam da empresa toda, não do trabalho de ninguém."""
+    from robo.config import RAIZ_PROJETO
+    titulos = set()
+    for arq in (RAIZ_PROJETO / "conhecimento").glob("*.md"):
+        for linha in arq.read_text(encoding="utf-8").splitlines():
+            if linha.startswith("# "):
+                titulos.add(linha[2:].strip())
+                break
+    return titulos
+
+
 def _quem(cfg, pessoa):
     return ({"quem": pessoa["id"]}, [])
 
@@ -296,6 +383,14 @@ def conferir_criterios(resultado: dict, criterios: list[dict]) -> list[str]:
             falhas.append(f"faltou '{c['chave']}' nos dados do resultado")
         elif t == "linhas_min" and len((r.get("dados") or {}).get("linhas") or []) < int(c.get("n", 1)):
             falhas.append(f"menos de {c.get('n')} linha(s) devolvidas")
+        elif t == "fonte_especifica" and any(f"“{g}”" in str(r.get("evidencia") or "") for g in c.get("genericas") or []):
+            falhas.append("a fonte é a abertura genérica de um manual, não um conhecimento sobre este trabalho")
+        elif t == "artefato":
+            arqs = [Path(x) for x in r.get("artefatos") or []]
+            if not arqs:
+                falhas.append("nenhum arquivo entregue")
+            elif not all(x.exists() and x.stat().st_size > 0 for x in arqs):
+                falhas.append("arquivo entregue não existe ou está vazio")
         elif t == "valor_unico":
             valores = list(((_dado(r.get("dados") or {}, "calculo.valores")) or {}).values())
             esperado, tol = float(c["esperado"]), float(c.get("tolerancia", 1e-6))
@@ -311,20 +406,306 @@ def conferir_criterios(resultado: dict, criterios: list[dict]) -> list[str]:
     return falhas
 
 
-# =============================================================================== distribuição
-def _ultimas_por_pessoa(tb: Trabalho) -> tuple[dict, set]:
-    """Última demanda de cada pessoa e quem tem demanda aberta."""
-    ultima, abertas = {}, set()
+
+
+def _texto_criterio(c: dict) -> str:
+    return {"ok": "a ferramenta termina com sucesso", "evidencia": "evidência registrada",
+            "natureza": "não pode ser só limitação", "texto_min": f"resposta com pelo menos {c.get('n')} caracteres",
+            "dados": f"o resultado traz '{c.get('chave')}'", "linhas_min": f"pelo menos {c.get('n')} linha(s) do banco",
+            "valor_unico": f"o valor bate com a conta independente de {c.get('coluna')}",
+            "artefato": "arquivo entregue e não vazio",
+            "fonte_especifica": "conhecimento específico do trabalho (não a abertura genérica de um manual)"}.get(c.get("tipo"), c.get("tipo", ""))
+
+
+# =============================================================================== Vicente: nível e montagem
+def _historico(tb: Trabalho, pid: str, limite: int = 10) -> list[dict]:
+    """Últimas demandas da pessoa (mais recente primeiro), com o nível de cada uma."""
     with tb.tx() as c:
-        for r in c.execute("SELECT funcionario, estado, criada_em FROM solicitacoes WHERE origem=?", (ORIGEM,)):
-            p = r["funcionario"]
-            if r["criada_em"] > ultima.get(p, ""):
-                ultima[p] = r["criada_em"]
+        linhas = [dict(r) for r in c.execute(
+            "SELECT id, estado, plano, criada_em FROM solicitacoes WHERE origem=? AND funcionario=? "
+            "ORDER BY criada_em DESC, id DESC LIMIT ?", (ORIGEM, pid, limite))]
+    for l in linhas:
+        try:
+            plano = json.loads(l.pop("plano") or "{}") or {}
+        except ValueError:
+            plano = {}
+        l["nivel"] = plano.get("nivel") or "basico"
+        l["tipo_demanda"] = plano.get("tipo_demanda") or "trabalho"
+    return linhas
+
+
+def nivel_para(cargo: str, historico: list[dict]) -> tuple[str, str]:
+    """(nível, motivo). Começa no básico; sobe um nível depois de SOBE_COM concluídas seguidas no nível atual; desce um
+    depois de uma FALHA; nunca passa do teto do cargo. Só conta demanda de trabalho (a de treinamento não mexe no nível).
+    'Concluída parcialmente' mantém o nível: costuma ser lacuna da EMPRESA (ex.: conhecimento que não existe), não erro
+    de quem executou; não sobe nem desce."""
+    teto = TETO_DO_CARGO.get(cargo, "basico")
+    # cancelada = abandonada (o robô caiu, por exemplo): não é mérito nem culpa da pessoa, não entra na conta
+    hist = [h for h in historico if h.get("tipo_demanda", "trabalho") == "trabalho" and h["estado"] in FINAIS
+            and h["estado"] != "cancelada"]
+    if not hist:
+        return "basico", "primeira demanda: começa no básico"
+    atual = hist[0]["nivel"] if hist[0]["nivel"] in NIVEIS else "basico"
+    i = NIVEIS.index(atual)
+    if hist[0]["estado"] == "falhou":
+        novo, motivo = NIVEIS[max(0, i - 1)], f"a última ({hist[0]['estado']}) não foi concluída: desce para revisar a base"
+    elif len(hist) >= SOBE_COM and all(h["nivel"] == atual and h["estado"] == "concluida" for h in hist[:SOBE_COM]):
+        novo, motivo = NIVEIS[min(len(NIVEIS) - 1, i + 1)], f"{SOBE_COM} concluídas seguidas no {atual}: sobe um nível"
+    else:
+        novo, motivo = atual, f"mantém o {atual} até {SOBE_COM} concluídas seguidas"
+    if NIVEIS.index(novo) > NIVEIS.index(teto):
+        return teto, f"{motivo}; limitado ao teto do cargo ({cargo}: {teto})"
+    return novo, motivo
+
+
+def _colega(cfg, ferramenta: str, exceto: str) -> str | None:
+    """Um colega (nunca a própria pessoa) que pode usar a ferramenta: o responsável padrão primeiro."""
+    from robo import organizacao
+    for c in (organizacao.ENCAMINHAR.get(ferramenta),):
+        if c and c != exceto and organizacao.pode_usar(c, ferramenta, cfg, producao=True):
+            return c
+    for p in organizacao.lista(cfg, com_contratados=False):
+        if p["id"] != exceto and organizacao.pode_usar(p["id"], ferramenta, cfg, producao=True):
+            return p["id"]
+    return None
+
+
+def montar(cfg, pessoa: dict, ferramenta: str, nivel: str = "basico", estudo_de: str | None = None) -> dict | str:
+    """O plano da demanda no nível pedido: {titulo, etapas, criterios_por_etapa, ...} ou o motivo de não dar para montar.
+      básico        1 etapa: a ferramenta da pessoa;
+      médio         + resumo executivo (.md) das etapas: entrega um arquivo;
+      difícil       + consulta ao conhecimento da empresa sobre a própria área antes do resumo;
+      profissional  + conferência cruzada por um colega de outra área (LGPD na mesma base, ou a situação do andar)."""
+    m = CATALOGO[ferramenta]
+    if estudo_de:  # treinamento: estudar o assunto da demanda que ficou bloqueada (compatível com o trabalho da pessoa)
+        preparado = (_pergunta_da_ferramenta(cfg, estudo_de), [])
+    else:
+        preparado = m.preparar(cfg, pessoa) if m.preparar else ({}, [])
+    if isinstance(preparado, str):
+        return preparado
+    params, extras = preparado
+    if ferramenta == "conhecimento":  # estudo só vale com conhecimento específico, nunca a abertura de um manual
+        params = {**params, "especifico": True}
+        extras = list(extras) + [{"tipo": "fonte_especifica", "genericas": sorted(secoes_genericas())}]
+    pid = pessoa["id"]
+    etapas = [{"titulo": m.titulo, "ferramenta": ferramenta, "funcionario": pid, "parametros": params}]
+    crits = {1: list(m.criterios) + list(extras)}
+    if nivel in ("dificil", "profissional") and ferramenta != "conhecimento":
+        etapas.append({"titulo": "Consultar o que a empresa já sabe sobre este trabalho", "ferramenta": "conhecimento",
+                       "funcionario": pid, "parametros": _pergunta_da_ferramenta(cfg, ferramenta)})
+        crits[len(etapas)] = [{"tipo": "ok"}, {"tipo": "evidencia"},
+                              {"tipo": "fonte_especifica", "genericas": sorted(secoes_genericas())}]
+    if nivel == "profissional":
+        if params.get("arquivo"):
+            cruz, p3, titulo = "dados_pessoais", {"arquivo": params["arquivo"]}, "Conferência cruzada: dados pessoais (LGPD)"
+        else:
+            cruz, p3, titulo = "reuniao_andar", {"andar": pessoa["andar"]}, "Conferência cruzada: situação do andar"
+        colega = _colega(cfg, cruz, pid)
+        if not colega:
+            return f"ninguém além de {pid} pode fazer a conferência cruzada ({cruz})"
+        etapas.append({"titulo": titulo, "ferramenta": cruz, "funcionario": colega, "parametros": p3})
+        crits[len(etapas)] = list(BASICOS)
+    if nivel != "basico":
+        etapas.append({"titulo": "Resumo executivo das etapas (.md)", "ferramenta": "resumo_executivo", "funcionario": pid,
+                       "parametros": {}, "depende": list(range(1, len(etapas) + 1))})
+        crits[len(etapas)] = [{"tipo": "ok"}, {"tipo": "artefato"}]
+    titulo = m.titulo if nivel == "basico" else f"{m.titulo} — nível {nivel}"
+    return {"titulo": titulo, "etapas": etapas, "criterios_por_etapa": {str(k): v for k, v in crits.items()},
+            "objetivo": m.objetivo, "evidencia_esperada": m.evidencia}
+
+
+def criar_demanda(cfg, pessoa: dict, ferramenta: str, nivel: str = "basico", tipo: str = "trabalho",
+                  motivo_nivel: str = "", estudo_de: str | None = None) -> tuple[str | None, str]:
+    """Cria a tarefa (não executa). Devolve (id, '') ou (None, motivo do bloqueio)."""
+    from robo import orquestrador, organizacao
+    plano = montar(cfg, pessoa, ferramenta, nivel, estudo_de)
+    if isinstance(plano, str):
+        return None, plano
+    revisor = organizacao.revisor_de(pessoa["id"], cfg)
+    todos = [c for v in plano["criterios_por_etapa"].values() for c in v]
+    pedido = (f"Objetivo: {plano['objetivo']}\nResponsável: {pessoa['nome']} ({pessoa['papel']}), {pessoa['andar']}º andar.\n"
+              f"Nível: {nivel}" + (f" ({motivo_nivel})" if motivo_nivel else "") + f". Etapas: {len(plano['etapas'])}.\n"
+              f"Evidência esperada: {plano['evidencia_esperada']}.\nCritérios de aceitação: "
+              + "; ".join(dict.fromkeys(_texto_criterio(c) for c in todos)) + ".\nDados: sintéticos (fábrica), nunca produção.")
+    sid = orquestrador.criar_demanda(
+        cfg, plano["titulo"], pedido, pessoa["id"], plano["etapas"], revisor,
+        plano_extra={"objetivo": plano["objetivo"], "evidencia_esperada": plano["evidencia_esperada"],
+                     "criterios_por_etapa": plano["criterios_por_etapa"], "dados": "sintetico", "nivel": nivel,
+                     "tipo_demanda": tipo, "gerada_por": "dem_gerador", "motivo_nivel": motivo_nivel})
+    return sid, ""
+
+
+# =============================================================================== Isadora: quem recebe
+def _estado_das_demandas(tb: Trabalho, agora: datetime) -> dict:
+    """Por pessoa: última demanda, última concluída, abertas e carga dos últimos 7 dias."""
+    sete = (agora - timedelta(days=7)).isoformat(timespec="seconds")
+    por: dict = {}
+    with tb.tx() as c:
+        for r in c.execute("SELECT id, funcionario, estado, criada_em, atualizada_em FROM solicitacoes WHERE origem=?",
+                           (ORIGEM,)):
+            p = por.setdefault(r["funcionario"], {"ultima": "", "ultima_concluida": "", "abertas": [], "carga_7d": 0})
+            p["ultima"] = max(p["ultima"], r["criada_em"])
+            if r["estado"] == "concluida":
+                p["ultima_concluida"] = max(p["ultima_concluida"], r["atualizada_em"] or r["criada_em"])
             if r["estado"] not in FINAIS:
-                abertas.add(p)
-    return ultima, abertas
+                p["abertas"].append({"id": r["id"], "criada_em": r["criada_em"]})
+            if r["criada_em"] >= sete:
+                p["carga_7d"] += 1
+    return por
 
 
+def ordenar(candidatas: list[dict], estado: dict, agora: datetime, horas_sem_atividade: float) -> list[tuple[dict, str]]:
+    """Fila justa: (1) quem nunca recebeu, (2) quem está sem demanda concluída há mais de `horas_sem_atividade`,
+    (3) os demais; dentro de cada grupo, quem espera há mais tempo e com menor carga. Depois alterna os andares
+    (round-robin) para nenhum andar ficar para trás no ciclo. Devolve (pessoa, motivo)."""
+    corte = (agora - timedelta(hours=horas_sem_atividade)).isoformat(timespec="seconds")
+
+    def chave(p):
+        e = estado.get(p["id"]) or {}
+        if not e.get("ultima"):
+            return (0, "", 0, p["id"]), "nunca recebeu demanda"
+        if (e.get("ultima_concluida") or "") < corte:
+            return (1, e["ultima"], e["carga_7d"], p["id"]), f"sem demanda concluída há mais de {horas_sem_atividade:g} h"
+        return (2, e["ultima"], e["carga_7d"], p["id"]), f"última demanda em {e['ultima'][:16]}; carga de {e['carga_7d']} em 7 dias"
+    marcadas = sorted(((chave(p), p) for p in candidatas), key=lambda x: x[0][0])
+    por_andar: dict[int, list] = {}
+    for (k, motivo), p in marcadas:
+        por_andar.setdefault(int(p["andar"]), []).append((k, p, motivo))
+    # round-robin respeitando a prioridade: a cada volta, cada andar entrega o seu próximo da fila
+    saida = []
+    while any(por_andar.values()):
+        volta = sorted((fila.pop(0) for fila in por_andar.values() if fila), key=lambda x: x[0])
+        saida += [(p, motivo) for _, p, motivo in volta]
+    return saida
+
+
+# =============================================================================== Renan: abandono e cobertura
+def encerrar_abandonadas(cfg, tb: Trabalho, estado: dict, agora: datetime, horas: float) -> list[dict]:
+    """Demanda aberta há mais de `horas` (o robô caiu no meio, por exemplo) é encerrada como cancelada, com o motivo,
+    em nome de quem fez isso (dem_cobertura, nunca o dono). Nada é apagado; a pessoa volta para a fila."""
+    corte = (agora - timedelta(hours=horas)).isoformat(timespec="seconds")
+    feitas = []
+    for pid, e in estado.items():
+        for a in list(e["abertas"]):
+            if a["criada_em"] >= corte:
+                continue
+            motivo = f"aberta desde {a['criada_em'][:16]} sem terminar (mais de {horas:g} h): encerrada para reatribuir"
+            s = tb.solicitacao(a["id"])
+            tb.mudar_estado(a["id"], "cancelada", "dem_cobertura", motivo)
+            for et in (s or {}).get("etapas", []):
+                if et["estado"] in ("pendente", "aguardando_dependencia", "aguardando_aprovacao", "em_execucao"):
+                    tb.atualizar_etapa(et["id"], "dem_cobertura", estado="cancelada")
+            e["abertas"].remove(a)
+            feitas.append({"funcionario": pid, "solicitacao": a["id"], "motivo": motivo})
+    return feitas
+
+
+def cobertura(cfg, dias: int = 7, agora: datetime | None = None) -> dict:
+    """Indicadores verificáveis de cobertura por andar e por área, na janela de `dias`. 'completa' só é verdade se
+    todo elegível recebeu demanda na janela ou tem justificativa registrada (pulado/bloqueado com motivo)."""
+    from robo import organizacao
+    agora = agora or datetime.now()
+    desde = (agora - timedelta(days=dias)).isoformat(timespec="seconds")
+    tb = _tb(cfg)
+    with tb.tx() as c:
+        por_pessoa = {r["funcionario"]: dict(r) for r in c.execute(
+            "SELECT funcionario, COUNT(*) total, SUM(estado='concluida') concluidas, SUM(estado IN "
+            "('falhou','concluida_parcialmente','cancelada')) com_problema, MAX(criada_em) ultima FROM solicitacoes "
+            "WHERE origem=? AND criada_em>=? GROUP BY funcionario", (ORIGEM, desde))}
+        justificadas = {r["funcionario"]: r["motivo"] for r in c.execute(
+            "SELECT funcionario, motivo FROM demandas_registro WHERE evento IN ('pulada','bloqueada','sem_trabalho') "
+            "AND data_hora>=? ORDER BY id", (desde,))}
+    andares: dict = {}
+    areas: dict = {}
+    for p in organizacao.lista(cfg):
+        area = organizacao.area_de(p["id"]) or "sem área"
+        for grupo, chave in ((andares, p["andar"]), (areas, area)):
+            g = grupo.setdefault(chave, {"quadro": 0, "elegiveis": 0, "com_demanda": 0, "concluidas": 0, "com_problema": 0,
+                                         "sem_demanda": [], "justificados": {}})
+            g["quadro"] += 1
+            if organizacao.nivel_de(p["id"], p) in NIVEIS_SEM_DEMANDA:
+                g["justificados"][p["id"]] = NIVEIS_SEM_DEMANDA["estagiario"]
+                continue
+            g["elegiveis"] += 1
+            pp = por_pessoa.get(p["id"])
+            if pp:
+                g["com_demanda"] += 1
+                g["concluidas"] += int(pp["concluidas"] or 0)
+                g["com_problema"] += int(pp["com_problema"] or 0)
+            elif p["id"] in justificadas:
+                g["justificados"][p["id"]] = justificadas[p["id"]]
+            else:
+                g["sem_demanda"].append(p["id"])
+    for grupo in (andares, areas):
+        for g in grupo.values():
+            g["completa"] = not g["sem_demanda"]
+    return {"janela_dias": dias, "andares": andares, "areas": areas, "por_pessoa": por_pessoa,
+            "completa": all(g["completa"] for g in andares.values())}
+
+
+# =============================================================================== Bento: avaliação independente
+def avaliar(cfg, limite: int = 3, agora: datetime | None = None) -> list[dict]:
+    """Segunda linha: reavalia demandas concluídas ainda não avaliadas (as mais recentes, uma por executor) sem
+    olhar o veredito do revisor. Confere: revisor diferente de todos os executores; critérios de cada etapa de novo;
+    arquivos entregues; e a conta do cálculo refeita a partir do ARQUIVO (não do valor guardado na demanda)."""
+    from robo import aprendizados
+    tb = _tb(cfg)
+    with tb.tx() as c:
+        feitas = {r[0] for r in c.execute("SELECT solicitacao FROM demandas_avaliacoes")}
+        candidatas = [r["id"] for r in c.execute(
+            "SELECT id FROM solicitacoes WHERE origem=? AND estado='concluida' ORDER BY atualizada_em DESC LIMIT 200",
+            (ORIGEM,))]
+    saida, vistos = [], set()
+    for sid in candidatas:
+        if len(saida) >= limite or sid in feitas:
+            continue
+        s = tb.solicitacao(sid)
+        executores = {e["funcionario"] for e in s["etapas"]}
+        if "dem_avaliador" in executores or s["revisor"] == "dem_avaliador" or s["funcionario"] in vistos:
+            continue  # nunca avalia o que fez ou revisou; uma por executor por ciclo
+        vistos.add(s["funcionario"])
+        achados = []
+        if s["revisor"] in executores or s["revisor"] == "dono":
+            achados.append(f"revisor {s['revisor']} não é independente")
+        crits = (s.get("plano") or {}).get("criterios_por_etapa") or {}
+        for e in s["etapas"]:
+            achados += [f"etapa {e['ordem']}: {x}" for x in conferir_criterios(e["resultado"], crits.get(str(e["ordem"])))]
+            for c in crits.get(str(e["ordem"])) or []:
+                if c.get("tipo") == "valor_unico" and e["parametros"].get("arquivo"):
+                    achados += _refazer_conta(e, c)
+        veredito = "divergente" if achados else "confirmada"
+        with tb.tx() as c:
+            c.execute("INSERT INTO demandas_avaliacoes (data_hora, solicitacao, avaliador, executores, revisor, nivel, veredito, "
+                      "achados) VALUES (?,?,?,?,?,?,?,?)",
+                      ((agora or datetime.now()).isoformat(timespec="seconds"), sid, "dem_avaliador",
+                       ",".join(sorted(executores)), s["revisor"], (s.get("plano") or {}).get("nivel"), veredito,
+                       json.dumps(achados, ensure_ascii=False)))
+        if achados:  # divergência vira aprendizado de quem executou (a causa fica registrada, sem apagar a aprovação)
+            try:
+                aprendizados.registrar(cfg, s["funcionario"], f"demanda:{s['etapas'][0]['ferramenta']}", "erro",
+                                       acao=s["titulo"], causa="; ".join(achados)[:500],
+                                       correcao="refazer a demanda conferindo cada critério antes de entregar",
+                                       evidencia_id=sid, origem="validacao")
+            except Exception:
+                pass
+        saida.append({"solicitacao": sid, "veredito": veredito, "achados": achados})
+    return saida
+
+
+def _refazer_conta(etapa: dict, criterio: dict) -> list[str]:
+    import pandas as pd
+    try:
+        df = _ler(Path(etapa["parametros"]["arquivo"]))
+        refeito = float(pd.to_numeric(df[criterio["coluna"]], errors="coerce").mean())
+    except Exception as e:
+        return [f"não consegui refazer a conta a partir do arquivo ({type(e).__name__})"]
+    valores = list(((_dado((etapa["resultado"] or {}).get("dados") or {}, "calculo.valores")) or {}).values())
+    if len(valores) != 1 or not math.isclose(float(valores[0]), refeito, rel_tol=1e-6, abs_tol=1e-6):
+        return [f"conta refeita do arquivo deu {refeito}, a demanda entregou {valores}"]
+    return []
+
+
+# =============================================================================== o ciclo (Aurora assina)
 def escolher_ferramenta(cfg, pessoa: dict) -> str | None:
     """A ferramenta mais específica da pessoa (a que menos gente tem), entre as do contrato que o catálogo cobre."""
     from robo import ferramentas, organizacao
@@ -345,31 +726,6 @@ def _raridade(cfg) -> dict:
     return conta
 
 
-def criar_demanda(cfg, pessoa: dict, ferramenta: str) -> tuple[str | None, str]:
-    """Cria a tarefa (ainda não executa). Devolve (id, '') ou (None, motivo do bloqueio)."""
-    from robo import orquestrador, organizacao
-    m = CATALOGO[ferramenta]
-    preparado = m.preparar(cfg, pessoa) if m.preparar else ({}, [])
-    if isinstance(preparado, str):
-        return None, preparado
-    params, extras = preparado
-    criterios = list(m.criterios) + list(extras)
-    revisor = organizacao.revisor_de(pessoa["id"], cfg)
-    pedido = (f"Objetivo: {m.objetivo}\nResponsável: {pessoa['nome']} ({pessoa['papel']}), {pessoa['andar']}º andar.\n"
-              f"Evidência esperada: {m.evidencia}.\nCritérios de aceitação: "
-              + "; ".join(_texto_criterio(c) for c in criterios) + ".\nDados: sintéticos (fábrica), nunca produção.")
-    return orquestrador.criar_demanda(cfg, m.titulo, pedido, pessoa["id"], ferramenta, params, revisor,
-                                      plano_extra={"objetivo": m.objetivo, "evidencia_esperada": m.evidencia,
-                                                   "criterios": criterios, "dados": "sintetico", "nivel": "basico"}), ""
-
-
-def _texto_criterio(c: dict) -> str:
-    return {"ok": "a ferramenta termina com sucesso", "evidencia": "evidência registrada",
-            "natureza": "não pode ser só limitação", "texto_min": f"resposta com pelo menos {c.get('n')} caracteres",
-            "dados": f"o resultado traz '{c.get('chave')}'", "linhas_min": f"pelo menos {c.get('n')} linha(s) do banco",
-            "valor_unico": f"o valor bate com a conta independente de {c.get('coluna')}"}.get(c.get("tipo"), c.get("tipo", ""))
-
-
 def _executar_com_job(cfg, sid: str, pid: str, ferramenta: str) -> str:
     """Executa a demanda dentro de um job aberto: enquanto roda, a pessoa aparece como TRABALHANDO (status honesto,
     robo/jobs.py); ao terminar, o job fecha com a solicitação como evidência."""
@@ -384,9 +740,21 @@ def _executar_com_job(cfg, sid: str, pid: str, ferramenta: str) -> str:
     return estado
 
 
+def _registrar(tb: Trabalho, ciclo: str, eventos: list[dict]) -> None:
+    from robo import organizacao
+    with tb.tx() as c:
+        for e in eventos:
+            c.execute("INSERT INTO demandas_registro (data_hora, ciclo, funcionario, andar, area, evento, nivel, ferramenta, "
+                      "solicitacao, motivo, responsavel) VALUES (?,?,?,?,?,?,?,?,?,?,?)",
+                      (_agora(), ciclo, e["funcionario"], e.get("andar"), organizacao.area_de(e["funcionario"]),
+                       e["evento"], e.get("nivel"), e.get("ferramenta"), e.get("solicitacao"), e.get("motivo", ""),
+                       e["responsavel"]))
+
+
 def rotina(cfg, agora: datetime | None = None) -> dict | None:
-    """Um ciclo de distribuição. Devolve o resumo (None = fora do horário: não é trabalho)."""
-    from robo import organizacao, orquestrador
+    """Um ciclo. Devolve o resumo (None = fora do horário: não é trabalho). Cada fase abre a sua etapa no job do
+    ciclo, com quem a faz, na hora em que começa (prova de trabalho dos cinco)."""
+    from robo import jobs, organizacao
     c = _c(cfg)
     if not c["habilitada"]:
         return None
@@ -398,67 +766,109 @@ def rotina(cfg, agora: datetime | None = None) -> dict | None:
                             (ORIGEM, agora.strftime("%Y-%m-%d"))).fetchone()[0]
     if ult and agora - datetime.fromisoformat(ult) < timedelta(minutes=float(c["intervalo_minutos"])):
         return None
-    ultima, abertas = _ultimas_por_pessoa(tb)
-    limite_pessoa = (agora - timedelta(hours=float(c["por_pessoa_horas"]))).isoformat(timespec="seconds")
-    gente = organizacao.lista(cfg)
-    puladas, candidatas = [], []
-    for p in gente:
-        nivel = organizacao.nivel_de(p["id"], p)
-        if nivel in NIVEIS_SEM_DEMANDA:
-            puladas.append({"funcionario": p["id"], "motivo": NIVEIS_SEM_DEMANDA[nivel]})
-        elif p["id"] in abertas:
-            puladas.append({"funcionario": p["id"], "motivo": "já tem uma demanda aberta"})
-        elif ultima.get(p["id"], "") > limite_pessoa:
-            puladas.append({"funcionario": p["id"], "motivo": f"recebeu demanda há menos de {c['por_pessoa_horas']} h"})
-        else:
-            candidatas.append(p)
-    # quem está há mais tempo sem demanda primeiro (nunca recebeu = primeiro de todos); empate: andar e id
-    candidatas.sort(key=lambda p: (ultima.get(p["id"], ""), p["andar"], p["id"]))
-    vagas = max(0, min(int(c["por_ciclo"]), int(c["por_dia"]) - hoje))
-    atribuidas, bloqueadas, finais = [], [], {}
-    for p in candidatas:
-        if len(atribuidas) >= vagas:
-            break
-        ferr = escolher_ferramenta(cfg, p)
-        if not ferr:
-            bloqueadas.append({"funcionario": p["id"], "motivo": "nenhuma ferramenta do contrato está no catálogo de demandas"})
-            continue
-        sid, motivo = criar_demanda(cfg, p, ferr)
-        if not sid:
-            bloqueadas.append({"funcionario": p["id"], "ferramenta": ferr, "motivo": motivo})
-            continue
-        atribuidas.append({"funcionario": p["id"], "ferramenta": ferr, "solicitacao": sid})
-        finais[sid] = _executar_com_job(cfg, sid, p["id"], ferr)  # executa já: nuvem e notebook veem o resultado no ciclo
-    concluidas = sum(1 for e in finais.values() if e == "concluida")
-    detalhe = {"atribuidas": atribuidas, "estados": finais, "bloqueadas": bloqueadas, "puladas": puladas,
-               "vagas": vagas, "hoje_antes": hoje}
-    with tb.tx() as conn:
-        conn.execute("INSERT INTO demandas_ciclos (data_hora, responsavel, elegiveis, atribuidas, concluidas, bloqueadas, "
-                     "detalhe) VALUES (?,?,?,?,?,?,?)",
-                     (agora.isoformat(timespec="seconds"), "casos_planejamento", len(candidatas), len(atribuidas),
-                      concluidas, len(bloqueadas), json.dumps(detalhe, ensure_ascii=False, default=str)))
+    ciclo = agora.isoformat(timespec="seconds")
+    jid = jobs.abrir(cfg, "ciclo_demandas", "sintetico", None, RESPONSAVEL)
+    eventos: list[dict] = []
+    try:
+        # ---- Renan: demandas abandonadas e quem pode receber
+        jobs.etapa(cfg, jid, "cobertura", "dem_cobertura")
+        estado = _estado_das_demandas(tb, agora)
+        reatribuidas = encerrar_abandonadas(cfg, tb, estado, agora, float(c["horas_abandono"]))
+        eventos += [{"funcionario": r["funcionario"], "evento": "reatribuida", "solicitacao": r["solicitacao"],
+                     "motivo": r["motivo"], "responsavel": "dem_cobertura"} for r in reatribuidas]
+        limite_pessoa = (agora - timedelta(hours=float(c["por_pessoa_horas"]))).isoformat(timespec="seconds")
+        candidatas = []
+        for p in organizacao.lista(cfg):
+            nivel_cargo, e = organizacao.nivel_de(p["id"], p), estado.get(p["id"]) or {}
+            motivo = (NIVEIS_SEM_DEMANDA.get(nivel_cargo) or ("já tem uma demanda aberta" if e.get("abertas") else "")
+                      or (f"recebeu demanda há menos de {c['por_pessoa_horas']} h" if e.get("ultima", "") > limite_pessoa else ""))
+            if motivo:
+                eventos.append({"funcionario": p["id"], "andar": p["andar"], "evento": "pulada", "motivo": motivo,
+                                "responsavel": "dem_cobertura"})
+            else:
+                candidatas.append(p)
+        # ---- Isadora: fila justa, alternando andares
+        jobs.etapa(cfg, jid, "distribuicao", "dem_distribuidor")
+        fila = ordenar(candidatas, estado, agora, float(c["horas_sem_atividade"]))
+        vagas = max(0, min(int(c["por_ciclo"]), int(c["por_dia"]) - hoje))
+        # ---- Vicente monta cada demanda no nível certo; quem não tem demanda adequada recebe treinamento (Renan)
+        jobs.etapa(cfg, jid, "geracao", "dem_gerador")
+        finais, atribuidas, bloqueadas = {}, [], []
+        for p, motivo_fila in fila:
+            if len(atribuidas) >= vagas:
+                break
+            ferr = escolher_ferramenta(cfg, p)
+            nivel, motivo_nivel = nivel_para(organizacao.nivel_de(p["id"], p), _historico(tb, p["id"]))
+            sid, motivo = (criar_demanda(cfg, p, ferr, nivel, motivo_nivel=motivo_nivel) if ferr
+                           else (None, "nenhuma ferramenta do contrato está no catálogo de demandas"))
+            tipo = "trabalho"
+            if not sid:
+                bloqueadas.append({"funcionario": p["id"], "ferramenta": ferr, "motivo": motivo})
+                eventos.append({"funcionario": p["id"], "andar": p["andar"], "evento": "bloqueada", "ferramenta": ferr,
+                                "nivel": nivel, "motivo": motivo, "responsavel": "dem_gerador"})
+                estudo = ferr
+                ferr, nivel, tipo = "conhecimento", "basico", "treinamento"
+                sid, motivo2 = criar_demanda(cfg, p, ferr, nivel, tipo="treinamento", estudo_de=estudo,
+                                             motivo_nivel="sem demanda de trabalho adequada neste ciclo: " + motivo)
+                if not sid:
+                    eventos.append({"funcionario": p["id"], "andar": p["andar"], "evento": "sem_trabalho",
+                                    "motivo": f"{motivo}; treinamento também indisponível: {motivo2}",
+                                    "responsavel": "dem_cobertura"})
+                    continue
+            atribuidas.append({"funcionario": p["id"], "ferramenta": ferr, "nivel": nivel, "tipo": tipo, "solicitacao": sid})
+            eventos.append({"funcionario": p["id"], "andar": p["andar"],
+                            "evento": "atribuida" if tipo == "trabalho" else "treinamento", "ferramenta": ferr,
+                            "nivel": nivel, "solicitacao": sid, "responsavel": "dem_distribuidor",
+                            "motivo": f"{motivo_fila}; nível {nivel}: {motivo_nivel}" if tipo == "trabalho"
+                            else f"{motivo_fila}; treinamento no lugar da demanda bloqueada"})
+            finais[sid] = _executar_com_job(cfg, sid, p["id"], ferr)  # executa já: nuvem e notebook veem no ciclo
+        # ---- Bento: avaliação independente por amostragem
+        jobs.etapa(cfg, jid, "avaliacao", "dem_avaliador")
+        avaliacoes = avaliar(cfg, int(c["avaliacoes_por_ciclo"]), agora)
+        _registrar(tb, ciclo, eventos)
+        cob = cobertura(cfg, agora=agora)
+        concluidas = sum(1 for e in finais.values() if e == "concluida")
+        detalhe = {"atribuidas": atribuidas, "estados": finais, "bloqueadas": bloqueadas, "reatribuidas": reatribuidas,
+                   "avaliacoes": avaliacoes, "vagas": vagas, "hoje_antes": hoje,
+                   "puladas": [{"funcionario": e["funcionario"], "motivo": e["motivo"]} for e in eventos if e["evento"] == "pulada"],
+                   "cobertura": {"completa": cob["completa"],
+                                 "andares": {a: {k: v for k, v in g.items() if k in ("elegiveis", "com_demanda", "sem_demanda")}
+                                             for a, g in cob["andares"].items()}}}
+        with tb.tx() as conn:
+            conn.execute("INSERT INTO demandas_ciclos (data_hora, responsavel, elegiveis, atribuidas, concluidas, bloqueadas, "
+                         "detalhe) VALUES (?,?,?,?,?,?,?)",
+                         (ciclo, RESPONSAVEL, len(candidatas), len(atribuidas), concluidas, len(bloqueadas),
+                          json.dumps(detalhe, ensure_ascii=False, default=str)))
+        jobs.fechar(cfg, jid, "concluido", {"atribuidas": len(atribuidas), "concluidas": concluidas,
+                                            "avaliacoes": len(avaliacoes), "cobertura_completa": cob["completa"]})
+    except BaseException as e:
+        jobs.fechar(cfg, jid, "falhou", {"erro": f"{type(e).__name__}: {e}"})
+        raise
     return {"elegiveis": len(candidatas), "atribuidas": len(atribuidas), "concluidas": concluidas,
-            "bloqueadas": len(bloqueadas), "estados": finais}
+            "bloqueadas": len(bloqueadas), "reatribuidas": len(reatribuidas), "avaliacoes": avaliacoes,
+            "estados": finais, "cobertura_completa": cob["completa"]}
 
 
-def cobertura(cfg) -> dict:
-    """Quem já recebeu demanda, por andar (base da Etapa 4: ninguém pode ficar para trás)."""
-    from robo import organizacao
-    tb = _tb(cfg)
-    with tb.tx() as c:
-        por_pessoa = {r["funcionario"]: dict(r) for r in c.execute(
-            "SELECT funcionario, COUNT(*) total, SUM(estado='concluida') concluidas, SUM(estado IN "
-            "('falhou','concluida_parcialmente')) com_problema, MAX(criada_em) ultima FROM solicitacoes WHERE origem=? "
-            "GROUP BY funcionario", (ORIGEM,))}
-    andares: dict = {}
-    for p in organizacao.lista(cfg):
-        a = andares.setdefault(p["andar"], {"quadro": 0, "elegiveis": 0, "com_demanda": 0, "sem_demanda": []})
-        a["quadro"] += 1
-        if organizacao.nivel_de(p["id"], p) in NIVEIS_SEM_DEMANDA:
-            continue
-        a["elegiveis"] += 1
-        if p["id"] in por_pessoa:
-            a["com_demanda"] += 1
-        else:
-            a["sem_demanda"].append(p["id"])
-    return {"andares": andares, "por_pessoa": por_pessoa}
+# =============================================================================== provas técnicas (RH)
+def provas() -> dict:
+    """Provas da equipe de demandas: regras determinísticas conferidas sem banco."""
+    agora = datetime(2026, 10, 23, 12, 0, 0)
+    c = lambda e, n: {"estado": e, "nivel": n}
+    fila = ordenar([{"id": "a", "andar": 1}, {"id": "b", "andar": 1}, {"id": "c", "andar": 2}],
+                   {"a": {"ultima": "2026-10-23T08:00:00", "ultima_concluida": "2026-10-23T08:00:00", "carga_7d": 3}},
+                   agora, 48)
+    return {
+        "dem_gerador": [("Primeira demanda no básico", nivel_para("senior", [])[0] == "basico"),
+                        ("Sobe depois de 2 concluídas", nivel_para("senior", [c("concluida", "basico")] * 2)[0] == "medio"),
+                        ("Nunca passa do teto do cargo", nivel_para("junior", [c("concluida", "basico")] * 2)[0] == "basico"),
+                        ("Desce depois de falha", nivel_para("gerente", [c("falhou", "dificil")])[0] == "medio")],
+        "dem_distribuidor": [("Quem nunca recebeu vem antes", [p["id"] for p, _ in fila][:2] == ["b", "c"]),
+                             ("Alterna os andares", {p["andar"] for p, _ in fila[:2]} == {1, 2})],
+        "dem_avaliador": [("Divergência no cálculo é achada", bool(conferir_criterios(
+            {"ok": True, "evidencia": "x", "dados": {"calculo": {"valores": {"t": 2.0}}}},
+            [{"tipo": "valor_unico", "esperado": 1.0}])))],
+        "dem_cobertura": [("Arquivo vazio não conta como entrega", bool(conferir_criterios(
+            {"ok": True, "artefatos": ["/nao/existe.md"]}, [{"tipo": "artefato"}])))],
+        "dem_coordenador": [("Estagiário fica em observação", "estagiario" in NIVEIS_SEM_DEMANDA),
+                            ("Publicar planilha fora da distribuição", "publicar_planilha" in FORA_DA_DISTRIBUICAO)],
+    }

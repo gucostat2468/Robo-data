@@ -56,6 +56,10 @@ CAUSAS: dict[str, tuple[str, str, str, str]] = {
     "artefatos": (NAO_ACIONADA, "arquivo entregue por uma etapa (resumo executivo, base publicada); as ferramentas das "
                   "demandas respondem em texto e dados, sem arquivo", "tarefa com resumo executivo ou publicação",
                   "robo/trabalho.py"),
+    "demandas_registro": (NAO_ACIONADA, "a rotina demandas ainda não rodou neste banco", "robô aberto ou turno da nuvem",
+                          "robo/demandas.py"),
+    "demandas_avaliacoes": (NAO_ACIONADA, "Bento só avalia demanda CONCLUÍDA que não executou nem revisou; ainda não "
+                            "houve nenhuma neste banco", "demanda concluída + rotina demandas", "robo/demandas.py"),
     "demandas_ciclos": (NAO_ACIONADA, "a rotina demandas (a cada 30 min) ainda não rodou neste banco",
                         "robô aberto ou turno da nuvem", "robo/demandas.py"),
     "aprovacoes": (NAO_ACIONADA, "só etapa que ALTERA dados pede aprovação do dono; as demandas automáticas nunca "

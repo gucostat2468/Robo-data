@@ -82,8 +82,8 @@ pedido ("Não preencha o banco indiscriminadamente com registros falsos").
 | 1 | Diagnóstico e inventário | — | **feito** (este documento) |
 | 2 | Persistência e rastreabilidade | 1 | **feito nesta sessão** (itens acima) |
 | 3 | Execução real de funcionários: cada demanda vira `solicitacao` + `etapas` com responsável, ferramenta autorizada e evidência | 2 | **feito** (seção 6) |
-| 4 | 5 funcionários de demandas sintéticas (planejar, gerar básico a profissional, distribuir por andar, cobertura de quem ficou sem trabalho, avaliação independente), a partir da Sala de Casos | 3 | próximo |
-| 5 | IA local: medir RAM/CPU do seu notebook antes de escolher modelo (ex.: Ollama com modelo de 3B a 8B); uma instância compartilhada com fila | 3 | planejado |
+| 4 | 5 funcionários de demandas sintéticas (planejar, gerar básico a profissional, distribuir por andar, cobertura de quem ficou sem trabalho, avaliação independente), a partir da Sala de Casos | 3 | **feito** (seção 7) |
+| 5 | IA local (próximo): medir RAM/CPU do seu notebook antes de escolher modelo (ex.: Ollama com modelo de 3B a 8B); uma instância compartilhada com fila | 3 | planejado |
 | 6 | Conversa natural com qualquer funcionário e handoffs registrados | 3, 5 | parcial (voz, diálogo com fato) |
 | 7 | Funcionário de pesquisa (Markdown e PDF com fontes; Perplexity só por API oficial e com chave sua) | 5 | planejado |
 | 8 | Head de AWS e Sênior Linux/Ubuntu (sem acesso real à nuvem); proposta de operação 24 h com custos | 3 | planejado; nenhum recurso pago criado |
@@ -126,4 +126,31 @@ Limitações:
 - o responsável pela rotina é a Planejadora de Treino (`casos_planejamento`); os 5 funcionários dedicados são da
   Etapa 4;
 - as ferramentas são determinísticas: nenhuma demanda usa IA ainda (Etapa 5).
+
+## 7. Etapa 4 executada: equipe de demandas e níveis
+
+Conflito verificado antes de criar: a Sala de Casos (head_casos) planeja CASOS DE TREINO com gabarito; ninguém
+planejava DEMANDAS de trabalho. Os cinco novos complementam a Sala, sem substituir ninguém:
+Aurora (coordenação, `dem_coordenador`), Vicente (geração e nível, `dem_gerador`), Isadora (distribuição,
+`dem_distribuidor`), Renan (cobertura, abandono e treinamento, `dem_cobertura`) e Bento (avaliação independente,
+`dem_avaliador`, que responde ao head_casos e não à coordenadora). Quadro: de 93 para 98.
+
+Evidência (banco local, ferramentas reais, dados sintéticos; 8 ciclos completos de 92 demandas):
+- os quatro níveis apareceram de verdade: básico (ciclo 1), médio (ciclo 2: 78 pessoas), difícil (ciclo 4: 62),
+  profissional (ciclo 6: 18 gerentes, heads e diretores); júnior ficou no básico e pleno no médio (teto do cargo);
+- o médio entregou 78 arquivos `.md` e registrou 44 repasses para quem tinha a ferramenta do resumo;
+- cobertura completa nos 5 andares e em todas as áreas em todos os ciclos; 7 estagiários fora, com motivo;
+- 1 pessoa por ciclo teve a demanda bloqueada (drivers sem base de NPS) e recebeu treinamento sobre o assunto;
+- o Bento confirmou 3 demandas por ciclo; no teste automático, achou a divergência quando o arquivo mudou.
+
+Defeito encontrado pela própria auditoria desta etapa: até o ciclo 6, a consulta ao conhecimento do nível difícil
+respondia 183 de 198 vezes com a mesma abertura genérica de um manual, e o critério aceitava. Corrigido: a pergunta
+passou a ser sobre a ferramenta da pessoa, a abertura genérica não vale como conhecimento e, sem nada específico, a
+resposta é "não sei". Ciclo 8 depois da correção: 64 concluídas e 28 concluídas parcialmente, por lacuna real de
+conhecimento. Nada é documentado sobre "Diagnosticar planilha", "Perfil e indicadores", "Estratégia Python",
+"Anomalias" e "People analytics". Concluída parcialmente mantém o nível (a lacuna é da empresa, não da pessoa).
+
+Achado para decisão do dono: há 3 nomes repetidos ANTIGOS no quadro (Davi: analise_estatistica e
+airflow_estagiario; Henrique: airflow_especialista e head_python; Bianca: airflow_pleno e rh_estagiaria). Não foram
+renomeados porque o pedido proíbe renomear sem autorização.
 

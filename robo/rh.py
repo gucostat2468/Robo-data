@@ -440,9 +440,11 @@ def _provas_nativas_cache() -> dict:
     from robo import lideranca
     from robo import paineis
     from robo import fabrica
+    from robo import demandas
     for grupo, ids in ((quadro.provas_quadro, [p["id"] for p in quadro.QUADRO]), (ti.provas_ti, list(ti.POR_ID)),
                        (paineis.provas, list(paineis.POR_ID)),
                        (fabrica.provas, list(fabrica.POR_ID)),
+                       (demandas.provas, list(demandas.POR_ID)),
                        (lideranca.provas, list(lideranca.POR_ID)),
                        (canal.provas_canal, ["canal_nina", "canal_iara", "canal_helena", "ger_operacoes"])):
         try:
@@ -678,6 +680,15 @@ def ficha(agente: dict) -> dict:
                 "limites": [quadro._frase(esc["nao_faz"]), f"Decide: {esc['decide']}",
                             "Nunca confere o próprio trabalho: gerar, conferir e revisar são pessoas diferentes"],
                 "gestor": _nome_pessoa(fabrica.GESTORES[p["id"]])}
+    from robo import demandas
+    if not base and agente["id"] in demandas.POR_ID:
+        p = demandas.POR_ID[agente["id"]]
+        esc = quadro.ESCOPO_NIVEL[p["nivel"]]
+        base = {"cargo": p["cargo"], "nivel": p["nivel"], "area": p["area"], "metodologias": p["metodologias"],
+                "responsabilidades": p["escopo"], "criterios": p["criterios"],
+                "limites": [quadro._frase(esc["nao_faz"]), f"Decide: {esc['decide']}",
+                            "Nunca avalia nem revisa a demanda que executou; não distribui dado real"],
+                "gestor": _nome_pessoa(demandas.GESTORES[p["id"]])}
     if not base and agente["id"] in ti.POR_ID:
         p = ti.POR_ID[agente["id"]]
         esc = quadro.ESCOPO_NIVEL[p["nivel"]]
