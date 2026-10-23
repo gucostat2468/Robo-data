@@ -5,6 +5,10 @@
     python -m robo telegram --configurar <grupo> <seu_id>
     python -m robo telegram --apresentar         manda o cartão de cada funcionário (foto, nome, cargo, área, andar)
 
+Sem computador nenhum (só o celular): crie no GitHub os segredos ROBO_TELEGRAM_TOKEN e ROBO_TELEGRAM_CODIGO (um código
+que só você sabe) e escreva no grupo "/vincular SEU-CÓDIGO". No próximo turno da nuvem o robô grava o grupo e o SEU id
+(quem mandou o código certo) e passa a responder só você. "/apresentar" no grupo manda os cartões da equipe (uma vez).
+
 Como funciona (honesto):
   - é UM robô do Telegram (criado por você no @BotFather) que fala por todos: cada mensagem sai assinada pelo
     funcionário que respondeu ("Davi · Estatística · 2º andar"). O Telegram não deixa um robô trocar de foto a cada
@@ -32,7 +36,8 @@ log = logging.getLogger("robo")
 
 API = "https://api.telegram.org"
 PADRAO = {"habilitado": False, "chat_id": "", "dono_id": "", "token_env": "ROBO_TELEGRAM_TOKEN", "resumo_minutos": 120,
-          "max_respostas": 3}
+          "max_respostas": 3, "codigo_vinculo": ""}
+CODIGO_MINIMO = 8  # código de vínculo curto demais é fácil de adivinhar
 ESQUEMA = """
 CREATE TABLE IF NOT EXISTS telegram_mensagens (
   id INTEGER PRIMARY KEY AUTOINCREMENT, data_hora TEXT NOT NULL, direcao TEXT NOT NULL, chat_id TEXT, update_id INTEGER,
@@ -40,6 +45,11 @@ CREATE TABLE IF NOT EXISTS telegram_mensagens (
 CREATE INDEX IF NOT EXISTS ix_tg_update ON telegram_mensagens(update_id);
 CREATE TRIGGER IF NOT EXISTS telegram_mensagens_imutavel BEFORE UPDATE ON telegram_mensagens
 BEGIN SELECT RAISE(ABORT, 'mensagem do Telegram é permanente: não se altera'); END;
+CREATE TABLE IF NOT EXISTS telegram_vinculos (
+  id INTEGER PRIMARY KEY AUTOINCREMENT, data_hora TEXT NOT NULL, chat_id TEXT NOT NULL, dono_id TEXT NOT NULL,
+  autor TEXT, update_id INTEGER);
+CREATE TRIGGER IF NOT EXISTS telegram_vinculos_imutavel BEFORE UPDATE ON telegram_vinculos
+BEGIN SELECT RAISE(ABORT, 'vínculo do Telegram é permanente: um novo vínculo entra como linha nova'); END;
 """
 
 
@@ -48,7 +58,32 @@ class ErroTelegram(RuntimeError):
 
 
 def _c(cfg) -> dict:
-    return {**PADRAO, **((getattr(cfg, "dados", {}) or {}).get("telegram") or {})}
+    c = {**PADRAO, **((getattr(cfg, "dados", {}) or {}).get("telegram") or {})}
+    if not (c["chat_id"] and c["dono_id"]):  # sem ids configurados: vale o último /vincular com o código certo
+        v = _ultimo_vinculo(cfg)
+        if v:
+            c["chat_id"], c["dono_id"] = c["chat_id"] or v["chat_id"], c["dono_id"] or v["dono_id"]
+    return c
+
+
+def _ultimo_vinculo(cfg) -> dict | None:
+    import sqlite3
+    db = Path(cfg.logs) / "trabalho.db"
+    if not db.exists():
+        return None
+    con = sqlite3.connect(db)
+    try:
+        r = con.execute("SELECT chat_id, dono_id FROM telegram_vinculos ORDER BY id DESC LIMIT 1").fetchone()
+    except sqlite3.Error:
+        return None
+    finally:
+        con.close()
+    return {"chat_id": r[0], "dono_id": r[1]} if r else None
+
+
+def codigo_valido(cfg) -> str:
+    cod = str(_c(cfg).get("codigo_vinculo") or "").strip()
+    return cod if len(cod) >= CODIGO_MINIMO else ""
 
 
 def _tb(cfg) -> Trabalho:
@@ -159,15 +194,39 @@ def buscar(cfg) -> list[dict]:
 
 def atender(cfg) -> dict:
     """Lê o grupo e responde ao dono pelo canal da empresa. Mensagem de outra pessoa ou de outro chat: registra e ignora."""
-    c = _c(cfg)
+    import hmac
     lidas = respondidas = ignoradas = 0
     for m in buscar(cfg):
         lidas += 1
+        texto = m["texto"].strip()
+        codigo = codigo_valido(cfg)
+        if texto.lower().startswith("/vincular"):  # o código NUNCA é gravado, em chat nenhum
+            dado = texto.split(maxsplit=1)[1].strip() if len(texto.split(maxsplit=1)) > 1 else ""
+            em_grupo = m["chat_id"].startswith("-")  # só em grupo, nunca no privado
+            certo = em_grupo and bool(codigo) and hmac.compare_digest(dado.encode(), codigo.encode())
+            _registrar(cfg, "entrada", "/vincular ****", certo,
+                       "" if certo else ("código errado ou ausente" if em_grupo else "vínculo só vale dentro do grupo"),
+                       m["chat_id"], m["update_id"], m["autor"] or m["autor_id"])
+            if certo:
+                with _tb(cfg).tx() as con:
+                    con.execute("INSERT INTO telegram_vinculos (data_hora, chat_id, dono_id, autor, update_id) "
+                                "VALUES (?,?,?,?,?)", (_agora(), m["chat_id"], m["autor_id"], m["autor"], m["update_id"]))
+                enviar(cfg, "Grupo vinculado. A partir de agora respondo só a você aqui. Apague a mensagem com o "
+                            "código. Escreva /apresentar para conhecer a equipe.", "canal_nina", chat_id=m["chat_id"])
+                respondidas += 1
+            else:
+                ignoradas += 1
+            continue
+        c = _c(cfg)
         do_dono = bool(c["dono_id"]) and m["autor_id"] == str(c["dono_id"]) and m["chat_id"] == str(c["chat_id"])
         _registrar(cfg, "entrada", m["texto"], True, "" if do_dono else "ignorada: não é o dono neste grupo",
                    m["chat_id"], m["update_id"], m["autor"] or m["autor_id"])
-        if not do_dono or not m["texto"].strip():
+        if not do_dono or not texto:
             ignoradas += 1
+            continue
+        if texto.lower().startswith("/apresentar"):
+            r = apresentar(cfg)
+            respondidas += 1 if r.get("enviados") else 0
             continue
         from robo import canal
         try:
@@ -212,7 +271,7 @@ def rotina(cfg) -> dict | None:
     """A cada minuto (com o robô aberto ou no turno da nuvem): responde o dono e, de tempos em tempos, manda o resumo.
     Desligado ou sem token: None (não é trabalho)."""
     c = _c(cfg)
-    if not c["habilitado"] or not token(cfg) or not c["chat_id"]:
+    if not c["habilitado"] or not token(cfg) or not (c["chat_id"] or codigo_valido(cfg)):
         return None
     r = atender(cfg)
     with _tb(cfg).tx() as conn:
@@ -220,7 +279,7 @@ def rotina(cfg) -> dict | None:
     from datetime import datetime, timedelta
     if not ultimo or datetime.fromisoformat(ultimo) < datetime.now() - timedelta(minutes=float(c["resumo_minutos"])):
         texto = resumo_do_periodo(cfg)
-        if texto:
+        if texto and c["chat_id"]:
             chat = c["chat_id"]
             try:
                 _api(cfg, "sendMessage", {"chat_id": chat, "text": _assinatura(cfg, "dem_coordenador") + _html(texto),

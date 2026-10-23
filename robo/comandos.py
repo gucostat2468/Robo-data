@@ -358,6 +358,8 @@ def principal(argv: list[str] | None = None) -> int:
     gtg.add_argument("--descobrir", action="store_true")
     gtg.add_argument("--configurar", nargs=2, metavar=("ID_DO_GRUPO", "SEU_ID"))
     gtg.add_argument("--apresentar", action="store_true")
+    sub.add_parser("boletim", help="mostra o boletim que o app do celular recebe (o turno da nuvem publica a cada 5 min) — "
+                                   "só lê")
     scd = sub.add_parser("cobertura-demandas", help="quem recebeu demanda, por andar e por área, e quem ficou sem e por "
                                                     "quê — só lê")
     scd.add_argument("--dias", type=int, default=7)
@@ -398,6 +400,12 @@ def principal(argv: list[str] | None = None) -> int:
         print(json.dumps(r, ensure_ascii=False, indent=1, default=str))
         if r["alerta_espaco"]:
             print(f"::warning::Banco gratuito com {r['banco_mb']} MB de {r['limite_mb']} MB: decidir arquivamento.")
+        return 0
+    if args.comando == "boletim":
+        import json
+        from robo import boletim
+        cfg = carregar_config(Path(args.config) if args.config else None)
+        print(json.dumps(boletim.montar(cfg), ensure_ascii=False, indent=1, default=str))
         return 0
     if args.comando == "servico":
         from robo import servico

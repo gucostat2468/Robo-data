@@ -12,19 +12,20 @@ on:
     inputs:
       minutos:
         description: "Duração do turno (minutos)"
-        default: "20"
+        default: "40"
 
 concurrency:
   group: empresa-nuvem      # nunca dois turnos ao mesmo tempo (o 2º espera o 1º salvar)
   cancel-in-progress: false
 
 permissions:
-  contents: read
+  contents: write   # só para o boletim do celular: commits no ramo painel-celular (estado/estado.json)
+  actions: write    # só para o turno chamar o próximo (empresa contínua)
 
 jobs:
   turno:
     runs-on: ubuntu-latest
-    timeout-minutes: 40
+    timeout-minutes: 60
     steps:
       - uses: actions/checkout@v5
       - uses: actions/setup-python@v6
@@ -42,7 +43,19 @@ jobs:
           ROBO_TELEGRAM_TOKEN: ${{ secrets.ROBO_TELEGRAM_TOKEN }}
           ROBO_TELEGRAM_CHAT: ${{ secrets.ROBO_TELEGRAM_CHAT }}
           ROBO_TELEGRAM_DONO: ${{ secrets.ROBO_TELEGRAM_DONO }}
+          # vincular o grupo só pelo celular: escreva "/vincular CÓDIGO" no grupo (CÓDIGO = este segredo, 8+ caracteres)
+          ROBO_TELEGRAM_CODIGO: ${{ secrets.ROBO_TELEGRAM_CODIGO }}
+          # app do celular: o turno publica o boletim da empresa a cada 5 min no ramo painel-celular
+          ROBO_PUBLICAR_BOLETIM: "1"
         run: |
           MIN="${{ github.event.inputs.minutos }}"
           [ -z "$MIN" ] && [ "${{ github.event_name }}" = "push" ] && MIN="$(grep -Eo '^[0-9]+' nuvem/ligar | head -1)"
-          python -m robo turno --minutos "${MIN:-20}" --pasta "$RUNNER_TEMP/empresa"
+          python -m robo turno --minutos "${MIN:-40}" --pasta "$RUNNER_TEMP/empresa"
+      # Empresa contínua: o GitHub costuma atrasar o horário marcado em horas. Ao terminar BEM, o turno chama o
+      # próximo (o "concurrency" acima garante um por vez). Para pausar pelo celular: Settings → Secrets and
+      # variables → Actions → aba Variables → criar ROBO_TURNO_CONTINUO com o valor 0.
+      - name: Chamar o próximo turno
+        if: success() && vars.ROBO_TURNO_CONTINUO != '0'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh workflow run empresa_nuvem.yml --ref "${{ github.ref_name }}"

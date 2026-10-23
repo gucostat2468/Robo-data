@@ -58,6 +58,9 @@ CAUSAS: dict[str, tuple[str, str, str, str]] = {
                   "robo/trabalho.py"),
     "telegram_mensagens": (NAO_ACIONADA, "o grupo do Telegram ainda não foi ligado (precisa do token do @BotFather, que só o "
                            "dono cria)", "python -m robo telegram --configurar", "robo/telegram.py"),
+    "telegram_vinculos": (NAO_ACIONADA, "ninguém mandou /vincular com o código certo no grupo ainda (precisa dos segredos "
+                          "ROBO_TELEGRAM_TOKEN e ROBO_TELEGRAM_CODIGO no GitHub)", "/vincular CÓDIGO no grupo",
+                          "robo/telegram.py"),
     "demandas_registro": (NAO_ACIONADA, "a rotina demandas ainda não rodou neste banco", "robô aberto ou turno da nuvem",
                           "robo/demandas.py"),
     "demandas_avaliacoes": (NAO_ACIONADA, "Bento só avalia demanda CONCLUÍDA que não executou nem revisou; ainda não "

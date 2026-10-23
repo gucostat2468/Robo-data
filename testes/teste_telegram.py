@@ -109,3 +109,45 @@ def teste_apresentacao_manda_cartoes_em_albuns_de_10(cfg, api, monkeypatch):
 
 def teste_resumo_so_com_numeros_dos_registros(cfg, api):
     assert telegram.resumo_do_periodo(cfg) is None  # nada aconteceu: nada a dizer
+
+
+# ----------------------------------------------------------------------------------------------- vínculo pelo celular
+@pytest.fixture
+def cfg_sem_ids(cfg_factory, monkeypatch):
+    monkeypatch.setenv("ROBO_TELEGRAM_TOKEN", TOKEN)
+    c = cfg_factory(telegram={"habilitado": True, "codigo_vinculo": "cafe-com-leite-77"})
+    c.criar_pastas()
+    return c
+
+
+def teste_vincular_pelo_celular_so_com_o_codigo_certo(cfg_sem_ids, api, monkeypatch):
+    chamadas, fila = api
+    from robo import canal
+    monkeypatch.setattr(canal, "responder", lambda texto, cfg: [{"autor": "canal_nina", "texto": "oi"}])
+    fila += [_msg(1, 7, -100777, "/vincular chute-errado"),       # intruso com código errado: nada
+             _msg(2, 42, 42, "/vincular cafe-com-leite-77"),      # no privado: nunca vincula
+             _msg(3, 42, -100777, "/vincular cafe-com-leite-77"),  # dono no grupo: vincula
+             _msg(4, 7, -100777, "me dá acesso")]                  # depois do vínculo, outra pessoa: ignorada
+    r = telegram.atender(cfg_sem_ids)
+    assert r["respondidas"] == 1 and r["ignoradas"] == 3
+    c = telegram._c(cfg_sem_ids)
+    assert c["chat_id"] == "-100777" and c["dono_id"] == "42"
+    linhas = _linhas(cfg_sem_ids)
+    assert not any("cafe-com-leite-77" in (l["texto"] or "") for l in linhas)  # o código nunca é gravado
+    import sqlite3
+    with sqlite3.connect(cfg_sem_ids.logs / "trabalho.db") as con:
+        with pytest.raises(sqlite3.DatabaseError):
+            con.execute("UPDATE telegram_vinculos SET dono_id='7'")
+    # agora o dono conversa normalmente
+    fila += [_msg(5, 42, -100777, "como estamos?")]
+    assert telegram.atender(cfg_sem_ids)["respondidas"] == 1
+
+
+def teste_codigo_curto_nao_vale(cfg_factory, api, monkeypatch):
+    monkeypatch.setenv("ROBO_TELEGRAM_TOKEN", TOKEN)
+    c = cfg_factory(telegram={"habilitado": True, "codigo_vinculo": "123"})
+    c.criar_pastas()
+    api[1].append(_msg(1, 42, -1001, "/vincular 123"))
+    telegram.atender(c)
+    assert telegram._c(c)["chat_id"] == ""
+    assert telegram.rotina(c) is None  # sem grupo e sem código válido: não é trabalho

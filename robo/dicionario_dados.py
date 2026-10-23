@@ -149,6 +149,9 @@ TABELAS = {
                            "saída (qual funcionário respondeu), com erro quando o envio falhou",
                            "uma mensagem do grupo", IMUTAVEL,
                            "o que o dono pergunta pelo celular; tempo e qualidade das respostas"),
+    "telegram_vinculos": ("operacao", "Cada vínculo do grupo do Telegram feito pelo celular com /vincular e o código "
+                          "certo: qual grupo e quem é o dono (o código nunca é gravado)", "um vínculo", IMUTAVEL,
+                          "quando e por quem o grupo foi ligado; troca de grupo vira linha nova"),
     "demandas_registro": ("operacao", "Cada decisão da distribuição sobre uma pessoa: atribuída, treinamento, pulada, "
                           "bloqueada, reatribuída ou sem trabalho, com nível, ferramenta, motivo e quem decidiu",
                           "um evento de distribuição", IMUTAVEL,
