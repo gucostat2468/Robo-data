@@ -181,3 +181,28 @@ def teste_consultas_da_empresa_rodam_ou_explicam_por_que_nao(empresa_com_um_lote
     assert r["colunas"], id_consulta
     if id_consulta.startswith("07 "):
         assert r["linhas"], f"{id_consulta} sem linhas com um lote de cada regra carregado"
+
+
+@com_pg
+def teste_usuario_de_leitura_da_nuvem_alcanca_o_treino(lote_no_banco):
+    """Bug achado pelo boletim do celular: na nuvem, robo_leitura só via o schema robo e TODO exercício de SQL falhava."""
+    import psycopg
+    from robo import nuvem
+    cfg, arquivo, gab = lote_no_banco
+    cfg.banco["senha_leitura"] = "leitura-" + uuid.uuid4().hex[:8]
+    try:
+        assert nuvem.garantir_leitura(cfg)
+        cfg.banco["usuario_leitura"] = "robo_leitura"
+        r = sql_treino.executar(cfg, "nps", arquivo, "profissional", gab)  # profissional lê laboratorio E treino
+        assert r["confere"], r["diferencas"]
+        with pytest.raises(psycopg.Error):  # e continua só de leitura
+            from robo.banco import Banco
+            with Banco(cfg.banco, cfg.base).conectar(leitura=True) as conn:
+                conn.execute("CREATE TABLE treino.invasora (x int)")
+    finally:
+        cfg.banco.pop("usuario_leitura", None)
+        b = cfg.banco
+        with psycopg.connect(host=b["host"], port=b["porta"], user=b["usuario"], password=b["senha"], dbname=b["banco"],
+                             autocommit=True) as c:
+            c.execute("REASSIGN OWNED BY robo_leitura TO CURRENT_USER")
+            c.execute("DROP OWNED BY robo_leitura")

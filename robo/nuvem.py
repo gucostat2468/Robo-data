@@ -149,7 +149,9 @@ def salvar_instantaneo(cfg) -> dict:
 
 
 def garantir_leitura(cfg) -> bool:
-    """Usuário robo_leitura (o do app do celular): só SELECT, transações somente leitura, só no schema robo."""
+    """Usuário robo_leitura (o do app do celular e dos exercícios de SQL): só SELECT, transações somente leitura.
+    Lê o schema robo (memória) e os schemas SINTÉTICOS laboratorio e treino (planilhas da fábrica: sem dado de
+    cliente). Sem os dois últimos, todo exercício de SQL na nuvem falhava por falta de permissão."""
     senha = (cfg.banco or {}).get("senha_leitura")
     if not senha:
         return False
@@ -161,10 +163,13 @@ def garantir_leitura(cfg) -> bool:
         conn.execute("ALTER ROLE robo_leitura SET default_transaction_read_only = on")
         banco = sql.Identifier(cfg.banco["banco"])
         conn.execute(sql.SQL("GRANT CONNECT ON DATABASE {} TO robo_leitura").format(banco))
-        conn.execute("CREATE SCHEMA IF NOT EXISTS robo")
-        conn.execute("GRANT USAGE ON SCHEMA robo TO robo_leitura")
-        conn.execute("GRANT SELECT ON ALL TABLES IN SCHEMA robo TO robo_leitura")
-        conn.execute("ALTER DEFAULT PRIVILEGES IN SCHEMA robo GRANT SELECT ON TABLES TO robo_leitura")
+        from robo.pipeline import SCHEMAS_SINTETICOS
+        for nome in ["robo", *sorted(set(SCHEMAS_SINTETICOS.values()))]:
+            schema = sql.Identifier(nome)
+            conn.execute(sql.SQL("CREATE SCHEMA IF NOT EXISTS {}").format(schema))
+            conn.execute(sql.SQL("GRANT USAGE ON SCHEMA {} TO robo_leitura").format(schema))
+            conn.execute(sql.SQL("GRANT SELECT ON ALL TABLES IN SCHEMA {} TO robo_leitura").format(schema))
+            conn.execute(sql.SQL("ALTER DEFAULT PRIVILEGES IN SCHEMA {} GRANT SELECT ON TABLES TO robo_leitura").format(schema))
     return True
 
 
