@@ -167,6 +167,16 @@ class ControleRobo:
             self._ultimo_canal = agora
             rotinas.executar(cfg, "canal", rotinas.funcao(cfg, "canal"))
             rotinas.executar(cfg, "registro", rotinas.funcao(cfg, "registro"))  # tudo que virou arquivo vai para o banco
+        # grupo do Telegram (só com telegram.habilitado e o token na variável de ambiente): linha própria, rede pode demorar
+        if agora - getattr(self, "_ultimo_telegram", 0) >= 30 and not getattr(self, "_telegram_rodando", False):
+            self._ultimo_telegram, self._telegram_rodando = agora, True
+
+            def _telegram():
+                try:
+                    rotinas.executar(cfg, "telegram", rotinas.funcao(cfg, "telegram"))
+                finally:
+                    self._telegram_rodando = False
+            threading.Thread(target=_telegram, name="robo-telegram", daemon=True).start()
         if str((cfg.dados.get("rotinas") or {}).get("agendador", "robo")).lower() == "airflow":
             return  # o Airflow agenda as rotinas (robo/orquestracao.py); a equipe de SLA vigia se ele está rodando
         # rotinas pesadas em segundo plano (avaliação, backup, estudo, reunião…): cada uma decide se está na hora

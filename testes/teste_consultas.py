@@ -82,7 +82,12 @@ def teste_biblioteca_tem_cabecalhos_completos():
         assert c["titulo"] and c["pergunta"] and c["como_ler"] and c["requer"], c["id"]
 
 
-@pytest.mark.parametrize("id_consulta", _todas())
+# as pastas 07 (lotes da fábrica) e 08 (operação da empresa) rodam sobre dados que a empresa PRODUZ: são testadas em
+# teste_sql_treino.py com lotes processados de verdade pela esteira e com o espelho da memória
+PROPRIOS = ("07 ", "08 ")
+
+
+@pytest.mark.parametrize("id_consulta", [c for c in _todas() if not c.startswith(PROPRIOS)])
 def teste_consulta_executa(banco, id_consulta):
     r = consultas.executar(banco, id_consulta)
     assert r["colunas"], id_consulta

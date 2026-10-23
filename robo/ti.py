@@ -213,6 +213,11 @@ def chk_rotinas_sem_registro(cfg) -> list[str]:
     return [f"rotinas sem nenhum registro ainda: {', '.join(nunca)}"] if nunca else []
 
 
+def _nuvem():
+    from robo import ti_nuvem  # import tardio: ti_nuvem usa a configuração, e ti é importado muito cedo
+    return ti_nuvem
+
+
 EQUIPE_TI = [
     {"id": "ger_ti", "nome": "Gustavo", "cargo": "Gerente de TI e Infraestrutura", "nivel": "gerente", "cor": "#111827",
      "funcao": None, "area": "Engenharia de Dados",
@@ -234,7 +239,24 @@ EQUIPE_TI = [
      "cor": "#B45309", "funcao": chk_cloud, "area": "Engenharia de Dados",
      "escopo": ["Avalia se o banco estaria pronto para o Amazon RDS", "Desenha o caminho de migração quando você quiser"],
      "criterios": ["Recomendação com versão e motivo"], "metodologias": ["AWS Well-Architected Framework"],
-     "nao_faz": ["Não envia nada para a nuvem: o sistema é 100% local por decisão do dono"]},
+     "nao_faz": ["Não cria recurso pago, não abre porta e não envia dado para a nuvem sem autorização do dono"]},
+    {"id": "head_aws", "nome": "Heloísa", "cargo": "Head de AWS, Arquitetura e Governança de Nuvem", "nivel": "head",
+     "cor": "#C2410C", "funcao": lambda cfg: _nuvem().chk_prontidao_nuvem(cfg), "area": "Engenharia de Dados",
+     "escopo": ["Responde pela arquitetura de nuvem, custos, segurança e plano de volta de cada mudança",
+                "Confere a cada ronda se o projeto está pronto para rodar num servidor (Dockerfile sem root, porta por "
+                "variável, segredos fora do repositório)",
+                "Aprova o desenho de nuvem antes de o dono decidir; nunca cria recurso"],
+     "criterios": ["Nenhuma mudança de infraestrutura sem custo estimado e plano de volta", "Menor privilégio sempre"],
+     "metodologias": ["AWS Well-Architected (6 pilares)", "FinOps", "Gestão de riscos"],
+     "nao_faz": ["Não tem acesso administrativo a nenhuma nuvem; não cria, não paga e não publica nada"]},
+    {"id": "aws_senior", "nome": "Ícaro", "cargo": "Sênior de AWS, Linux e Ubuntu", "nivel": "senior", "cor": "#EA580C",
+     "funcao": lambda cfg: _nuvem().chk_restauracao_backup(cfg), "area": "Engenharia de Dados",
+     "escopo": ["Testa a cada ronda se o último backup VOLTA (restaura numa pasta temporária e confere a integridade)",
+                "Mede a saúde do PostgreSQL (espaço contra o limite do plano, linhas mortas, consultas presas)",
+                "Procura segredo escrito nos arquivos do repositório público"],
+     "criterios": ["Backup que não restaura é falha crítica", "Zero segredo no repositório"],
+     "metodologias": ["Administração Linux/Ubuntu", "Backup 3-2-1 com teste de restauração", "Hardening (CIS)"],
+     "nao_faz": ["Não roda comando em servidor de ninguém; só lê e testa neste computador"]},
     {"id": "dev_pleno", "nome": "Diego", "cargo": "Desenvolvedor Python Pleno", "nivel": "pleno", "cor": "#1E40AF",
      "funcao": chk_dependencias, "area": "Engenharia de Dados",
      "escopo": ["Confere a versão do Python e de cada biblioteca exigida"], "criterios": ["Todas as dependências no mínimo exigido"],
@@ -273,6 +295,7 @@ EQUIPE_TI = [
 ]
 POR_ID = {p["id"]: p for p in EQUIPE_TI}
 GESTORES = {"ger_ti": "dono", "coord_devops": "ger_ti", "sec_senior": "coord_devops", "cloud_aws": "ger_ti",
+            "head_aws": "dir_tecnologia", "aws_senior": "head_aws",
             "dev_pleno": "coord_devops", "infra_pleno": "coord_devops", "dev_junior": "dev_pleno", "devops_estagiario": "infra_pleno",
             "airflow_especialista": "ger_ti", "airflow_pleno": "airflow_especialista", "airflow_estagiario": "airflow_pleno"}
 

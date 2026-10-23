@@ -135,6 +135,37 @@ def executar_texto(banco, texto: str, limite: int = LIMITE_LINHAS) -> dict:
     }
 
 
+def disponibilidade(banco, itens: list[dict] | None = None) -> list[dict]:
+    """Cada consulta com 'disponivel' e, se não estiver, o motivo: as tabelas do cabeçalho 'requer' existem e têm
+    linhas? Assim a tela mostra "precisa de planilha real de NPS" em vez de deixar a consulta quebrar."""
+    itens = listar() if itens is None else itens
+    saida, cache, sem_acesso = [], {}, {}
+    with banco.conectar(leitura=True) as conn:
+        for c in itens:
+            tabelas = re.findall(r"\b([a-z_][a-z0-9_]*\.[a-z_][a-z0-9_]*)\b", c.get("requer") or "")
+            faltam = []
+            for tab in tabelas:
+                if tab not in cache:
+                    try:
+                        with conn.transaction():  # um erro (ex.: sem permissão) não contamina a próxima checagem
+                            existe = conn.execute("SELECT to_regclass(%s)", (tab,)).fetchone()[0]
+                            cache[tab] = bool(existe) and bool(conn.execute(f"SELECT 1 FROM {tab} LIMIT 1").fetchone())
+                    except Exception as e:
+                        cache[tab] = False
+                        sem_acesso[tab] = type(e).__name__
+                if not cache[tab]:
+                    faltam.append(tab)
+            motivo = ""
+            if faltam and any(x in sem_acesso for x in faltam):
+                motivo = "o usuário de leitura não tem acesso a " + ", ".join(x for x in faltam if x in sem_acesso)
+            elif faltam:
+                real = [x for x in faltam if x.split(".")[0] in ("tratado", "analitico", "analise")]
+                motivo = (f"precisa de planilha REAL carregada ({', '.join(real)})" if real
+                          else f"ainda sem dados em {', '.join(faltam)}")
+            saida.append({**c, "disponivel": not faltam, "motivo": motivo})
+    return saida
+
+
 def explicar_erro(mensagem: str, requer: str = "") -> str:
     m = mensagem.lower()
     if "does not exist" in m or "não existe" in m:

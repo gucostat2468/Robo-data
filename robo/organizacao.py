@@ -52,7 +52,7 @@ FERRAMENTAS_ANDAR = {
     2: ["calcular", "perfil_indicadores", "resumo_executivo", "consulta_sql"],
     3: ["calcular", "perfil_indicadores"],
     4: ["dados_pessoais", "resumo_executivo"],
-    5: ["ronda_ti", "orquestracao"],
+    5: ["ronda_ti", "orquestracao", "postgres_saude", "segredos_repo", "restauracao_backup"],
 }
 # Ferramentas extras por pessoa (especialidade)
 LIDERES = ["ger_engenharia", "coord_engenharia", "ger_analise", "coord_analise", "excel_supervisor", "coord_excel",
@@ -69,6 +69,7 @@ FERRAMENTAS_PESSOA = {
     "fab_coordenador": ["fabrica"], "fab_gerador": ["fabrica"], "fab_conferente": ["fabrica"], "fab_revisor": ["fabrica"],
     "dem_coordenador": ["demandas"], "dem_gerador": ["demandas"], "dem_distribuidor": ["demandas"],
     "dem_cobertura": ["demandas"], "dem_avaliador": ["demandas"],
+    "head_aws": ["prontidao_nuvem"], "cloud_aws": ["prontidao_nuvem"],
 }
 # Sala de Casos (4º andar): a revisão independente de casos de treino é a ferramenta de trabalho de todos eles
 for _pid in ("head_casos", "casos_engenharia", "casos_analytics", "casos_governanca", "casos_ti", "casos_revisor",
@@ -85,7 +86,9 @@ ENCAMINHAR = {
     "segmentacao": "cd_pleno_segmentos", "anomalias": "cd_junior_anomalias", "recrutamento": "rh_rs",
     "desenvolvimento": "rh_td", "desempenho": "rh_desempenho", "people_analytics": "rh_people", "raio_x": "dir_operacoes",
     "revisao_biblioteca": "head_python", "estrategia_python": "head_python", "laboratorio": "head_engenharia",
-    "conhecimento": "canal_nina", "historico": "canal_nina", "revisar_caso": "casos_revisor",
+    "conhecimento": "canal_nina", "historico": "canal_nina", "revisar_caso": "casos_revisor", "sql_treino": "dba",
+    "restauracao_backup": "aws_senior", "prontidao_nuvem": "head_aws", "postgres_saude": "aws_senior",
+    "segredos_repo": "sec_senior",
 }
 
 ENTRADAS = {
@@ -294,7 +297,10 @@ def revisor_de(pid: str, cfg=None) -> str:
 
 def ferramentas_de(pid: str, andar: int) -> list[str]:
     from robo import lideranca
+    from robo.sql_treino import AREAS_DE_DADOS
     fs = list(FERRAMENTAS_COMUNS) + FERRAMENTAS_ANDAR.get(int(andar or 1), []) + FERRAMENTAS_PESSOA.get(pid, [])
+    if area_de(pid) in AREAS_DE_DADOS:  # engenharia, análise, estatística, qualidade e insights treinam SQL de verdade
+        fs.append("sql_treino")
     fs += (lideranca.POR_ID.get(pid) or {}).get("ferramentas", [])
     if pid in LIDERES:
         fs.append("reuniao_andar")

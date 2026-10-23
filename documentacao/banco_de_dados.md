@@ -6,7 +6,7 @@
 
 | Onde | O que guarda | Para quê |
 |---|---|---|
-| `logs/trabalho.db` (SQLite) | **Fonte de tudo**: a memória da empresa (72 tabelas abaixo) | Funciona sem internet e sem servidor; nada se apaga |
+| `logs/trabalho.db` (SQLite) | **Fonte de tudo**: a memória da empresa (73 tabelas abaixo) | Funciona sem internet e sem servidor; nada se apaga |
 | `logs/backups_sqlite/` | Cópia diária do `trabalho.db`, conferida (`integrity_check`) e com SHA-256 | Restaurar se o disco falhar; o 1º de cada mês fica para sempre |
 | PostgreSQL `robo_dados`, schema `robo` | Espelho de TODAS as tabelas (`memoria_<tabela>`) | Consultas em SQL, Power BI e Machine Learning |
 | PostgreSQL schemas `bruto` → `tratado` → `analitico` | As planilhas de negócio (ELT) | Análise e Power BI |
@@ -114,6 +114,7 @@
 | `jobs` | Prova de trabalho: cada processamento real (planilha real ou sintética, rodada de treino, exercício do laboratório, rotina que fez algo), com início, fim, estado, responsável, evidência e hash da saída | um processamento | só de inclusão; um job fechado nunca muda (gatilho) | carga real de trabalho por pessoa e por tipo; tempo de ciclo; taxa de falha da esteira |
 | `jobs_etapas` | Cada etapa de um job, com QUEM fez, início, fim, ok e evidência — é o que define quem está trabalhando agora (etapa aberta nos últimos 15 minutos) | uma etapa de um job | só de inclusão; uma etapa fechada nunca muda (gatilho) | tempo por etapa e por pessoa; gargalos da esteira; prova auditável de trabalho |
 | `demandas_ciclos` | Cada ciclo de distribuição de demandas: elegíveis, atribuídas, concluídas, bloqueadas e, no detalhe, quem foi pulado e por quê (estagiário, demanda aberta, recebeu há pouco) | um ciclo da rotina demandas | só acrescenta (imutável: não altera nem apaga) | cobertura de trabalho por pessoa e andar; quem ficou sem demanda e por quê |
+| `telegram_mensagens` | Cada mensagem do grupo do Telegram: entrada (quem escreveu, se era o dono) e saída (qual funcionário respondeu), com erro quando o envio falhou | uma mensagem do grupo | só acrescenta (imutável: não altera nem apaga) | o que o dono pergunta pelo celular; tempo e qualidade das respostas |
 | `demandas_registro` | Cada decisão da distribuição sobre uma pessoa: atribuída, treinamento, pulada, bloqueada, reatribuída ou sem trabalho, com nível, ferramenta, motivo e quem decidiu | um evento de distribuição | só acrescenta (imutável: não altera nem apaga) | cobertura por andar e área; quem nunca recebe trabalho e por quê; justiça da distribuição |
 | `dialogo_ciclos` | Cada ciclo das conversas: quantos fatos avaliados, quantas conversas e se não houve assunto | um ciclo | só acrescenta (imutável: não altera nem apaga) | quanto silêncio é falta de assunto e não de gente |
 | `cobertura_persistencia` | Cada levantamento de cobertura do banco: tabela por tabela (SQLite e PostgreSQL), linhas, natureza (real, sintético, operação, controle) e a causa de cada tabela vazia | uma tabela num levantamento | só acrescenta (imutável: não altera nem apaga) | evolução da cobertura no tempo; quais partes da operação ainda não gravam nada |
@@ -191,6 +192,7 @@
 - **`salas_encerradas`**: `id`, `andar`, `inicio`, `fim`, `recap`, `arquivo`
 - **`sessoes`**: `id`, `aberto_em`, `ultimo_batimento`, `desligado_antes_horas`, `briefing`
 - **`solicitacoes`**: `id`, `tipo`, `titulo`, `pedido`, `origem`, `prioridade`, `estado`, `funcionario`, `andar`, `conversa_id`, `projeto_id`, `modelo`, `plano`, `resultado`, `revisor`, `revisao`, `tentativas`, `criada_em`, `atualizada_em`
+- **`telegram_mensagens`**: `id`, `data_hora`, `direcao`, `chat_id`, `update_id`, `autor`, `funcionario`, `texto`, `ok`, `erro`
 - **`treino_casos`**: `id`, `criado_em`, `competencia`, `nivel`, `semente`, `versao_gerador`, `designer`, `resumo`, `parametros`, `gabarito`, `arquivo`, `conteudo_sha256`, `estado`, `revisor`, `revisado_em`, `revisao`, `versao_codigo`, `encerrado_em`, `arquivo_guardado`
 - **`treino_certificacoes`**: `id`, `data_hora`, `designer`, `competencia`, `versao_gerador`, `ok`, `detalhe`, `revisor`
 - **`treino_niveis`**: `funcionario`, `competencia`, `nivel`, `desde`

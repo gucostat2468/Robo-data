@@ -122,6 +122,62 @@ def _comando_rotina(args) -> int:
     return 1 if est.get("ultimo_status") == "erro" else 0
 
 
+def _telegram(args) -> int:
+    from robo import telegram
+    from robo.config import RAIZ_PROJETO
+    from robo.painel import configuracao
+    arq = Path(args.config) if args.config else RAIZ_PROJETO / "config.yaml"
+    cfg = carregar_config(arq if arq.exists() else None)
+    if not telegram.token(cfg):
+        print("Falta o token. No Prompt de Comando: setx ROBO_TELEGRAM_TOKEN \"o-token-do-BotFather\" "
+              "e abra um Prompt NOVO.", file=sys.stderr)
+        return 1
+    try:
+        if args.testar:
+            eu = telegram._api(cfg, "getMe")
+            print(f"Token OK: o robô do Telegram é @{eu.get('username')} ({eu.get('first_name')}).")
+            c = telegram._c(cfg)
+            if c["chat_id"]:
+                g = telegram._api(cfg, "getChat", {"chat_id": c["chat_id"]})
+                print(f"Grupo OK: {g.get('title')} (id {c['chat_id']}). Ligado: {'sim' if c['habilitado'] else 'não'}.")
+            else:
+                print("Grupo ainda não configurado: escreva qualquer coisa no grupo e rode --descobrir.")
+            return 0
+        if args.descobrir:
+            vistos = {}
+            for u in telegram._api(cfg, "getUpdates", {"timeout": 0}) or []:
+                m = u.get("message") or {}
+                ch, de = m.get("chat") or {}, m.get("from") or {}
+                vistos[(ch.get("id"), de.get("id"))] = (ch.get("title") or ch.get("type"), de.get("first_name"), m.get("text"))
+            if not vistos:
+                print("Nenhuma mensagem nova. Adicione o robô ao grupo, escreva 'oi' no grupo e rode de novo.")
+                return 1
+            for (chat, autor), (titulo, nome, texto) in vistos.items():
+                print(f"Grupo: {titulo}  →  id do grupo: {chat}   |   {nome}  →  seu id: {autor}   (\"{texto}\")")
+            print("\nAgora: python -m robo telegram --configurar <id do grupo> <seu id>")
+            return 0
+        if args.configurar:
+            if not arq.exists():
+                print("Ainda não existe config.yaml: abra o robô uma vez (python -m robo app) antes.", file=sys.stderr)
+                return 1
+            grupo, dono = args.configurar
+            configuracao._gravar(arq, "telegram", "chat_id", str(grupo))
+            configuracao._gravar(arq, "telegram", "dono_id", str(dono))
+            configuracao._gravar(arq, "telegram", "habilitado", True)
+            cfg = carregar_config(arq)
+            ok = telegram.enviar(cfg, "Grupo ligado. A partir de agora a equipe responde aqui. Pergunte, por exemplo: "
+                                      "\"como está o treino?\" ou \"quem está trabalhando agora?\"", "canal_nina")
+            print("Configurado e testado: a Nina mandou a primeira mensagem no grupo." if ok else
+                  "Configurado, mas a mensagem de teste falhou: rode --testar.")
+            return 0 if ok else 1
+        r = telegram.apresentar(cfg)
+        print(f"{r['enviados']} cartão(ões) enviado(s)." + (f" Parou: {r['erro']}" if r.get("erro") else ""))
+        return 0 if not r.get("erro") else 1
+    except telegram.ErroTelegram as e:
+        print(f"O Telegram respondeu: {e}", file=sys.stderr)
+        return 1
+
+
 def _cobertura_demandas(args) -> int:
     from robo import demandas, organizacao
     try:
@@ -278,6 +334,10 @@ def principal(argv: list[str] | None = None) -> int:
                                        "memória, trabalha, salva tudo a cada 10 min. Lê ROBO_PG_URL e ROBO_PG_SENHA_LEITURA")
     stu.add_argument("--minutos", type=float, default=20)
     stu.add_argument("--pasta", default="nuvem_trabalho", help="pasta de trabalho temporária")
+    sse = sub.add_parser("servico", help="modo servidor (contêiner/Cloud Run): turnos um atrás do outro e uma página de "
+                                         "saúde SOMENTE LEITURA na porta da variável PORT (padrão 8080). Sem painel")
+    sse.add_argument("--minutos", type=float, default=20, help="duração de cada turno")
+    sse.add_argument("--pasta", default="/tmp/empresa", help="pasta de trabalho temporária")
     spc = sub.add_parser("preparar-pc", help="prepara o computador de uma vez (Prompt como Administrador): banco real, "
                                              "memória, celular, banco no celular, início com o Windows, vigia e diagnóstico")
     spc.add_argument("--memoria", help="arquivo trabalho_AAAAMMDD_HHMMSS.db.gz com a memória da empresa a importar")
@@ -291,6 +351,13 @@ def principal(argv: list[str] | None = None) -> int:
     sim.add_argument("arquivo")
     sim.add_argument("--substituir", action="store_true", help="trocar mesmo se este computador já tiver história "
                                                                 "(a memória atual é guardada antes)")
+    stg = sub.add_parser("telegram", help="grupo do Telegram: testar, descobrir o id do grupo, configurar e apresentar "
+                                          "a equipe (token na variável ROBO_TELEGRAM_TOKEN)")
+    gtg = stg.add_mutually_exclusive_group(required=True)
+    gtg.add_argument("--testar", action="store_true")
+    gtg.add_argument("--descobrir", action="store_true")
+    gtg.add_argument("--configurar", nargs=2, metavar=("ID_DO_GRUPO", "SEU_ID"))
+    gtg.add_argument("--apresentar", action="store_true")
     scd = sub.add_parser("cobertura-demandas", help="quem recebeu demanda, por andar e por área, e quem ficou sem e por "
                                                     "quê — só lê")
     scd.add_argument("--dias", type=int, default=7)
@@ -318,7 +385,7 @@ def principal(argv: list[str] | None = None) -> int:
         import json
         import os
         from robo import nuvem
-        url = os.environ.get("ROBO_PG_URL", "").strip()
+        url = nuvem.url_do_ambiente()  # ROBO_PG_URL, ou DB_USER/DB_PASS/DB_NAME (+ INSTANCE_CONNECTION_NAME)
         if not url:
             print("::warning::Falta o segredo ROBO_PG_URL (endereço do PostgreSQL gratuito). Veja documentacao/nuvem_gratis.md"
                   if os.environ.get("GITHUB_ACTIONS") else "Defina ROBO_PG_URL (veja documentacao/nuvem_gratis.md).")
@@ -332,6 +399,9 @@ def principal(argv: list[str] | None = None) -> int:
         if r["alerta_espaco"]:
             print(f"::warning::Banco gratuito com {r['banco_mb']} MB de {r['limite_mb']} MB: decidir arquivamento.")
         return 0
+    if args.comando == "servico":
+        from robo import servico
+        return servico.principal(args.pasta, args.minutos, args.verboso)
     if args.comando == "preparar-pc":
         from robo import preparar_pc
         return preparar_pc.preparar(principal, args.config, args.memoria)
@@ -377,6 +447,8 @@ def principal(argv: list[str] | None = None) -> int:
         atencoes = sum(i["situacao"] == "atencao" for i in itens)
         print(f"\nResultado: {falhas} falha(s), {atencoes} ponto(s) de atenção." + (" Tudo certo." if not falhas and not atencoes else ""))
         return 1 if falhas else 0
+    if args.comando == "telegram":
+        return _telegram(args)
     if args.comando == "cobertura-demandas":
         return _cobertura_demandas(args)
     if args.comando == "cobertura-banco":

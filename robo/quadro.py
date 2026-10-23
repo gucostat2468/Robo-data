@@ -37,6 +37,9 @@ import pandas as pd
 from robo.limpeza import normalizar_nome_coluna
 
 ESCOPO_NIVEL = {
+    "head": {"nome": "Head", "decide": "a arquitetura e o método da área (custos, segurança, plano de volta)",
+             "bloqueia": True, "executa": "revisa o desenho técnico e as verificações da área",
+             "nao_faz": "não aprova a própria mudança nem altera permissões sem autorização do dono"},
     "gerente": {"nome": "Gerente", "decide": "metas, prioridades e prazos do andar", "bloqueia": False,
                 "executa": "acompanha indicadores do andar e escreve a manchete para o dono",
                 "nao_faz": "não executa tarefa operacional nem aprova o próprio trabalho"},

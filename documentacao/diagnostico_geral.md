@@ -111,3 +111,16 @@ demandas). Detalhes em `documentacao/diagnostico_reestruturacao.md`.
 | 7 | Catálogo de dados + primeiro experimento de ML | 10, 11 | 1 a 2 |
 | 8 | Extras 7.1 a 7.7 | 16 a 22 | 2 a 3 |
 | 9 | Pedidos antigos | 23 a 27 | 1 a 2 (Telegram depende do token) |
+
+## 6. Atualização (23/10/2026, sessão seguinte)
+
+| Item | Situação agora |
+|---|---|
+| 8. Head de AWS e Sênior de AWS/Linux | **feito**: Heloísa e Ícaro com 4 verificações reais na ronda de TI e demandas a cada 2 h; sem acesso à nuvem |
+| 9. Plano 24 h com custos | **parcial**: `documentacao/nuvem_google.md` (Google Cloud custa cerca de US$ 70–100/mês; o caminho grátis continua o GitHub Actions + Neon). Falta comparar AWS e Azure |
+| 23. Grupo no Telegram | **código pronto e testado**; falta só o token (você) |
+| Novo: treino de SQL | **feito**: 61 de 100 funcionários das áreas de dados alternam SQL (4 níveis, conferido contra gabarito) com a ferramenta própria |
+| Novo: biblioteca de consultas | 69 consultas; 40 novas que rodam com os dados que a empresa já produz; a tela diz o que falta para as outras 29 |
+| Novo: contêiner | Dockerfile sem root, serviço com saúde só leitura e instância única, testado em Docker contra PostgreSQL |
+
+Quadro: 100 funcionários. Testes: 679 passando.

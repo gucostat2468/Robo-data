@@ -1,0 +1,18 @@
+# nada de segredo, memória local ou lixo de desenvolvimento dentro da imagem
+.git
+.github
+.claude
+.venv
+**/__pycache__
+**/*.pyc
+.pytest_cache
+config.yaml
+logs
+demonstracao
+airflow
+dados
+testes
+*.lock
+*.bat
+*.vbs
+*.pyw

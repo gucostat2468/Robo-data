@@ -124,14 +124,19 @@ Legenda: ✅ feito e testado · 🟡 feito em parte · ⏳ pendente
 | 119 | Cinco funcionários distribuindo demandas sintéticas em 4 níveis, sem deixar ninguém para trás | ✅ | Aurora, Vicente, Isadora, Renan e Bento (`robo/demandas.py`); níveis básico a profissional com trabalho diferente em cada um; cobertura por andar e área (`python -m robo cobertura-demandas`); abandono, treinamento no lugar e avaliação independente registrados |
 | 120 | Diagnóstico geral do projeto e decisões com autonomia | ✅ | `documentacao/diagnostico_geral.md`: 32 itens abertos, 6 que dependem do dono, ordem recomendada; nomes repetidos resolvidos (Gael, Caetano, Lorena) |
 | 121 | Organograma visual | ⏳ | planejado (diagnóstico geral, item 13) |
-| 122 | Grupo no Telegram com foto, nome, área e cargo de cada funcionário | ⏳ | depende do token do @BotFather (seu celular, 2 min) |
+| 122 | Grupo no Telegram com foto, nome, área e cargo de cada funcionário | 🟡 | código pronto e testado (`robo/telegram.py`, `python -m robo telegram`): responde só você, assina por funcionário, cartão com foto de cada um, tudo registrado; falta o token do @BotFather (seu celular, 2 min) |
 | 123 | Fundos de Power BI no estilo Figma | ⏳ | planejado (diagnóstico geral, item 24) |
 | 124 | Skill de engenharia reversa para o Claude | ⏳ | planejado (diagnóstico geral, item 25) |
 | 125 | Funcionário de pesquisa (Markdown, PDF, fontes, notificações) | ⏳ | planejado (Etapa 7; fontes gratuitas, Perplexity só com chave sua) |
-| 126 | Head de AWS e Sênior de AWS/Linux/Ubuntu | ⏳ | planejado (Etapa 8; sem acesso real à nuvem) |
+| 126 | Head de AWS e Sênior de AWS/Linux/Ubuntu | ✅ | Heloísa (Head de AWS) e Ícaro (Sênior AWS/Linux/Ubuntu) com trabalho real: prontidão para servidor, backup que restaura, saúde do PostgreSQL, segredos no repositório; demanda a cada 2 h; sem acesso à nuvem (menor privilégio) |
 | 127 | IA local para os funcionários | ⏳ | planejado (Etapa 5); a instalação no seu notebook depende de você |
 | 128 | Machine learning e deep learning com os dados do banco | ⏳ | planejado (Etapa 9): primeiro experimento com as tentativas de treino |
 | 129 | Extras 7.1 a 7.7 (contrato de dados, drift, linhagem, fila com SLA, dia acelerado, relatório semanal em PDF, teste de caos) | ⏳ | planejado |
 | 130 | Relatório final com vídeo dos andares | ⏳ | planejado |
+| 131 | Funcionários de dados treinando SQL, não só planilha | ✅ | `robo/sql_treino.py`: 4 níveis (contagem → reconciliação com CTE) sobre os lotes da fábrica no PostgreSQL, conferidos contra o gabarito; áreas de dados alternam SQL e ferramenta própria |
+| 132 | Consultas SQL que funcionam com o que temos | ✅ | `consultas_sql/07 Treino da fábrica` (30, uma por regra) e `08 Operação da empresa` (10, sobre a memória); a tela marca ●/○ e diz o que falta para cada consulta |
+| 133 | 5º andar e AWS trabalhando mais | ✅ | 5º andar a cada 6 h, Heloísa/Ícaro/Cloud a cada 2 h (geral: 24 h); 4 verificações novas na ronda de TI |
+| 134 | Desenho do Google Cloud (Cloud Run + Cloud SQL) | 🟡 | projeto pronto (Dockerfile sem root, PORT, Unix socket do Cloud SQL, saúde só leitura, instância única) e testado em contêiner; NADA criado no Google: custa cerca de US$ 70–100/mês (`documentacao/nuvem_google.md`) |
+| 135 | Todas as tabelas do PostgreSQL com dados reais e coerentes | 🟡 | schemas laboratorio/treino/robo enchem com o trabalho real; tratado/analitico só com planilha REAL sua (não invento); causas em `python -m robo cobertura-banco` |
 | 98 | Você acessar meu PC | 🟡 | esta sessão roda na nuvem e não alcança o seu PC; para eu operar no Windows: Claude Desktop ou `claude remote-control` na pasta do projeto |
 | 38 | IA opcional sem fingir | ✅ | `robo/ia.py`: desligada por padrão; Ollama local, API compatível ou Claude; só redige, nunca calcula; texto com número fora dos fatos é descartado; frase de IA marcada como hipótese com o modelo |

@@ -38,6 +38,10 @@ jobs:
         env:
           ROBO_PG_URL: ${{ secrets.ROBO_PG_URL }}
           ROBO_PG_SENHA_LEITURA: ${{ secrets.ROBO_PG_SENHA_LEITURA }}
+          # grupo do Telegram (opcional): sem estes três segredos, o turno simplesmente não fala no grupo
+          ROBO_TELEGRAM_TOKEN: ${{ secrets.ROBO_TELEGRAM_TOKEN }}
+          ROBO_TELEGRAM_CHAT: ${{ secrets.ROBO_TELEGRAM_CHAT }}
+          ROBO_TELEGRAM_DONO: ${{ secrets.ROBO_TELEGRAM_DONO }}
         run: |
           MIN="${{ github.event.inputs.minutos }}"
           [ -z "$MIN" ] && [ "${{ github.event_name }}" = "push" ] && MIN="$(grep -Eo '^[0-9]+' nuvem/ligar | head -1)"

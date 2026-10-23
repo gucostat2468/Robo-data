@@ -56,6 +56,8 @@ CAUSAS: dict[str, tuple[str, str, str, str]] = {
     "artefatos": (NAO_ACIONADA, "arquivo entregue por uma etapa (resumo executivo, base publicada); as ferramentas das "
                   "demandas respondem em texto e dados, sem arquivo", "tarefa com resumo executivo ou publicação",
                   "robo/trabalho.py"),
+    "telegram_mensagens": (NAO_ACIONADA, "o grupo do Telegram ainda não foi ligado (precisa do token do @BotFather, que só o "
+                           "dono cria)", "python -m robo telegram --configurar", "robo/telegram.py"),
     "demandas_registro": (NAO_ACIONADA, "a rotina demandas ainda não rodou neste banco", "robô aberto ou turno da nuvem",
                           "robo/demandas.py"),
     "demandas_avaliacoes": (NAO_ACIONADA, "Bento só avalia demanda CONCLUÍDA que não executou nem revisou; ainda não "

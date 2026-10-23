@@ -43,6 +43,26 @@ LIMITE_MB_PADRAO = 500  # plano gratuito: avisa com 80% (o Neon gratuito dá 0,5
 
 
 # =============================================================================== configuração
+def url_do_ambiente(amb: dict | None = None) -> str:
+    """Endereço do PostgreSQL montado SÓ de variáveis de ambiente (nunca de arquivo). Duas formas:
+      ROBO_PG_URL                         a URL inteira (GitHub Actions + Neon, o caminho grátis de hoje);
+      DB_USER, DB_PASS, DB_NAME           o padrão do Google Cloud Run + Cloud SQL. Com INSTANCE_CONNECTION_NAME a
+                                          conexão vai pelo Unix socket /cloudsql/<instância> (sem IP público, sem
+                                          porta aberta); sem ela, por DB_HOST e DB_PORT.
+    Devolve '' quando nada está definido."""
+    from psycopg.conninfo import make_conninfo
+    amb = os.environ if amb is None else amb
+    url = (amb.get("ROBO_PG_URL") or "").strip()
+    if url:
+        return url
+    if not (amb.get("DB_USER") and amb.get("DB_NAME")):
+        return ""
+    instancia = (amb.get("INSTANCE_CONNECTION_NAME") or "").strip()
+    host = f"/cloudsql/{instancia}" if instancia else (amb.get("DB_HOST") or "localhost")
+    return make_conninfo("", host=host, port=None if instancia else (amb.get("DB_PORT") or "5432"),
+                         user=amb["DB_USER"], password=amb.get("DB_PASS") or "", dbname=amb["DB_NAME"])
+
+
 def config_da_nuvem(pasta: Path, url: str, senha_leitura: str = ""):
     """Config montada só da memória (nada de senha em arquivo). As pastas ficam na máquina temporária do turno."""
     from psycopg.conninfo import conninfo_to_dict
@@ -51,15 +71,20 @@ def config_da_nuvem(pasta: Path, url: str, senha_leitura: str = ""):
     pasta = Path(pasta)
     for sub in ("entrada", "logs", "agentes", "habilidades"):
         (pasta / sub).mkdir(parents=True, exist_ok=True)
-    banco = {"habilitado": True, "host": c.get("host", "localhost"), "porta": int(c.get("port") or 5432),
+    host = c.get("host", "localhost")
+    local = host in ("localhost", "127.0.0.1") or host.startswith("/")  # Unix socket (Cloud SQL) não usa SSL
+    banco = {"habilitado": True, "host": host, "porta": int(c.get("port") or 5432),
              "banco": c.get("dbname", "neondb"), "usuario": c.get("user", "postgres"), "senha": c.get("password", ""),
-             "sslmode": c.get("sslmode") or ("require" if c.get("host") not in ("localhost", "127.0.0.1") else ""),
+             "sslmode": c.get("sslmode") or ("" if local else "require"),
              "usuario_leitura": "robo_leitura", "senha_leitura": senha_leitura, "tempo_limite_conexao": 20}
     return carregar_config(pasta / "config_nuvem_inexistente.yaml", sobrescrever={
         "pastas": {k: str(pasta / k) for k in ("entrada", "logs", "agentes", "habilidades")},
         "banco": banco, "rotinas": {"agendador": "robo"}, "backup": {"copia_extra": "", "postgres": False},
         # lotes menores na nuvem: cabem no turno de 20 min e no plano gratuito do banco
-        "fabrica": {"linhas_min": 1000, "linhas_max": 5000}})
+        "fabrica": {"linhas_min": 1000, "linhas_max": 5000},
+        # o grupo do Telegram também atende pela nuvem (token em ROBO_TELEGRAM_TOKEN, nos Secrets do GitHub)
+        "telegram": {"habilitado": bool(os.environ.get("ROBO_TELEGRAM_CHAT")),
+                     "chat_id": os.environ.get("ROBO_TELEGRAM_CHAT", ""), "dono_id": os.environ.get("ROBO_TELEGRAM_DONO", "")}})
 
 
 def _conectar(cfg):
@@ -190,7 +215,7 @@ def turno(cfg, minutos: float = 20, salvar_a_cada_min: float = 10, pausa_s: floa
     voltas = 0
     while time.monotonic() < fim:
         voltas += 1
-        for nome in ("canal", "registro", "treino", "laboratorio", "fabrica", "demandas"):
+        for nome in ("canal", "registro", "treino", "laboratorio", "fabrica", "demandas", "telegram"):
             rotinas.executar(cfg, nome, rotinas.funcao(cfg, nome))
         planilhas += _esteira(monitor)
         rotinas.batimento(cfg, sessao)

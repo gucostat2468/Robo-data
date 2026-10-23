@@ -44,6 +44,9 @@ ROTINAS = {
                 "limpeza, validação, saída, histórico e análise) num computador de teste; cada etapa conferida", 1),
     "caixa_dono": ("ger_operacoes", "Caixa do dono: sugestões da equipe tiradas dos fatos (erros repetidos no treino, rotinas "
                    "com erro) chegam ao dono junto com as ideias e pendências", 1),
+    "telegram": ("canal_nina", "Grupo do Telegram: responde o dono pelo canal da empresa (cada mensagem assinada por quem "
+                 "respondeu) e manda o resumo do período; só com telegram.habilitado e o token na variável de ambiente",
+                 1 / 60),
     "demandas": ("dem_coordenador", "Demandas (Aurora, Vicente, Isadora, Renan e Bento): cada funcionário recebe trabalho "
                  "real com a própria ferramenta, no nível do cargo (básico a profissional), com critérios de aceitação, "
                  "revisão independente e avaliação por amostragem; ninguém fica para trás", 0.5),
@@ -63,7 +66,7 @@ def funcao(cfg, nome: str):
     """O que cada rotina executa. Uma lista só, usada pelo laço do robô (painel/controle.py) e pelo comando
     `python -m robo rotina <nome>` (que é o que o Airflow chama). Assim os dois nunca divergem."""
     from robo import caixa_dono, jornada
-    from robo import demandas, dialogo, fabrica
+    from robo import demandas, dialogo, fabrica, telegram
     from robo import (alcadas, auditoria, backup, desenvolvimento, estrategia, ideias, laboratorio, licoes, memoria,
                       paineis, registro_total, reuniao, rh_desempenho, treino)
     from robo.canal import Canal
@@ -89,6 +92,7 @@ def funcao(cfg, nome: str):
         "fabrica": lambda: fabrica.rotina(cfg),
         "dialogo": lambda: dialogo.rotina(cfg),
         "demandas": lambda: demandas.rotina(cfg),
+        "telegram": lambda: telegram.rotina(cfg),
         "jornada": lambda: jornada.rotina(cfg),
         "caixa_dono": lambda: caixa_dono.rotina(cfg),
     }

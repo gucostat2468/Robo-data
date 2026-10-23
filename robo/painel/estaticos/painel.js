@@ -933,7 +933,7 @@ function listaConsultas() {
   for (const c of itens) {
     if (c.categoria !== grupo) { grupo = c.categoria; html += `<div class="grupo">${esc(grupo)}</div>`; }
     html += `<button class="${E.consultaAtual?.id === c.id ? "ativo" : ""}" data-acao="abrir-consulta" data-id="${esc(c.id)}">
-      <strong>${esc(c.titulo)}</strong><small title="${esc(c.pergunta)}">${esc(c.pergunta)}</small></button>`;
+      <strong>${c.disponivel === false ? "○ " : c.disponivel ? "● " : ""}${esc(c.titulo)}</strong><small title="${esc(c.pergunta)}">${esc(c.disponivel === false ? c.motivo : c.pergunta)}</small></button>`;
   }
   return html;
 }
@@ -962,6 +962,7 @@ function renderConsultas() {
           <dt>Pergunta</dt><dd>${esc(c.pergunta)}</dd>
           <dt>Como ler</dt><dd>${esc(c.como_ler)}</dd>
           <dt>Precisa de</dt><dd class="mono">${esc(c.requer)}</dd>
+          ${c.disponivel === false ? `<dt>Situação</dt><dd><span class="etiqueta alerta">sem dados</span> ${esc(c.motivo)}</dd>` : ""}
         </dl>
         <pre class="sql">${esc(c.sql)}</pre>
         <div class="acoes">

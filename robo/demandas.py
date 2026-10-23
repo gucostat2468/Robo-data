@@ -38,6 +38,8 @@ from robo.trabalho import FINAIS, Trabalho, _agora
 
 ORIGEM = "demanda_sintetica"
 PADRAO = {"habilitada": True, "intervalo_minutos": 30, "por_ciclo": 6, "por_dia": 150, "por_pessoa_horas": 24,
+          # o 5º andar (TI, nuvem, segurança) recebe trabalho com mais frequência; a equipe de AWS mais que todos
+          "horas_por_andar": {"5": 6}, "horas_por_pessoa": {"head_aws": 2, "aws_senior": 2, "cloud_aws": 2},
           "horas_sem_atividade": 48, "horas_abandono": 6, "avaliacoes_por_ciclo": 3}
 
 # =============================================================================== a equipe de demandas (4º andar)
@@ -237,21 +239,21 @@ def _com_indicador(cfg, pessoa):
 
 
 def _sql(cfg, pessoa):
-    """Leitura real no PostgreSQL: os lotes sintéticos que a esteira gravou no schema treino."""
+    """Exercício de SQL: um lote da fábrica que já está no PostgreSQL e tem gabarito conferido. Cada pessoa pega um lote
+    diferente (rodízio pelo id), para a turma não responder sempre a mesma pergunta."""
     if not (cfg.banco or {}).get("habilitado"):
-        return "PostgreSQL desligado nas Configurações: consulta SQL não roda"
-    from robo.banco import Banco
+        return "PostgreSQL desligado nas Configurações: exercício de SQL não roda"
+    from robo import sql_treino
     try:
-        with Banco(cfg.banco, cfg.base).conectar() as conn:
-            existe = conn.execute("SELECT to_regclass('treino.lotes')").fetchone()[0]
-            n = conn.execute("SELECT COUNT(*) FROM treino.lotes").fetchone()[0] if existe else 0
+        lotes = sql_treino.lotes_no_banco(cfg, sql_treino.lotes_com_gabarito(cfg))
     except Exception as e:
         return f"PostgreSQL indisponível ({type(e).__name__})"
-    if not n:
-        return "o schema treino ainda não tem lotes (nenhuma planilha da fábrica foi carregada)"
-    return ({"sql": "SELECT arquivo, status, linhas_entrada, linhas_saida, erros FROM treino.lotes "
-                    "ORDER BY processado_em DESC LIMIT 20"},
-            [{"tipo": "linhas_min", "n": min(int(n), 20)}])
+    if not lotes:
+        return "nenhum lote da fábrica conferido está no PostgreSQL ainda (schema treino)"
+    import zlib
+    lote = lotes[zlib.crc32(pessoa["id"].encode()) % len(lotes)]
+    return ({"regra": lote["regra"], "arquivo": lote["arquivo"], "gabarito": lote["gabarito"]},
+            [{"tipo": "verdadeiro", "chave": "confere"}])
 
 
 def _pergunta_da_area(cfg, pessoa):
@@ -312,6 +314,21 @@ CATALOGO: dict[str, Modelo] = {m.ferramenta: m for m in [
     Modelo("consulta_sql", "Conferir no PostgreSQL os lotes da fábrica",
            "Ler, em transação somente leitura, os lotes sintéticos gravados no schema treino.",
            "linhas devolvidas pelo PostgreSQL", BASICOS, _sql),
+    Modelo("sql_treino", "Exercício de SQL no PostgreSQL com os dados da fábrica",
+           "Responder com SQL (somente leitura) uma pergunta sobre um lote real do banco, e bater com o gabarito.",
+           "o SQL, o resultado do banco e a conferência com o gabarito do lote", BASICOS, _sql),
+    Modelo("restauracao_backup", "Testar se o último backup volta",
+           "Restaurar o backup mais recente numa pasta temporária e provar que ele está íntegro e completo.",
+           "integridade, tabelas e linhas do backup restaurado", BASICOS + [{"tipo": "dados", "chave": "integridade"}]),
+    Modelo("prontidao_nuvem", "Conferir se o projeto está pronto para servidor",
+           "Checar Dockerfile, usuário sem root, porta por variável e segredos fora do repositório.",
+           "cada item conferido com ok ou não", BASICOS + [{"tipo": "dados", "chave": "itens"}]),
+    Modelo("postgres_saude", "Medir a saúde do PostgreSQL",
+           "Medir espaço contra o limite do plano, linhas mortas, conexões e consultas presas.",
+           "tamanho do banco, schemas, conexões", BASICOS + [{"tipo": "dados", "chave": "mb"}]),
+    Modelo("segredos_repo", "Procurar segredos no repositório público",
+           "Varrer os arquivos versionados atrás de senha, token e chave escritos.",
+           "arquivos lidos e achados (sem mostrar o segredo)", BASICOS + [{"tipo": "dados", "chave": "arquivos_lidos"}]),
     Modelo("ronda_ti", "Ronda de saúde do sistema", "Conferir disco, pastas, dependências, segurança e logs agora.",
            "verificações executadas neste computador", BASICOS),
     Modelo("orquestracao", "SLA das rotinas", "Apontar rotinas atrasadas, com erro ou lentas pelos registros.",
@@ -383,6 +400,10 @@ def conferir_criterios(resultado: dict, criterios: list[dict]) -> list[str]:
             falhas.append(f"faltou '{c['chave']}' nos dados do resultado")
         elif t == "linhas_min" and len((r.get("dados") or {}).get("linhas") or []) < int(c.get("n", 1)):
             falhas.append(f"menos de {c.get('n')} linha(s) devolvidas")
+        elif t == "verdadeiro" and _dado(r.get("dados") or {}, c["chave"]) is not True:
+            falhas.append(f"'{c['chave']}' não é verdadeiro no resultado"
+                          + (": " + "; ".join((r.get("dados") or {}).get("diferencas") or [])
+                             if (r.get("dados") or {}).get("diferencas") else ""))
         elif t == "fonte_especifica" and any(f"“{g}”" in str(r.get("evidencia") or "") for g in c.get("genericas") or []):
             falhas.append("a fonte é a abertura genérica de um manual, não um conhecimento sobre este trabalho")
         elif t == "artefato":
@@ -414,7 +435,8 @@ def _texto_criterio(c: dict) -> str:
             "dados": f"o resultado traz '{c.get('chave')}'", "linhas_min": f"pelo menos {c.get('n')} linha(s) do banco",
             "valor_unico": f"o valor bate com a conta independente de {c.get('coluna')}",
             "artefato": "arquivo entregue e não vazio",
-            "fonte_especifica": "conhecimento específico do trabalho (não a abertura genérica de um manual)"}.get(c.get("tipo"), c.get("tipo", ""))
+            "fonte_especifica": "conhecimento específico do trabalho (não a abertura genérica de um manual)",
+            "verdadeiro": "o resultado do banco bate com o gabarito"}.get(c.get("tipo"), c.get("tipo", ""))
 
 
 # =============================================================================== Vicente: nível e montagem
@@ -422,7 +444,7 @@ def _historico(tb: Trabalho, pid: str, limite: int = 10) -> list[dict]:
     """Últimas demandas da pessoa (mais recente primeiro), com o nível de cada uma."""
     with tb.tx() as c:
         linhas = [dict(r) for r in c.execute(
-            "SELECT id, estado, plano, criada_em FROM solicitacoes WHERE origem=? AND funcionario=? "
+            "SELECT id, estado, plano, modelo, criada_em FROM solicitacoes WHERE origem=? AND funcionario=? "
             "ORDER BY criada_em DESC, id DESC LIMIT ?", (ORIGEM, pid, limite))]
     for l in linhas:
         try:
@@ -484,6 +506,8 @@ def montar(cfg, pessoa: dict, ferramenta: str, nivel: str = "basico", estudo_de:
     if isinstance(preparado, str):
         return preparado
     params, extras = preparado
+    if ferramenta == "sql_treino":  # o exercício de SQL tem o nível da demanda (contagem → reconciliação com CTE)
+        params = {**params, "nivel": nivel}
     if ferramenta == "conhecimento":  # estudo só vale com conhecimento específico, nunca a abertura de um manual
         params = {**params, "especifico": True}
         extras = list(extras) + [{"tipo": "fonte_especifica", "genericas": sorted(secoes_genericas())}]
@@ -496,7 +520,14 @@ def montar(cfg, pessoa: dict, ferramenta: str, nivel: str = "basico", estudo_de:
         crits[len(etapas)] = [{"tipo": "ok"}, {"tipo": "evidencia"},
                               {"tipo": "fonte_especifica", "genericas": sorted(secoes_genericas())}]
     if nivel == "profissional":
-        if params.get("arquivo"):
+        conferir = []
+        if ferramenta == "sql_treino":
+            # o "arquivo" do SQL é o nome do lote no banco, não uma planilha: o colega (o DBA primeiro) refaz o lote por
+            # OUTRA consulta (soma e média da métrica) e confere com o mesmo gabarito
+            cruz, titulo = "sql_treino", "Conferência cruzada: o mesmo lote por outra consulta (soma e média)"
+            p3 = {**params, "nivel": "medio"}
+            conferir = [{"tipo": "verdadeiro", "chave": "confere"}]
+        elif params.get("arquivo"):
             cruz, p3, titulo = "dados_pessoais", {"arquivo": params["arquivo"]}, "Conferência cruzada: dados pessoais (LGPD)"
         else:
             cruz, p3, titulo = "reuniao_andar", {"andar": pessoa["andar"]}, "Conferência cruzada: situação do andar"
@@ -504,7 +535,7 @@ def montar(cfg, pessoa: dict, ferramenta: str, nivel: str = "basico", estudo_de:
         if not colega:
             return f"ninguém além de {pid} pode fazer a conferência cruzada ({cruz})"
         etapas.append({"titulo": titulo, "ferramenta": cruz, "funcionario": colega, "parametros": p3})
-        crits[len(etapas)] = list(BASICOS)
+        crits[len(etapas)] = list(BASICOS) + conferir
     if nivel != "basico":
         etapas.append({"titulo": "Resumo executivo das etapas (.md)", "ferramenta": "resumo_executivo", "funcionario": pid,
                        "parametros": {}, "depende": list(range(1, len(etapas) + 1))})
@@ -706,15 +737,27 @@ def _refazer_conta(etapa: dict, criterio: dict) -> list[str]:
 
 
 # =============================================================================== o ciclo (Aurora assina)
-def escolher_ferramenta(cfg, pessoa: dict) -> str | None:
-    """A ferramenta mais específica da pessoa (a que menos gente tem), entre as do contrato que o catálogo cobre."""
+def escolher_ferramenta(cfg, pessoa: dict, ultima: str | None = None) -> str | None:
+    """A ferramenta mais específica da pessoa (a que menos gente tem), entre as do contrato que o catálogo cobre.
+    Quem é das áreas de dados alterna: uma demanda de SQL, uma da ferramenta própria (ultima = ferramenta da anterior)."""
     from robo import ferramentas, organizacao
     suas = [f for f in organizacao.ferramentas_de(pessoa["id"], pessoa["andar"])
             if f in CATALOGO and f in ferramentas.REGISTRO and organizacao.pode_usar(pessoa["id"], f, cfg, producao=True)]
     if not suas:
         return None
+    if "sql_treino" in suas and ultima != "sql_treino":
+        return "sql_treino"
     raridade = _raridade(cfg)
-    return sorted(suas, key=lambda f: (f in GERAIS, raridade.get(f, 0), f))[0]
+    outras = [f for f in suas if f != "sql_treino"] or suas
+    return sorted(outras, key=lambda f: (f in GERAIS, raridade.get(f, 0), f))[0]
+
+
+def _escolher(cfg, pessoa, ultima):
+    """Chama escolher_ferramenta com a última ferramenta só se ela aceitar (testes antigos trocam a função)."""
+    try:
+        return escolher_ferramenta(cfg, pessoa, ultima)
+    except TypeError:
+        return escolher_ferramenta(cfg, pessoa)
 
 
 def _raridade(cfg) -> dict:
@@ -724,6 +767,15 @@ def _raridade(cfg) -> dict:
         for f in organizacao.ferramentas_de(p["id"], p["andar"]):
             conta[f] = conta.get(f, 0) + 1
     return conta
+
+
+def intervalo_da_pessoa(c: dict, pessoa: dict) -> float:
+    """Horas entre demandas: pessoa > andar > geral. Nunca mais folgado que o geral (só aperta)."""
+    geral = float(c["por_pessoa_horas"])
+    por_pessoa = (c.get("horas_por_pessoa") or {}).get(pessoa["id"])
+    por_andar = (c.get("horas_por_andar") or {}).get(str(pessoa.get("andar")))
+    escolhido = por_pessoa if por_pessoa is not None else por_andar
+    return min(geral, float(escolhido)) if escolhido is not None else geral
 
 
 def _executar_com_job(cfg, sid: str, pid: str, ferramenta: str) -> str:
@@ -776,12 +828,13 @@ def rotina(cfg, agora: datetime | None = None) -> dict | None:
         reatribuidas = encerrar_abandonadas(cfg, tb, estado, agora, float(c["horas_abandono"]))
         eventos += [{"funcionario": r["funcionario"], "evento": "reatribuida", "solicitacao": r["solicitacao"],
                      "motivo": r["motivo"], "responsavel": "dem_cobertura"} for r in reatribuidas]
-        limite_pessoa = (agora - timedelta(hours=float(c["por_pessoa_horas"]))).isoformat(timespec="seconds")
         candidatas = []
         for p in organizacao.lista(cfg):
             nivel_cargo, e = organizacao.nivel_de(p["id"], p), estado.get(p["id"]) or {}
+            horas = intervalo_da_pessoa(c, p)
+            limite_pessoa = (agora - timedelta(hours=horas)).isoformat(timespec="seconds")
             motivo = (NIVEIS_SEM_DEMANDA.get(nivel_cargo) or ("já tem uma demanda aberta" if e.get("abertas") else "")
-                      or (f"recebeu demanda há menos de {c['por_pessoa_horas']} h" if e.get("ultima", "") > limite_pessoa else ""))
+                      or (f"recebeu demanda há menos de {horas:g} h" if e.get("ultima", "") > limite_pessoa else ""))
             if motivo:
                 eventos.append({"funcionario": p["id"], "andar": p["andar"], "evento": "pulada", "motivo": motivo,
                                 "responsavel": "dem_cobertura"})
@@ -797,8 +850,11 @@ def rotina(cfg, agora: datetime | None = None) -> dict | None:
         for p, motivo_fila in fila:
             if len(atribuidas) >= vagas:
                 break
-            ferr = escolher_ferramenta(cfg, p)
-            nivel, motivo_nivel = nivel_para(organizacao.nivel_de(p["id"], p), _historico(tb, p["id"]))
+            hist = _historico(tb, p["id"])
+            ultima = next((h["modelo"].split(":", 1)[1] for h in hist if (h.get("modelo") or "").startswith("demanda:")
+                           and h.get("tipo_demanda") == "trabalho"), None)
+            ferr = _escolher(cfg, p, ultima)
+            nivel, motivo_nivel = nivel_para(organizacao.nivel_de(p["id"], p), hist)
             sid, motivo = (criar_demanda(cfg, p, ferr, nivel, motivo_nivel=motivo_nivel) if ferr
                            else (None, "nenhuma ferramenta do contrato está no catálogo de demandas"))
             tipo = "trabalho"

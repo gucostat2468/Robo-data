@@ -811,7 +811,14 @@ class Api:
 
     def consultas(self, _q) -> dict:
         from robo import consultas
-        return {"itens": consultas.listar(), "banco_habilitado": bool(self.cfg.banco.get("habilitado"))}
+        itens = consultas.listar()
+        if self.cfg.banco.get("habilitado"):
+            try:  # cada consulta diz se tem dado para rodar e, se não, por quê (em vez de quebrar ao executar)
+                from robo.banco import Banco
+                itens = consultas.disponibilidade(Banco(self.cfg.banco, self.cfg.base), itens)
+            except Exception as e:
+                log.debug("Disponibilidade das consultas indisponível: %s", e)
+        return {"itens": itens, "banco_habilitado": bool(self.cfg.banco.get("habilitado"))}
 
     def consulta(self, q) -> dict:
         from robo import consultas

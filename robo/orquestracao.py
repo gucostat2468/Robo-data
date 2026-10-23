@@ -51,6 +51,8 @@ FLUXOS = {
     "robo_fabrica": {"descricao": "Fábrica de Planilhas: lote sintético na esteira (só com a fila real vazia) e conferência "
                                   "do resultado contra o gabarito", "cron": "*/30 * * * *", "a_cada_min": 30,
                      "limite_min": 25, "rotinas": ["fabrica"]},
+    "robo_telegram": {"descricao": "Grupo do Telegram: responde o dono e manda o resumo do período (desligado sem token)",
+                      "cron": "*/1 * * * *", "a_cada_min": 1, "limite_min": 2, "rotinas": ["telegram"]},
 }
 
 # Regras de SLA (as mesmas no robô, no treino e na documentação)

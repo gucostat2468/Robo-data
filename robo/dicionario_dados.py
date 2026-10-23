@@ -145,6 +145,10 @@ TABELAS = {
                         "e, no detalhe, quem foi pulado e por quê (estagiário, demanda aberta, recebeu há pouco)",
                         "um ciclo da rotina demandas", IMUTAVEL,
                         "cobertura de trabalho por pessoa e andar; quem ficou sem demanda e por quê"),
+    "telegram_mensagens": ("operacao", "Cada mensagem do grupo do Telegram: entrada (quem escreveu, se era o dono) e "
+                           "saída (qual funcionário respondeu), com erro quando o envio falhou",
+                           "uma mensagem do grupo", IMUTAVEL,
+                           "o que o dono pergunta pelo celular; tempo e qualidade das respostas"),
     "demandas_registro": ("operacao", "Cada decisão da distribuição sobre uma pessoa: atribuída, treinamento, pulada, "
                           "bloqueada, reatribuída ou sem trabalho, com nível, ferramenta, motivo e quem decidiu",
                           "um evento de distribuição", IMUTAVEL,
@@ -227,8 +231,9 @@ def _todas_as_tabelas(cfg) -> None:
     voz._tb(cfg)
     aprendizados._tb(cfg)
     dialogo._tb(cfg)
-    from robo import demandas
+    from robo import demandas, telegram
     demandas._tb(cfg)
+    telegram._tb(cfg)
     caixa_dono._tb(cfg)
     jornada._tb(cfg)
     from robo import cobertura_banco

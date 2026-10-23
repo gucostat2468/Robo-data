@@ -379,6 +379,38 @@ def f_consulta_sql(cfg, consulta: str | None = None, sql: str | None = None, **_
                      evidencia="PostgreSQL, transação somente leitura")
 
 
+def f_sql_treino(cfg, regra: str = "", arquivo: str = "", nivel: str = "basico", gabarito: dict | None = None,
+                 **_) -> dict:
+    """Exercício de SQL no PostgreSQL sobre um lote da fábrica, conferido contra o gabarito (robo/sql_treino.py)."""
+    from robo import sql_treino
+    if not cfg.banco.get("habilitado"):
+        return resultado(False, "limitacao", "O PostgreSQL está desligado: exercício de SQL não roda. Nada foi inventado.")
+    try:
+        r = sql_treino.executar(cfg, regra, arquivo, nivel, gabarito or {})
+    except Exception as e:
+        return resultado(False, "limitacao", f"O SQL não rodou: {type(e).__name__}: {str(e)[:200]}")
+    tabela = " | ".join(r["colunas"]) + "\n" + "\n".join(" | ".join(map(str, l)) for l in r["linhas"][:10])
+    veredito = "Confere com o gabarito da fábrica." if r["confere"] else "NÃO confere: " + "; ".join(r["diferencas"])
+    return resultado(True, "execucao", f"{r['pergunta']}\n\n{r['sql']}\n\n{tabela}\n\n{veredito}",
+                     {"sql": r["sql"], "colunas": r["colunas"], "linhas": [list(map(str, l)) for l in r["linhas"][:50]],
+                      "confere": r["confere"], "diferencas": r["diferencas"], "nivel": nivel, "regra": regra,
+                      "arquivo": arquivo},
+                     evidencia=f"PostgreSQL somente leitura em {r['duracao']} s; gabarito do lote {arquivo}")
+
+
+def _f_nuvem(detalhe: str, titulo: str, evidencia: str):
+    """Ferramentas do 5º andar (robo/ti_nuvem.py): medem de verdade e devolvem os problemas achados (ou nenhum)."""
+    def executar(cfg, **_) -> dict:
+        from robo import ti_nuvem
+        r = getattr(ti_nuvem, detalhe)(cfg)
+        if r.get("aplicavel") is False:
+            return resultado(False, "limitacao", f"{titulo}: não se aplica agora ({r.get('motivo')}).")
+        corpo = "Nenhum problema encontrado." if r["ok"] else "Problemas:\n" + "\n".join(f"• {p}" for p in r["problemas"])
+        extra = {k: v for k, v in r.items() if k not in ("problemas",)}
+        return resultado(True, "execucao", f"{titulo}: {corpo}", {**extra, "problemas": r["problemas"]}, evidencia=evidencia)
+    return executar
+
+
 def f_ronda_ti(cfg, **_) -> dict:
     from robo import ti
     r = ti.ronda(cfg, anunciar=False)
@@ -660,6 +692,17 @@ REGISTRO: dict[str, Ferramenta] = {f.id: f for f in [
                "baixo", False, f_perfil_indicadores),
     Ferramenta("dados_pessoais", "Verificar dados pessoais", "Procura e-mail, CPF e telefone (LGPD)", "baixo", False, f_dados_pessoais),
     Ferramenta("consulta_sql", "Consulta SQL", "Consulta da biblioteca em transação somente leitura", "baixo", False, f_consulta_sql),
+    Ferramenta("sql_treino", "Exercício de SQL", "Consulta no PostgreSQL sobre um lote da fábrica, conferida contra o gabarito",
+               "baixo", False, f_sql_treino, ["regra", "arquivo"]),
+    Ferramenta("restauracao_backup", "Teste de restauração do backup",
+               "Restaura o último backup numa pasta temporária e confere integridade e tabelas", "baixo", False,
+               _f_nuvem("detalhe_restauracao", "Restauração do backup", "backup descompactado e conferido agora")),
+    Ferramenta("prontidao_nuvem", "Prontidão para servidor", "Dockerfile, porta por variável, segredos fora do repositório",
+               "baixo", False, _f_nuvem("detalhe_prontidao", "Prontidão para nuvem", "arquivos do projeto lidos agora")),
+    Ferramenta("postgres_saude", "Saúde do PostgreSQL", "Espaço contra o limite, linhas mortas, conexões e consultas presas",
+               "baixo", False, _f_nuvem("detalhe_postgres", "Saúde do PostgreSQL", "estatísticas do PostgreSQL agora")),
+    Ferramenta("segredos_repo", "Segredos no repositório", "Senha, token e chave escritos nos arquivos do projeto",
+               "baixo", False, _f_nuvem("detalhe_segredos", "Segredos no repositório", "arquivos versionados lidos agora")),
     Ferramenta("ronda_ti", "Ronda de TI", "Verificações de saúde do computador e do robô", "baixo", False, f_ronda_ti),
     Ferramenta("orquestracao", "SLA das rotinas (Airflow)", "Rotinas atrasadas, com erro ou lentas, pelos registros",
                "baixo", False, f_orquestracao),

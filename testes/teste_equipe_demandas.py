@@ -214,3 +214,45 @@ def teste_treinamento_estuda_o_assunto_da_demanda_bloqueada(cfg_factory, monkeyp
     assert s["plano"]["tipo_demanda"] == "treinamento"
     params = s["etapas"][0]["parametros"]
     assert params["pergunta"].startswith("Drivers do indicador") and params["especifico"] is True
+
+
+# ----------------------------------------------------------------------------------------------- SQL e 5º andar
+def teste_area_de_dados_alterna_sql_com_a_ferramenta_propria(cfg_factory):
+    cfg = _cfg(cfg_factory)
+    from robo.sql_treino import AREAS_DE_DADOS
+    pessoa = next(p for p in organizacao.lista(cfg) if organizacao.area_de(p["id"]) in AREAS_DE_DADOS
+                  and "sql_treino" in organizacao.ferramentas_de(p["id"], p["andar"])
+                  and len(organizacao.ferramentas_de(p["id"], p["andar"])) > 1
+                  and organizacao.pode_usar(p["id"], "sql_treino", cfg, producao=True))
+    primeira = demandas.escolher_ferramenta(cfg, pessoa)
+    segunda = demandas.escolher_ferramenta(cfg, pessoa, ultima=primeira)
+    assert primeira == "sql_treino" and segunda != "sql_treino"
+    assert demandas.escolher_ferramenta(cfg, pessoa, ultima=segunda) == "sql_treino"
+
+
+def teste_quinto_andar_e_aws_trabalham_mais_vezes(cfg_factory):
+    c = {**demandas.PADRAO, "por_pessoa_horas": 24}
+    gente = organizacao.por_id()
+    assert demandas.intervalo_da_pessoa(c, gente["aws_senior"]) == 2
+    assert demandas.intervalo_da_pessoa(c, gente["head_aws"]) == 2
+    quinto = next(p for p in gente.values() if p["andar"] == 5 and p["id"] not in c["horas_por_pessoa"])
+    assert demandas.intervalo_da_pessoa(c, quinto) == 6
+    outro = next(p for p in gente.values() if p["andar"] == 2)
+    assert demandas.intervalo_da_pessoa(c, outro) == 24
+    # só aperta: um intervalo geral menor vale para todos
+    assert demandas.intervalo_da_pessoa({**c, "por_pessoa_horas": 1}, gente["aws_senior"]) == 1
+
+
+def teste_sql_profissional_tem_conferencia_cruzada_de_sql_por_colega(cfg_factory, monkeypatch):
+    cfg = _cfg(cfg_factory)
+    gab = {"linhas": 10}
+    monkeypatch.setattr(demandas.CATALOGO["sql_treino"], "preparar",
+                        lambda cfg, p: ({"regra": "nps", "arquivo": "TREINO_nps_1_2_3.xlsx", "gabarito": gab},
+                                        [{"tipo": "verdadeiro", "chave": "confere"}]))
+    pessoa = organizacao.por_id()["head_engenharia"]
+    plano = demandas.montar(cfg, pessoa, "sql_treino", "profissional")
+    cruz = next(e for e in plano["etapas"] if e["titulo"].startswith("Conferência cruzada"))
+    assert cruz["ferramenta"] == "sql_treino" and cruz["funcionario"] != "head_engenharia"
+    assert cruz["parametros"]["nivel"] == "medio" and cruz["parametros"]["arquivo"] == "TREINO_nps_1_2_3.xlsx"
+    n = str(plano["etapas"].index(cruz) + 1)
+    assert {"tipo": "verdadeiro", "chave": "confere"} in plano["criterios_por_etapa"][n]

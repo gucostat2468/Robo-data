@@ -100,6 +100,9 @@ PADROES: dict = {
         "notificacoes": True,
     },
     # acompanhamento pelo celular (somente leitura, só rede de casa/VPN, mesma senha do painel) — robo/painel/celular.py
+    # grupo do Telegram (robo/telegram.py): desligado; o token fica SÓ na variável de ambiente ROBO_TELEGRAM_TOKEN
+    "telegram": {"habilitado": False, "chat_id": "", "dono_id": "", "token_env": "ROBO_TELEGRAM_TOKEN",
+                 "resumo_minutos": 120, "max_respostas": 3},
     "celular": {
         "habilitado": False,
         "porta": 8766,

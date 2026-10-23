@@ -246,7 +246,7 @@ Com a habilidade **Classificar NPS**, você também ganha a coluna `grupo_nps` (
 
 ## 8. Consultas SQL prontas
 
-`consultas_sql/` traz 29 consultas organizadas por problema de negócio, cada uma com pergunta, como ler o resultado e tabelas necessárias:
+`consultas_sql/` traz 69 consultas organizadas por problema de negócio, cada uma com pergunta, como ler o resultado e tabelas necessárias. Na tela, ● = tem dado para rodar agora; ○ = falta algo, e o motivo aparece (ex.: "precisa de planilha REAL carregada"):
 
 - **Monitoramento do robô:** cargas por dia, erros mais frequentes, reprovados, descarte na limpeza, tamanho das tabelas.
 - **Qualidade dos dados:** completude por coluna, duplicidades entre arquivos, volume por arquivo, outliers.
@@ -254,6 +254,10 @@ Com a habilidade **Classificar NPS**, você também ganha a coluna `grupo_nps` (
 - **CSAT e CES:** geral e por canal, esforço, mensal, Pareto de motivos.
 - **Clientes e churn:** base ativa e churn mensal, **retenção por coorte**, tempo de vida, churn por plano.
 - **Vendas e funil:** receita e crescimento, curva ABC, **RFM**, conversão do funil e por origem.
+- **Treino da fábrica (pasta 07):** 2 por regra (volume e métrica por lote; segmento com participação): rodam já, sobre os lotes sintéticos do schema `treino`.
+- **Operação da empresa (pasta 08):** acerto do treino por andar, competências que mais erram, demandas por andar e nível, quem está sem demanda, trabalho com prova, rotinas com erro, fábrica por regra, cobertura do banco (sobre o espelho `robo.memoria_*`).
+
+**Treino de SQL dos funcionários** (`robo/sql_treino.py`): quem é de Engenharia, Análise, Estatística, Qualidade ou Customer Insights alterna uma demanda de SQL com uma da própria ferramenta. Níveis: básico (contagem), médio (soma, média, NPS), difícil (GROUP BY com janela de participação) e profissional (CTE reconciliando bruto × tratado × registro da carga, com um colega refazendo por outra consulta). Tudo roda em transação somente leitura e é conferido contra o gabarito da fábrica.
 
 Execute pelo painel (modo **somente leitura**: nenhuma consulta altera dados) ou copie para o Power BI (PostgreSQL → Opções avançadas → Instrução SQL). Crie as suas copiando um arquivo.
 
@@ -408,6 +412,16 @@ Os níveis mudam o trabalho, não só o nome:
 
 Sobe um nível com 2 demandas concluídas seguidas; desce um nível depois de uma falha; nunca passa do teto do cargo.
 Para ver quem recebeu, por andar e por área: `python -m robo cobertura-demandas`.
+
+## 11e. Grupo no Telegram e contêiner (Google Cloud)
+
+- **Telegram:** `python -m robo telegram --testar | --descobrir | --configurar ID_DO_GRUPO SEU_ID | --apresentar`.
+  Um robô do Telegram fala por todos (cada mensagem assinada por quem respondeu), só você manda, tudo fica em
+  `telegram_mensagens`. O token fica na variável `ROBO_TELEGRAM_TOKEN` (nunca em arquivo).
+- **Contêiner:** `Dockerfile` (sem root, porta `PORT`) roda `python -m robo servico`: turnos seguidos + `GET /saude`
+  somente leitura, instância única garantida por trava no PostgreSQL. Banco por `ROBO_PG_URL` ou
+  `DB_USER/DB_PASS/DB_NAME` + `INSTANCE_CONNECTION_NAME` (Cloud SQL). Custos e riscos: `documentacao/nuvem_google.md`.
+  Nada foi criado no Google: custa dinheiro e a regra é nuvem grátis.
 
 ## 12. Apache Airflow (opcional)
 
