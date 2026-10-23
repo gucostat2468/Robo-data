@@ -6,7 +6,7 @@
 
 | Onde | O que guarda | Para quê |
 |---|---|---|
-| `logs/trabalho.db` (SQLite) | **Fonte de tudo**: a memória da empresa (62 tabelas abaixo) | Funciona sem internet e sem servidor; nada se apaga |
+| `logs/trabalho.db` (SQLite) | **Fonte de tudo**: a memória da empresa (63 tabelas abaixo) | Funciona sem internet e sem servidor; nada se apaga |
 | `logs/backups_sqlite/` | Cópia diária do `trabalho.db`, conferida (`integrity_check`) e com SHA-256 | Restaurar se o disco falhar; o 1º de cada mês fica para sempre |
 | PostgreSQL `robo_dados`, schema `robo` | Espelho de TODAS as tabelas (`memoria_<tabela>`) | Consultas em SQL, Power BI e Machine Learning |
 | PostgreSQL schemas `bruto` → `tratado` → `analitico` | As planilhas de negócio (ELT) | Análise e Power BI |
@@ -66,6 +66,7 @@
 | `ideias_registro` | Cada ideia da Iara (ideias e expansão), com o dado que a originou e o dono | uma ideia registrada num dia | só acrescenta (imutável: não altera nem apaga) | quais problemas mais geram ideias e quanto tempo levam para sumir |
 | `caixa_dono_eventos` | Cada decisão do dono na Caixa do dono (ideia, sugestão, regra, RH ou aprovação): aprovada ou recusada, com a nota e o número que motivou | uma decisão do dono | só acrescenta (imutável: não altera nem apaga) | que tipo de ideia o dono aprova; tempo até decidir |
 | `caixa_dono_sugestoes` | Sugestões que os funcionários fazem a partir de fatos registrados (erros repetidos no treino, rotinas com erro) | uma sugestão registrada | só acrescenta (imutável: não altera nem apaga) | de onde vêm as melhores ideias; problemas recorrentes |
+| `voz_falas` | Cada fala composta pela voz de um funcionário: quem, ato de fala, molde usado, hash do texto e se veio de regra ou de IA (garante variação sem repetir parágrafo em 24 h e permite auditar) | uma fala | só acrescenta (imutável: não altera nem apaga) | estilo e variação de cada voz; quanto a IA redige versus a regra |
 | `fabrica_lotes` | Cada planilha sintética da Fábrica: regra de negócio, semente, linhas, nível de sujeira, quem gerou, conferiu e revisou, o gabarito e a conferência final contra a saída da esteira | um lote (uma planilha TREINO_) | registro com situação (a situação muda; a linha nunca some) | acerto da esteira por regra de negócio e por nível de sujeira; regressões entre versões do código |
 | `paineis_planilhas` | Cada planilha lida pela Bárbara: tema, papel e regra de cada cabeçalho, regras quebradas, medidas DAX e números-âncora (leitura completa em JSON) | uma planilha com um conteúdo | só acrescenta (imutável: não altera nem apaga) | aprender a reconhecer tema e regra de negócio pelo cabeçalho (rótulo supervisionado) |
 
@@ -179,6 +180,7 @@
 - **`treino_tentativas`**: `id`, `data_hora`, `rodada`, `caso_id`, `funcionario`, `andar`, `cargo_nivel`, `competencia`, `nivel`, `ferramenta`, `acertou`, `nota`, `tipo_erro`, `detalhe`, `resposta`, `segundos`, `versao_codigo`
 - **`uso_ferramentas`**: `id`, `data_hora`, `ferramenta`, `quem`, `ok`, `natureza`, `excecao`, `segundos`
 - **`vigia_eventos`**: `id`, `data_hora`, `evento`, `detalhe`
+- **`voz_falas`**: `id`, `data_hora`, `funcionario`, `ato`, `chave`, `molde`, `hash_texto`, `natureza`
 
 ## Como usar para Machine Learning (exemplo em SQL no PostgreSQL)
 

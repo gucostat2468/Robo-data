@@ -159,7 +159,8 @@ class Canal:
         if not texto:
             return []
         enviada = self.postar(DONO["id"], texto, canal, "pergunta")
-        respostas = [self.postar(r["autor"], r["texto"], canal, "resposta", pergunta=enviada["id"], intencao=r["intencao"])
+        respostas = [self.postar(r["autor"], r["texto"], canal, "resposta", pergunta=enviada["id"], intencao=r["intencao"],
+                                 natureza=r.get("natureza", "regra"), **({"modelo": r["modelo"]} if r.get("modelo") else {}))
                      for r in responder(texto, self.cfg)]
         return [enviada, *respostas]
 
@@ -592,7 +593,37 @@ def _numeros(texto: str) -> list[float]:
 
 
 def responder(texto: str, cfg) -> list[dict]:
-    """Devolve 1+ respostas [{autor, texto, intencao}]. Nunca inventa: sem confiança, diz que não entendeu."""
+    """Duas camadas: 1) _apurar = FATOS (determinístico: quem responde, sobre o quê, com qual conteúdo e números);
+    2) _compor = REDAÇÃO na voz de quem responde (IA, se ligada e conferida; senão a voz determinística de robo/voz.py).
+    Devolve 1+ respostas [{autor, texto, intencao, natureza, fatos}]. Nunca inventa número."""
+    return [_compor(f, texto, cfg) for f in _apurar(texto, cfg)]
+
+
+def _compor(fato: dict, pergunta: str, cfg) -> dict:
+    from robo import ia, voz
+    autor, intencao = fato.get("autor") or "canal_nina", fato.get("intencao") or "conversa"
+    if intencao == "nao_entendi":
+        conteudo = voz.duvida_honesta(pergunta)
+    else:
+        conteudo = fato.get("texto") or ""
+    fatos = {"pergunta": pergunta, "quem_responde": autor, "assunto": intencao, "conteudo": conteudo}
+    saida = {**fato, "fatos": fatos}
+    if intencao not in ("nao_entendi",) and ia.status(cfg).get("configurado"):
+        p = pessoas().get(autor) or {}
+        sistema = (f"Você é {p.get('nome', autor)}, {p.get('papel', '')} numa empresa de dados. Responda ao dono da empresa "
+                   f"na primeira pessoa, com naturalidade, em até 5 frases.")
+        r = ia.conversar(cfg, sistema, [{"role": "user", "content": pergunta}], fatos, timeout=45)
+        if r["ok"]:
+            voz.compor(cfg, autor, voz.ATO_DA_INTENCAO.get(intencao, "explicacao"), r["texto"], natureza="hipotese")
+            return {**saida, "texto": r["texto"], "natureza": "hipotese", "modelo": r["modelo"], "aviso": r["aviso"]}
+        saida["aviso_ia"] = r["aviso"]
+    falado = voz.compor(cfg, autor, voz.ATO_DA_INTENCAO.get(intencao, "explicacao"), conteudo,
+                        chave=f"{intencao}:{normalizar(pergunta)[:120]}")
+    return {**saida, "texto": falado["texto"], "natureza": "regra", "molde": falado["molde"]}
+
+
+def _apurar(texto: str, cfg) -> list[dict]:
+    """Camada de FATOS: decide quem responde e com qual conteúdo factual (sem redação final)."""
     t = normalizar(texto)
     gente = pessoas()
     # 1) chamou alguém pelo nome? ("Ricardo, ...", "@Dora ...")
@@ -639,24 +670,18 @@ def responder(texto: str, cfg) -> list[dict]:
         return [r]
     if chamado:
         return [_resposta_pessoal(chamado, cfg)]
-    return [{"autor": "canal_nina", "intencao": "nao_entendi",
-             "texto": "Não tenho certeza do que você precisa — prefiro perguntar a chutar. Posso ajudar com: "
-                      "\"como está hoje?\", \"quais erros tivemos?\", \"sprint\", \"ideias\", \"banco\", "
-                      "\"quem é a equipe?\", dúvidas de Excel (PROCX, SOMASES, tabela dinâmica...), Power BI/DAX, "
-                      "NPS/CSAT, cálculo de amostra e trade marketing (sell-out, share, ruptura), e cálculos sobre as suas "
-                      "bases (\"nps por região\", \"média de valor por loja onde canal = App\"). "
-                      "Você também pode chamar alguém pelo nome, ex.: \"Ricardo, como faço uma tabela dinâmica?\""}]
+    return [{"autor": "canal_nina", "intencao": "nao_entendi", "texto": ""}]  # a voz pergunta, com honestidade
 
 
 def _resposta_pessoal(pid: str, cfg) -> dict:
     from robo import rh
     p = pessoas().get(pid, {})
     f = rh.FICHAS.get(pid) or {}
-    resp = "; ".join((f.get("responsabilidades") or [])[:2])
+    itens = [r[0].lower() + r[1:] for r in (f.get("responsabilidades") or [])[:2] if r]
+    resp = " e ".join(itens)
     return {"autor": pid, "intencao": "apresentacao",
-            "texto": f"Oi! Sou {p.get('nome')}, {f.get('cargo') or p.get('papel')}. "
-                     + (f"Cuido de: {resp}. " if resp else "")
-                     + "Me pergunte algo específico da minha área que eu respondo com os dados de hoje."}
+            "texto": f"Sou {p.get('nome')}, {f.get('cargo') or p.get('papel')}."
+                     + (f" Cuido de {resp}." if resp else "")}
 
 
 def _hoje(cfg) -> tuple[list[dict], list[dict], list[dict]]:

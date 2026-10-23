@@ -631,7 +631,8 @@ class Api:
         numero, ini, fim = c.sprint_de(date.today())
         gente = pessoas()
         autores = sorted({m["autor"] for m in c.listar(limite=5000)})
-        return {"mensagens": msgs, "canais": CANAIS,
+        from robo import ia
+        return {"mensagens": msgs, "canais": CANAIS, "ia": ia.status(self.cfg),
                 "autores": [{"id": a, "nome": gente.get(a, {}).get("nome", a), "papel": gente.get(a, {}).get("papel", "")}
                             for a in autores],
                 "sprint": {"numero": numero, "inicio": ini.isoformat(), "fim": fim.isoformat(),
@@ -643,6 +644,15 @@ class Api:
         if not texto:
             raise ErroApi("Escreva uma mensagem.")
         return {"mensagens": Canal(self.cfg).perguntar(texto, str(b.get("canal") or "geral"))}
+
+    def ia_testar(self, b) -> dict:
+        """Testa uma conversa SEM postar no canal: mostra a resposta, de onde veio (regra ou IA) e os fatos usados."""
+        from robo import ia
+        from robo.canal import responder
+        texto = str(b.get("texto", "")).strip()
+        if not texto:
+            raise ErroApi("Escreva uma pergunta para testar.")
+        return {"ia": ia.status(self.cfg), "respostas": responder(texto, self.cfg)}
 
     def canal_sprint(self, _b) -> dict:
         from robo.canal import Canal
@@ -1419,7 +1429,7 @@ ROTAS_POST = {
     "/api/conhecimento/rodar": Api.conhecimento_rodar, "/api/conhecimento/criar": Api.conhecimento_criar,
     "/api/conhecimento/versao": Api.conhecimento_versao, "/api/conhecimento/arquivar": Api.conhecimento_arquivar,
     "/api/erros/resolver": Api.erros_resolver, "/api/aprendizado/decidir": Api.aprendizado_decidir, "/api/treino/rodar": Api.treino_rodar, "/api/aprendizado/desativar": Api.aprendizado_desativar,
-    "/api/paineis/atualizar": Api.paineis_atualizar, "/api/fabrica/produzir": Api.fabrica_produzir,
+    "/api/paineis/atualizar": Api.paineis_atualizar, "/api/fabrica/produzir": Api.fabrica_produzir, "/api/ia/testar": Api.ia_testar,
     "/api/caixa-dono/decidir": Api.caixa_dono_decidir, "/api/jornada/rodar": Api.jornada_rodar,
 }
 ROTAS_UPLOAD = {"/api/testar": Api.testar, "/api/enviar": Api.enviar, "/api/conversa/anexar": Api.anexar}

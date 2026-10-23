@@ -795,3 +795,12 @@ pre.sql, .consultas pre { max-width: 100%; overflow: auto; }
 .qf-topo-real .qf-vermelho b { color: var(--perigo); }
 .qf-agora { background: var(--sucesso-suave); border-radius: var(--raio-p); padding: 6px 10px; font-size: 13px; margin: 6px 0; }
 .qf-plantao { display: block; margin-top: 4px; }
+
+/* Canal: testar conversa (mostra de onde veio a resposta e os fatos usados) */
+.ia-teste { background: var(--superficie); border: 1px solid var(--borda); border-radius: var(--raio); padding: 10px 14px; margin-bottom: 12px; }
+.ia-teste summary { cursor: pointer; font-weight: 600; }
+.ia-teste-linha { display: flex; gap: 8px; margin-top: 8px; }
+.ia-teste-linha input { flex: 1; min-width: 0; font: inherit; padding: 8px 10px; border: 1px solid var(--borda-forte); border-radius: var(--raio-p); }
+.ia-teste-res { border-top: 1px solid var(--borda); margin-top: 10px; padding-top: 8px; }
+.ia-teste-res p { margin: 6px 0; }
+.ia-teste-res small { word-break: break-word; }

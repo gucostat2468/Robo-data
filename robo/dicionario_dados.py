@@ -130,6 +130,9 @@ TABELAS = {
                     "trabalhando agora (etapa aberta nos últimos 15 minutos)", "uma etapa de um job",
                     "só de inclusão; uma etapa fechada nunca muda (gatilho)",
                     "tempo por etapa e por pessoa; gargalos da esteira; prova auditável de trabalho"),
+    "voz_falas": ("conhecimento", "Cada fala composta pela voz de um funcionário: quem, ato de fala, molde usado, hash do texto e "
+                  "se veio de regra ou de IA (garante variação sem repetir parágrafo em 24 h e permite auditar)",
+                  "uma fala", IMUTAVEL, "estilo e variação de cada voz; quanto a IA redige versus a regra"),
     "fabrica_lotes": ("conhecimento", "Cada planilha sintética da Fábrica: regra de negócio, semente, linhas, nível de sujeira, "
                       "quem gerou, conferiu e revisou, o gabarito e a conferência final contra a saída da esteira",
                       "um lote (uma planilha TREINO_)", SITUACAO,
@@ -179,7 +182,7 @@ def _todas_as_tabelas(cfg) -> None:
     """Garante que todo módulo criou o próprio esquema (para listar e documentar tudo)."""
     from robo import (alcadas, aprendizado, auditoria, backup, decisoes, erros, interacoes, laboratorio, licoes,
                       registro_total, rh_desempenho, sala, treino, vigia)
-    from robo import caixa_dono, fabrica, ideias, jobs, jornada, paineis
+    from robo import caixa_dono, fabrica, ideias, jobs, jornada, paineis, voz
     from robo.painel import celular
     from robo.ferramentas import USO_ESQUEMA
     from robo.rotinas import ESQUEMA as ROTINAS
@@ -192,6 +195,7 @@ def _todas_as_tabelas(cfg) -> None:
     paineis._tb(cfg)
     jobs._tb(cfg)
     fabrica._tb(cfg)
+    voz._tb(cfg)
     caixa_dono._tb(cfg)
     jornada._tb(cfg)
     from robo.trabalho import proteger

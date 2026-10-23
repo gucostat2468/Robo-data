@@ -1142,6 +1142,11 @@ const TIPO_MSG = { pergunta: "você perguntou", resposta: "resposta", acontecime
 const SUGESTOES = ["Como está hoje?", "Quais erros tivemos?", "Sprint", "Ideias para melhorar", "Como faço um PROCX?",
   "Amostra para margem de 5% numa base de 2000", "Quem é a equipe?", "Como ligo o PostgreSQL?"];
 
+function pessoas_nome(id) {
+  const a = ((E.canal || {}).autores || []).find((x) => x.id === id);
+  return a ? a.nome : id;
+}
+
 function renderCanal() {
   const c = E.canal;
   const acoes = `<button class="btn" data-acao="canal-sprint">${icone("historico")}Rodar sprint agora</button>`;
@@ -1150,8 +1155,16 @@ function renderCanal() {
   const lista = c.mensagens.map((m) => `<div class="msg ${m.autor === "dono" ? "minha" : ""} tipo-${esc(m.tipo)}">
       <div class="msg-cab"><strong>${esc(m.nome)}</strong><small>${esc(m.papel)}</small><span class="etiqueta">${esc(TIPO_MSG[m.tipo] || m.tipo)}</span>
         ${E.canalAtual === "geral" && m.canal !== "geral" ? `<span class="etiqueta info">#${esc(m.canal)}</span>` : ""}<time>${esc(dataCurta(m.data_hora))}</time></div>
-      <div class="msg-texto">${esc(m.texto)}</div></div>`).join("");
-  return cabecalho("Canal da equipe", `Converse com todo o prédio — 100% no seu computador, sem internet e sem API. Sprint ${sp.numero}: ${esc(dataBr(sp.inicio))} a ${esc(dataBr(sp.fim))} (faltam ${sp.dias_restantes} dia(s)).`, acoes) +
+      <div class="msg-texto">${esc(m.texto)}</div>${m.natureza === "hipotese" ? `<small class="muted">redigido por IA (${esc(m.modelo || "modelo")}) a partir dos fatos; números conferidos</small>` : ""}</div>`).join("");
+  const ia = c.ia || {};
+  const selo = `<span class="etiqueta ${ia.situacao === "modelo ativo" ? "sucesso" : ia.situacao === "modelo ausente" ? "alerta" : ""}" title="${esc(ia.motivo || "")}">IA: ${
+    ia.situacao === "modelo ativo" ? `${esc(ia.provedor)} ${esc(ia.modelo || "")}` : ia.situacao === "modelo ausente" ? `${esc(ia.provedor)} indisponível` : "desligada (voz de regras)"}</span>`;
+  const teste = `<details class="ia-teste"><summary>Testar conversa</summary><div class="ia-teste-linha">
+      <input type="text" id="ia-teste-texto" placeholder="Ex.: como está hoje?" aria-label="Pergunta de teste">
+      <button class="btn" data-acao="ia-testar">Testar</button></div>
+      ${E.iaTeste ? E.iaTeste.respostas.map((r) => `<div class="ia-teste-res"><b>${esc(pessoas_nome(r.autor))}</b> <span class="etiqueta">${r.natureza === "hipotese" ? "IA: " + esc(r.modelo || "") : "regras e voz"}</span>
+        <p>${esc(r.texto)}</p><small class="muted">fatos usados: ${esc(JSON.stringify(r.fatos || {}))}</small></div>`).join("") : ""}</details>`;
+  return cabecalho("Canal da equipe", `${selo} Converse com todo o prédio. Sprint ${sp.numero}: ${esc(dataBr(sp.inicio))} a ${esc(dataBr(sp.fim))} (faltam ${sp.dias_restantes} dia(s)).`, acoes) + teste +
     `<div class="canal-layout">
       <nav class="canais">${Object.entries(c.canais).map(([id, nome]) => `<button data-acao="canal-ir" data-canal="${id}" class="${E.canalAtual === id ? "ativo" : ""}"><b>#${esc(id)}</b><small>${esc(nome)}</small></button>`).join("")}</nav>
       <section class="conversa cartao">
@@ -1505,6 +1518,12 @@ const ACOES = {
   }),
   "canal-ir": async (el) => { E.canalAtual = el.dataset.canal; await carregarCanal(); desenhar(); },
   "canal-enviar": () => enviarCanal(),
+  "ia-testar": (el) => comCarregando(el, async () => {
+    const campo = $("#ia-teste-texto");
+    try { E.iaTeste = await api("/api/ia/testar", { corpo: { texto: campo ? campo.value : "" } }); } catch (e) { avisar(e.message, "erro"); }
+    desenhar();
+    const d = document.querySelector(".ia-teste"); if (d) d.open = true;
+  }),
   "canal-sprint": (el) => comCarregando(el, async () => {
     await api("/api/canal/sprint", { corpo: {} });
     avisar("Sprint publicada: cada pessoa contou o que fez, o que foi bom, o que travou e o backlog.", "sucesso");

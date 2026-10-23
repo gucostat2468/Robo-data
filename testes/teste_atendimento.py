@@ -240,7 +240,7 @@ def teste_ferramenta_com_erro_vira_limitacao(cfg):
 def teste_ia_desligada_por_padrao_e_so_local(cfg):
     from robo import ia
     s = ia.status(cfg)
-    assert not s["configurado"] and "Nenhum modelo" in s["motivo"]
+    assert not s["configurado"] and s["situacao"] == "desligada" and "IA desligada" in s["motivo"]
     assert not ia.redigir(cfg, "resuma", "x")["ok"]
     cfg.dados["ia"] = {"provedor": "ollama", "url": "http://exemplo.com:11434", "modelo": "x"}
     assert "próprio computador" in ia.status(cfg)["motivo"]

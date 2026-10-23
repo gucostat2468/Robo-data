@@ -275,11 +275,8 @@ def _responder(cfg, tb, conversa_id, contrato, texto, ctx, arquivo) -> tuple[lis
             msgs = [_msg(r["autor"] if r["autor"] in organizacao.por_id(cfg) else pid,
                          ferramentas.resultado(True, "ferramenta", r["texto"], evidencia=f"canal ({r.get('intencao')})"))]
             return msgs, _registrar_pergunta(tb, contrato, texto, conversa_id, msgs)
-        r = ferramentas.resultado(False, "limitacao",
-                                  "Não tenho certeza do que você precisa — prefiro perguntar a chutar. Posso: responder sobre o "
-                                  "meu trabalho (\"o que você faz?\"), calcular (\"nps por região\"), verificar uma planilha "
-                                  "anexada (\"verifique esta planilha\"), montar uma análise completa, mostrar o histórico "
-                                  "ou buscar no conhecimento da empresa.")
+        from robo import voz
+        r = ferramentas.resultado(False, "limitacao", voz.duvida_honesta(texto))
         msgs = [_msg(pid, r)]
         return msgs, _registrar_pergunta(tb, contrato, texto, conversa_id, msgs)
 
