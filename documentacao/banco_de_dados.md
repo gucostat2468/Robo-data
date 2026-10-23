@@ -6,7 +6,7 @@
 
 | Onde | O que guarda | Para quê |
 |---|---|---|
-| `logs/trabalho.db` (SQLite) | **Fonte de tudo**: a memória da empresa (59 tabelas abaixo) | Funciona sem internet e sem servidor; nada se apaga |
+| `logs/trabalho.db` (SQLite) | **Fonte de tudo**: a memória da empresa (62 tabelas abaixo) | Funciona sem internet e sem servidor; nada se apaga |
 | `logs/backups_sqlite/` | Cópia diária do `trabalho.db`, conferida (`integrity_check`) e com SHA-256 | Restaurar se o disco falhar; o 1º de cada mês fica para sempre |
 | PostgreSQL `robo_dados`, schema `robo` | Espelho de TODAS as tabelas (`memoria_<tabela>`) | Consultas em SQL, Power BI e Machine Learning |
 | PostgreSQL schemas `bruto` → `tratado` → `analitico` | As planilhas de negócio (ELT) | Análise e Power BI |
@@ -66,6 +66,7 @@
 | `ideias_registro` | Cada ideia da Iara (ideias e expansão), com o dado que a originou e o dono | uma ideia registrada num dia | só acrescenta (imutável: não altera nem apaga) | quais problemas mais geram ideias e quanto tempo levam para sumir |
 | `caixa_dono_eventos` | Cada decisão do dono na Caixa do dono (ideia, sugestão, regra, RH ou aprovação): aprovada ou recusada, com a nota e o número que motivou | uma decisão do dono | só acrescenta (imutável: não altera nem apaga) | que tipo de ideia o dono aprova; tempo até decidir |
 | `caixa_dono_sugestoes` | Sugestões que os funcionários fazem a partir de fatos registrados (erros repetidos no treino, rotinas com erro) | uma sugestão registrada | só acrescenta (imutável: não altera nem apaga) | de onde vêm as melhores ideias; problemas recorrentes |
+| `fabrica_lotes` | Cada planilha sintética da Fábrica: regra de negócio, semente, linhas, nível de sujeira, quem gerou, conferiu e revisou, o gabarito e a conferência final contra a saída da esteira | um lote (uma planilha TREINO_) | registro com situação (a situação muda; a linha nunca some) | acerto da esteira por regra de negócio e por nível de sujeira; regressões entre versões do código |
 | `paineis_planilhas` | Cada planilha lida pela Bárbara: tema, papel e regra de cada cabeçalho, regras quebradas, medidas DAX e números-âncora (leitura completa em JSON) | uma planilha com um conteúdo | só acrescenta (imutável: não altera nem apaga) | aprender a reconhecer tema e regra de negócio pelo cabeçalho (rótulo supervisionado) |
 
 ### Treino contínuo e laboratório (casos com gabarito, tentativas e níveis)
@@ -104,6 +105,8 @@
 | `backups_registro` | Cada backup (SQLite e PostgreSQL): arquivo, SHA-256, linhas e integridade | um backup | só acrescenta (imutável: não altera nem apaga) | prova de que dá para restaurar |
 | `jornada_execucoes` | Cada volta completa da esteira com planilha sintética (equipe de Airflow): etapa a etapa, com o tempo de cada uma | uma volta da jornada | só acrescenta (imutável: não altera nem apaga) | confiabilidade da esteira por versão do código; etapa que mais falha; tempo por etapa |
 | `paineis_versoes` | Cada montagem dos painéis (Bárbara) e a conferência do Heitor: situação, indicadores e divergências | uma versão dos painéis | só acrescenta (imutável: não altera nem apaga) | evolução de cada indicador no tempo; qualidade dos painéis |
+| `jobs` | Prova de trabalho: cada processamento real (planilha real ou sintética, rodada de treino, exercício do laboratório, rotina que fez algo), com início, fim, estado, responsável, evidência e hash da saída | um processamento | só de inclusão; um job fechado nunca muda (gatilho) | carga real de trabalho por pessoa e por tipo; tempo de ciclo; taxa de falha da esteira |
+| `jobs_etapas` | Cada etapa de um job, com QUEM fez, início, fim, ok e evidência — é o que define quem está trabalhando agora (etapa aberta nos últimos 15 minutos) | uma etapa de um job | só de inclusão; uma etapa fechada nunca muda (gatilho) | tempo por etapa e por pessoa; gargalos da esteira; prova auditável de trabalho |
 | `vigia_eventos` | Cada vez que o vigia achou o robô parado (e religou) ou sem responder | um evento do vigia | só acrescenta (imutável: não altera nem apaga) | disponibilidade real: quedas por dia e tempo até voltar |
 | `logs_sistema` | Cada registro do log do sistema (robo.log e os girados), com nível e mensagem completa | um registro do log (com o traceback, se houver) | só acrescenta (imutável: não altera nem apaga) | série de eventos e erros por módulo e hora; prever falha antes de acontecer |
 | `arquivos_linhas` | Cada linha nova dos arquivos que só crescem (.jsonl, .csv): RH, conhecimento, histórico | uma linha de um arquivo, na ordem | só acrescenta (imutável: não altera nem apaga) | reconstruir qualquer arquivo da pasta de logs |
@@ -135,10 +138,13 @@
 - **`etapas`**: `id`, `solicitacao_id`, `ordem`, `titulo`, `funcionario`, `ferramenta`, `parametros`, `depende`, `risco`, `precisa_aprovacao`, `estado`, `natureza`, `resultado`, `tentativas`, `inicio`, `fim`
 - **`eventos`**: `id`, `solicitacao_id`, `data_hora`, `tipo`, `quem`, `de`, `para`, `texto`, `dados`
 - **`experiencias`**: `id`, `funcionario`, `data_hora`, `tipo`, `resumo`, `detalhe`, `origem`, `referencia`, `andar`
+- **`fabrica_lotes`**: `id`, `data_hora`, `regra`, `semente`, `linhas`, `nivel`, `arquivo`, `gerador`, `conferente`, `revisor`, `estado`, `gabarito`, `conferencia`, `resultado`, `job_fabrica`, `conferido_em`
 - **`handover_eventos`**: `id`, `handover_id`, `data_hora`, `tipo`, `de`, `para`, `quem`, `detalhe`
 - **`handovers`**: `id`, `chave`, `andar`, `area`, `responsavel`, `detectado_por`, `erro`, `causa`, `regra`, `como_verificar`, `exemplo`, `recorrencias`, `estado`, `backlog_id`, `criado_em`, `ultima_ocorrencia`, `atualizado_em`
 - **`ideias_registro`**: `id`, `data_hora`, `titulo`, `motivo`, `primeiro_passo`, `dono`, `impacto`, `chave`
 - **`interacoes`**: `id`, `data_hora`, `de`, `para`, `tipo`, `texto`, `ref`
+- **`jobs`**: `id`, `tipo`, `origem`, `arquivo`, `inicio`, `fim`, `estado`, `funcionario`, `evidencia`, `hash_saida`
+- **`jobs_etapas`**: `id`, `job_id`, `etapa`, `funcionario`, `inicio`, `fim`, `ok`, `detalhe`, `evidencia`
 - **`jornada_execucoes`**: `id`, `data_hora`, `area`, `semente`, `linhas_esperadas`, `linhas_saida`, `ok`, `etapa_falhou`, `etapas`, `tempos`, `segundos`, `versao_codigo`
 - **`laboratorio_exercicios`**: `id`, `rodada`, `data_hora`, `area`, `semente`, `etapa`, `responsavel`, `ok`, `detalhe`, `segundos`, `nivel`
 - **`laboratorio_medidas`**: `id`, `data_hora`, `area`, `linhas`, `segundos`

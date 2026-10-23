@@ -10,8 +10,14 @@ Fontes (cada uma só entra se a tabela existir):
   uso_ferramentas, canal_mensagens, handover_eventos, rh_movimentos (quem propôs e quem validou),
   rotinas_execucoes (pelo responsável da rotina em robo/rotinas.py), experiencias e a última ronda de TI.
 
-Situação: "trabalhando" (último registro há menos de 2 h), "ativo hoje" (menos de 24 h), "ocioso" (24 h ou mais)
-e "sem registro" (nunca deixou registro).
+Situação (regra honesta, desde 23/10/2026 — antes qualquer registro em 2 h, até batimento de rotina, contava como
+"trabalhando", e parecia que todos trabalhavam sem estar):
+  trabalhando  = job ABERTO com uma etapa dessa pessoa em execução nos últimos 15 min (robo/jobs.py);
+  ativo_hoje   = evidência real nas últimas 24 h (etapa de job, treino, conversa, mentoria, lição, revisão…);
+  plantao      = só a rotina dela rodou no prazo (ou a verificação na ronda de TI) — plantão NÃO é trabalho;
+  ocioso       = última evidência real há mais de 24 h;
+  sem_registro = nenhuma evidência real, nunca.
+Rotina, ronda e postagem automática do canal NUNCA promovem ninguém a "trabalhando" nem a "ativo hoje".
 """
 
 from __future__ import annotations
@@ -20,11 +26,16 @@ from datetime import datetime, timedelta
 
 from robo.trabalho import Trabalho
 
-TRABALHANDO_H = 2
 OCIOSO_H = 24
+# registro automático (batimento de rotina, item da ronda, aviso no canal): conta como plantão, não como trabalho
+SO_PLANTAO = {"rotinas_execucoes", "ronda_ti", "canal_mensagens"}
+NATUREZA = {"treino_tentativas": "treino (dados sintéticos)", "laboratorio_exercicios": "laboratório (dados sintéticos)",
+            "treino_casos": "preparo/revisão de caso de treino", "treino_certificacoes": "revisão de exame de treino"}
 
 # (tabela, coluna de quem fez, coluna de quando, colunas para o texto, como escrever o texto)
 FONTES = [
+    ("jobs_etapas", "funcionario", "fim", "etapa, ok, job_id",
+     lambda r, n: f"Etapa {r['etapa']} do job {r['job_id']}: {'feita' if r['ok'] else 'com falha'}"),
     ("treino_tentativas", "funcionario", "data_hora", "competencia, nivel, acertou",
      lambda r, n: f"Treino: {n['comp'](r['competencia'])} nível {r['nivel']} — {'acertou' if r['acertou'] else 'errou'}"),
     ("interacoes", "de", "data_hora", "para, tipo, texto",
@@ -93,13 +104,21 @@ def registros(cfg, agora: datetime | None = None) -> dict[str, dict]:
     def anotar(pid, quando, o_que, fonte, n24=0):
         if not pid:
             return
-        d = saida.setdefault(pid, {"ultimo": None, "em_24h": 0, "fontes": {}})
+        d = saida.setdefault(pid, {"ultimo": None, "ultimo_real": None, "ultimo_plantao": None, "em_24h": 0,
+                                   "real_24h": 0, "fontes": {}})
         if n24:
             d["em_24h"] += n24
             d["fontes"][fonte] = d["fontes"].get(fonte, 0) + n24
+            if fonte not in SO_PLANTAO:
+                d["real_24h"] += n24
         q = _quando(quando)
-        if q and (d["ultimo"] is None or q > d["ultimo"]["_q"]):
-            d["ultimo"] = {"_q": q, "quando": q.isoformat(timespec="seconds"), "o_que": o_que, "fonte": fonte}
+        if not q:
+            return
+        item = {"_q": q, "quando": q.isoformat(timespec="seconds"), "o_que": o_que, "fonte": fonte,
+                "natureza": "plantão (registro automático)" if fonte in SO_PLANTAO else NATUREZA.get(fonte, "trabalho registrado")}
+        for chave in ("ultimo", "ultimo_plantao" if fonte in SO_PLANTAO else "ultimo_real"):
+            if d[chave] is None or q > d[chave]["_q"]:
+                d[chave] = dict(item)
 
     with Trabalho(cfg).tx() as c:
         tabelas = {r[0] for r in c.execute("SELECT name FROM sqlite_master WHERE type='table'")}
@@ -144,8 +163,9 @@ def registros(cfg, agora: datetime | None = None) -> dict[str, dict]:
     except Exception:
         pass
     for d in saida.values():
-        if d["ultimo"]:
-            d["ultimo"].pop("_q", None)
+        for chave in ("ultimo", "ultimo_real", "ultimo_plantao"):
+            if d[chave]:
+                d[chave].pop("_q", None)
     return saida
 
 
@@ -155,23 +175,52 @@ def _verificacao_ti(pid: str) -> str:
     return "; ".join(p.get("escopo") or [])[:160] or pid
 
 
-def situacao(ultimo: dict | None, agora: datetime) -> str:
-    if not ultimo:
-        return "sem_registro"
-    idade = agora - datetime.fromisoformat(ultimo["quando"])
-    if idade < timedelta(hours=TRABALHANDO_H):
+def situacao(ultimo_real: dict | None, agora: datetime, trabalhando: bool = False, plantao: bool = False) -> str:
+    """trabalhando só com job aberto; depois evidência real; plantão (rotina no prazo) nunca vira trabalho."""
+    if trabalhando:
         return "trabalhando"
-    if idade < timedelta(hours=OCIOSO_H):
+    if ultimo_real and agora - datetime.fromisoformat(ultimo_real["quando"]) < timedelta(hours=OCIOSO_H):
         return "ativo_hoje"
-    return "ocioso"
+    if plantao:
+        return "plantao"
+    return "ocioso" if ultimo_real else "sem_registro"
+
+
+def _em_plantao(cfg, agora: datetime) -> set[str]:
+    """Responsáveis por rotina verificada dentro do prazo (1,5 × o intervalo) e pessoas da TI na última ronda."""
+    from robo.rotinas import ROTINAS
+    pessoas: set[str] = set()
+    try:
+        with Trabalho(cfg).tx() as c:
+            if c.execute("SELECT 1 FROM sqlite_master WHERE name='rotinas_estado'").fetchone():
+                for r in c.execute("SELECT nome, ultima_verificacao FROM rotinas_estado"):
+                    resp, _, horas = ROTINAS.get(r["nome"]) or (None, None, None)
+                    q = _quando(r["ultima_verificacao"])
+                    if resp and q and agora - q <= timedelta(hours=1.5 * float(horas)):
+                        pessoas.add(resp)
+        from robo import ti
+        ronda = ti.ultima_ronda(cfg) or {}
+        q = _quando(ronda.get("data_hora"))
+        if q and agora - q <= timedelta(hours=1):
+            pessoas |= {i["id"] for i in ronda.get("itens") or []}
+    except Exception:
+        pass
+    return pessoas
 
 
 def quadro(cfg, agora: datetime | None = None) -> dict:
     """Todas as pessoas do organograma, com escopo e último trabalho registrado, + o resumo por andar."""
     from robo import organizacao
     from robo.rotinas import ROTINAS
+    from robo import jobs
     agora = agora or datetime.now()
     regs = registros(cfg, agora)
+    try:
+        agora_trab = jobs.trabalhando_agora(cfg, agora)
+        resumo_jobs = jobs.resumo(cfg, agora)
+    except Exception:
+        agora_trab, resumo_jobs = {}, {}
+    plantao = _em_plantao(cfg, agora)
     rotinas_de: dict[str, list[str]] = {}
     for nome, (resp, desc, horas) in ROTINAS.items():
         a_cada = f"{round(horas * 60)} min" if horas < 1 else (f"{horas:g} h" if horas < 24 else f"{horas / 24:g} dia(s)")
@@ -180,24 +229,30 @@ def quadro(cfg, agora: datetime | None = None) -> dict:
     for p in organizacao.lista(cfg):
         ct = organizacao.contrato(p["id"], cfg) or {}
         r = regs.get(p["id"]) or {}
-        ultimo = r.get("ultimo")
+        ultimo = r.get("ultimo_real")  # plantão nunca aparece como "último trabalho"
         escopo = list(ct.get("responsabilidades") or []) or [x for x in (ct.get("objetivo") or p.get("descricao") or "").split("; ") if x]
         pessoas.append({
             "id": p["id"], "nome": p["nome"], "cargo": ct.get("cargo") or p.get("papel"), "andar": int(p.get("andar") or 0),
             "nivel": ct.get("nivel_nome") or ct.get("nivel") or "", "gestor": ct.get("gestor_nome") or "",
             "cor": p.get("cor"), "escopo": escopo, "ferramentas": ct.get("ferramentas") or [],
-            "rotinas": rotinas_de.get(p["id"], []), "ultimo": ultimo, "em_24h": r.get("em_24h", 0),
-            "fontes_24h": r.get("fontes", {}), "situacao": situacao(ultimo, agora),
+            "rotinas": rotinas_de.get(p["id"], []), "ultimo": ultimo, "ultimo_plantao": r.get("ultimo_plantao"),
+            "em_24h": r.get("em_24h", 0), "real_24h": r.get("real_24h", 0), "fontes_24h": r.get("fontes", {}),
+            "agora": agora_trab.get(p["id"]),
+            "situacao": situacao(r.get("ultimo_real"), agora, p["id"] in agora_trab, p["id"] in plantao),
         })
     andares = {}
     for x in pessoas:
         a = andares.setdefault(x["andar"], {"andar": x["andar"], "nome": organizacao.NOME_ANDAR.get(x["andar"], ""),
-                                             "pessoas": 0, "trabalhando": 0, "ativo_hoje": 0, "ocioso": 0, "sem_registro": 0})
+                                             "pessoas": 0, "trabalhando": 0, "ativo_hoje": 0, "plantao": 0, "ocioso": 0,
+                                             "sem_registro": 0})
         a["pessoas"] += 1
         a[x["situacao"]] += 1
     parados = [{"id": x["id"], "nome": x["nome"], "andar": x["andar"], "cargo": x["cargo"], "situacao": x["situacao"],
-                "gestor": x["gestor"]} for x in pessoas if x["situacao"] in ("ocioso", "sem_registro")]
+                "gestor": x["gestor"]} for x in pessoas if x["situacao"] in ("plantao", "ocioso", "sem_registro")]
     return {"gerado_em": agora.isoformat(timespec="seconds"), "pessoas": pessoas,
-            "andares": [andares[a] for a in sorted(andares)], "parados": parados,
-            "regra": f"trabalhando = registro há menos de {TRABALHANDO_H} h; ativo hoje = menos de {OCIOSO_H} h; "
-                     f"ocioso = {OCIOSO_H} h ou mais; sem registro = nunca registrou trabalho"}
+            "andares": [andares[a] for a in sorted(andares)], "parados": parados, "jobs": resumo_jobs,
+            "trabalho_real_agora": len(agora_trab), "total_pessoas": len(pessoas),
+            "regra": "Trabalhando é quem tem uma etapa de job aberta agora (últimos 15 minutos). Ativo hoje é quem deixou "
+                     "trabalho real registrado nas últimas 24 horas. Plantão é quem só teve a rotina automática rodando no "
+                     "prazo, o que não conta como trabalho. Ocioso é quem não trabalha há mais de 24 horas, e sem registro "
+                     "é quem nunca deixou trabalho registrado."}

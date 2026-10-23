@@ -84,3 +84,8 @@ body.escritorio { overflow: hidden; background: #dfe6ef; }
   .hud-topo .andares { overflow-x: auto; max-width: 100%; }
   .hud-ficha { top: auto; bottom: 12px; max-height: 55vh; overflow: auto; left: 8px; right: 8px; width: auto; }
 }
+
+/* prova de trabalho no topo: quem trabalha agora e há quanto tempo a última planilha passou */
+.hud-real { display: flex; flex-direction: column; gap: 2px; font-size: 12px; background: rgba(255,255,255,.92); color: #101828;
+  border-radius: 10px; padding: 6px 10px; box-shadow: 0 2px 8px rgba(0,0,0,.12); }
+.hud-real .vermelho { color: #c43a1f; font-weight: 600; }

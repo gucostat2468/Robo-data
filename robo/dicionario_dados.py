@@ -122,6 +122,18 @@ TABELAS = {
                           "confiabilidade da esteira por versão do código; etapa que mais falha; tempo por etapa"),
     "paineis_versoes": ("operacao", "Cada montagem dos painéis (Bárbara) e a conferência do Heitor: situação, indicadores e "
                         "divergências", "uma versão dos painéis", IMUTAVEL, "evolução de cada indicador no tempo; qualidade dos painéis"),
+    "jobs": ("operacao", "Prova de trabalho: cada processamento real (planilha real ou sintética, rodada de treino, exercício do "
+             "laboratório, rotina que fez algo), com início, fim, estado, responsável, evidência e hash da saída",
+             "um processamento", "só de inclusão; um job fechado nunca muda (gatilho)",
+             "carga real de trabalho por pessoa e por tipo; tempo de ciclo; taxa de falha da esteira"),
+    "jobs_etapas": ("operacao", "Cada etapa de um job, com QUEM fez, início, fim, ok e evidência — é o que define quem está "
+                    "trabalhando agora (etapa aberta nos últimos 15 minutos)", "uma etapa de um job",
+                    "só de inclusão; uma etapa fechada nunca muda (gatilho)",
+                    "tempo por etapa e por pessoa; gargalos da esteira; prova auditável de trabalho"),
+    "fabrica_lotes": ("conhecimento", "Cada planilha sintética da Fábrica: regra de negócio, semente, linhas, nível de sujeira, "
+                      "quem gerou, conferiu e revisou, o gabarito e a conferência final contra a saída da esteira",
+                      "um lote (uma planilha TREINO_)", SITUACAO,
+                      "acerto da esteira por regra de negócio e por nível de sujeira; regressões entre versões do código"),
     "paineis_planilhas": ("conhecimento", "Cada planilha lida pela Bárbara: tema, papel e regra de cada cabeçalho, regras "
                           "quebradas, medidas DAX e números-âncora (leitura completa em JSON)", "uma planilha com um conteúdo",
                           IMUTAVEL, "aprender a reconhecer tema e regra de negócio pelo cabeçalho (rótulo supervisionado)"),
@@ -167,7 +179,7 @@ def _todas_as_tabelas(cfg) -> None:
     """Garante que todo módulo criou o próprio esquema (para listar e documentar tudo)."""
     from robo import (alcadas, aprendizado, auditoria, backup, decisoes, erros, interacoes, laboratorio, licoes,
                       registro_total, rh_desempenho, sala, treino, vigia)
-    from robo import caixa_dono, ideias, jornada, paineis
+    from robo import caixa_dono, fabrica, ideias, jobs, jornada, paineis
     from robo.painel import celular
     from robo.ferramentas import USO_ESQUEMA
     from robo.rotinas import ESQUEMA as ROTINAS
@@ -178,6 +190,8 @@ def _todas_as_tabelas(cfg) -> None:
         m._tb(cfg)
     ideias._tb_registro(cfg)
     paineis._tb(cfg)
+    jobs._tb(cfg)
+    fabrica._tb(cfg)
     caixa_dono._tb(cfg)
     jornada._tb(cfg)
     from robo.trabalho import proteger

@@ -299,6 +299,11 @@ def _salvar_estado(cfg, e: dict) -> None:
 
 def ronda(cfg, anunciar: bool = True) -> dict:
     """Roda todas as verificações, grava o resultado e avisa no canal #ti só o que piorou desde a última ronda."""
+    try:  # job aberto há mais de 6 h é de um programa que caiu no meio: registra como abandonado (não some)
+        from robo import jobs
+        jobs.marcar_abandonados(cfg)
+    except Exception:
+        pass
     itens = []
     for p in EQUIPE_TI:
         if p["funcao"] is None:

@@ -112,5 +112,7 @@ Legenda: ✅ feito e testado · 🟡 feito em parte · ⏳ pendente
 | 107 | Toda ideia de funcionário chega até mim | ✅ | "Caixa do dono": ideias e pendências que só o dono decide; decisão registrada em `caixa_dono_eventos` |
 | 108 | Esteira ponta a ponta funcionando (Airflow) | ✅ | rotina `jornada`: planilha suja passa pelas 7 etapas num computador de teste e cada etapa é conferida |
 | 109 | Grupo de WhatsApp com os funcionários | ❌ | WhatsApp não tem grupo para robôs nem opção grátis oficial; alternativa grátis: grupo no Telegram com robô (precisa do token do @BotFather) |
+| 110 | Status honesto: ninguém aparece trabalhando sem estar | ✅ | `robo/jobs.py`: trabalhando só com etapa de job aberta; rotina e ronda viram plantão; `/api/prova-de-trabalho`; topo do escritório com trabalho real agora e última planilha |
+| 111 | Fábrica de planilhas sintéticas como prioridade, para todos os andares treinarem | ✅ | `robo/fabrica.py` + `robo/regras_negocio.py`: 15 regras de negócio, 2 a 20 mil linhas, esteira real, gabarito conferido, separada do real; achou e corrigiu uma falha real da limpeza (nota fiscal duplicada) |
 | 98 | Você acessar meu PC | 🟡 | esta sessão roda na nuvem e não alcança o seu PC; para eu operar no Windows: Claude Desktop ou `claude remote-control` na pasta do projeto |
 | 38 | IA opcional sem fingir | 🟡 | `robo/ia.py`: só modelo local, desligado; ainda não usado nas respostas |

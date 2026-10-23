@@ -405,7 +405,57 @@ def _dados_lote(caminho, lote_id, rel: Relatorio, t: _Tratamento, gravadas, apro
 
 def processar_arquivo(caminho: str | Path, cfg: Config, gravar: bool = True, ao_etapa=None) -> Resultado:
     """gravar=False = modo diagnóstico: só analisa; não grava, não carrega no banco e não move nada.
-    ao_etapa(etapa, arquivo, **extra): chamado no início de cada etapa (usado pelo escritório 3D)."""
+    ao_etapa(etapa, arquivo, **extra): chamado no início de cada etapa (usado pelo escritório 3D).
+
+    Com gravar=True, todo processamento abre um JOB (robo/jobs.py): cada etapa fica registrada com quem fez, e o job
+    fecha com a evidência (linhas, saídas, hash). É a prova de trabalho — sem job, ninguém aparece "trabalhando"."""
+    if not gravar:
+        return _processar_arquivo(caminho, cfg, gravar, ao_etapa)
+    from robo import jobs, organizacao
+    nome = Path(caminho).name
+    origem = "sintetico" if nome.upper().startswith("TREINO_") else "real"
+    try:
+        jid = jobs.abrir(cfg, "planilha", origem, nome, "recepcao")
+        gente = organizacao.por_id(cfg)
+    except Exception:  # o registro de trabalho nunca pode impedir a planilha de ser tratada
+        log.debug("Job não aberto", exc_info=True)
+        return _processar_arquivo(caminho, cfg, gravar, ao_etapa)
+
+    def anotar(etapa, arquivo, **extra):
+        if etapa not in ("adiado", "concluido"):
+            quem = etapa if etapa in gente else (f"analise_{etapa}" if f"analise_{etapa}" in gente else None)
+            try:
+                jobs.etapa(cfg, jid, etapa, quem)
+            except Exception:
+                log.debug("Etapa do job não registrada", exc_info=True)
+        if ao_etapa:
+            ao_etapa(etapa, arquivo, **extra)
+    cfg_job = cfg_de_treino(cfg) if origem == "sintetico" else cfg
+    try:
+        r = _processar_arquivo(caminho, cfg_job, gravar, anotar)
+    except BaseException as e:
+        jobs.fechar(cfg, jid, "falhou", {"erro": f"{type(e).__name__}: {e}"})
+        raise
+    saidas = [str(x) for x in (r.saidas or [])]
+    evidencia = {"status": r.status, "linhas_entrada": r.linhas_entrada, "linhas_saida": r.linhas_saida, "saidas": saidas,
+                 "execucao": r.id, "erros": len(r.relatorio.erros), "motivo_adiamento": r.motivo_adiamento or None}
+    estado = "concluido" if r.status == SUCESSO else ("adiado" if r.status == ADIADO else "falhou")
+    jobs.fechar(cfg, jid, estado, evidencia, jobs.hash_arquivo(saidas[0]) if saidas else None)
+    return r
+
+
+def cfg_de_treino(cfg: Config) -> Config:
+    """Planilha sintética (TREINO_*) passa pela MESMA esteira, mas tudo que ela produz fica separado: saída em
+    Bases-Tratadas/_treino, originais/erros/relatórios em _treino, e NADA vai para o PostgreSQL de produção."""
+    import copy
+    t = copy.copy(cfg)
+    t.dados = {**cfg.dados, "banco": {**(cfg.dados.get("banco") or {}), "habilitado": False}}
+    for attr in ("tratadas", "erros", "originais", "relatorios"):
+        setattr(t, attr, Path(getattr(cfg, attr)) / "_treino")
+    return t
+
+
+def _processar_arquivo(caminho: str | Path, cfg: Config, gravar: bool = True, ao_etapa=None) -> Resultado:
     inicio = time.perf_counter()
     caminho = Path(caminho)
     rel = Relatorio(arquivo=caminho.name)

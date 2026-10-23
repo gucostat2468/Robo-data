@@ -294,6 +294,11 @@ class Api:
                     "descricao": "; ".join(p["escopo"]), "nativo": True, "aceita_habilidades": False, "habilidades": [],
                     "ativo": True, "ronda": False, "prontidao": "",
                     "ficha": _ficha_curta(rh.ficha({"id": p["id"], "habilidades": []}))} for p in EQUIPE_BI]
+        from robo.fabrica import EQUIPE_FABRICA
+        equipe += [{"id": p["id"], "nome": p["nome"], "papel": p["cargo"].split(" — ")[0], "cor": p["cor"], "andar": p["andar"],
+                    "descricao": "; ".join(p["escopo"]), "nativo": True, "aceita_habilidades": False, "habilidades": [],
+                    "ativo": True, "ronda": False, "prontidao": "",
+                    "ficha": _ficha_curta(rh.ficha({"id": p["id"], "habilidades": []}))} for p in EQUIPE_FABRICA]
         from robo import lideranca
         equipe += [{"id": p["id"], "nome": p["nome"], "papel": p["papel"], "cor": p["cor"], "andar": p["andar"],
                     "descricao": p["descricao"], "nativo": True, "aceita_habilidades": False, "habilidades": [], "ativo": True,
@@ -334,9 +339,46 @@ class Api:
             "canal_hoje": self._canal_hoje(cfg),
             "ti": {"saudavel": ronda_ti.get("saudavel"), "data_hora": ronda_ti.get("data_hora"),
                    "alertas": [a for i in ronda_ti.get("itens") or [] for a in i["achados"]][:5]},
-            "vivo": self._vivo(cfg),
+            "vivo": self._vivo(cfg), "trabalho_real": self._trabalho_real(cfg),
         })
         return dados
+
+    def _trabalho_real(self, cfg) -> dict:
+        """Quem tem etapa de job ABERTA agora e há quanto tempo a última planilha foi processada (robo/jobs.py)."""
+        from robo import jobs
+        try:
+            agora = jobs.trabalhando_agora(cfg)
+            return {**jobs.resumo(cfg), "ids": list(agora), "etapas": agora}
+        except Exception:
+            log.debug("Escritório: prova de trabalho indisponível", exc_info=True)
+            return {}
+
+    def fabrica(self, _q) -> dict:
+        from robo import fabrica
+        return fabrica.resumo(self.cfg)
+
+    def fabrica_produzir(self, _b) -> dict:
+        from robo import fabrica
+        return {"ok": True, "lote": fabrica.produzir_lote(self.cfg)}
+
+    def prova_de_trabalho(self, _q) -> dict:
+        """Para cada funcionário, a última evidência AUDITÁVEL: etapa de job com arquivo, linhas, hash e caminho; se não
+        houver job, o último trabalho real registrado; se nem isso, "sem registro". É a resposta oficial para a pergunta
+        "a operação diz que está tudo funcionando — é verdade?"."""
+        from robo import atividade_equipe, jobs
+        cfg = self.cfg
+        q = atividade_equipe.quadro(cfg)
+        ev = jobs.ultima_evidencia(cfg)
+        pessoas = []
+        for p in q["pessoas"]:
+            e = ev.get(p["id"])
+            pessoas.append({"id": p["id"], "nome": p["nome"], "cargo": p["cargo"], "andar": p["andar"], "situacao": p["situacao"],
+                            "agora": p.get("agora"), "evidencia_job": e, "ultimo_trabalho_real": p.get("ultimo"),
+                            "prova": "job" if e else ("registro" if p.get("ultimo") else "sem registro")})
+        return {"gerado_em": q["gerado_em"], "regra": q["regra"], "jobs": q.get("jobs"),
+                "trabalho_real_agora": q.get("trabalho_real_agora"), "total_pessoas": q.get("total_pessoas"),
+                "com_prova_de_job": sum(1 for x in pessoas if x["prova"] == "job"),
+                "sem_registro": [x["nome"] for x in pessoas if x["prova"] == "sem registro"], "pessoas": pessoas}
 
     def _vivo(self, cfg) -> dict:
         """O que acabou de ser REGISTRADO no banco (conversas e tentativas de treino) — vira balão em cima de quem fez."""
@@ -1352,7 +1394,7 @@ ROTAS_GET = {
     "/api/conhecimento": Api.conhecimento, "/api/conhecimento/caderno": Api.conhecimento_caderno,
     "/api/conhecimento/licao": Api.conhecimento_licao, "/api/conhecimento/buscar": Api.conhecimento_buscar,
     "/api/erros": Api.erros_sistema, "/api/gestao": Api.gestao, "/api/treino": Api.treino, "/api/banco/registros": Api.banco_registros, "/api/treino/pessoa": Api.treino_pessoa, "/api/aprendizado": Api.aprendizado,
-    "/api/paineis": Api.paineis, "/api/quem-faz-o-que": Api.quem_faz_o_que,
+    "/api/paineis": Api.paineis, "/api/quem-faz-o-que": Api.quem_faz_o_que, "/api/prova-de-trabalho": Api.prova_de_trabalho, "/api/fabrica": Api.fabrica,
     "/api/caixa-dono": Api.caixa_dono,
 }
 ROTAS_POST = {
@@ -1377,7 +1419,7 @@ ROTAS_POST = {
     "/api/conhecimento/rodar": Api.conhecimento_rodar, "/api/conhecimento/criar": Api.conhecimento_criar,
     "/api/conhecimento/versao": Api.conhecimento_versao, "/api/conhecimento/arquivar": Api.conhecimento_arquivar,
     "/api/erros/resolver": Api.erros_resolver, "/api/aprendizado/decidir": Api.aprendizado_decidir, "/api/treino/rodar": Api.treino_rodar, "/api/aprendizado/desativar": Api.aprendizado_desativar,
-    "/api/paineis/atualizar": Api.paineis_atualizar,
+    "/api/paineis/atualizar": Api.paineis_atualizar, "/api/fabrica/produzir": Api.fabrica_produzir,
     "/api/caixa-dono/decidir": Api.caixa_dono_decidir, "/api/jornada/rodar": Api.jornada_rodar,
 }
 ROTAS_UPLOAD = {"/api/testar": Api.testar, "/api/enviar": Api.enviar, "/api/conversa/anexar": Api.anexar}

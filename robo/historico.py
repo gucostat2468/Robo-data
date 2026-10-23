@@ -59,8 +59,17 @@ def _gravar_linhas(pasta_logs: Path, linhas: list[dict]) -> None:
             w.writerow([linha.get(c, "") for c in CABECALHO])
 
 
-def ler(pasta_logs: Path, limite: int | None = None) -> list[dict]:
-    """Mais recentes primeiro."""
+PREFIXO_SINTETICO = "TREINO_"
+
+
+def eh_sintetico(nome_arquivo) -> bool:
+    """Planilha da Fábrica de Planilhas (dados inventados para treino): nunca entra em número real."""
+    return str(nome_arquivo or "").upper().startswith(PREFIXO_SINTETICO)
+
+
+def ler(pasta_logs: Path, limite: int | None = None, incluir_sinteticos: bool = False) -> list[dict]:
+    """Mais recentes primeiro. Por padrão SEM as planilhas sintéticas da fábrica (TREINO_*): nenhum painel, BI ou
+    número real mistura dado inventado. Quem precisa delas (a tela da fábrica) pede incluir_sinteticos=True."""
     arquivo = arquivo_historico(pasta_logs)
     if not arquivo.exists():
         return []
@@ -70,6 +79,8 @@ def ler(pasta_logs: Path, limite: int | None = None) -> list[dict]:
     if pendente.exists():  # linhas que esperam o CSV ser fechado no Excel também aparecem no painel
         linhas += [{k: str(v) for k, v in json.loads(l).items()} for l in pendente.read_text(encoding="utf-8").splitlines() if l.strip()]
     linhas.reverse()
+    if not incluir_sinteticos:
+        linhas = [x for x in linhas if not eh_sintetico(x.get("arquivo"))]
     return linhas[:limite] if limite else linhas
 
 

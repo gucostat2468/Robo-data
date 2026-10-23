@@ -412,6 +412,30 @@ def _rodada(cfg, quantos, funcionarios) -> dict:
     if quantos:
         pessoas = pessoas[:int(quantos)]
     feitas, sem_caso = [], []
+    from robo import jobs
+    jid = jobs.abrir(cfg, "treino", "sintetico", rid, ROTINA_RESPONSAVEL)
+    try:
+        _rodar_pessoas(cfg, pessoas, ultima, rid, jid, feitas, sem_caso)
+    except BaseException as e:
+        jobs.fechar(cfg, jid, "falhou", {"erro": f"{type(e).__name__}: {e}", "tentativas": len(feitas)})
+        raise
+    jobs.fechar(cfg, jid, "concluido", {"tentativas": len(feitas), "acertos": sum(f["acertou"] for f in feitas),
+                                        "sem_caso": len(sem_caso)})
+    encerrar_casos(cfg)
+    try:
+        from robo import interacoes
+        interacoes.conversas_por_fatos(cfg)  # SLA das rotinas e acerto baixo num andar viram conversa registrada
+    except Exception:
+        log.exception("Treino: conversas por fatos falharam")
+    return {"ok": True, "rodada": rid, "tentativas": len(feitas), "acertos": sum(f["acertou"] for f in feitas),
+            "mudancas_de_nivel": [f for f in feitas if f["mudanca_nivel"]], "sem_caso": sem_caso, "detalhe": feitas}
+
+
+ROTINA_RESPONSAVEL = "casos_planejamento"
+
+
+def _rodar_pessoas(cfg, pessoas, ultima, rid, jid, feitas, sem_caso) -> None:
+    from robo import jobs
     for pid in pessoas:
         comps = competencias_de(pid, cfg)
         if not comps:
@@ -430,15 +454,11 @@ def _rodada(cfg, quantos, funcionarios) -> dict:
         if not caso:
             sem_caso.append(f"{comp} n{nivel}")
             continue
-        feitas.append(tentar(cfg, pid, comp, caso, rid))
-    encerrar_casos(cfg)
-    try:
-        from robo import interacoes
-        interacoes.conversas_por_fatos(cfg)  # SLA das rotinas e acerto baixo num andar viram conversa registrada
-    except Exception:
-        log.exception("Treino: conversas por fatos falharam")
-    return {"ok": True, "rodada": rid, "tentativas": len(feitas), "acertos": sum(f["acertou"] for f in feitas),
-            "mudancas_de_nivel": [f for f in feitas if f["mudanca_nivel"]], "sem_caso": sem_caso, "detalhe": feitas}
+        eid = jobs.etapa(cfg, jid, f"treino:{comp}:n{nivel}", pid)
+        f = tentar(cfg, pid, comp, caso, rid)
+        jobs.fechar_etapa(cfg, eid, f["acertou"], f"caso {caso.get('id')}",
+                          {"tentativa": f.get("tentativa"), "caso": caso.get("id"), "nivel": caso.get("nivel")})
+        feitas.append(f)
 
 
 def encerrar_casos(cfg) -> int:

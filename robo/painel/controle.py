@@ -201,6 +201,16 @@ class ControleRobo:
                 finally:
                     self._lab_rodando = False
             threading.Thread(target=_lab, name="robo-laboratorio", daemon=True).start()
+        # fábrica de planilhas: confere o que voltou da esteira e, com a fila real vazia, injeta um lote sintético
+        if agora - getattr(self, "_ultima_fabrica", 0) >= 60 and not getattr(self, "_fabrica_rodando", False):
+            self._ultima_fabrica, self._fabrica_rodando = agora, True
+
+            def _fabrica():
+                try:
+                    rotinas.executar(cfg, "fabrica", rotinas.funcao(cfg, "fabrica"))
+                finally:
+                    self._fabrica_rodando = False
+            threading.Thread(target=_fabrica, name="robo-fabrica", daemon=True).start()
         # treino contínuo: todos os funcionários trabalhando em casos com gabarito, no nível de cada um (robo/treino.py)
         if agora - getattr(self, "_ultimo_treino", 0) >= 30 and not getattr(self, "_treino_rodando", False):
             self._ultimo_treino, self._treino_rodando = agora, True

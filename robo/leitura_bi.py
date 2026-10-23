@@ -414,7 +414,8 @@ def planilhas_reais(cfg, limite: int = 8) -> list[tuple[str, pd.DataFrame]]:
     pasta = Path(getattr(cfg, "tratadas", "") or "")
     if not pasta or not pasta.exists():
         return []
-    arquivos = sorted([p for p in pasta.rglob("*") if p.suffix.lower() in (".xlsx", ".csv") and not p.name.startswith("~$")],
+    arquivos = sorted([p for p in pasta.rglob("*") if p.suffix.lower() in (".xlsx", ".csv") and not p.name.startswith("~$")
+                       and "_treino" not in p.relative_to(pasta).parts],  # sintético da fábrica nunca é "real"
                       key=lambda p: p.stat().st_mtime, reverse=True)[:limite]
     saida = []
     for p in arquivos:

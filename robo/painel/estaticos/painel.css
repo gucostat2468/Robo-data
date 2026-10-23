@@ -785,3 +785,13 @@ pre.sql, .consultas pre { max-width: 100%; overflow: auto; }
   .pbi-grade { grid-template-columns: 1fr; }
 }
 .pbi-barra .etiqueta { white-space: normal; max-width: 100%; }
+
+/* Quem faz o quê: números honestos no topo (trabalho real agora / última planilha) */
+.qf-topo-real { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 10px; margin-bottom: 12px; }
+.qf-topo-real > div { background: var(--superficie); border: 1px solid var(--borda); border-radius: var(--raio); padding: 12px 14px; }
+.qf-topo-real b { display: block; font-size: 22px; }
+.qf-topo-real span { color: var(--texto-2); font-size: 13px; }
+.qf-topo-real .qf-vermelho { border-color: var(--perigo); background: var(--perigo-suave); }
+.qf-topo-real .qf-vermelho b { color: var(--perigo); }
+.qf-agora { background: var(--sucesso-suave); border-radius: var(--raio-p); padding: 6px 10px; font-size: 13px; margin: 6px 0; }
+.qf-plantao { display: block; margin-top: 4px; }

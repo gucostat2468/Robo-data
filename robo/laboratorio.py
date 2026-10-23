@@ -274,6 +274,7 @@ def exercicio(cfg, area: str | None = None, semente: int | None = None, gravar: 
     nivel = int(nivel or 1 + (feitos // len(AREAS)) % len(NIVEIS))
     # número sequencial no fim: duas rodadas no mesmo segundo não se misturam (nem a pasta, nem o termômetro)
     rodada = f"LAB-{datetime.now():%Y%m%d-%H%M%S}-{area}-n{nivel}-{feitos + 1}"
+    inicio_job = _agora()
     caso = aplicar_nivel(gerar(area, semente), nivel, semente)
     certo = verdade(caso)
     seg, met = normalizar_nome_coluna(caso["segmento"]), normalizar_nome_coluna(caso["metrica"])
@@ -390,6 +391,15 @@ def exercicio(cfg, area: str | None = None, semente: int | None = None, gravar: 
                       "segundos, nivel) VALUES (?,?,?,?,?,?,?,?,?,?)",
                       (rodada, _agora(), area, semente, x["etapa"], x["responsavel"], int(x["ok"]), x["detalhe"][:1000],
                        x["segundos"], nivel))
+    try:  # prova de trabalho: o exercício inteiro vira um job fechado, uma etapa por responsável
+        from robo import jobs
+        jobs.registrar_concluido(cfg, "laboratorio", "sintetico", None, inicio_job,
+                                 [{"etapa": x["etapa"], "funcionario": x["responsavel"], "ok": x["ok"], "detalhe": x["detalhe"],
+                                   "evidencia": {"segundos": x["segundos"]}} for x in resultados],
+                                 "concluido" if all(x["ok"] for x in resultados) else "falhou", rodada,
+                                 {"area": area, "nivel": nivel, "semente": semente})
+    except Exception:
+        pass
     for x in resultados:
         memoria.experiencia(cfg, x["responsavel"], "acerto" if x["ok"] else "erro", f"Laboratório ({area}): {x['etapa']}",
                             "laboratorio", rodada, x["detalhe"], tb)

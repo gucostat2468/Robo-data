@@ -25,13 +25,16 @@ log = logging.getLogger("robo")
 IGNORAR_NOMES = {"desktop.ini", "thumbs.db", ".ds_store"}
 
 
+PASTA_SINTETICO = "sintetico"   # Bases-Limpeza/sintetico: planilhas TREINO_ da Fábrica de Planilhas (robo/fabrica.py)
+
+
 def eh_candidato(caminho: Path) -> bool:
     nome = caminho.name.lower()
     return (
         caminho.is_file()
         and nome not in IGNORAR_NOMES
         and not nome.startswith(("~$", "~robo_tmp_", ".", "~"))
-        and not nome.endswith((".tmp", ".crdownload", ".part", ".partial", ".lnk"))
+        and not nome.endswith((".tmp", ".crdownload", ".part", ".partial", ".lnk", ".gabarito.json"))
     )
 
 
@@ -87,6 +90,10 @@ class Monitor:
         except FileNotFoundError:
             log.error("Pasta de entrada não encontrada: %s", self.cfg.entrada)
             return resultados
+        if not arquivos:  # produção real vem primeiro: a subpasta da fábrica só é lida com a raiz vazia
+            sint = self.cfg.entrada / PASTA_SINTETICO
+            if sint.is_dir():
+                arquivos = sorted(p for p in sint.iterdir() if eh_candidato(p))
 
         from robo.pipeline import ja_publicado
         for arq in arquivos:

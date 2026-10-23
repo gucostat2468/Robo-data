@@ -66,6 +66,7 @@ FERRAMENTAS_PESSOA = {
     "ger_operacoes": ["organizacao"], "ger_ti": ["organizacao"], "excel_supervisor": ["diagnosticar_planilha"],
     "sec_senior": ["dados_pessoais"], "coord_devops": ["diagnosticar_planilha"],
     "bi_powerbi": ["paineis", "consulta_sql"], "bi_reconciliacao": ["paineis", "consulta_sql"],
+    "fab_coordenador": ["fabrica"], "fab_gerador": ["fabrica"], "fab_conferente": ["fabrica"], "fab_revisor": ["fabrica"],
 }
 # Sala de Casos (4º andar): a revisão independente de casos de treino é a ferramenta de trabalho de todos eles
 for _pid in ("head_casos", "casos_engenharia", "casos_analytics", "casos_governanca", "casos_ti", "casos_revisor",
@@ -77,7 +78,7 @@ ENCAMINHAR = {
     "calcular": "analise_estatistica", "perfil_indicadores": "analise_indicadores",
     "resumo_executivo": "analise_relator", "diagnosticar_planilha": "coord_engenharia",
     "publicar_planilha": "recepcao", "consulta_sql": "dba", "dados_pessoais": "gov_pleno_lgpd",
-    "ronda_ti": "coord_devops", "orquestracao": "airflow_pleno", "organizacao": "canal_helena", "reuniao_andar": "ger_operacoes", "ideias": "canal_iara", "paineis": "bi_powerbi",
+    "ronda_ti": "coord_devops", "orquestracao": "airflow_pleno", "organizacao": "canal_helena", "reuniao_andar": "ger_operacoes", "ideias": "canal_iara", "paineis": "bi_powerbi", "fabrica": "fab_coordenador",
     "scorecard": "dir_operacoes", "auditoria": "head_engenharia", "drivers": "cd_senior_drivers",
     "segmentacao": "cd_pleno_segmentos", "anomalias": "cd_junior_anomalias", "recrutamento": "rh_rs",
     "desenvolvimento": "rh_td", "desempenho": "rh_desempenho", "people_analytics": "rh_people", "raio_x": "dir_operacoes",
@@ -144,6 +145,9 @@ def _fixos() -> tuple:
     from robo.paineis import EQUIPE_BI
     p += [{"id": x["id"], "nome": x["nome"], "papel": _papel_curto(x["cargo"]), "andar": x["andar"], "grupo": "bi", "canal": "excel",
            "cor": x.get("cor"), "descricao": "; ".join(x.get("escopo") or [])} for x in EQUIPE_BI]
+    from robo.fabrica import EQUIPE_FABRICA
+    p += [{"id": x["id"], "nome": x["nome"], "papel": _papel_curto(x["cargo"]), "andar": x["andar"], "grupo": "fabrica",
+           "canal": "geral", "cor": x.get("cor"), "descricao": "; ".join(x.get("escopo") or [])} for x in EQUIPE_FABRICA]
     from robo.lideranca import EQUIPE as LIDERANCA
     p += [{"id": x["id"], "nome": x["nome"], "papel": _papel_curto(x["cargo"]), "andar": x["andar"], "grupo": "lideranca",
            "canal": "lideranca" if x["nivel"] in ("diretor", "head") else ("rh" if x["id"].startswith("rh_") else CANAL_DO_ANDAR[x["andar"]]),
@@ -229,21 +233,25 @@ def nivel_de(pid: str, pessoa: dict | None = None) -> str:
     """Nível do cargo. Promoção registrada pelo ciclo de RH vale primeiro (chega em `pessoa` por lista(cfg))."""
     if pessoa and pessoa.get("nivel_rh"):
         return pessoa["nivel_rh"]
-    from robo import lideranca, quadro, rh, ti
-    f = rh.FICHAS.get(pid) or quadro.POR_ID.get(pid) or ti.POR_ID.get(pid) or lideranca.POR_ID.get(pid) or {}
+    from robo import fabrica, lideranca, quadro, rh, ti
+    f = (rh.FICHAS.get(pid) or quadro.POR_ID.get(pid) or ti.POR_ID.get(pid) or lideranca.POR_ID.get(pid)
+         or fabrica.POR_ID.get(pid) or {})
     return f.get("nivel") or (pessoa or {}).get("nivel") or "pleno"
 
 
 def area_de(pid: str) -> str:
-    from robo import lideranca, quadro, rh, ti
-    f = rh.FICHAS.get(pid) or quadro.POR_ID.get(pid) or ti.POR_ID.get(pid) or lideranca.POR_ID.get(pid) or {}
+    from robo import fabrica, lideranca, quadro, rh, ti
+    f = (rh.FICHAS.get(pid) or quadro.POR_ID.get(pid) or ti.POR_ID.get(pid) or lideranca.POR_ID.get(pid)
+         or fabrica.POR_ID.get(pid) or {})
     return f.get("area") or ""
 
 
 def gestor_de(pid: str) -> str | None:
-    from robo import lideranca, paineis, quadro, ti
+    from robo import fabrica, lideranca, paineis, quadro, ti
     if pid in paineis.GESTORES:
         return paineis.GESTORES[pid]
+    if pid in fabrica.GESTORES:
+        return fabrica.GESTORES[pid]
     if pid in lideranca.NOVOS_GESTORES:  # gerentes que passaram a ter head ou diretor acima
         return lideranca.NOVOS_GESTORES[pid]
     if pid in lideranca.POR_ID:

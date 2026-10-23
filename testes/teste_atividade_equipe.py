@@ -25,7 +25,7 @@ def _semear(cfg, agora):
                   ("backup", h(1), h(1), 2.0, "fez", ""))
 
 
-def teste_todos_aparecem_e_ultimo_trabalho_e_o_mais_recente(cfg_factory):
+def teste_todos_aparecem_e_so_trabalho_real_conta(cfg_factory):
     cfg = cfg_factory()
     cfg.criar_pastas()
     agora = datetime.now()
@@ -34,13 +34,17 @@ def teste_todos_aparecem_e_ultimo_trabalho_e_o_mais_recente(cfg_factory):
     pessoas = {p["id"]: p for p in q["pessoas"]}
     assert set(pessoas) == {p["id"] for p in organizacao.lista(cfg)}
     rec = pessoas["recepcao"]
-    assert rec["situacao"] == "trabalhando" and "errou" in rec["ultimo"]["o_que"] and rec["em_24h"] == 1
-    # o backup é responsabilidade da DBA: a rotina (1 h atrás) é mais nova que a conversa dela (5 h atrás)
-    assert pessoas["dba"]["ultimo"]["fonte"] == "rotinas_execucoes" and pessoas["dba"]["situacao"] == "trabalhando"
+    # treino há 30 min: trabalho real de hoje, mas sem job aberto agora NÃO é "trabalhando"
+    assert rec["situacao"] == "ativo_hoje" and "errou" in rec["ultimo"]["o_que"] and rec["real_24h"] == 1
+    # a rotina do backup (1 h atrás) é plantão: o último trabalho REAL da DBA é a conversa de 5 h atrás
+    dba = pessoas["dba"]
+    assert dba["ultimo"]["fonte"] == "interacoes" and dba["situacao"] == "ativo_hoje"
+    assert dba["ultimo_plantao"]["fonte"] == "rotinas_execucoes"
     assert pessoas["limpeza"]["situacao"] == "ocioso"
     parados = {p["id"] for p in q["parados"]}
     assert "limpeza" in parados and "recepcao" not in parados
     assert sum(a["pessoas"] for a in q["andares"]) == len(pessoas)
+    assert q["trabalho_real_agora"] == 0
     assert all(p["escopo"] for p in q["pessoas"] if p["id"] in ("recepcao", "bi_powerbi", "airflow_pleno"))
 
 
@@ -53,14 +57,43 @@ def teste_banco_vazio_ninguem_tem_trabalho_inventado(cfg_factory):
     assert len(q["parados"]) == len(q["pessoas"])
 
 
-def teste_ronda_de_ti_conta_como_trabalho_do_5o_andar(cfg_factory):
+def teste_ronda_de_ti_e_plantao_nao_trabalho(cfg_factory):
     from robo import ti
     cfg = cfg_factory()
     cfg.criar_pastas()
     ti._salvar_estado(cfg, {"ultima_ronda": {"data_hora": datetime.now().strftime("%Y-%m-%d %H:%M:%S"), "itens": [
         {"id": "infra_pleno", "ok": False, "achados": ["Disco com 1 GB livre"]}]}})
     p = {x["id"]: x for x in atividade_equipe.quadro(cfg)["pessoas"]}["infra_pleno"]
-    assert p["situacao"] == "trabalhando" and "Ronda de TI" in p["ultimo"]["o_que"] and "Disco com 1 GB" in p["ultimo"]["o_que"]
+    assert p["situacao"] == "plantao" and p["ultimo"] is None
+    assert "Ronda de TI" in p["ultimo_plantao"]["o_que"]
+
+
+def teste_forjar_trabalho_sem_job_nao_funciona(cfg_factory):
+    """Registro automático recente (rotina, canal) não pode virar "trabalhando": só etapa de job aberta vale."""
+    from robo import rotinas
+    cfg = cfg_factory()
+    cfg.criar_pastas()
+    rotinas._tb(cfg)
+    agora = datetime.now()
+    with Trabalho(cfg).tx() as c:
+        c.execute("INSERT INTO rotinas_execucoes (nome, inicio, fim, segundos, status, detalhe) VALUES (?,?,?,?,?,?)",
+                  ("backup", agora.isoformat(timespec="seconds"), agora.isoformat(timespec="seconds"), 1.0, "fez", ""))
+    q = atividade_equipe.quadro(cfg, agora)
+    assert not [p for p in q["pessoas"] if p["situacao"] in ("trabalhando", "ativo_hoje")]
+
+
+def teste_job_aberto_e_o_unico_trabalhando(cfg_factory):
+    from robo import jobs
+    cfg = cfg_factory()
+    cfg.criar_pastas()
+    jid = jobs.abrir(cfg, "planilha", "real", "vendas.xlsx", "recepcao")
+    jobs.etapa(cfg, jid, "limpeza", "limpeza")
+    q = {p["id"]: p for p in atividade_equipe.quadro(cfg)["pessoas"]}
+    assert q["limpeza"]["situacao"] == "trabalhando" and q["limpeza"]["agora"]["arquivo"] == "vendas.xlsx"
+    assert [p for p in q.values() if p["situacao"] == "trabalhando"] == [q["limpeza"]]
+    jobs.fechar(cfg, jid, "concluido", {"linhas_saida": 10})
+    q = {p["id"]: p for p in atividade_equipe.quadro(cfg)["pessoas"]}
+    assert q["limpeza"]["situacao"] == "ativo_hoje" and q["limpeza"]["ultimo"]["fonte"] == "jobs_etapas"
 
 
 def teste_api(cfg_factory):

@@ -956,6 +956,27 @@ renderer.domElement.addEventListener("pointerup", (e) => {
 addEventListener("resize", () => { camera.aspect = innerWidth / innerHeight; camera.updateProjectionMatrix(); renderer.setSize(innerWidth, innerHeight); if (geo) enquadrarCameras(); });
 
 // ------------------------------------------------------------------ dados do robô
+// Prova de trabalho: anima "trabalhando" quem tem etapa de job aberta no servidor; quem saiu da lista volta ao plantão.
+function mostrarTrabalhoReal(t) {
+  const ids = new Set(t.ids || []);
+  estado.porServidor = estado.porServidor || new Set();
+  for (const id of ids) {
+    const e = estado.estacoes.get(id);
+    if (e && e.situacao !== "trabalhando") definirSituacao(id, "trabalhando");
+  }
+  for (const id of estado.porServidor) {
+    const e = estado.estacoes.get(id);
+    if (!ids.has(id) && e && e.situacao === "trabalhando" && !estado.tocando) definirSituacao(id, "parado");
+  }
+  estado.porServidor = ids;
+  const el = $("#hud-real");
+  if (!el) return;
+  const min = t.ultima_planilha_min;
+  const total = estado.equipe.length || "?";
+  el.innerHTML = `<span><b>${ids.size} de ${total}</b> com trabalho real agora</span>` +
+    `<span class="${min == null || min > 60 ? "vermelho" : ""}">${min == null ? "nenhuma planilha processada ainda" : `última planilha há <b>${min} min</b>`}</span>`;
+}
+
 async function atualizar() {
   try {
     const d = await api(`/api/escritorio?desde=${estado.ultimoSeq}`);
@@ -974,6 +995,7 @@ async function atualizar() {
       estado.filaEventos.push(ev);
     }
     mostrarVivo(d.vivo || {});
+    mostrarTrabalhoReal(d.trabalho_real || {});
     estado.ultimoSeq = Math.max(estado.ultimoSeq, d.ultimo_seq || 0);
     estado.iniciado = true;
     $("#hud-status").innerHTML = d.erro_config ? `<i class="ponto erro"></i>Configuração pendente`

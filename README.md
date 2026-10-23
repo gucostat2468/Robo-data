@@ -308,6 +308,27 @@ python -m robo diagnostico            :: confere o computador inteiro e diz como
   para sempre. Para um 2º lugar (HD externo): no config.yaml, `backup: copia_extra: "E:\\Backups"`.
 - **Levar a memória para outro computador:** `python -m robo importar-memoria trabalho_AAAAMMDD_HHMMSS.db.gz`.
 
+## 11a. Status honesto e Fábrica de Planilhas
+
+**Status honesto.** Antes, o painel dizia "trabalhando" para quem tivesse qualquer registro nas últimas 2 horas, até o
+batimento automático de uma rotina, e parecia que todos trabalhavam sem estar. Agora todo processamento real abre um
+**job** com as etapas e quem fez cada uma (`robo/jobs.py`):
+
+- **trabalhando**: tem uma etapa de job aberta agora (últimos 15 minutos);
+- **ativo hoje**: deixou trabalho real nas últimas 24 horas (etapa de job, treino, conversa, mentoria, lição, revisão);
+- **plantão**: só a rotina automática dela rodou no prazo, o que não conta como trabalho;
+- **ocioso** e **sem registro**.
+
+O escritório 3D mostra no topo "X de Y com trabalho real agora" e há quanto tempo passou a última planilha (vermelho
+acima de 60 minutos). A prova de cada pessoa está em `GET /api/prova-de-trabalho`.
+
+**Fábrica de Planilhas** (menu Dados): Joana gera, Ruan confere o gabarito por outro caminho, Celina revisa e Teodoro
+coordena. São 15 regras de negócio (NPS, CSAT/CES, churn, RFM, curva ABC, funil, folha, ponto, estoque, logística,
+financeiro, leads, educação, vendas e pesquisa de mercado), com 2 mil a 20 mil linhas e a sujeira do mundo real. A
+planilha `TREINO_*` entra em `Bases-Limpeza/sintetico`, passa pela esteira de verdade e sai em `Bases-Tratadas/_treino`.
+Ela nunca vai para o PostgreSQL de produção nem para o histórico real, e é conferida contra o gabarito. Com planilha
+real na fila, a fábrica espera. Detalhes em `MIGRACAO.md`.
+
 ## 12. Apache Airflow (opcional)
 
 O robô agenda as próprias rotinas. Se quiser vê-las no Airflow (com histórico, retentativas e tempo limite):

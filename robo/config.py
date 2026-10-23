@@ -49,7 +49,11 @@ PADROES: dict = {
         # "erro" = #REF!, #DIV/0!, #N/D etc. bloqueiam o arquivo | "anular" = viram vazio (com aviso)
         "erros_excel": "erro",
         # colunas cujo nome indica identificador ficam sempre como texto (preserva zeros à esquerda)
-        "padroes_identificador": ["id", "id_*", "*_id", "cpf*", "cnpj*", "cep*", "telefone*", "celular*", "matricula*", "codigo*", "cod_*", "ra", "rg"],
+        "padroes_identificador": ["id", "id_*", "*_id", "cpf*", "cnpj*", "cep*", "telefone*", "celular*", "matricula*", "codigo*", "cod_*", "ra", "rg",
+                                  # chaves de negócio (achado da Fábrica de Planilhas, 23/10/2026: sem elas, a cópia exata de
+                                  # uma nota fiscal não era removida e a soma do faturamento saía maior)
+                                  "nota_fiscal*", "nf", "nf_*", "numero_nf*", "pedido", "pedido_*", "numero_pedido*", "titulo",
+                                  "numero_titulo*", "protocolo*", "sku", "sku_*", "chamado*", "ticket_id*"],
     },
     "saida": {
         # xlsx | csv | ambos | nenhum (nenhum = só grava no banco)
