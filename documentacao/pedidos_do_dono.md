@@ -138,5 +138,8 @@ Legenda: ✅ feito e testado · 🟡 feito em parte · ⏳ pendente
 | 133 | 5º andar e AWS trabalhando mais | ✅ | 5º andar a cada 6 h, Heloísa/Ícaro/Cloud a cada 2 h (geral: 24 h); 4 verificações novas na ronda de TI |
 | 134 | Desenho do Google Cloud (Cloud Run + Cloud SQL) | 🟡 | projeto pronto (Dockerfile sem root, PORT, Unix socket do Cloud SQL, saúde só leitura, instância única) e testado em contêiner; NADA criado no Google: custa cerca de US$ 70–100/mês (`documentacao/nuvem_google.md`) |
 | 135 | Todas as tabelas do PostgreSQL com dados reais e coerentes | 🟡 | schemas laboratorio/treino/robo enchem com o trabalho real; tratado/analitico só com planilha REAL sua (não invento); causas em `python -m robo cobertura-banco` |
+| 136 | App no celular para acompanhar em tempo real, sem computador | ✅ | página "Empresa ao Vivo" no Claude lendo o boletim que a nuvem publica a cada 5 min (`robo/boletim.py`); guia em `documentacao/celular_sem_pc.md` |
+| 137 | Telegram configurado só pelo celular | 🟡 | `/vincular CÓDIGO` no grupo (sem ids, sem computador); falta você criar o robô e os 2 segredos no GitHub |
+| 138 | Empresa trabalhando de verdade o dia todo | ✅ | turnos de 40 min que chamam o próximo (antes: 20 min a cada 3–6 h); o 1º boletim achou e foi corrigido o SQL que falhava na nuvem |
 | 98 | Você acessar meu PC | 🟡 | esta sessão roda na nuvem e não alcança o seu PC; para eu operar no Windows: Claude Desktop ou `claude remote-control` na pasta do projeto |
 | 38 | IA opcional sem fingir | ✅ | `robo/ia.py`: desligada por padrão; Ollama local, API compatível ou Claude; só redige, nunca calcula; texto com número fora dos fatos é descartado; frase de IA marcada como hipótese com o modelo |

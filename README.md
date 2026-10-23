@@ -415,6 +415,9 @@ Para ver quem recebeu, por andar e por área: `python -m robo cobertura-demandas
 
 ## 11e. Grupo no Telegram e contêiner (Google Cloud)
 
+- **Só pelo celular, sem computador:** app "Empresa ao Vivo" e Telegram com `/vincular CÓDIGO` — passo a passo em
+  `documentacao/celular_sem_pc.md`. A nuvem trabalha em turnos de 40 min seguidos e publica um boletim a cada 5 min.
+
 - **Telegram:** `python -m robo telegram --testar | --descobrir | --configurar ID_DO_GRUPO SEU_ID | --apresentar`.
   Um robô do Telegram fala por todos (cada mensagem assinada por quem respondeu), só você manda, tudo fica em
   `telegram_mensagens`. O token fica na variável `ROBO_TELEGRAM_TOKEN` (nunca em arquivo).
