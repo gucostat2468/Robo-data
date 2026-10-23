@@ -1,0 +1,252 @@
+{
+ "versao": 1,
+ "gerado_em": "2026-10-23T23:19:41",
+ "turno": {
+  "estado": "trabalhando",
+  "inicio": "2026-10-23T23:19:41",
+  "fim_previsto": "2026-10-23T23:59:41",
+  "voltas": 0,
+  "planilhas": 1
+ },
+ "funcionarios": 101,
+ "andares": [
+  {
+   "andar": 1,
+   "pessoas": 19,
+   "trabalharam_hoje": 19,
+   "demandas": 5,
+   "concluidas": 2,
+   "parciais": 0,
+   "falhas": 3,
+   "treino": 123,
+   "acertos": 95
+  },
+  {
+   "andar": 2,
+   "pessoas": 16,
+   "trabalharam_hoje": 16,
+   "demandas": 8,
+   "concluidas": 3,
+   "parciais": 0,
+   "falhas": 5,
+   "treino": 106,
+   "acertos": 84
+  },
+  {
+   "andar": 3,
+   "pessoas": 12,
+   "trabalharam_hoje": 12,
+   "demandas": 5,
+   "concluidas": 2,
+   "parciais": 0,
+   "falhas": 3,
+   "treino": 77,
+   "acertos": 73
+  },
+  {
+   "andar": 4,
+   "pessoas": 31,
+   "trabalharam_hoje": 31,
+   "demandas": 8,
+   "concluidas": 8,
+   "parciais": 0,
+   "falhas": 0,
+   "treino": 188,
+   "acertos": 180
+  },
+  {
+   "andar": 5,
+   "pessoas": 23,
+   "trabalharam_hoje": 23,
+   "demandas": 4,
+   "concluidas": 0,
+   "parciais": 0,
+   "falhas": 4,
+   "treino": 151,
+   "acertos": 120
+  }
+ ],
+ "agora": [],
+ "ultimos": [
+  {
+   "quando": "2026-10-23T23:19:25",
+   "funcionario": "Caio",
+   "cargo": "Indicadores (NPS, CSAT, CES)",
+   "andar": 2,
+   "trabalho": "Exercício de SQL no PostgreSQL com os dados da fábrica",
+   "estado": "falhou"
+  },
+  {
+   "quando": "2026-10-23T23:19:21",
+   "funcionario": "Dora",
+   "cargo": "DBA PostgreSQL",
+   "andar": 1,
+   "trabalho": "Exercício de SQL no PostgreSQL com os dados da fábrica",
+   "estado": "falhou"
+  },
+  {
+   "quando": "2026-10-23T23:19:21",
+   "funcionario": "Gabriel",
+   "cargo": "Especialista em Tabelas Dinâmicas e Dashboards",
+   "andar": 3,
+   "trabalho": "Consultar o conhecimento da área",
+   "estado": "falhou"
+  },
+  {
+   "quando": "2026-10-23T23:19:17",
+   "funcionario": "Marina",
+   "cargo": "Arquiteta de Cloud (AWS)",
+   "andar": 5,
+   "trabalho": "Exercício de SQL no PostgreSQL com os dados da fábrica",
+   "estado": "falhou"
+  },
+  {
+   "quando": "2026-10-23T23:19:14",
+   "funcionario": "Davi",
+   "cargo": "Estatística",
+   "andar": 2,
+   "trabalho": "Exercício de SQL no PostgreSQL com os dados da fábrica",
+   "estado": "falhou"
+  },
+  {
+   "quando": "2026-10-23T23:19:14",
+   "funcionario": "Lívia",
+   "cargo": "Designer de Casos",
+   "andar": 4,
+   "trabalho": "Consultar o conhecimento da área",
+   "estado": "concluida"
+  },
+  {
+   "quando": "2026-10-23T22:09:13",
+   "funcionario": "Sérgio",
+   "cargo": "Analista de Dados Pleno",
+   "andar": 2,
+   "trabalho": "Exercício de SQL no PostgreSQL com os dados da fábrica",
+   "estado": "falhou"
+  },
+  {
+   "quando": "2026-10-23T22:09:09",
+   "funcionario": "Carla",
+   "cargo": "Coordenadora de Engenharia de Dados",
+   "andar": 1,
+   "trabalho": "Exercício de SQL no PostgreSQL com os dados da fábrica",
+   "estado": "falhou"
+  },
+  {
+   "quando": "2026-10-23T22:09:04",
+   "funcionario": "Heitor",
+   "cargo": "Analista Pleno de BI",
+   "andar": 3,
+   "trabalho": "Exercício de SQL no PostgreSQL com os dados da fábrica",
+   "estado": "falhou"
+  },
+  {
+   "quando": "2026-10-23T22:09:04",
+   "funcionario": "Murilo",
+   "cargo": "Designer de Casos",
+   "andar": 4,
+   "trabalho": "Consultar o conhecimento da área",
+   "estado": "concluida"
+  }
+ ],
+ "sql": {
+  "exercicios_hoje": 13,
+  "concluidos_hoje": 0
+ },
+ "fabrica": {
+  "lotes_hoje": 5,
+  "conferidos_ok_hoje": 4
+ },
+ "rotinas": [
+  {
+   "rotina": "caixa_dono",
+   "execucoes_24h": 6,
+   "erros_24h": 0,
+   "ultima": "2026-10-23T23:19:10"
+  },
+  {
+   "rotina": "demandas",
+   "execucoes_24h": 5,
+   "erros_24h": 0,
+   "ultima": "2026-10-23T23:19:25"
+  },
+  {
+   "rotina": "dialogo",
+   "execucoes_24h": 5,
+   "erros_24h": 0,
+   "ultima": "2026-10-23T23:19:25"
+  },
+  {
+   "rotina": "fabrica",
+   "execucoes_24h": 9,
+   "erros_24h": 0,
+   "ultima": "2026-10-23T23:19:25"
+  },
+  {
+   "rotina": "ideias",
+   "execucoes_24h": 1,
+   "erros_24h": 0,
+   "ultima": "2026-10-23T07:29:35"
+  },
+  {
+   "rotina": "jornada",
+   "execucoes_24h": 6,
+   "erros_24h": 0,
+   "ultima": "2026-10-23T23:19:10"
+  },
+  {
+   "rotina": "laboratorio",
+   "execucoes_24h": 10,
+   "erros_24h": 0,
+   "ultima": "2026-10-23T22:22:34"
+  },
+  {
+   "rotina": "licoes",
+   "execucoes_24h": 6,
+   "erros_24h": 0,
+   "ultima": "2026-10-23T23:19:09"
+  },
+  {
+   "rotina": "memoria_pg",
+   "execucoes_24h": 5,
+   "erros_24h": 0,
+   "ultima": "2026-10-23T22:22:12"
+  },
+  {
+   "rotina": "paineis",
+   "execucoes_24h": 6,
+   "erros_24h": 0,
+   "ultima": "2026-10-23T23:19:27"
+  },
+  {
+   "rotina": "registro",
+   "execucoes_24h": 60,
+   "erros_24h": 0,
+   "ultima": "2026-10-23T22:28:35"
+  },
+  {
+   "rotina": "rh_desempenho",
+   "execucoes_24h": 1,
+   "erros_24h": 0,
+   "ultima": "2026-10-23T18:19:27"
+  },
+  {
+   "rotina": "ronda_ti",
+   "execucoes_24h": 11,
+   "erros_24h": 0,
+   "ultima": "2026-10-23T23:19:03"
+  },
+  {
+   "rotina": "treino",
+   "execucoes_24h": 43,
+   "erros_24h": 0,
+   "ultima": "2026-10-23T22:27:11"
+  }
+ ],
+ "totais": {
+  "demandas": 30,
+  "tentativas_treino": 3711,
+  "conversas": 1641,
+  "trabalhos_com_prova": 232
+ }
+}
