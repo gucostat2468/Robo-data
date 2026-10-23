@@ -1,4 +1,4 @@
-"""Jornada ponta a ponta (equipe de Airflow: Henrique, Bianca e Davi): a esteira inteira, de hora em hora, com resposta
+"""Jornada ponta a ponta (equipe de Airflow: Caetano, Bianca e Gael): a esteira inteira, de hora em hora, com resposta
 conhecida.
 
 Num computador de teste ISOLADO (pasta temporária, banco desligado, sem regras de produção — nada toca as pastas nem as

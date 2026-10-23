@@ -56,10 +56,10 @@ def teste_os_cinco_estao_no_quadro_com_gestao_independente():
         assert pid in gente and gente[pid]["andar"] == 4
     assert organizacao.gestor_de("dem_avaliador") == "head_casos"  # quem avalia não responde a quem distribui
     assert organizacao.gestor_de("dem_gerador") == "dem_coordenador"
-    # os 5 nomes novos não repetem ninguém (há 3 repetições ANTIGAS no quadro — Davi, Henrique, Bianca — que não são
-    # renomeadas sem autorização do dono)
-    outros = [p["nome"] for p in organizacao.lista() if p["id"] not in demandas.POR_ID]
-    assert not {p["nome"] for p in demandas.EQUIPE_DEMANDAS} & set(outros)
+    # nenhum nome repetido no quadro inteiro (as 3 repetições antigas foram resolvidas com autorização do dono,
+    # trocando só o nome exibido: id, histórico e permissões continuam os mesmos)
+    nomes = [p["nome"] for p in organizacao.lista()]
+    assert len(set(nomes)) == len(nomes)
 
 
 def teste_provas_tecnicas_da_equipe():

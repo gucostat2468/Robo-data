@@ -1413,7 +1413,7 @@ function blocoJornada(lista) {
     historico: "Histórico", analise: "Análise" };
   const ult = lista[0];
   const cab = `<div class="secao-titulo" style="margin-top:16px;display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap">
-    <span>Jornada ponta a ponta — Bianca e Henrique (Airflow) conferem a esteira inteira de hora em hora</span>
+    <span>Jornada ponta a ponta — Bianca e Caetano (Airflow) conferem a esteira inteira de hora em hora</span>
     <button class="btn" data-acao="jornada-rodar">${icone("play")}Rodar a jornada agora</button></div>`;
   if (!ult) return cab + `<div class="cartao vazio"><p>Nenhuma volta registrada ainda. A rotina “jornada” roda de hora em hora — ou clique em “Rodar a jornada agora”.</p></div>`;
   const trilha = etapas.map((e) => { const x = ult.etapas[e] || {}; return `<div class="jornada-etapa ${x.ok ? "ok" : "falha"}" title="${esc(x.detalhe || "")}">

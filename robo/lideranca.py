@@ -168,7 +168,7 @@ EQUIPE = [
        "head_python", "#003B57", ["Garante que a memória da empresa (trabalho.db) grava tudo ou nada e aguenta reinício"],
        ["Revisão do sqlite3 verde", "Exigência: 90% de acerto"], ["sqlite3: transações, WAL"],
        ["Não grava fora de transação"], ["revisao_biblioteca"]),
-    _p("rh_estagiaria", "Bianca", "Estagiária de RH", "estagiario", 4, "Pessoas e Cultura", "rh_desempenho", "#F9A8D4",
+    _p("rh_estagiaria", "Lorena", "Estagiária de RH", "estagiario", 4, "Pessoas e Cultura", "rh_desempenho", "#F9A8D4",
        ["Acompanha os indicadores de desempenho em modo observação"], ["Relato correto"], [FONTES["oxygen"]],
        ["Não altera nem decide nada"], ["desempenho"]),
     # ------------------------------------------------------------------ Sala de Casos (4º andar, responde ao dono)

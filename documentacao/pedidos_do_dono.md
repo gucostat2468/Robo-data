@@ -119,8 +119,19 @@ Legenda: ✅ feito e testado · 🟡 feito em parte · ⏳ pendente
 | 114 | A empresa aprende com cada erro e acerto | ✅ | `robo/aprendizados.py`: memória consultada antes de ler cada planilha; semente de 208 erros típicos (`python -m robo semear-aprendizado`); replay de erros antigos |
 | 115 | App do celular de verdade | ✅ | `python -m robo diagnostico-celular` (8 passos e QR code), página "No celular" no painel com o QR, ícones PNG, service worker e tela offline (em HTTPS), telas sem rolar para o lado em 375 px, ações opcionais (pausar, retomar, ver log, reprocessar) desligadas por padrão e registradas |
 | 116 | Todas as tabelas do banco com dados | 🟡 | causa de cada vazia levantada e registrada (`python -m robo cobertura-banco`); esteira passou a rodar na nuvem; `laboratorio` e `treino` passaram a receber o dado sintético. As que dependem de pedido do dono, reunião, RH ou chat continuam vazias até esses fatos acontecerem: encher com linhas inventadas seria mentir |
-| 117 | Reestruturação operacional (24 itens) | 🟡 | diagnóstico e plano em `documentacao/diagnostico_reestruturacao.md`; etapas 1 e 2 feitas; 3 a 9 planejadas |
+| 117 | Reestruturação operacional (24 itens) | 🟡 | etapas 1 a 4 de 9 feitas (diagnóstico, persistência, execução real, equipe de demandas); o que falta está em `documentacao/diagnostico_geral.md` |
 | 118 | Funcionários recebendo e executando tarefas de verdade | ✅ | `robo/demandas.py` + orquestrador: tarefa com a ferramenta do contrato, critérios de aceitação conferidos sem IA, revisão por outra pessoa, job como prova; 87 de 87 elegíveis receberam e executaram demanda no teste local (79 de 81 aprovadas na 1ª rodada; as 2 falhas eram defeito da preparação, corrigido) |
 | 119 | Cinco funcionários distribuindo demandas sintéticas em 4 níveis, sem deixar ninguém para trás | ✅ | Aurora, Vicente, Isadora, Renan e Bento (`robo/demandas.py`); níveis básico a profissional com trabalho diferente em cada um; cobertura por andar e área (`python -m robo cobertura-demandas`); abandono, treinamento no lugar e avaliação independente registrados |
+| 120 | Diagnóstico geral do projeto e decisões com autonomia | ✅ | `documentacao/diagnostico_geral.md`: 32 itens abertos, 6 que dependem do dono, ordem recomendada; nomes repetidos resolvidos (Gael, Caetano, Lorena) |
+| 121 | Organograma visual | ⏳ | planejado (diagnóstico geral, item 13) |
+| 122 | Grupo no Telegram com foto, nome, área e cargo de cada funcionário | ⏳ | depende do token do @BotFather (seu celular, 2 min) |
+| 123 | Fundos de Power BI no estilo Figma | ⏳ | planejado (diagnóstico geral, item 24) |
+| 124 | Skill de engenharia reversa para o Claude | ⏳ | planejado (diagnóstico geral, item 25) |
+| 125 | Funcionário de pesquisa (Markdown, PDF, fontes, notificações) | ⏳ | planejado (Etapa 7; fontes gratuitas, Perplexity só com chave sua) |
+| 126 | Head de AWS e Sênior de AWS/Linux/Ubuntu | ⏳ | planejado (Etapa 8; sem acesso real à nuvem) |
+| 127 | IA local para os funcionários | ⏳ | planejado (Etapa 5); a instalação no seu notebook depende de você |
+| 128 | Machine learning e deep learning com os dados do banco | ⏳ | planejado (Etapa 9): primeiro experimento com as tentativas de treino |
+| 129 | Extras 7.1 a 7.7 (contrato de dados, drift, linhagem, fila com SLA, dia acelerado, relatório semanal em PDF, teste de caos) | ⏳ | planejado |
+| 130 | Relatório final com vídeo dos andares | ⏳ | planejado |
 | 98 | Você acessar meu PC | 🟡 | esta sessão roda na nuvem e não alcança o seu PC; para eu operar no Windows: Claude Desktop ou `claude remote-control` na pasta do projeto |
 | 38 | IA opcional sem fingir | ✅ | `robo/ia.py`: desligada por padrão; Ollama local, API compatível ou Claude; só redige, nunca calcula; texto com número fora dos fatos é descartado; frase de IA marcada como hipótese com o modelo |
