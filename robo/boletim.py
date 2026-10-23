@@ -29,6 +29,7 @@ log = logging.getLogger("robo")
 VERSAO = 1
 RAMO = "painel-celular"
 ARQUIVO = "estado/estado.json"
+LEIA = "README.md"  # o GitHub abre este arquivo sozinho na página do ramo
 
 
 def _q(c, sql, params=()):
@@ -110,6 +111,52 @@ def montar(cfg, agora: datetime | None = None, turno: dict | None = None) -> dic
     return saida
 
 
+# =============================================================================== versão para ler no navegador
+ESTADOS = {"concluida": "✅ concluída", "concluida_parcialmente": "🟡 parcial", "falhou": "🔴 falhou"}
+
+
+def _hora(iso: str | None) -> str:
+    """O turno roda em UTC; quem lê está em Brasília (UTC-3)."""
+    if not iso:
+        return ""
+    try:
+        return (datetime.fromisoformat(str(iso)[:19]) - timedelta(hours=3)).strftime("%d/%m %H:%M")
+    except ValueError:
+        return str(iso)
+
+
+def markdown(d: dict) -> str:
+    """O mesmo boletim em Markdown: o GitHub mostra formatado no navegador do celular, sem login e sem app."""
+    t = d.get("turno") or {}
+    estado = t.get("estado") or "sem turno"
+    andares = d.get("andares") or []
+    soma = lambda k: sum(a.get(k) or 0 for a in andares)  # noqa: E731
+    dem, ok = soma("demandas"), soma("concluidas")
+    taxa = f" ({100 * ok / dem:.0f}%)" if dem else ""
+    l = [f"# Empresa ao vivo", "",
+         f"**Boletim das {_hora(d.get('gerado_em'))}** (horário de Brasília) · {estado}", "",
+         "> Atualiza a cada 5 minutos enquanto a empresa trabalha. Recarregue a página para ver o mais novo.", "",
+         "## Hoje", "",
+         f"- **{dem}** demandas, **{ok}** concluídas{taxa}, {soma('parciais')} parciais, {soma('falhas')} com falha",
+         f"- **{soma('trabalharam_hoje')}** de {d.get('funcionarios')} funcionários já trabalharam",
+         f"- SQL: {(d.get('sql') or {}).get('exercicios_hoje', 0)} exercícios, "
+         f"{(d.get('sql') or {}).get('concluidos_hoje', 0)} conferidos com o gabarito",
+         f"- Fábrica: {(d.get('fabrica') or {}).get('lotes_hoje', 0)} planilhas, "
+         f"{(d.get('fabrica') or {}).get('conferidos_ok_hoje', 0)} conferidas sem erro", "",
+         "## Trabalhando agora", ""]
+    agora = d.get("agora") or []
+    l += [f"- {a['funcionario']} ({a.get('cargo', '')}): {a.get('tipo')} desde {_hora(a.get('desde'))[-5:]}" for a in agora] \
+        or ["- ninguém com trabalho aberto neste boletim"]
+    l += ["", "## Andares", "", "| Andar | Trabalharam | Demandas | Concluídas | Parciais | Falhas |", "|---|--:|--:|--:|--:|--:|"]
+    l += [f"| {a['andar']}º | {a['trabalharam_hoje']} de {a['pessoas']} | {a['demandas']} | {a['concluidas']} | "
+          f"{a['parciais']} | {a['falhas']} |" for a in andares]
+    l += ["", "## Últimas entregas", "", "| Hora | Quem | Trabalho | Resultado |", "|---|---|---|---|"]
+    l += [f"| {_hora(u.get('quando'))[-5:]} | {u['funcionario']} ({u.get('andar')}º) | {u.get('trabalho', '')} | "
+          f"{ESTADOS.get(u.get('estado'), u.get('estado'))} |" for u in d.get("ultimos") or []]
+    l += ["", "---", "Números tirados dos registros da empresa (dado sintético de treino, nunca de cliente)."]
+    return "\n".join(l) + "\n"
+
+
 # =============================================================================== publicar (turno da nuvem)
 def _git(*args, cwd: Path, check: bool = True, input_: str | None = None) -> subprocess.CompletedProcess:
     return subprocess.run(["git", *args], cwd=cwd, capture_output=True, text=True, timeout=60, check=check,
@@ -150,7 +197,8 @@ def publicar(cfg, raiz: Path, pasta: Path, turno: dict | None = None, remoto: st
         alvo = pasta / ARQUIVO
         alvo.parent.mkdir(parents=True, exist_ok=True)
         alvo.write_text(json.dumps(dados, ensure_ascii=False, indent=1, default=str), encoding="utf-8")
-        _git("add", ARQUIVO, cwd=pasta)
+        (pasta / LEIA).write_text(markdown(dados), encoding="utf-8")
+        _git("add", ARQUIVO, LEIA, cwd=pasta)
         if _git("diff", "--cached", "--quiet", cwd=pasta, check=False).returncode == 0:
             return True  # nada mudou
         # o boletim vai também na MENSAGEM do commit: o app lê a lista de commits do ramo (JSON puro pelo conector

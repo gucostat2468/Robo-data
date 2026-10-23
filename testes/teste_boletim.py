@@ -48,7 +48,7 @@ def teste_publica_no_ramo_proprio_com_historico(cfg_factory, tmp_path):
     assert boletim.publicar(cfg, repo, pasta, {"estado": "trabalhando"})
     # o ramo tem só o boletim (nada do código) e guarda cada versão
     arquivos = _git("ls-tree", "-r", "--name-only", "painel-celular", cwd=origem).split()
-    assert arquivos == ["estado/estado.json"]
+    assert arquivos == ["README.md", "estado/estado.json"]
     assert len(_git("log", "--oneline", "painel-celular", cwd=origem).splitlines()) == 2
     dados = json.loads(_git("show", "painel-celular:estado/estado.json", cwd=origem))
     assert dados["turno"]["estado"] == "trabalhando" and len(dados["agora"]) == 1
@@ -74,3 +74,12 @@ def teste_so_publica_quando_o_workflow_pede(monkeypatch):
     assert not boletim.ligado()
     monkeypatch.setenv("ROBO_PUBLICAR_BOLETIM", "1")
     assert boletim.ligado()
+
+
+def teste_versao_para_navegador(cfg_factory):
+    cfg = cfg_factory()
+    cfg.criar_pastas()
+    jobs.abrir(cfg, "demanda", "sintetico", None, "dba")
+    md = boletim.markdown(boletim.montar(cfg))
+    assert md.startswith("# Empresa ao vivo") and "| Andar |" in md and "Trabalhando agora" in md
+    assert boletim._hora("2026-10-23T23:19:41") == "23/10 20:19"  # UTC → Brasília
