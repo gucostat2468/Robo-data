@@ -103,6 +103,7 @@ PADROES: dict = {
     "celular": {
         "habilitado": False,
         "porta": 8766,
+        "acoes": False,  # True libera 4 ações seguras pelo celular: reprocessar, pausar, retomar, ver log
     },
     # alçadas da liderança com o dono fora (robo/alcadas.py): duas pessoas, só a matriz, o dono reverte em 7 dias
     "autonomia": {

@@ -167,8 +167,8 @@ TABELAS = {
                          "como a configuração e os documentos mudaram ao longo do tempo"),
     "registro_cursores": ("operacao", "Até onde cada arquivo já foi lido pelo registro total", "um arquivo (por geração)",
                           ESTADO_ATUAL, "controle interno: a história fica nas tabelas acima"),
-    "acessos_celular": ("operacao", "Cada tentativa de entrar pelo celular (certa, errada ou bloqueada), com IP e aparelho",
-                        "uma tentativa de entrada no acompanhamento pelo celular", IMUTAVEL,
+    "acessos_celular": ("operacao", "Cada tentativa de entrar pelo celular (certa, errada ou bloqueada) e cada ação feita por ele, com IP e aparelho",
+                        "uma entrada ou uma ação (evento 'acao': pausar, retomar, ver log, reprocessar) pelo celular", IMUTAVEL,
                         "padrão de uso e detecção de acesso estranho (horário, IP, erros seguidos)"),
     "rh_movimentos": ("pessoas", "Cada movimento de RH: promoção, plano de melhoria, afastamento, reintegração, propostas ao "
                       "dono, decisões e reversões — com a evidência (números) e quem propôs e quem validou",

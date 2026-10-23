@@ -1,4 +1,4 @@
-"""Acompanhamento pelo celular (somente leitura) e liberação do PostgreSQL para o app do celular.
+"""Acompanhamento pelo celular (somente leitura por padrão; ações em teste_celular_app.py) e liberação do PostgreSQL para o app do celular.
 
 O que precisa ser verdade sempre:
   - o servidor do celular não tem NENHUMA ação: só a página, o resumo e entrar/sair;
@@ -65,7 +65,7 @@ def teste_so_rede_privada():
 
 def teste_nao_liga_sem_senha_nem_desligado(cfg_factory):
     cfg = cfg_factory()
-    assert celular.configuracao(cfg) == {"habilitado": False, "porta": 8766}  # desligado por padrão
+    assert celular.configuracao(cfg) == {"habilitado": False, "porta": 8766, "acoes": False}  # desligado por padrão
     s, motivo = celular.iniciar(lambda: cfg, lambda: None)
     assert s is None and "desligado" in motivo
     cfg.dados["celular"] = {"habilitado": True, "porta": 8766}

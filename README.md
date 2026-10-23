@@ -363,22 +363,42 @@ O Airflow roda no WSL2 (Linux dentro do Windows, nada na nuvem). Passo a passo, 
 agenda (`rotinas: agendador: robo | airflow`): **`documentacao/airflow.md`**. O robô e o Airflow nunca rodam a mesma
 rotina ao mesmo tempo (trava entre programas; a tarefa repetida sai com código 99 e o Airflow a marca como pulada).
 
-## 13. Acompanhar pelo celular (somente leitura)
+## 13. Acompanhar pelo celular
 
-**O que é:** uma página no celular com o estado da empresa (robô ligado, rotinas, treino das últimas 24 h, últimas
-planilhas, decisões atrasadas, alertas da TI e último backup), atualizando a cada 20 segundos. Ela **não tem nenhum
-botão que mude algo**: é só para acompanhar. O painel completo continua abrindo só no notebook.
+**O que é:** uma página no celular com o estado da empresa (robô ligado, rotinas, treino das últimas 24 h, conversas,
+andares, últimas planilhas, decisões atrasadas, alertas da TI e último backup), atualizando a cada 10 segundos. Por
+padrão ela **só lê**. O painel completo continua abrindo só no notebook.
+
+**Abrir em 3 toques (depois de ligar uma vez, abaixo):**
+1. No notebook, abra o painel e vá em **Gestão → No celular**. Aparece um QR code com o endereço.
+2. No celular, abra a **câmera** e aponte para o QR code.
+3. Toque no **link** que aparecer e entre com a senha do painel.
+
+Para virar ícone na tela do celular: no iPhone, **Compartilhar → Adicionar à Tela de Início**. No Android, o botão
+**Instalar** aparece no topo quando o navegador permite.
 
 **Ligar (uma vez):**
-1. Tenha a senha do painel definida (`python -m robo senha`). Sem senha, o celular não abre — de propósito.
-2. No Prompt de Comando, na pasta do projeto: `python -m robo celular --ligar`. Ele mostra o endereço, por exemplo
-   `http://192.168.0.23:8766/`.
+1. Tenha a senha do painel definida (`python -m robo senha`). Sem senha, o celular não abre, de propósito.
+2. No Prompt de Comando, na pasta do projeto: `python -m robo celular --ligar`.
 3. Feche e abra o robô. Na 1ª vez o Windows pergunta sobre o firewall: marque **só "Redes privadas"**.
-4. No iPhone (na **mesma rede Wi-Fi** de casa), abra o endereço no Safari, entre com a senha do painel e toque em
-   **Compartilhar → Adicionar à Tela de Início**. Vira um ícone "Robô" como um app.
+
+**Não abriu?** Rode `python -m robo diagnostico-celular`. Ele confere, em ordem, os 8 passos entre o notebook e o
+celular (ligado, senha, rede de casa, servidor ouvindo, resposta pelo IP da rede, firewall, instalação e ações), diz
+qual falhou e como corrigir, e mostra o QR code no próprio Prompt. Corrija sempre o **primeiro ✘**: os seguintes
+costumam depender dele.
 
 **Fora de casa:** instale o Tailscale (VPN gratuita) no notebook e no celular e use o IP `100.x.x.x` do notebook.
 **Nunca** abra a porta no roteador.
+
+**Sobre a tela offline (honesto):** a tela "sem conexão" e a instalação completa no Android exigem HTTPS. Pelo Wi-Fi de
+casa o endereço é `http://`, então o navegador não liga essa parte. O resto funciona normalmente e o atalho na tela de
+início também. Para ter HTTPS grátis: com o Tailscale ligado, ative uma vez "HTTPS Certificates" no site do
+Tailscale (aba DNS), rode no notebook `tailscale serve --bg 8766` e use o endereço `https://…ts.net` que ele mostrar. Nenhum dado fica guardado no celular, nem com HTTPS.
+
+**Ações pelo celular (opcional, desligadas por padrão).** Com `celular: {acoes: true}` no `config.yaml`, aparece a aba
+**Ações** com quatro botões e nada além deles: pausar o robô, retomar o robô, ver o log e mandar uma planilha reprovada
+de volta para a fila. Cada toque pede confirmação e fica registrado em `acessos_celular` e como job `acao_celular` em
+`jobs`. Apagar, aprovar regra, rodar SQL e mudar configuração continuam só no notebook.
 
 **Segurança:** só aceita endereços de rede privada; 5 senhas erradas bloqueiam o aparelho por 15 minutos; toda entrada
 (certa ou errada) fica registrada para sempre na tabela `acessos_celular`. Desligar: `python -m robo celular --desligar`.

@@ -75,6 +75,7 @@ rotinas:
 celular:
   habilitado: false
   porta: 8766
+  acoes: false   # true libera só 4 ações seguras (reprocessar reprovado, pausar, retomar, ver log), todas registradas
 
 # Alçadas: com você FORA (sem abrir o painel nem entrar pelo celular) há horas_offline horas, a liderança decide o que
 # a matriz de robo/alcadas.py permite — sempre duas pessoas diferentes, tudo registrado, e você reverte em dias_reversao.

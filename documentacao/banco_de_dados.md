@@ -118,7 +118,7 @@
 | `arquivos_linhas` | Cada linha nova dos arquivos que só crescem (.jsonl, .csv): RH, conhecimento, histórico | uma linha de um arquivo, na ordem | só acrescenta (imutável: não altera nem apaga) | reconstruir qualquer arquivo da pasta de logs |
 | `arquivos_versoes` | Cada versão de arquivo reescrito (.json, .md, .yaml, .txt): atas, estado da TI, relatórios de erro, config.yaml sem senhas, equipe | uma versão de um arquivo | só acrescenta (imutável: não altera nem apaga) | como a configuração e os documentos mudaram ao longo do tempo |
 | `registro_cursores` | Até onde cada arquivo já foi lido pelo registro total | um arquivo (por geração) | estado atual (sobrescrito de propósito; a história fica em outra tabela) | controle interno: a história fica nas tabelas acima |
-| `acessos_celular` | Cada tentativa de entrar pelo celular (certa, errada ou bloqueada), com IP e aparelho | uma tentativa de entrada no acompanhamento pelo celular | só acrescenta (imutável: não altera nem apaga) | padrão de uso e detecção de acesso estranho (horário, IP, erros seguidos) |
+| `acessos_celular` | Cada tentativa de entrar pelo celular (certa, errada ou bloqueada) e cada ação feita por ele, com IP e aparelho | uma entrada ou uma ação (evento 'acao': pausar, retomar, ver log, reprocessar) pelo celular | só acrescenta (imutável: não altera nem apaga) | padrão de uso e detecção de acesso estranho (horário, IP, erros seguidos) |
 | `dono_presenca` | Última vez que o dono usou o painel (base para saber se ele está fora) | uma origem de presença e o último horário | estado atual (sobrescrito de propósito; a história fica em outra tabela) | horários de presença do dono |
 
 ## Colunas de cada tabela

@@ -1714,6 +1714,22 @@ window.addEventListener("drop", (e) => {
 document.querySelectorAll("[data-icone]").forEach((el) => { el.outerHTML = icone(el.dataset.icone); });
 window.addEventListener("hashchange", () => irPara(location.hash.slice(1)));
 prepararMenu();
+// celular: cada célula de tabela ganha o nome da coluna, e no CSS (≤520 px) cada linha vira um cartão "coluna: valor"
+function rotularTabelas(raiz) {
+  raiz.querySelectorAll("table.tabela").forEach((tb) => {
+    const nomes = [...tb.querySelectorAll("thead th")].map((th) => th.textContent.trim());
+    if (!nomes.length) return;
+    tb.querySelectorAll("tbody tr").forEach((tr) => [...tr.children].forEach((td, i) => {
+      if (!td.dataset.rotulo && nomes[i]) td.dataset.rotulo = nomes[i];
+    }));
+  });
+}
+let rotularAgendado = false;  // muitas mudanças seguidas na tela → uma só passada por quadro
+new MutationObserver(() => {
+  if (rotularAgendado) return;
+  rotularAgendado = true;
+  requestAnimationFrame(() => { rotularAgendado = false; rotularTabelas(document); });
+}).observe(document.body, { childList: true, subtree: true });
 (async () => {
   // pergunta antes se precisa de senha (rota livre): sem login, nada de chamadas que voltariam 401
   try { const a = await (await fetch("/api/acesso")).json(); if (a.senha && !a.logado) { mostrarLogin(); return; } } catch { /* sem conexão: o aviso sai abaixo */ }

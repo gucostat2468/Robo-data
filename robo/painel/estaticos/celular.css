@@ -64,3 +64,42 @@ button { font: inherit; cursor: pointer; }
 .tag.nivel, .tag.rh, .tag.lideranca { color: var(--azul); }
 .barra { height: 6px; border-radius: 999px; background: var(--borda); margin-top: 6px; overflow: hidden; }
 .barra > span { display: block; height: 100%; background: var(--verde); }
+
+/* ---- Fase 6: toque de 44 px, ações, instalar, offline e três larguras (≤359, 600+, 900+) ---- */
+body { padding-left: env(safe-area-inset-left); padding-right: env(safe-area-inset-right); overflow-wrap: anywhere; }
+.topo { padding-top: max(12px, env(safe-area-inset-top)); }
+.topo-acoes { display: flex; gap: 4px; }
+.link, .aba, .primario, .acao { min-height: 44px; }
+.link { padding: 0 10px; }
+.abas { overflow-x: auto; scrollbar-width: none; }
+.abas::-webkit-scrollbar { display: none; }
+.aba { min-width: 72px; }
+.dica { margin: 0; padding: 10px 16px; font-size: 13px; background: var(--ambar-fundo); color: var(--texto); border-bottom: 1px solid var(--borda); }
+.botoes { display: grid; grid-template-columns: 1fr; gap: 8px; }
+.acao { width: 100%; padding: 10px 14px; border-radius: 10px; border: 1px solid var(--borda); background: var(--cartao);
+        color: var(--texto); font-weight: 600; text-align: left; }
+.acao:active { background: var(--fundo); }
+.acao.linha { border: 0; padding: 0; background: none; color: var(--azul); word-break: break-all; }
+.lista li:has(> .acao.linha) { padding: 0 12px; }
+.log { margin: 12px 0 0; padding: 12px; max-height: 50vh; overflow: auto; font-size: 12px; line-height: 1.4;
+       background: var(--cartao); border: 1px solid var(--borda); border-radius: 12px; white-space: pre-wrap; word-break: break-word; }
+.botao-link { display: flex; align-items: center; justify-content: center; text-decoration: none; }
+.passos-offline { margin: 0 0 4px; }
+code { font-size: 12px; }
+@media (max-width: 359px) {
+  body { font-size: 14px; }
+  .grade { grid-template-columns: 1fr; }
+  .kpi .valor { font-size: 21px; }
+  .marca span { display: none; }
+}
+@media (min-width: 600px) {
+  main { max-width: 760px; }
+  .grade { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  .botoes { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+}
+@media (min-width: 900px) {
+  main { max-width: 1040px; }
+  .grade { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+}
+@media (hover: hover) { .acao:hover { border-color: var(--azul); } }
+.grade { align-items: start; }  /* um cartão com texto longo não estica o vizinho */

@@ -1,4 +1,5 @@
-// Acompanhamento pelo celular: só lê /api/resumo a cada 10 s. Não existe nenhuma ação que altere a empresa.
+// Acompanhamento pelo celular: lê /api/resumo a cada 10 s. Ações (pausar, retomar, reprocessar, ver log) só aparecem
+// se o dono ligou celular.acoes no notebook; cada uma é registrada lá.
 "use strict";
 (function () {
   const $ = (id) => document.getElementById(id);
@@ -30,6 +31,11 @@
     return c;
   }
 
+  // no celular, lista longa vira "a, b, c, d e mais N" (a lista inteira está no painel do notebook)
+  function resumir(nomes, max = 4) {
+    return nomes.length > max ? `${nomes.slice(0, max).join(", ")} e mais ${nomes.length - max}` : nomes.join(", ");
+  }
+
   function indisponivel(p) { return !p || p.indisponivel; }
 
   function lista(alvo, itens, vazio, montar) {
@@ -39,7 +45,47 @@
     itens.forEach((x) => ul.append(montar(x)));
   }
 
+  function desenharAcoes(a) {
+    const ligadas = !!(a && a.ligadas);
+    $("aba-acoes").hidden = !ligadas;
+    if (!ligadas) return;
+    lista("reprovados", a.reprovados, "Nenhuma planilha reprovada.", (nome) => {
+      const li = el("li"), b = el("button", "acao linha", nome);
+      b.addEventListener("click", () => agir("reprocessar", nome));
+      li.append(b);
+      return li;
+    });
+  }
+
+  async function agir(acao, nome) {
+    const textos = { pausar: "Pausar o robô? Os arquivos novos ficam esperando na pasta.", retomar: "Retomar o robô?",
+      reprocessar: `Mandar "${nome}" de volta para a fila?` };
+    if (textos[acao] && !confirm(textos[acao])) return;
+    $("resultado-acao").textContent = "Enviando…";
+    try {
+      const resp = await fetch("/api/acao", { method: "POST", credentials: "same-origin",
+        headers: { "Content-Type": "application/json", "X-Robo-Celular": "1" }, body: JSON.stringify({ acao, nome }) });
+      const r = await resp.json();
+      if (resp.status === 401) return mostrar(true);
+      if (!resp.ok) throw new Error(r.erro || resp.status);
+      if (acao === "ver_log") {
+        $("log").hidden = false;
+        $("log").textContent = r.linhas.length ? r.linhas.join("\n") : "Log vazio.";
+        $("resultado-acao").textContent = "";
+        return;
+      }
+      $("resultado-acao").textContent = acao === "reprocessar" ? `${r.nome} voltou para a fila.`
+        : (r.ligado ? "Robô ligado." : "Robô pausado.");
+      atualizar();
+    } catch (e) {
+      $("resultado-acao").textContent = "Não deu certo: " + e.message;
+    }
+  }
+
+  document.querySelectorAll(".botoes .acao").forEach((b) => b.addEventListener("click", () => agir(b.dataset.acao)));
+
   function desenhar(r) {
+    desenharAcoes(r.acoes);
     $("atualizado").textContent = "Atualizado em " + r.gerado_em + " · renova a cada 10 s";
     const g = $("cartoes");
     g.replaceChildren();
@@ -52,7 +98,7 @@
     else {
       const probl = ro.atrasadas.length + ro.com_erro.length;
       const det = probl ? [ro.com_erro.length ? "erro: " + ro.com_erro.map((x) => x.nome).join(", ") : "",
-        ro.atrasadas.length ? "atrasadas: " + ro.atrasadas.join(", ") : ""].filter(Boolean).join(" · ") : `${ro.total} rotinas em dia`;
+        ro.atrasadas.length ? "atrasadas: " + resumir(ro.atrasadas) : ""].filter(Boolean).join(" · ") : `${ro.total} rotinas em dia`;
       g.append(kpi("Rotinas", probl ? `${probl} com problema` : "Em dia", det, ro.com_erro.length ? "ruim" : (probl ? "atencao" : "bom")));
     }
     const t = r.treino || {};
@@ -165,6 +211,26 @@
     document.querySelectorAll(".aba").forEach((x) => x.classList.toggle("ativa", x === b));
     document.querySelectorAll("[data-painel]").forEach((p) => { p.hidden = p.dataset.painel !== b.dataset.aba; });
   }));
+
+  // ---------------------------------------------------------------- instalar como app
+  // O service worker (tela offline) só existe em HTTPS; no Wi-Fi de casa (http) o navegador não deixa, e tudo bem.
+  if ("serviceWorker" in navigator && window.isSecureContext) {
+    navigator.serviceWorker.register("/service-worker.js").catch(() => {});
+  }
+  let pedidoInstalar = null;
+  window.addEventListener("beforeinstallprompt", (ev) => { ev.preventDefault(); pedidoInstalar = ev; $("instalar").hidden = false; });
+  $("instalar").addEventListener("click", async () => {
+    if (!pedidoInstalar) return;
+    pedidoInstalar.prompt();
+    await pedidoInstalar.userChoice.catch(() => null);
+    pedidoInstalar = null;
+    $("instalar").hidden = true;
+  });
+  const instalado = window.matchMedia("(display-mode: standalone)").matches || navigator.standalone === true;
+  if (!instalado && /iPhone|iPad|iPod/.test(navigator.userAgent)) {
+    $("dica-instalar").textContent = "Para virar app: toque em Compartilhar e depois em \"Adicionar à Tela de Início\".";
+    $("dica-instalar").hidden = false;
+  }
 
   atualizar();
 })();

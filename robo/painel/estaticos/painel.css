@@ -804,3 +804,32 @@ pre.sql, .consultas pre { max-width: 100%; overflow: auto; }
 .ia-teste-res { border-top: 1px solid var(--borda); margin-top: 10px; padding-top: 8px; }
 .ia-teste-res p { margin: 6px 0; }
 .ia-teste-res small { word-break: break-word; }
+
+/* ---- celular (Fase 6): área segura, toque de 44 px e tabela vira cartão ---- */
+@supports (padding: env(safe-area-inset-left)) {
+  @media (max-width: 760px) {
+    .topo-movel { padding-left: max(12px, env(safe-area-inset-left)); padding-right: max(12px, env(safe-area-inset-right)); }
+    .conteudo { padding-bottom: max(16px, env(safe-area-inset-bottom)); }
+  }
+}
+@media (pointer: coarse) {
+  .btn, .nav-grupo a, .nav-grupo > summary, .topo-movel .btn, select, input:not([type="checkbox"]):not([type="radio"]) { min-height: 44px; }
+}
+@media (max-width: 520px) {
+  .conteudo { padding: 12px; }
+  .cabecalho h1 { font-size: 20px; }
+  .grade.kpis { grid-template-columns: minmax(0, 1fr); }
+  .tabela-envoltorio { max-height: none; }
+  table.tabela thead { display: none; }
+  table.tabela, table.tabela tbody, table.tabela tr, table.tabela td { display: block; width: 100%; }
+  table.tabela tr { border: 1px solid var(--borda); border-radius: var(--raio-p); margin: 0 0 10px; padding: 4px 0; background: var(--superficie); }
+  table.tabela td { display: flex; justify-content: space-between; gap: 12px; white-space: normal; border-bottom: 0; padding: 6px 12px;
+                    text-align: right; overflow-wrap: anywhere; }
+  table.tabela td[data-rotulo]::before { content: attr(data-rotulo); flex: none; max-width: 45%; text-align: left;
+                                         font-weight: 600; color: var(--texto-3); }
+  .tabela .truncar, .tabela .arquivo { max-width: none; }
+}
+/* página "No celular" */
+.cel-cartao-qr { text-align: center; }
+.cel-qr { width: min(260px, 100%); height: auto; image-rendering: pixelated; border-radius: var(--raio-p); background: #fff; }
+.cel-passos { margin: 0; padding-left: 0; list-style: none; display: flex; flex-direction: column; gap: 12px; }

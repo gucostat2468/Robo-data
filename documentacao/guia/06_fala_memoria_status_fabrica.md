@@ -102,9 +102,23 @@ verdade sem tocar no dado real.
   aprendizado e fato para conversa.
 - `fabrica.rotina`: planilha real tem prioridade; um lote por vez; teto diário; para depois de 3 falhas seguidas.
 
+## robo/diagnostico_celular.py e o app do celular (Fase 6)
+
+**Para que serve.** Descobrir por que o celular não abre o robô e abrir em 3 toques.
+
+- `rodar(cfg)`: 8 passos em ordem (ligado, senha, rede, servidor ouvindo, resposta pelo IP da rede, firewall,
+  instalação, ações). Um passo que depende de outro que falhou aparece como "pulado", não como falha a mais.
+- `qr_terminal(url)` / `qr_svg(url)`: o QR code do endereço (pacote `segno`).
+- `robo/painel/celular.py` → `executar_acao(cfg, controle, acao, nome)`: as 4 ações opcionais. Cada uma grava um job
+  `acao_celular` e uma linha em `acessos_celular`. A rota `/api/acao` exige sessão, o cabeçalho `X-Robo-Celular` e
+  `celular.acoes: true`.
+- Estáticos: `service-worker.js` (guarda só a casca do app, nunca `/api`), `offline.html`, ícones PNG
+  (`ferramentas/gerar_icones_celular.py` os redesenha) e `celular_painel.js` (página "No celular" do painel).
+- No painel, em telas até 520 px, cada linha de tabela vira um cartão "coluna: valor" (`rotularTabelas` em painel.js).
+
 ## Como conferir que está funcionando
 
 - `GET /api/prova-de-trabalho`: quem trabalhou de verdade e a evidência.
 - Menu Dados → Fábrica: lotes, conferências e divergências.
 - Canal do andar: conversas com o fato que as originou.
-- `python -m pytest -q testes/teste_fala.py testes/teste_dialogo.py testes/teste_aprendizados.py testes/teste_jobs.py testes/teste_fabrica.py`
+- `python -m pytest -q testes/teste_fala.py testes/teste_dialogo.py testes/teste_aprendizados.py testes/teste_jobs.py testes/teste_fabrica.py testes/teste_celular_app.py`

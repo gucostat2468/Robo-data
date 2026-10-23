@@ -1,0 +1,27 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#1D4ED8">
+<link rel="stylesheet" href="/celular.css">
+<title>Robô de Planilhas · sem conexão</title>
+</head>
+<body>
+<header class="topo">
+  <div class="marca"><img src="/robo.svg" alt="" width="28" height="28"><div><strong>Robô de Planilhas</strong><span>sem conexão com o notebook</span></div></div>
+</header>
+<main>
+  <section class="cartao login">
+    <h1>Não alcancei o notebook</h1>
+    <p>Nenhum dado fica guardado no celular, então não há nada para mostrar até a conexão voltar.</p>
+    <ul class="lista passos-offline">
+      <li><span>O celular está no mesmo Wi-Fi do notebook (ou com a VPN Tailscale ligada)?</span></li>
+      <li><span>O notebook está ligado e com o robô aberto?</span></li>
+      <li><span>No notebook, <code>python -m robo diagnostico-celular</code> mostra onde está o problema.</span></li>
+    </ul>
+    <a class="primario botao-link" href="/">Tentar de novo</a>
+  </section>
+</main>
+</body>
+</html>

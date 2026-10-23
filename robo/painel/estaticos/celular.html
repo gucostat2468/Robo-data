@@ -10,15 +10,19 @@
 <meta name="theme-color" content="#1D4ED8">
 <link rel="manifest" href="/manifest.webmanifest">
 <link rel="icon" href="/robo.svg" type="image/svg+xml">
-<link rel="apple-touch-icon" href="/robo.svg">
+<link rel="apple-touch-icon" href="/icone-180.png">
 <link rel="stylesheet" href="/celular.css">
 <title>Robô de Planilhas</title>
 </head>
 <body>
 <header class="topo">
   <div class="marca"><img src="/robo.svg" alt="" width="28" height="28"><div><strong>Robô de Planilhas</strong><span>acompanhamento · somente leitura</span></div></div>
-  <button id="sair" class="link" hidden>Sair</button>
+  <div class="topo-acoes">
+    <button id="instalar" class="link" hidden>Instalar</button>
+    <button id="sair" class="link" hidden>Sair</button>
+  </div>
 </header>
+<p id="dica-instalar" class="dica" hidden></p>
 
 <main>
   <section id="tela-login" class="cartao login" hidden>
@@ -40,6 +44,7 @@
       <button class="aba ativa" data-aba="vivo" role="tab">Ao vivo</button>
       <button class="aba" data-aba="andares" role="tab">Andares</button>
       <button class="aba" data-aba="operacao" role="tab">Operação</button>
+      <button class="aba" data-aba="acoes" role="tab" id="aba-acoes" hidden>Ações</button>
     </nav>
     <div data-painel="vivo">
       <div class="grade" id="gente"></div>
@@ -57,6 +62,18 @@
     <ul class="lista" id="decisoes"></ul>
     <h2>Alertas da TI</h2>
     <ul class="lista" id="alertas"></ul>
+    </div>
+    <div data-painel="acoes" hidden>
+      <p class="nota">Cada toque aqui fica registrado com data, hora e aparelho. Nada é apagado.</p>
+      <div class="botoes">
+        <button class="acao" data-acao="pausar">Pausar o robô</button>
+        <button class="acao" data-acao="retomar">Retomar o robô</button>
+        <button class="acao" data-acao="ver_log">Ver o log</button>
+      </div>
+      <h2>Reprovadas (toque para reprocessar)</h2>
+      <ul class="lista" id="reprovados"></ul>
+      <p id="resultado-acao" class="nota" role="status"></p>
+      <pre id="log" class="log" hidden></pre>
     </div>
   </section>
 </main>

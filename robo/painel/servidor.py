@@ -104,6 +104,24 @@ def _nome_original(nome: str) -> str:
     return RE_CARIMBO.sub("", nome)
 
 
+def reprocessar_reprovado(cfg, nome: str) -> dict:
+    """Devolve um arquivo de Bases-Erros para Bases-Limpeza (usado pelo painel e pelas ações do celular)."""
+    arq = cfg.erros / Path(str(nome or "")).name
+    if not arq.is_file():
+        raise ErroApi("Arquivo não encontrado em Bases-Erros", 404)
+    destino = cfg.entrada / _nome_original(arq.name)
+    if destino.exists():
+        raise ErroApi(f"Já existe um '{destino.name}' em Bases-Limpeza aguardando processamento.", 409)
+    try:
+        shutil.move(str(arq), str(destino))
+    except PermissionError:
+        raise ErroApi("O arquivo está aberto no Excel. Salve, feche e tente de novo.", 409)
+    txt = arq.with_name(f"{arq.stem}_ERROS.txt")
+    txt.unlink(missing_ok=True)
+    log.info("Reprocessamento solicitado: %s voltou para Bases-Limpeza", destino.name)
+    return {"ok": True, "nome": destino.name}
+
+
 def _dentro(caminho: Path, pastas) -> bool:
     try:
         alvo = caminho.resolve()
@@ -360,6 +378,14 @@ class Api:
     def fabrica_produzir(self, _b) -> dict:
         from robo import fabrica
         return {"ok": True, "lote": fabrica.produzir_lote(self.cfg)}
+
+    def celular_diagnostico(self, _q) -> dict:
+        """Os mesmos passos do `python -m robo diagnostico-celular`, mais o endereço e o QR code em SVG para apontar a
+        câmera do celular direto da tela do notebook."""
+        from robo import diagnostico_celular as dc
+        cfg = self.cfg
+        url = dc.endereco(cfg)
+        return {"itens": dc.rodar(cfg), "url": url, "qr_svg": dc.qr_svg(url) if url else None}
 
     def prova_de_trabalho(self, _q) -> dict:
         """Para cada funcionário, a última evidência AUDITÁVEL: etapa de job com arquivo, linhas, hash e caminho; se não
@@ -865,21 +891,7 @@ class Api:
         return {"ok": True, "caminho": str(caminho)}
 
     def reprocessar(self, b):
-        cfg = self.cfg
-        arq = cfg.erros / Path(str(b.get("nome", ""))).name
-        if not arq.is_file():
-            raise ErroApi("Arquivo não encontrado em Bases-Erros", 404)
-        destino = cfg.entrada / _nome_original(arq.name)
-        if destino.exists():
-            raise ErroApi(f"Já existe um '{destino.name}' em Bases-Limpeza aguardando processamento.", 409)
-        try:
-            shutil.move(str(arq), str(destino))
-        except PermissionError:
-            raise ErroApi("O arquivo está aberto no Excel. Salve, feche e tente de novo.", 409)
-        txt = arq.with_name(f"{arq.stem}_ERROS.txt")
-        txt.unlink(missing_ok=True)
-        log.info("Reprocessamento solicitado: %s voltou para Bases-Limpeza", destino.name)
-        return {"ok": True, "nome": destino.name}
+        return reprocessar_reprovado(self.cfg, b.get("nome", ""))
 
     def descartar(self, b):
         cfg = self.cfg
@@ -1404,7 +1416,7 @@ ROTAS_GET = {
     "/api/conhecimento": Api.conhecimento, "/api/conhecimento/caderno": Api.conhecimento_caderno,
     "/api/conhecimento/licao": Api.conhecimento_licao, "/api/conhecimento/buscar": Api.conhecimento_buscar,
     "/api/erros": Api.erros_sistema, "/api/gestao": Api.gestao, "/api/treino": Api.treino, "/api/banco/registros": Api.banco_registros, "/api/treino/pessoa": Api.treino_pessoa, "/api/aprendizado": Api.aprendizado,
-    "/api/paineis": Api.paineis, "/api/quem-faz-o-que": Api.quem_faz_o_que, "/api/prova-de-trabalho": Api.prova_de_trabalho, "/api/fabrica": Api.fabrica,
+    "/api/paineis": Api.paineis, "/api/quem-faz-o-que": Api.quem_faz_o_que, "/api/prova-de-trabalho": Api.prova_de_trabalho, "/api/celular/diagnostico": Api.celular_diagnostico, "/api/fabrica": Api.fabrica,
     "/api/caixa-dono": Api.caixa_dono,
 }
 ROTAS_POST = {

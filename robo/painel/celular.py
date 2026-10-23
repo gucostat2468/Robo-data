@@ -1,4 +1,4 @@
-"""Acompanhar a empresa pelo celular — SOMENTE LEITURA, só na rede da sua casa.
+"""Acompanhar a empresa pelo celular — só na rede da sua casa. Somente leitura, a não ser que você ligue as ações.
 
 Por que um segundo servidor (e não abrir o painel principal na rede):
   - o painel principal tem botões que mudam coisas (aprovar regra, apagar reprovado, rodar SQL…) e continua preso a
@@ -6,6 +6,11 @@ Por que um segundo servidor (e não abrir o painel principal na rede):
   - este servidor do celular NÃO tem nenhuma ação: só uma página de acompanhamento e um resumo em JSON. Mesmo que
     alguém descubra a senha, não consegue alterar nada;
   - vem DESLIGADO. Liga com `python -m robo celular --ligar` (grava celular.habilitado no config.yaml).
+
+Ações pelo celular (OPCIONAIS, desligadas por padrão: `celular: {acoes: true}` no config.yaml): só quatro, todas
+seguras e reversíveis — reprocessar um reprovado, pausar o robô, retomar o robô e ver o log. Cada ação exige a sessão,
+o cabeçalho X-Robo-Celular (um site de fora não consegue mandar) e fica registrada em acessos_celular e em jobs.
+Nada de apagar, aprovar regra, rodar SQL ou mudar configuração pelo celular.
 
 Regras de segurança (todas verificadas em testes/teste_celular.py):
   - só responde a endereços de rede privada (casa, VPN Tailscale); qualquer outro recebe 403;
@@ -109,7 +114,8 @@ def ip_da_rede() -> str | None:
 
 def configuracao(cfg) -> dict:
     c = dict((cfg.dados.get("celular") or {}) if cfg else {})
-    return {"habilitado": bool(c.get("habilitado", False)), "porta": int(c.get("porta") or PORTA_PADRAO)}
+    return {"habilitado": bool(c.get("habilitado", False)), "porta": int(c.get("porta") or PORTA_PADRAO),
+            "acoes": c.get("acoes") is True}
 
 
 # ----------------------------------------------------------------------------------------------- sessão e senha
@@ -213,7 +219,14 @@ def resumo(cfg, controle=None) -> dict:
         s, p = backup.ultimo_sqlite(cfg) or {}, backup.ultimo(cfg) or {}
         return {"sqlite": s.get("data_hora") or s.get("criado_em"), "postgres": p.get("data_hora") or p.get("criado_em")}
 
-    for chave, f in (("robo", _robo), ("rotinas", _rotinas), ("treino", _treino), ("planilhas", _planilhas),
+    def _acoes():
+        if not configuracao(cfg)["acoes"]:
+            return {"ligadas": False}
+        reprovados = sorted((p for p in cfg.erros.glob("*") if p.is_file() and not p.name.endswith("_ERROS.txt")),
+                            key=lambda p: p.stat().st_mtime, reverse=True)
+        return {"ligadas": True, "reprovados": [p.name for p in reprovados[:20]]}
+
+    for chave, f in (("acoes", _acoes), ("robo", _robo), ("rotinas", _rotinas), ("treino", _treino), ("planilhas", _planilhas),
                      ("ti", _ti), ("decisoes", _decisoes), ("backup", _backup), ("caixa", _caixa),
                      ("ao_vivo", lambda: ao_vivo(cfg)), ("andares", lambda: andares(cfg)),
                      ("gente", lambda: movimentos_de_gente(cfg))):
@@ -323,13 +336,22 @@ def movimentos_de_gente(cfg) -> dict:
 MANIFESTO = {
     "name": "Robô de Planilhas — acompanhamento", "short_name": "Robô", "start_url": "/", "display": "standalone",
     "background_color": "#F5F7FB", "theme_color": "#1D4ED8", "lang": "pt-BR",
-    "icons": [{"src": "/robo.svg", "sizes": "any", "type": "image/svg+xml"}],
+    "id": "/", "scope": "/", "orientation": "portrait",
+    "description": "Acompanhe a empresa de robôs pelo celular, na rede de casa.",
+    "icons": [{"src": "/icone-192.png", "sizes": "192x192", "type": "image/png"},
+              {"src": "/icone-512.png", "sizes": "512x512", "type": "image/png"},
+              {"src": "/icone-maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable"},
+              {"src": "/robo.svg", "sizes": "any", "type": "image/svg+xml"}],
 }
+ACOES = ("reprocessar", "pausar", "retomar", "ver_log")
 
 
 # os únicos arquivos servidos (CSP default-src 'self' proíbe script e estilo embutidos na página)
 ARQUIVOS = {"/robo.svg": ("robo.svg", "image/svg+xml"), "/celular.css": ("celular.css", "text/css; charset=utf-8"),
-            "/celular.js": ("celular.js", "text/javascript; charset=utf-8")}
+            "/celular.js": ("celular.js", "text/javascript; charset=utf-8"),
+            "/service-worker.js": ("service-worker.js", "text/javascript; charset=utf-8"),
+            "/offline.html": ("offline.html", "text/html; charset=utf-8"),
+            **{f"/{n}": (n, "image/png") for n in ("icone-180.png", "icone-192.png", "icone-512.png", "icone-maskable-512.png")}}
 
 
 def criar_manipulador(obter_cfg, senha_hash, controle=None, portao: PortaoCelular | None = None):
@@ -404,7 +426,7 @@ def criar_manipulador(obter_cfg, senha_hash, controle=None, portao: PortaoCelula
             if not self._rede_ok():
                 return
             caminho = urllib.parse.urlparse(self.path).path
-            if caminho not in ("/entrar", "/sair"):
+            if caminho not in ("/entrar", "/sair", "/api/acao"):
                 return self._json({"erro": "não encontrado"}, 404)
             try:
                 tamanho = int(self.headers.get("Content-Length") or 0)
@@ -414,6 +436,8 @@ def criar_manipulador(obter_cfg, senha_hash, controle=None, portao: PortaoCelula
                 self.close_connection = True
                 return self._json({"erro": "requisição inválida"}, 413)
             corpo = self.rfile.read(tamanho) if tamanho else b""
+            if caminho == "/api/acao":
+                return self._acao(corpo)
             if caminho == "/sair":
                 portao.sair(self._token())
                 return self._json({"ok": True}, extra={"Set-Cookie": f"{NOME_COOKIE}=; Path=/; Max-Age=0; HttpOnly; SameSite=Strict"})
@@ -437,7 +461,65 @@ def criar_manipulador(obter_cfg, senha_hash, controle=None, portao: PortaoCelula
             return self._json({"ok": True}, extra={
                 "Set-Cookie": f"{NOME_COOKIE}={token}; Path=/; Max-Age={VALIDADE_SESSAO}; HttpOnly; SameSite=Strict"})
 
+        def _acao(self, corpo: bytes):
+            if not portao.valida(self._token()):
+                return self._json({"erro": "Entre com a senha do painel.", "login": True}, 401)
+            if self.headers.get("X-Robo-Celular") != "1":  # só a própria página manda este cabeçalho
+                return self._json({"erro": "pedido sem o cabeçalho do app"}, 403)
+            cfg = obter_cfg()
+            if not configuracao(cfg)["acoes"]:
+                return self._json({"erro": "Ações pelo celular estão desligadas. Para ligar: celular: {acoes: true} "
+                                           "no config.yaml do notebook."}, 403)
+            try:
+                dados = json.loads(corpo or b"{}")
+                if not isinstance(dados, dict):
+                    raise ValueError
+            except ValueError:
+                return self._json({"erro": "JSON inválido"}, 400)
+            acao, nome = str(dados.get("acao") or ""), str(dados.get("nome") or "")[:200]
+            if acao not in ACOES:
+                return self._json({"erro": f"ação desconhecida (existem: {', '.join(ACOES)})"}, 400)
+            status, resposta = executar_acao(cfg, controle, acao, nome)
+            _registrar_seguro(cfg, self._ip(), "acao", f"{acao} {nome}".strip() + f" → {status}",
+                              self.headers.get("User-Agent", ""))
+            return self._json(resposta, status)
+
     return Manipulador
+
+
+def executar_acao(cfg, controle, acao: str, nome: str = "") -> tuple[int, dict]:
+    """Executa uma das 4 ações seguras e registra um job fechado (tipo acao_celular, origem dono) como prova."""
+    from robo import jobs
+    inicio = _agora()
+    status, resposta = 200, {"ok": True}
+    if controle is None and acao != "reprocessar":
+        status, resposta = 503, {"erro": "este servidor não enxerga o robô (abra pelo python -m robo app)"}
+    elif acao == "pausar":
+        controle.pausar()
+        resposta = {"ok": True, "ligado": bool(controle.ligado)}
+    elif acao == "retomar":
+        controle.ligar()
+        resposta = {"ok": True, "ligado": bool(controle.ligado)}
+    elif acao == "ver_log":
+        memoria = getattr(controle, "memoria_log", None)
+        linhas = memoria.desde(0)[-60:] if memoria else []
+        resposta = {"ok": True, "linhas": [f"{r['hora']} {r['nivel']} {r['mensagem'][:300]}" for r in linhas]}
+    elif acao == "reprocessar":
+        from robo.painel.servidor import ErroApi, reprocessar_reprovado
+        try:
+            resposta = reprocessar_reprovado(cfg, nome)
+        except ErroApi as e:
+            status, resposta = e.status, {"erro": str(e)}
+    try:
+        jobs.registrar_concluido(cfg, "acao_celular", "dono", None, inicio,
+                                 [{"etapa": acao, "funcionario": None, "ok": status == 200,
+                                   "detalhe": nome or resposta.get("erro", "")}],
+                                 estado="concluido" if status == 200 else "falhou", arquivo=nome or None,
+                                 evidencia={"status": status})
+    except Exception:
+        log.exception("Celular: não consegui registrar o job da ação %s", acao)
+    log.info("Ação pelo celular: %s %s → %s", acao, nome, status)
+    return status, resposta
 
 
 def _registrar_seguro(cfg, ip, evento, detalhe, navegador) -> None:

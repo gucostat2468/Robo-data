@@ -122,6 +122,41 @@ def _comando_rotina(args) -> int:
     return 1 if est.get("ultimo_status") == "erro" else 0
 
 
+def _diagnostico_celular(args) -> int:
+    from robo import diagnostico_celular as dc
+    try:
+        cfg = carregar_config(Path(args.config) if args.config else None)
+    except ErroConfig as e:
+        print(f"Configuração com problema: {e}", file=sys.stderr)
+        return 1
+    print("Diagnóstico do celular (só lê, não altera nada)\n")
+    itens = dc.rodar(cfg)
+    marca = {"ok": "✔", "atencao": "!", "falha": "✘", "nao_se_aplica": "–"}
+    for i in itens:
+        print(f" {marca[i['situacao']]} {i['titulo']}: {i['detalhe']}")
+        if i["corrigir"] and i["situacao"] != "ok":
+            print(f"     → {i['corrigir']}")
+    falhas = sum(i["situacao"] == "falha" for i in itens)
+    url = dc.endereco(cfg)
+    if url:
+        print(f"\nEndereço para o celular: {url}")
+        qr = dc.qr_terminal(url)
+        if qr:
+            print("Aponte a câmera do celular para o quadrado abaixo:\n")
+            print(qr)
+        else:
+            print("(Para ver o QR code aqui: pip install segno)")
+        if args.salvar_qr:
+            svg = dc.qr_svg(url)
+            if svg:
+                destino = cfg.logs / "celular_qr.svg"
+                destino.write_text(svg, encoding="utf-8")
+                print(f"QR code salvo em {destino}")
+    print(f"\nResultado: {falhas} falha(s)." + (" Pode abrir no celular." if not falhas else
+                                                 " Corrija o primeiro ✘ da lista: os seguintes costumam depender dele."))
+    return 1 if falhas else 0
+
+
 def _celular(args) -> int:
     from robo.config import RAIZ_PROJETO
     from robo.painel import celular, configuracao
@@ -209,6 +244,9 @@ def principal(argv: list[str] | None = None) -> int:
     sim.add_argument("arquivo")
     sim.add_argument("--substituir", action="store_true", help="trocar mesmo se este computador já tiver história "
                                                                 "(a memória atual é guardada antes)")
+    sdc = sub.add_parser("diagnostico-celular", help="confere passo a passo por que o celular abre ou não abre o robô e "
+                                                    "mostra o QR code do endereço — só lê, não altera nada")
+    sdc.add_argument("--salvar-qr", action="store_true", help="salva o QR code em logs/celular_qr.svg")
     scel = sub.add_parser("celular", help="acompanhamento pelo celular (somente leitura, rede de casa): ligar, desligar ou ver")
     grupo = scel.add_mutually_exclusive_group()
     grupo.add_argument("--ligar", action="store_true")
@@ -287,6 +325,8 @@ def principal(argv: list[str] | None = None) -> int:
         atencoes = sum(i["situacao"] == "atencao" for i in itens)
         print(f"\nResultado: {falhas} falha(s), {atencoes} ponto(s) de atenção." + (" Tudo certo." if not falhas and not atencoes else ""))
         return 1 if falhas else 0
+    if args.comando == "diagnostico-celular":
+        return _diagnostico_celular(args)
     if args.comando == "importar-memoria":
         from robo import backup
         try:

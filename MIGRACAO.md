@@ -67,3 +67,16 @@ fabrica:
 
 Mudança na limpeza: a lista padrão de identificadores ganhou chaves de negócio (nota fiscal, NF, pedido, título,
 protocolo, SKU, chamado). Com isso, a cópia exata de uma nota fiscal passa a ser removida.
+
+## Fase 6 — celular de verdade (23/10/2026)
+
+Nenhuma tabela nova. A tabela `acessos_celular` passa a receber o evento `acao` (com a ação e o resultado), e cada ação
+pelo celular grava um job fechado em `jobs` (tipo `acao_celular`, origem `dono`).
+
+Configuração nova (opcional): `celular: {acoes: false}`. Com `true`, libera só 4 ações: reprocessar um reprovado,
+pausar, retomar e ver o log.
+
+Comando novo: `python -m robo diagnostico-celular` (só lê; `--salvar-qr` grava `logs/celular_qr.svg`). Rota nova no
+painel: `GET /api/celular/diagnostico`. Pacote novo em `requisitos.txt`: `segno` (QR code, só Python). Sem ele, o
+endereço aparece por escrito. Rode `instalar.bat` de novo para instalar.
+

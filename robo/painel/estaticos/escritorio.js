@@ -32,6 +32,9 @@ function avisar(msg, tipo = "") {
 // ------------------------------------------------------------------ renderizador
 let renderer;
 try {
+  // celular antigo ou navegador sem WebGL: pergunta antes, porque o three.js nem sempre lança erro sozinho
+  const teste = document.createElement("canvas");
+  if (!(teste.getContext("webgl2") || teste.getContext("webgl"))) throw new Error("sem WebGL");
   renderer = new THREE.WebGLRenderer({ antialias: true });
 } catch {
   $("#sem-3d").hidden = false;
