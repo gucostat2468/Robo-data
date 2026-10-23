@@ -99,3 +99,21 @@ ao banco, com aviso no relatório de qualidade. Nada é apagado para abrir espa�
 Comando novo: `python -m robo cobertura-banco` (só conta; gera `logs/cobertura_banco.md` e `.json`).
 Turno da nuvem: agora roda a esteira (planilhas da fábrica) e grava o levantamento de cobertura a cada salvamento.
 
+## Demandas para todos os funcionários (23/10/2026)
+
+| Tabela | O que muda | Regra |
+|---|---|---|
+| `demandas_ciclos` (nova) | cada ciclo da distribuição: elegíveis, atribuídas, concluídas, bloqueadas e o detalhe de quem foi pulado e por quê | só de inclusão |
+| `solicitacoes`, `etapas`, `eventos` | passam a receber as demandas (origem `demanda_sintetica`, modelo `demanda:<ferramenta>`) e as planilhas da fábrica processadas (origem `sintetica`) | as mesmas regras de antes: nada se apaga |
+| `jobs` | novo tipo `demanda` (uma por demanda executada) | job fechado não muda |
+
+Mudanças de comportamento:
+- o pós-processamento de cada planilha (solicitação automática, memória e aprendizado) saiu do painel para
+  `robo/pos_processamento.py` e passou a rodar também na nuvem;
+- planilha da fábrica (TREINO_*) gera solicitação com origem `sintetica` e **não** gera proposta de regra nem
+  handover (antes, no notebook, gerava como se fosse real);
+- o revisor de uma demanda nunca é quem executou nem "dono": se o gestor for o dono, quem revisa é `casos_revisor`.
+
+Configuração nova (opcional): `demandas: {habilitada: true, intervalo_minutos: 30, por_ciclo: 6, por_dia: 150,
+por_pessoa_horas: 24}`. Desligar: `demandas: {habilitada: false}`.
+

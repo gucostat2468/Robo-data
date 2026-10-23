@@ -183,13 +183,14 @@ def turno(cfg, minutos: float = 20, salvar_a_cada_min: float = 10, pausa_s: floa
     for nome in rotinas.ROTINAS:  # cada uma decide se está na hora (backup diário, reunião semanal…)
         if nome not in NAO_RODAM_NA_NUVEM:
             rotinas.executar(cfg, nome, rotinas.funcao(cfg, nome))
-    monitor = Monitor(cfg)
+    from robo import pos_processamento
+    monitor = Monitor(cfg, ao_processar=lambda r: pos_processamento.registrar(cfg, r))
     planilhas = _esteira(monitor)
     ultimo_salvo = time.monotonic()
     voltas = 0
     while time.monotonic() < fim:
         voltas += 1
-        for nome in ("canal", "registro", "treino", "laboratorio", "fabrica"):
+        for nome in ("canal", "registro", "treino", "laboratorio", "fabrica", "demandas"):
             rotinas.executar(cfg, nome, rotinas.funcao(cfg, nome))
         planilhas += _esteira(monitor)
         rotinas.batimento(cfg, sessao)

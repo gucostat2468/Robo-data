@@ -367,6 +367,25 @@ Onde fica cada tipo de dado no PostgreSQL:
 
 O diagnóstico completo da reestruturação está em `documentacao/diagnostico_reestruturacao.md`.
 
+## 11d. Demandas: trabalho real para cada funcionário
+
+A rotina `demandas` (a cada 30 minutos, `robo/demandas.py`) dá a cada funcionário uma tarefa que ele executa com a
+**ferramenta do próprio contrato**: o cientista roda drivers, a DBA consulta o PostgreSQL, o 5º andar faz a ronda de
+TI, o RH mede o desempenho. Cada demanda tem objetivo, evidência esperada e **critérios de aceitação** conferidos
+sem IA. Um cálculo, por exemplo, só é aceito se bater com uma conta feita em pandas por outro caminho. Quem revisa é
+sempre outra pessoa, e a conferência automática nunca sai no seu nome.
+
+Como a distribuição funciona:
+- quem está há mais tempo sem demanda recebe primeiro; ninguém tem duas abertas, nem recebe outra em menos de 24 horas;
+- estagiários ficam em observação (sua regra) e o motivo fica registrado;
+- demanda sem condição de rodar (sem planilha sintética, banco desligado) não vira tarefa: fica registrada como
+  bloqueada, com o motivo;
+- os dados são os sintéticos da fábrica; nenhuma demanda lê planilha real, publica ou altera dados;
+- até 6 por ciclo e 150 por dia (`demandas: {por_ciclo, por_dia, por_pessoa_horas, intervalo_minutos}`).
+
+Onde ver: tela **Solicitações** (origem "demanda_sintetica"), tabela `demandas_ciclos` (quem recebeu, quem foi pulado e
+por quê) e `jobs` do tipo `demanda` (prova de trabalho).
+
 ## 12. Apache Airflow (opcional)
 
 O robô agenda as próprias rotinas. Se quiser vê-las no Airflow (com histórico, retentativas e tempo limite):

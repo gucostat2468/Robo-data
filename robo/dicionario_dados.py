@@ -141,6 +141,10 @@ TABELAS = {
     "dialogo_conversas": ("conhecimento", "Cada conversa entre funcionários nascida de um fato (pedido de ajuda, cobrança, aviso), "
                           "com o compromisso verificável e se ele foi cumprido (com a prova)", "uma conversa", SITUACAO,
                           "quais conversas resolvem; tempo até cumprir; quem ajuda quem"),
+    "demandas_ciclos": ("operacao", "Cada ciclo de distribuição de demandas: elegíveis, atribuídas, concluídas, bloqueadas "
+                        "e, no detalhe, quem foi pulado e por quê (estagiário, demanda aberta, recebeu há pouco)",
+                        "um ciclo da rotina demandas", IMUTAVEL,
+                        "cobertura de trabalho por pessoa e andar; quem ficou sem demanda e por quê"),
     "dialogo_ciclos": ("operacao", "Cada ciclo das conversas: quantos fatos avaliados, quantas conversas e se não houve assunto",
                        "um ciclo", IMUTAVEL, "quanto silêncio é falta de assunto e não de gente"),
     "cobertura_persistencia": ("operacao", "Cada levantamento de cobertura do banco: tabela por tabela (SQLite e PostgreSQL), "
@@ -215,6 +219,8 @@ def _todas_as_tabelas(cfg) -> None:
     voz._tb(cfg)
     aprendizados._tb(cfg)
     dialogo._tb(cfg)
+    from robo import demandas
+    demandas._tb(cfg)
     caixa_dono._tb(cfg)
     jornada._tb(cfg)
     from robo import cobertura_banco

@@ -221,6 +221,16 @@ class ControleRobo:
                 finally:
                     self._dialogo_rodando = False
             threading.Thread(target=_dialogo, name="robo-dialogo", daemon=True).start()
+        # demandas: trabalho real para cada funcionário, com critérios e revisão (robo/demandas.py; intervalo na rotina)
+        if agora - getattr(self, "_ultimo_demandas", 0) >= 60 and not getattr(self, "_demandas_rodando", False):
+            self._ultimo_demandas, self._demandas_rodando = agora, True
+
+            def _demandas():
+                try:
+                    rotinas.executar(cfg, "demandas", rotinas.funcao(cfg, "demandas"))
+                finally:
+                    self._demandas_rodando = False
+            threading.Thread(target=_demandas, name="robo-demandas", daemon=True).start()
         # treino contínuo: todos os funcionários trabalhando em casos com gabarito, no nível de cada um (robo/treino.py)
         if agora - getattr(self, "_ultimo_treino", 0) >= 30 and not getattr(self, "_treino_rodando", False):
             self._ultimo_treino, self._treino_rodando = agora, True
@@ -256,20 +266,14 @@ class ControleRobo:
     def _apos_processar(self, r):
         if not self.cfg:
             return
+        from robo import pos_processamento
+        pos_processamento.registrar(self.cfg, r)  # central de solicitações, memória e aprendizado (o mesmo da nuvem)
         try:
-            from robo import memoria, orquestrador
-            orquestrador.registrar_execucao_automatica(self.cfg, r)  # central de solicitações (pedido automático)
-            memoria.registrar_execucao(self.cfg, r)                  # experiências e handovers de cada área
             if self.cfg.banco.get("habilitado"):
-                memoria.sincronizar_postgres(self.cfg)               # e a mesma memória no PostgreSQL (schema robo)
+                from robo import memoria
+                memoria.sincronizar_postgres(self.cfg)  # e a mesma memória no PostgreSQL (schema robo)
         except Exception:
-            log.exception("Não consegui registrar a execução na central/memória")
-        try:  # aprendizado operacional: reprovou → proposta de regra; regra aprovada → prova de que mudou
-            from robo import aprendizado
-            aprendizado.comprovar(self.cfg, r)
-            aprendizado.propor(self.cfg, r)
-        except Exception:
-            log.exception("Não consegui registrar o aprendizado da execução")
+            log.exception("Não consegui copiar a memória para o PostgreSQL")
         if not self.cfg.painel.get("notificacoes", True):
             return
         if r.status == SUCESSO:

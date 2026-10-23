@@ -179,6 +179,29 @@ def criar(cfg, pedido: str, funcionario: str | None = None, conversa_id: str | N
     return sid
 
 
+def criar_demanda(cfg, titulo: str, pedido: str, funcionario: str, ferramenta: str, params: dict, revisor: str,
+                  plano_extra: dict | None = None, origem: str = "demanda_sintetica") -> str:
+    """Tarefa de uma etapa só, para uma pessoa e uma ferramenta do contrato dela (robo/demandas.py). Passa pela mesma
+    máquina de estados, execução e revisão independente das tarefas pedidas pelo dono. Não executa (quem chama decide)."""
+    tb = Trabalho(cfg)
+    pessoa = organizacao.por_id(cfg).get(funcionario) or {}
+    f = ferramentas.REGISTRO.get(ferramenta)
+    sid = tb.criar_solicitacao("tarefa", titulo, pedido, origem, funcionario, pessoa.get("andar"), "media",
+                               modelo=f"demanda:{ferramenta}")
+    tb.mudar_estado(sid, "em_triagem", "casos_planejamento", f"Demanda para {pessoa.get('nome', funcionario)}")
+    tb.criar_etapas(sid, [{"titulo": titulo, "ferramenta": ferramenta, "funcionario": funcionario, "parametros": params,
+                           "risco": f.risco if f else "baixo", "precisa_aprovacao": bool(f and f.altera_dados)}])
+    if revisor in (funcionario, organizacao.DONO):
+        # quem executa não revisa; e a conferência automática não pode sair no nome do dono, que não a fez:
+        # vai para a Revisora Independente de Casos (Sala de Casos), que existe para isso
+        revisor = "casos_revisor" if funcionario != "casos_revisor" else organizacao.revisor_de("head_casos", cfg)
+    plano = {"modelo": f"demanda:{ferramenta}", "etapas": 1, "revisor": revisor, **(plano_extra or {})}
+    tb.mudar_estado(sid, "planejada", "casos_planejamento", f"Demanda com 1 etapa; revisão independente de {revisor}",
+                    plano=plano, revisor=revisor)
+    tb.mudar_estado(sid, "na_fila", "casos_planejamento")
+    return sid
+
+
 # --------------------------------------------------------------------------- execução
 _executando: set[str] = set()
 _trava_exec = threading.Lock()
@@ -322,8 +345,13 @@ def _revisar(cfg, sid: str) -> str:
             de_novo = ferramentas.executar("calcular", cfg, **e["parametros"])
             if de_novo["texto"] != r.get("texto"):
                 achados.append("O recálculo independente deu resultado diferente")
+    criterios = (s.get("plano") or {}).get("criterios")
+    if criterios:  # critérios de aceitação da demanda (robo/demandas.py), conferidos sem IA
+        from robo.demandas import conferir_criterios
+        for e in concluidas:
+            achados += [f"Critério não atendido em “{e['titulo']}”: {x}" for x in conferir_criterios(e["resultado"], criterios)]
     revisao = {"revisor": revisor, "achados": achados, "data_hora": datetime.now().isoformat(timespec="seconds"),
-               "conferido": [e["titulo"] for e in concluidas]}
+               "conferido": [e["titulo"] for e in concluidas], "criterios": criterios or []}
     if achados:
         tb.mudar_estado(sid, "reprovada_revisao", revisor, "Reprovada na revisão: " + "; ".join(achados), revisao=revisao)
         tentativas = int(s["tentativas"] or 0)
@@ -479,15 +507,16 @@ def retomar_pendentes(cfg) -> list[str]:
     return retomadas
 
 
-def registrar_execucao_automatica(cfg, r) -> str | None:
-    """Toda planilha processada pelo monitor vira uma solicitação automática (com evidência do histórico)."""
+def registrar_execucao_automatica(cfg, r, origem: str = "automatica") -> str | None:
+    """Toda planilha processada pelo monitor vira uma solicitação automática (com evidência do histórico).
+    origem='sintetica' para as planilhas da fábrica (TREINO_*), para nunca se misturarem com as reais."""
     try:
         from robo.pipeline import REPROVADO, SUCESSO
         if r.status not in (SUCESSO, REPROVADO):
             return None
         tb = Trabalho(cfg)
         sid = tb.criar_solicitacao("tarefa", f"Processar {r.arquivo.name}", f"Arquivo recebido em Bases-Limpeza: {r.arquivo.name}",
-                                   "automatica", "recepcao", 1, "media", modelo="pipeline")
+                                   origem, "recepcao", 1, "media", modelo="pipeline")
         tb.mudar_estado(sid, "em_triagem", "recepcao")
         tb.mudar_estado(sid, "planejada", "recepcao", "Pipeline completo de produção")
         tb.mudar_estado(sid, "na_fila", "recepcao")

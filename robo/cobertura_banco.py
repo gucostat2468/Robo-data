@@ -46,16 +46,21 @@ SEM_CAUSA = "vazia: sem causa registrada (investigar)"
 # Causa de cada tabela que pode ficar vazia, levantada no código (quem grava e o que dispara). (situacao, causa, gatilho, módulo)
 CAUSAS: dict[str, tuple[str, str, str, str]] = {
     # motor de solicitações (pedido → etapas → funcionário → ferramenta → aprovação → artefato)
-    "solicitacoes": (NAO_ACIONADA, "só nasce de um pedido feito pelo dono; nenhuma rotina cria solicitações ainda",
-                     "pedido no chat da empresa ou na tela Solicitações", "robo/trabalho.py"),
+    "solicitacoes": (NAO_ACIONADA, "nasce de pedido do dono, da rotina demandas (trabalho para cada funcionário) ou de "
+                     "planilha processada; nenhum dos três aconteceu ainda neste banco",
+                     "rotina demandas, planilha na esteira ou pedido no chat", "robo/demandas.py, robo/trabalho.py"),
     "etapas": (NAO_ACIONADA, "etapas pertencem a uma solicitação; sem solicitação, sem etapa",
-               "pedido do dono que vira plano de etapas", "robo/trabalho.py"),
+               "rotina demandas ou pedido do dono", "robo/trabalho.py"),
     "eventos": (NAO_ACIONADA, "linha do tempo de uma solicitação; sem solicitação, sem evento",
-                "pedido do dono", "robo/trabalho.py"),
-    "artefatos": (NAO_ACIONADA, "arquivo entregue por uma etapa de solicitação", "etapa de solicitação concluída",
+                "rotina demandas ou pedido do dono", "robo/trabalho.py"),
+    "artefatos": (NAO_ACIONADA, "arquivo entregue por uma etapa (resumo executivo, base publicada); as ferramentas das "
+                  "demandas respondem em texto e dados, sem arquivo", "tarefa com resumo executivo ou publicação",
                   "robo/trabalho.py"),
-    "aprovacoes": (NAO_ACIONADA, "etapa de solicitação com risco pede aprovação; sem solicitação, sem aprovação",
-                   "etapa arriscada de uma solicitação", "robo/trabalho.py"),
+    "demandas_ciclos": (NAO_ACIONADA, "a rotina demandas (a cada 30 min) ainda não rodou neste banco",
+                        "robô aberto ou turno da nuvem", "robo/demandas.py"),
+    "aprovacoes": (NAO_ACIONADA, "só etapa que ALTERA dados pede aprovação do dono; as demandas automáticas nunca "
+                   "alteram dados (publicar planilha fica fora da distribuição)", "pedido do dono para publicar",
+                   "robo/trabalho.py"),
     # conversa direta do dono com um funcionário
     "conversas": (NAO_ACIONADA, "conversa do dono com um funcionário pela ficha ou chat; a nuvem não tem painel",
                   "abrir a ficha de alguém no painel e escrever", "robo/trabalho.py"),

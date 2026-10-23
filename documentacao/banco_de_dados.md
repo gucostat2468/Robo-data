@@ -6,7 +6,7 @@
 
 | Onde | O que guarda | Para quê |
 |---|---|---|
-| `logs/trabalho.db` (SQLite) | **Fonte de tudo**: a memória da empresa (69 tabelas abaixo) | Funciona sem internet e sem servidor; nada se apaga |
+| `logs/trabalho.db` (SQLite) | **Fonte de tudo**: a memória da empresa (70 tabelas abaixo) | Funciona sem internet e sem servidor; nada se apaga |
 | `logs/backups_sqlite/` | Cópia diária do `trabalho.db`, conferida (`integrity_check`) e com SHA-256 | Restaurar se o disco falhar; o 1º de cada mês fica para sempre |
 | PostgreSQL `robo_dados`, schema `robo` | Espelho de TODAS as tabelas (`memoria_<tabela>`) | Consultas em SQL, Power BI e Machine Learning |
 | PostgreSQL schemas `bruto` → `tratado` → `analitico` | As planilhas de negócio (ELT) | Análise e Power BI |
@@ -112,6 +112,7 @@
 | `paineis_versoes` | Cada montagem dos painéis (Bárbara) e a conferência do Heitor: situação, indicadores e divergências | uma versão dos painéis | só acrescenta (imutável: não altera nem apaga) | evolução de cada indicador no tempo; qualidade dos painéis |
 | `jobs` | Prova de trabalho: cada processamento real (planilha real ou sintética, rodada de treino, exercício do laboratório, rotina que fez algo), com início, fim, estado, responsável, evidência e hash da saída | um processamento | só de inclusão; um job fechado nunca muda (gatilho) | carga real de trabalho por pessoa e por tipo; tempo de ciclo; taxa de falha da esteira |
 | `jobs_etapas` | Cada etapa de um job, com QUEM fez, início, fim, ok e evidência — é o que define quem está trabalhando agora (etapa aberta nos últimos 15 minutos) | uma etapa de um job | só de inclusão; uma etapa fechada nunca muda (gatilho) | tempo por etapa e por pessoa; gargalos da esteira; prova auditável de trabalho |
+| `demandas_ciclos` | Cada ciclo de distribuição de demandas: elegíveis, atribuídas, concluídas, bloqueadas e, no detalhe, quem foi pulado e por quê (estagiário, demanda aberta, recebeu há pouco) | um ciclo da rotina demandas | só acrescenta (imutável: não altera nem apaga) | cobertura de trabalho por pessoa e andar; quem ficou sem demanda e por quê |
 | `dialogo_ciclos` | Cada ciclo das conversas: quantos fatos avaliados, quantas conversas e se não houve assunto | um ciclo | só acrescenta (imutável: não altera nem apaga) | quanto silêncio é falta de assunto e não de gente |
 | `cobertura_persistencia` | Cada levantamento de cobertura do banco: tabela por tabela (SQLite e PostgreSQL), linhas, natureza (real, sintético, operação, controle) e a causa de cada tabela vazia | uma tabela num levantamento | só acrescenta (imutável: não altera nem apaga) | evolução da cobertura no tempo; quais partes da operação ainda não gravam nada |
 | `vigia_eventos` | Cada vez que o vigia achou o robô parado (e religou) ou sem responder | um evento do vigia | só acrescenta (imutável: não altera nem apaga) | disponibilidade real: quedas por dia e tempo até voltar |
@@ -144,6 +145,7 @@
 - **`conversas`**: `id`, `funcionario`, `titulo`, `origem`, `criada_em`, `atualizada_em`, `contexto`, `arquivada`
 - **`decisoes`**: `id`, `criada_em`, `origem`, `reuniao_id`, `andar`, `texto`, `dono`, `prazo`, `criterio`, `vinculo_tipo`, `vinculo_id`, `registrada_por`, `estado`, `estado_em`, `evidencia`, `repactuacoes`
 - **`decisoes_eventos`**: `id`, `decisao_id`, `data_hora`, `tipo`, `de`, `para`, `quem`, `reuniao_id`, `detalhe`
+- **`demandas_ciclos`**: `id`, `data_hora`, `responsavel`, `elegiveis`, `atribuidas`, `concluidas`, `bloqueadas`, `detalhe`
 - **`dialogo_ciclos`**: `id`, `data_hora`, `fatos_avaliados`, `conversas`, `sem_assunto`, `compromissos_verificados`
 - **`dialogo_conversas`**: `id`, `data_hora`, `fato_id`, `tipo`, `de`, `para`, `turnos`, `compromisso`, `situacao`, `verificado_em`, `prova`
 - **`dono_presenca`**: `origem`, `ultima`

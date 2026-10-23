@@ -81,8 +81,8 @@ pedido ("Não preencha o banco indiscriminadamente com registros falsos").
 |---|---|---|---|
 | 1 | Diagnóstico e inventário | — | **feito** (este documento) |
 | 2 | Persistência e rastreabilidade | 1 | **feito nesta sessão** (itens acima) |
-| 3 | Execução real de funcionários: cada demanda vira `solicitacao` + `etapas` com responsável, ferramenta autorizada e evidência | 2 | próximo |
-| 4 | 5 funcionários de demandas sintéticas (planejar, gerar básico a profissional, distribuir por andar, cobertura de quem ficou sem trabalho, avaliação independente), a partir da Sala de Casos | 3 | planejado |
+| 3 | Execução real de funcionários: cada demanda vira `solicitacao` + `etapas` com responsável, ferramenta autorizada e evidência | 2 | **feito** (seção 6) |
+| 4 | 5 funcionários de demandas sintéticas (planejar, gerar básico a profissional, distribuir por andar, cobertura de quem ficou sem trabalho, avaliação independente), a partir da Sala de Casos | 3 | próximo |
 | 5 | IA local: medir RAM/CPU do seu notebook antes de escolher modelo (ex.: Ollama com modelo de 3B a 8B); uma instância compartilhada com fila | 3 | planejado |
 | 6 | Conversa natural com qualquer funcionário e handoffs registrados | 3, 5 | parcial (voz, diálogo com fato) |
 | 7 | Funcionário de pesquisa (Markdown e PDF com fontes; Perplexity só por API oficial e com chave sua) | 5 | planejado |
@@ -93,3 +93,37 @@ Riscos e autorizações pendentes:
 - **Espaço no Neon gratuito:** com a esteira na nuvem, `laboratorio` e `treino` crescem a cada lote. Há teto de
   100 MB e o alerta de 80% já existente. Antes de subir o teto, decidir com você.
 - **Nada foi publicado, nenhuma porta aberta, nenhum recurso pago criado.**
+
+## 6. Etapa 3 executada: funcionários recebendo e executando tarefas
+
+O que já existia e foi reaproveitado: o motor de solicitações (`robo/trabalho.py`) e o orquestrador
+(`robo/orquestrador.py`), com estados, contrato de ferramentas, aprovação e revisor independente. Faltava uma fonte
+automática de trabalho: só o dono criava tarefas.
+
+Achado adicional: o pós-processamento de cada planilha (virar solicitação, memória e aprendizado) só existia dentro
+do painel. Na nuvem, nenhuma planilha virava solicitação. Foi extraído para `robo/pos_processamento.py`.
+
+O que foi criado:
+- `robo/demandas.py`: catálogo de demandas por ferramenta (objetivo, evidência esperada, critérios de aceitação),
+  distribuição justa e o registro de cada ciclo em `demandas_ciclos`;
+- `orquestrador.criar_demanda` e os critérios conferidos pelo revisor (sem IA);
+- cada demanda roda dentro de um job (`jobs` tipo `demanda`), então a pessoa aparece como trabalhando só enquanto
+  executa.
+
+Evidência (banco local deste ambiente, ferramentas reais, dados sintéticos):
+- 1º ciclo: 6 atribuídas, 6 aprovadas; 16 bloqueadas por um defeito meu (a busca da planilha original não olhava as
+  subpastas), corrigido;
+- ciclo sem teto: 81 atribuídas, 79 aprovadas, 2 falhas honestas (drivers sem coluna de NPS; cálculo escolheu
+  `nota_fiscal`, que é identificador). Causa: a preparação da demanda, não a ferramenta. Corrigido com as mesmas
+  regras das ferramentas;
+- cobertura: 87 de 87 elegíveis com demanda nos 5 andares; 7 estagiários fora, com o motivo registrado;
+- cálculo de ponta a ponta: a calculadora deu 19,786 e a conta independente em pandas deu 19,786;
+- turno da nuvem (4 min, banco vazio): 6 demandas aprovadas + 1 planilha sintética registrada; `solicitacoes`,
+  `etapas` e `eventos` chegaram ao PostgreSQL.
+
+Limitações:
+- todas as demandas são de nível "básico"; os níveis médio, difícil e profissional são da Etapa 4;
+- o responsável pela rotina é a Planejadora de Treino (`casos_planejamento`); os 5 funcionários dedicados são da
+  Etapa 4;
+- as ferramentas são determinísticas: nenhuma demanda usa IA ainda (Etapa 5).
+
