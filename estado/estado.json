@@ -1,12 +1,12 @@
 {
  "versao": 1,
- "gerado_em": "2026-10-24T06:32:14",
+ "gerado_em": "2026-10-24T10:55:45",
  "turno": {
-  "estado": "entre turnos: memória salva; o próximo turno começa em poucos minutos",
-  "inicio": "2026-10-24T05:50:14",
-  "fim_previsto": "2026-10-24T06:30:14",
-  "voltas": 117,
-  "planilhas": 2
+  "estado": "trabalhando",
+  "inicio": "2026-10-24T10:55:45",
+  "fim_previsto": "2026-10-24T11:35:45",
+  "voltas": 0,
+  "planilhas": 1
  },
  "funcionarios": 101,
  "andares": [
@@ -14,8 +14,8 @@
    "andar": 1,
    "pessoas": 19,
    "trabalharam_hoje": 19,
-   "demandas": 10,
-   "concluidas": 9,
+   "demandas": 14,
+   "concluidas": 13,
    "parciais": 0,
    "falhas": 1,
    "treino": 89,
@@ -25,8 +25,8 @@
    "andar": 2,
    "pessoas": 16,
    "trabalharam_hoje": 16,
-   "demandas": 11,
-   "concluidas": 10,
+   "demandas": 15,
+   "concluidas": 14,
    "parciais": 0,
    "falhas": 1,
    "treino": 75,
@@ -36,8 +36,8 @@
    "andar": 3,
    "pessoas": 12,
    "trabalharam_hoje": 12,
-   "demandas": 10,
-   "concluidas": 10,
+   "demandas": 13,
+   "concluidas": 13,
    "parciais": 0,
    "falhas": 0,
    "treino": 56,
@@ -47,8 +47,8 @@
    "andar": 4,
    "pessoas": 31,
    "trabalharam_hoje": 31,
-   "demandas": 11,
-   "concluidas": 11,
+   "demandas": 15,
+   "concluidas": 15,
    "parciais": 0,
    "falhas": 0,
    "treino": 144,
@@ -58,8 +58,8 @@
    "andar": 5,
    "pessoas": 23,
    "trabalharam_hoje": 23,
-   "demandas": 10,
-   "concluidas": 10,
+   "demandas": 15,
+   "concluidas": 15,
    "parciais": 0,
    "falhas": 0,
    "treino": 101,
@@ -69,83 +69,83 @@
  "agora": [],
  "ultimos": [
   {
-   "quando": "2026-10-24T06:20:41",
-   "funcionario": "Sílvia",
-   "cargo": "Coordenadora da Sala Excel",
-   "andar": 3,
-   "trabalho": "Calcular a média de uma métrica da base sintética",
-   "estado": "concluida"
-  },
-  {
-   "quando": "2026-10-24T06:20:36",
-   "funcionario": "Eva",
-   "cargo": "Monitoramento",
-   "andar": 2,
-   "trabalho": "Diagnosticar a planilha original da fábrica",
-   "estado": "concluida"
-  },
-  {
-   "quando": "2026-10-24T06:20:34",
-   "funcionario": "Saulo",
-   "cargo": "Supervisor de Planilhas",
-   "andar": 1,
-   "trabalho": "Calcular a média de uma métrica da base sintética",
-   "estado": "concluida"
-  },
-  {
-   "quando": "2026-10-24T06:20:30",
-   "funcionario": "Lúcia",
-   "cargo": "Especialista em Fórmulas e Power Query",
-   "andar": 3,
-   "trabalho": "Calcular a média de uma métrica da base sintética",
-   "estado": "concluida"
-  },
-  {
-   "quando": "2026-10-24T06:20:30",
-   "funcionario": "Elisa",
-   "cargo": "Especialista em PyYAML (configuração)",
+   "quando": "2026-10-24T10:55:30",
+   "funcionario": "Rodrigo",
+   "cargo": "Analista de Infraestrutura Pleno",
    "andar": 5,
-   "trabalho": "Revisão da biblioteca sob sua responsabilidade",
+   "trabalho": "Ronda de saúde do sistema",
    "estado": "concluida"
   },
   {
-   "quando": "2026-10-24T06:20:30",
-   "funcionario": "Roberta",
-   "cargo": "Analista de Treinamento e Desenvolvimento Pleno",
-   "andar": 4,
-   "trabalho": "Planos de desenvolvimento 70-20-10",
-   "estado": "concluida"
-  },
-  {
-   "quando": "2026-10-24T06:20:25",
-   "funcionario": "Caio",
-   "cargo": "Indicadores (NPS, CSAT, CES)",
+   "quando": "2026-10-24T10:55:29",
+   "funcionario": "Rogério",
+   "cargo": "Diretor de Analytics, Ciência de Dados e BI",
    "andar": 2,
-   "trabalho": "Perfil e indicadores da base sintética",
+   "trabalho": "Situação do andar agora",
    "estado": "concluida"
   },
   {
-   "quando": "2026-10-24T06:20:22",
-   "funcionario": "Rita",
-   "cargo": "Recepção",
-   "andar": 1,
-   "trabalho": "Diagnosticar a planilha original da fábrica",
-   "estado": "concluida"
-  },
-  {
-   "quando": "2026-10-24T06:20:22",
-   "funcionario": "Priscila",
-   "cargo": "Analista de Recrutamento e Seleção Pleno",
+   "quando": "2026-10-24T10:55:29",
+   "funcionario": "Marta",
+   "cargo": "Diretora de Pessoas e Cultura (CHRO)",
    "andar": 4,
-   "trabalho": "Situação das contratações",
+   "trabalho": "Scorecard da área",
    "estado": "concluida"
   },
   {
-   "quando": "2026-10-24T06:20:21",
-   "funcionario": "Gabriel",
-   "cargo": "Especialista em Tabelas Dinâmicas e Dashboards",
+   "quando": "2026-10-24T10:55:28",
+   "funcionario": "Beto",
+   "cargo": "Banco de dados (ELT)",
+   "andar": 1,
+   "trabalho": "Conferir no PostgreSQL os lotes da fábrica",
+   "estado": "concluida"
+  },
+  {
+   "quando": "2026-10-24T10:55:28",
+   "funcionario": "Marcos",
+   "cargo": "Coordenador de Análise e Ciência de Dados",
+   "andar": 2,
+   "trabalho": "Consultar o conhecimento da área",
+   "estado": "concluida"
+  },
+  {
+   "quando": "2026-10-24T10:55:28",
+   "funcionario": "Cláudia",
+   "cargo": "Diretora de Operações e Governança",
+   "andar": 4,
+   "trabalho": "Scorecard da área",
+   "estado": "concluida"
+  },
+  {
+   "quando": "2026-10-24T10:55:28",
+   "funcionario": "Ricardo",
+   "cargo": "Gerente da Sala Excel",
    "andar": 3,
-   "trabalho": "Calcular a média de uma métrica da base sintética",
+   "trabalho": "Situação do andar agora",
+   "estado": "concluida"
+  },
+  {
+   "quando": "2026-10-24T10:55:28",
+   "funcionario": "André",
+   "cargo": "Head de Infraestrutura e Segurança",
+   "andar": 5,
+   "trabalho": "Auditoria por amostragem",
+   "estado": "concluida"
+  },
+  {
+   "quando": "2026-10-24T10:55:28",
+   "funcionario": "Carla",
+   "cargo": "Coordenadora de Engenharia de Dados",
+   "andar": 1,
+   "trabalho": "Consultar o conhecimento da área",
+   "estado": "concluida"
+  },
+  {
+   "quando": "2026-10-24T10:55:25",
+   "funcionario": "Otto",
+   "cargo": "Auditoria (Validação)",
+   "andar": 1,
+   "trabalho": "Consultar o conhecimento da área",
    "estado": "concluida"
   }
  ],
@@ -154,7 +154,7 @@
   "concluidos_hoje": 0
  },
  "fabrica": {
-  "lotes_hoje": 4,
+  "lotes_hoje": 5,
   "conferidos_ok_hoje": 4
  },
  "rotinas": [
@@ -168,41 +168,41 @@
    "rotina": "caixa_dono",
    "execucoes_24h": 7,
    "erros_24h": 0,
-   "ultima": "2026-10-24T05:49:53"
+   "ultima": "2026-10-24T10:55:24"
   },
   {
    "rotina": "demandas",
    "execucoes_24h": 10,
    "erros_24h": 0,
-   "ultima": "2026-10-24T06:20:41"
+   "ultima": "2026-10-24T10:55:30"
   },
   {
    "rotina": "dialogo",
    "execucoes_24h": 7,
    "erros_24h": 0,
-   "ultima": "2026-10-24T05:49:58"
+   "ultima": "2026-10-24T10:55:31"
   },
   {
    "rotina": "fabrica",
-   "execucoes_24h": 20,
+   "execucoes_24h": 19,
    "erros_24h": 0,
-   "ultima": "2026-10-24T06:21:12"
+   "ultima": "2026-10-24T10:55:31"
   },
   {
    "rotina": "ideias",
    "execucoes_24h": 1,
    "erros_24h": 0,
-   "ultima": "2026-10-23T07:29:35"
+   "ultima": "2026-10-24T10:55:20"
   },
   {
    "rotina": "jornada",
    "execucoes_24h": 7,
    "erros_24h": 0,
-   "ultima": "2026-10-24T05:49:53"
+   "ultima": "2026-10-24T10:55:24"
   },
   {
    "rotina": "laboratorio",
-   "execucoes_24h": 20,
+   "execucoes_24h": 18,
    "erros_24h": 0,
    "ultima": "2026-10-24T06:28:52"
   },
@@ -210,23 +210,23 @@
    "rotina": "licoes",
    "execucoes_24h": 7,
    "erros_24h": 0,
-   "ultima": "2026-10-24T05:49:52"
+   "ultima": "2026-10-24T10:55:24"
   },
   {
    "rotina": "memoria_pg",
-   "execucoes_24h": 14,
+   "execucoes_24h": 12,
    "erros_24h": 0,
-   "ultima": "2026-10-24T06:32:10"
+   "ultima": "2026-10-24T06:28:16"
   },
   {
    "rotina": "paineis",
    "execucoes_24h": 7,
    "erros_24h": 0,
-   "ultima": "2026-10-24T05:49:59"
+   "ultima": "2026-10-24T10:55:32"
   },
   {
    "rotina": "registro",
-   "execucoes_24h": 113,
+   "execucoes_24h": 101,
    "erros_24h": 0,
    "ultima": "2026-10-24T06:29:37"
   },
@@ -238,21 +238,21 @@
   },
   {
    "rotina": "ronda_ti",
-   "execucoes_24h": 14,
+   "execucoes_24h": 13,
    "erros_24h": 0,
-   "ultima": "2026-10-24T06:29:37"
+   "ultima": "2026-10-24T10:55:18"
   },
   {
    "rotina": "treino",
-   "execucoes_24h": 81,
+   "execucoes_24h": 72,
    "erros_24h": 0,
    "ultima": "2026-10-24T06:28:49"
   }
  ],
  "totais": {
-  "demandas": 88,
+  "demandas": 108,
   "tentativas_treino": 4416,
-  "conversas": 1833,
-  "trabalhos_com_prova": 537
+  "conversas": 1838,
+  "trabalhos_com_prova": 568
  }
 }
