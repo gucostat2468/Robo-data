@@ -56,12 +56,19 @@ REGIOES = ["Sudeste", "Sul", "Nordeste", "Norte", "Centro-Oeste"]
 
 
 # ------------------------------------------------------------------------------------------------ geradores
+# Pesos verdadeiros dos atributos na nota NPS (pesquisa de alunos): Conteúdo pesa mais, depois Atendimento, e
+# Infraestrutura quase nada. É a verdade que o gabarito guarda para conferir a análise de drivers.
+PESOS_NPS = {"Nota Conteúdo": 0.6, "Nota Atendimento": 0.3, "Nota Infraestrutura": 0.05}
+
+
 def _nps(rng, n):
     curso = _escolha(rng, ["Administração", "Direito", "Enfermagem", "Engenharia", "Pedagogia", "Psicologia"], n)
     base = {"Administração": 7.5, "Direito": 8.0, "Enfermagem": 6.5, "Engenharia": 7.0, "Pedagogia": 8.6, "Psicologia": 7.8}
-    nota = np.clip(np.round([rng.normal(base[c], 2.1) for c in curso]), 0, 10).astype(int)
+    atributos = {a: np.clip(np.round(rng.normal(7.5, 1.8, n)), 0, 10).astype(int) for a in PESOS_NPS}
+    efeito = sum(peso * (atributos[a] - 7.5) for a, peso in PESOS_NPS.items())
+    nota = np.clip(np.round(np.array([base[c] for c in curso]) + efeito + rng.normal(0, 1.3, n)), 0, 10).astype(int)
     return {"ID Resposta": _ids(rng, n), "Curso": curso, "Modalidade": _escolha(rng, ["EAD", "Presencial", "Semipresencial"], n, [5, 3, 2]),
-            "UF": _escolha(rng, UFS, n), "Nota NPS": nota, "Data da Resposta": _datas(rng, n)}
+            "UF": _escolha(rng, UFS, n), **atributos, "Nota NPS": nota, "Data da Resposta": _datas(rng, n)}
 
 
 def _csat(rng, n):
@@ -303,4 +310,6 @@ def gabarito(regra: Regra, limpo: pd.DataFrame) -> dict:
     return {"linhas": int(len(limpo)), "metrica": met, "segmento": seg, "soma_metrica": round(float(x.sum()), 4),
             "media_metrica": round(float(x.mean()), 6) if x.notna().any() else None, "nulos_metrica": int(x.isna().sum()),
             "por_segmento": {str(k): int(v) for k, v in limpo[seg].value_counts().items()},
-            "indicador": {"nome": regra.indicador, "valor": None if indicador is None else round(float(indicador), 6)}}
+            "indicador": {"nome": regra.indicador, "valor": None if indicador is None else round(float(indicador), 6)},
+            **({"drivers": {"alvo": met, "ordem": [normalizar_nome_coluna(a) for a in sorted(PESOS_NPS, key=lambda a: -PESOS_NPS[a])],
+                            "pesos": {normalizar_nome_coluna(a): w for a, w in PESOS_NPS.items()}}} if regra.id == "nps" else {})}

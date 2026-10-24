@@ -229,15 +229,43 @@ def _calculo(cfg, pessoa):
 
 
 def _com_indicador(cfg, pessoa):
-    """Drivers precisam de um alvo NPS ou CSAT, pela mesma regra da ferramenta (calculos._coluna_indicador)."""
+    """Drivers precisam de um alvo NPS ou CSAT (mesma regra da ferramenta, calculos._coluna_indicador) E de atributos
+    numéricos para comparar: sem eles a tarefa é impossível e falhava sem culpa de quem a recebeu (achado no turno da
+    nuvem: a NPS da fábrica só tinha a nota). Quando a fábrica guardou a verdade dos drivers, ela vira critério."""
     from robo.calculos import _coluna_indicador
+    from robo.ciencia import _numericas
     bases = _recentes(Path(cfg.tratadas) / "_treino")
+    sem_atributo = 0
     for arq in bases:
         df = _ler(arq)
-        if _coluna_indicador("nps", df) or _coluna_indicador("csat", df):
-            return {"arquivo": str(arq)}, []
+        alvo = _coluna_indicador("nps", df) or _coluna_indicador("csat", df)
+        if not alvo:
+            continue
+        if not _numericas(df, [alvo]):
+            sem_atributo += 1
+            continue
+        verdade = _verdade_dos_drivers(cfg, arq)
+        extras = [{"tipo": "primeiro_driver", "esperado": verdade["ordem"][0]}] if verdade else []
+        return {"arquivo": str(arq)}, extras
+    if sem_atributo:
+        return (f"{sem_atributo} base(s) com NPS/CSAT, mas sem atributo numérico (nota de atendimento, conteúdo…) para "
+                "comparar com o indicador: drivers não têm o que medir")
     return (f"nenhuma das {len(bases)} base(s) sintética(s) recentes tem coluna de NPS ou CSAT para ser o alvo "
             "(a fábrica gera as regras nps e csat_ces; a demanda volta quando houver um lote delas)")
+
+
+def _verdade_dos_drivers(cfg, arquivo: Path) -> dict | None:
+    """A ordem verdadeira dos drivers, do gabarito que a fábrica guardou ao gerar o lote (fabrica_lotes)."""
+    try:
+        with _tb(cfg).tx() as c:
+            r = c.execute("SELECT gabarito FROM fabrica_lotes WHERE arquivo LIKE ? ORDER BY id DESC LIMIT 1",
+                          (f"%{Path(arquivo).name}",)).fetchone()
+    except Exception:
+        return None
+    try:
+        return (json.loads(r[0] or "{}").get("drivers") or None) if r else None
+    except ValueError:
+        return None
 
 
 def _sql_lotes(cfg, pessoa):
@@ -471,6 +499,11 @@ def conferir_criterios(resultado: dict, criterios: list[dict]) -> list[str]:
                 falhas.append("nenhum arquivo entregue")
             elif not all(x.exists() and x.stat().st_size > 0 for x in arqs):
                 falhas.append("arquivo entregue não existe ou está vazio")
+        elif t == "primeiro_driver":
+            lista = _dado(r.get("dados") or {}, "drivers.drivers") or []
+            achado = lista[0].get("atributo") if lista and isinstance(lista[0], dict) else None
+            if achado != c.get("esperado"):
+                falhas.append(f"o driver principal achado foi '{achado}', mas o gabarito da fábrica diz '{c.get('esperado')}'")
         elif t == "valor_unico":
             valores = list(((_dado(r.get("dados") or {}, "calculo.valores")) or {}).values())
             esperado, tol = float(c["esperado"]), float(c.get("tolerancia", 1e-6))
@@ -495,7 +528,8 @@ def _texto_criterio(c: dict) -> str:
             "valor_unico": f"o valor bate com a conta independente de {c.get('coluna')}",
             "artefato": "arquivo entregue e não vazio",
             "fonte_especifica": "conhecimento específico do trabalho (não a abertura genérica de um manual)",
-            "verdadeiro": "o resultado do banco bate com o gabarito"}.get(c.get("tipo"), c.get("tipo", ""))
+            "verdadeiro": "o resultado do banco bate com o gabarito",
+            "primeiro_driver": f"o driver principal é o do gabarito da fábrica ({c.get('esperado')})"}.get(c.get("tipo"), c.get("tipo", ""))
 
 
 # =============================================================================== Vicente: nível e montagem

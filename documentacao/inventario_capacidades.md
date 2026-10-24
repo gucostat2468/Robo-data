@@ -28,6 +28,8 @@ Python 3.13.16. 702 testes coletados antes deste ciclo; a suíte completa passou
 | Revisão independente | Comprovada | `demandas_avaliacoes`: o avaliador nunca é o executor nem o revisor; `teste_demandas.py` | — |
 | Estagiários só observam | Comprovada | `NIVEIS_SEM_DEMANDA`; `demandas.observar` grava a observação | — |
 | Fábrica sintética com gabarito | Comprovada | `robo/fabrica.py`; boletim: 10 lotes no dia, 10 conferidos com o gabarito | — |
+| Drivers (Ciência de Dados) com tarefa possível e gabarito | **Corrigida neste ciclo** | turno real: o drivers do Vinícius falhou; reproduzido aqui: a NPS da fábrica só tinha a nota, sem atributos — tarefa impossível, critério inadequado. Agora a fábrica gera notas de atributo com pesos conhecidos (`regras_negocio.PESOS_NPS`), o gabarito guarda a ordem verdadeira, a demanda só nasce com atributo e o critério `primeiro_driver` reprova ranking errado | `teste_demandas.py::teste_drivers_*` |
+| Código de protocolo/matrícula tratado como driver | **Corrigida neste ciclo** | `ciencia.IGNORAR_TERMOS` | `teste_codigo_de_protocolo_nao_e_driver` |
 | Treino nível 1–5 com sujeira real | Comprovada | `treino_casos.py`, `laboratorio.py`; achou defeito real da limpeza (cabeçalho repetido) | desafio aberto: valor "1.234,56*" |
 
 ## 2. PostgreSQL e persistência

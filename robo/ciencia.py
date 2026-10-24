@@ -18,7 +18,7 @@ import pandas as pd
 SEMENTE = 42
 # Colunas que são número mas não são medida: código, CEP e partes de data. Compara o 1º TERMO do nome, não o começo
 # do texto — antes 'dias_entrega', 'anos_de_casa' e 'mesas' ficavam de fora (achado do treino contínuo, nível 4).
-IGNORAR_TERMOS = {"id", "cod", "codigo", "cep", "ano", "mes", "dia", "semana", "trimestre"}
+IGNORAR_TERMOS = {"id", "cod", "codigo", "cep", "ano", "mes", "dia", "semana", "trimestre", "protocolo", "matricula"}
 
 
 def _numericas(df: pd.DataFrame, excluir: list[str] | None = None) -> list[str]:

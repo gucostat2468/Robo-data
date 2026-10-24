@@ -211,3 +211,48 @@ def teste_cada_demanda_usa_o_proprio_preparo():
     assert demandas.CATALOGO["sql_treino"].preparar is demandas._sql
     nomes = [m.preparar.__name__ for m in demandas.CATALOGO.values() if m.preparar]
     assert len(set(nomes)) == len({id(m.preparar) for m in demandas.CATALOGO.values() if m.preparar})
+
+
+# ------------------------------------------------------------------ drivers: tarefa possível e conferida pela verdade
+def _base_nps_tratada(cfg_factory, linhas=1500):
+    """Lote NPS da fábrica tratado pela esteira (como no turno da nuvem)."""
+    from robo import fabrica, pos_processamento
+    from robo.monitor import Monitor
+    cfg = cfg_factory(fabrica={"linhas_min": linhas, "linhas_max": linhas})
+    cfg.criar_pastas()
+    fabrica.produzir_lote(cfg, regra_id="nps", linhas=linhas, semente=11)
+    Monitor(cfg, ao_processar=lambda r: pos_processamento.registrar(cfg, r)).ciclo(forcar=True)
+    return cfg
+
+
+def teste_drivers_conferidos_pela_verdade_da_fabrica(cfg_factory):
+    """A pesquisa NPS da fábrica tem notas de atributo com pesos conhecidos; a demanda de drivers leva o driver
+    verdadeiro como critério, e a análise real o encontra."""
+    cfg = _base_nps_tratada(cfg_factory)
+    prep = demandas._com_indicador(cfg, {"id": "ci_pleno"})
+    assert not isinstance(prep, str), prep
+    params, extras = prep
+    assert extras == [{"tipo": "primeiro_driver", "esperado": "nota_conteudo"}]
+    r = ferramentas.executar("drivers", cfg, **params)
+    assert r["ok"] and demandas.conferir_criterios(r, extras) == []
+    # resposta errada é reprovada (o critério não aceita qualquer ranking)
+    errado = json.loads(json.dumps(r))
+    errado["dados"]["drivers"]["drivers"].reverse()
+    assert "gabarito da fábrica diz 'nota_conteudo'" in demandas.conferir_criterios(errado, extras)[0]
+
+
+def teste_drivers_sem_atributo_nao_vira_tarefa_impossivel(cfg_factory, tmp_path):
+    """Base só com a nota (sem atributos) bloqueia com motivo, em vez de virar demanda que falha sem culpa de ninguém."""
+    cfg = _cfg(cfg_factory)
+    pasta = cfg.tratadas / "_treino"
+    pasta.mkdir(parents=True, exist_ok=True)
+    pd.DataFrame({"id_resposta": range(100), "curso": ["A", "B"] * 50, "nota_nps": [i % 11 for i in range(100)]}) \
+        .to_excel(pasta / "TREINO_nps_antiga.xlsx", index=False)
+    motivo = demandas._com_indicador(cfg, {"id": "ci_pleno"})
+    assert isinstance(motivo, str) and "sem atributo numérico" in motivo
+
+
+def teste_codigo_de_protocolo_nao_e_driver():
+    from robo.ciencia import _numericas
+    df = pd.DataFrame({"protocolo": [1, 2, 3], "matricula": [4, 5, 6], "nota_ces": [1, 2, 3], "nota_csat": [3, 4, 5]})
+    assert _numericas(df, ["nota_csat"]) == ["nota_ces"]
