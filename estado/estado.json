@@ -1,11 +1,11 @@
 {
  "versao": 1,
- "gerado_em": "2026-10-24T11:33:55",
+ "gerado_em": "2026-10-24T11:37:36",
  "turno": {
-  "estado": "trabalhando",
+  "estado": "entre turnos: memória salva; o próximo turno começa em poucos minutos",
   "inicio": "2026-10-24T10:55:45",
   "fim_previsto": "2026-10-24T11:35:45",
-  "voltas": 108,
+  "voltas": 112,
   "planilhas": 2
  },
  "funcionarios": 101,
@@ -18,8 +18,8 @@
    "concluidas": 18,
    "parciais": 0,
    "falhas": 1,
-   "treino": 133,
-   "acertos": 124
+   "treino": 135,
+   "acertos": 126
   },
   {
    "andar": 2,
@@ -40,8 +40,8 @@
    "concluidas": 13,
    "parciais": 0,
    "falhas": 0,
-   "treino": 81,
-   "acertos": 66
+   "treino": 84,
+   "acertos": 69
   },
   {
    "andar": 4,
@@ -51,8 +51,8 @@
    "concluidas": 21,
    "parciais": 0,
    "falhas": 0,
-   "treino": 211,
-   "acertos": 194
+   "treino": 215,
+   "acertos": 198
   },
   {
    "andar": 5,
@@ -62,8 +62,8 @@
    "concluidas": 21,
    "parciais": 0,
    "falhas": 0,
-   "treino": 153,
-   "acertos": 137
+   "treino": 159,
+   "acertos": 143
   }
  ],
  "agora": [],
@@ -214,9 +214,9 @@
   },
   {
    "rotina": "memoria_pg",
-   "execucoes_24h": 15,
+   "execucoes_24h": 16,
    "erros_24h": 0,
-   "ultima": "2026-10-24T11:33:51"
+   "ultima": "2026-10-24T11:37:32"
   },
   {
    "rotina": "paineis",
@@ -226,9 +226,9 @@
   },
   {
    "rotina": "registro",
-   "execucoes_24h": 122,
+   "execucoes_24h": 125,
    "erros_24h": 0,
-   "ultima": "2026-10-24T11:31:26"
+   "ultima": "2026-10-24T11:35:09"
   },
   {
    "rotina": "rh_desempenho",
@@ -238,21 +238,21 @@
   },
   {
    "rotina": "ronda_ti",
-   "execucoes_24h": 13,
+   "execucoes_24h": 14,
    "erros_24h": 0,
-   "ultima": "2026-10-24T10:55:18"
+   "ultima": "2026-10-24T11:35:09"
   },
   {
    "rotina": "treino",
-   "execucoes_24h": 87,
+   "execucoes_24h": 88,
    "erros_24h": 0,
-   "ultima": "2026-10-24T11:31:11"
+   "ultima": "2026-10-24T11:34:19"
   }
  ],
  "totais": {
   "demandas": 128,
-  "tentativas_treino": 4641,
-  "conversas": 1916,
-  "trabalhos_com_prova": 659
+  "tentativas_treino": 4656,
+  "conversas": 1917,
+  "trabalhos_com_prova": 666
  }
 }
