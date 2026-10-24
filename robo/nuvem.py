@@ -253,11 +253,14 @@ def turno(cfg, minutos: float = 20, salvar_a_cada_min: float = 10, pausa_s: floa
     inicio_txt = datetime.now().isoformat(timespec="seconds")
     previsto = (datetime.now() + timedelta(minutes=minutos)).isoformat(timespec="seconds")
 
-    def _boletim(estado: str) -> None:  # o celular acompanha o turno (ramo painel-celular), só no GitHub Actions
+    def _boletim(estado: str, final: bool = False) -> None:  # o celular acompanha o turno, só no GitHub Actions
         if boletim.ligado():
             boletim.publicar(cfg, RAIZ, Path(cfg.logs).parent / "boletim_git",
                              {"estado": estado, "inicio": inicio_txt, "fim_previsto": previsto, "voltas": voltas,
                               "planilhas": planilhas})
+            # o painel completo (mesmo do computador, com o escritório 3D) lê este espelho no app do celular
+            from robo import painel_espelho
+            painel_espelho.publicar(cfg, RAIZ, Path(cfg.logs).parent / "espelho_git", forcar=final)
     _boletim("trabalhando")
     ultimo_boletim = time.monotonic()
     while time.monotonic() < fim and not (parar is not None and parar.is_set()):
@@ -284,7 +287,7 @@ def turno(cfg, minutos: float = 20, salvar_a_cada_min: float = 10, pausa_s: floa
         if nome in rotinas.ROTINAS:
             rotinas.executar(cfg, nome, rotinas.funcao(cfg, nome))
     inst = salvar(cfg)
-    _boletim("entre turnos: memória salva; o próximo turno começa em poucos minutos")
+    _boletim("entre turnos: memória salva; o próximo turno começa em poucos minutos", final=True)
     mb = tamanho_mb(cfg)
     limite = float(os.environ.get("ROBO_LIMITE_MB") or LIMITE_MB_PADRAO)
     alerta = mb >= 0.8 * limite

@@ -21,6 +21,19 @@ cobra nada e os dados ficam guardados). Confira em neon.tech → seu projeto →
 
 Endereço: **https://robo-de-planilhas-ao-vivo.floot.app** (pedido do dono: usar o Floot dos conectores).
 
+O app abre o **painel original** — o mesmo do computador: Visão geral, Central de dados, Estratégia, Canal, Equipe,
+Escritório 3D dos 5 andares — e não uma tela nova. Como funciona:
+
+- o turno da nuvem chama as rotas de leitura do painel (as mesmas funções do servidor do computador) e grava cada
+  resposta no ramo `painel-espelho` (a cada ~10 min e no fim do turno; `robo/painel_espelho.py`). O ramo guarda só a
+  versão atual: é cópia derivada; a fonte de verdade continua no SQLite e no PostgreSQL;
+- o app serve o HTML, JS, CSS e o 3D da MESMA versão do código que gerou o espelho, e troca só a origem dos dados;
+- botões que alteram algo respondem "somente leitura no celular"; uma faixa no rodapé diz de quando são os dados;
+- ficam de fora do espelho a configuração (pastas e endereço do banco), o log do sistema e o diagnóstico de rede; e
+  qualquer resposta em que apareça um segredo não é publicada.
+
+O resumo em abas continua em `/resumo`.
+
 - Lê o mesmo boletim público (`estado/estado.json` do ramo `painel-celular`) no servidor do Floot; não fala com o
   banco, não guarda segredo e não tem nenhum botão que altere a empresa (somente leitura).
 - Abas: Geral, Pessoas (busca e filtro por andar), Banco (tabelas com dados e a causa de cada vazia), Níveis e IA.
