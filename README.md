@@ -1,6 +1,6 @@
 # Empresa ao vivo
 
-**Boletim das 24/10 12:06** (horário de Brasília) · trabalhando
+**Boletim das 24/10 12:11** (horário de Brasília) · entre turnos: memória salva; o próximo turno começa em poucos minutos
 
 > Atualiza a cada 5 minutos enquanto a empresa trabalha. Recarregue a página para ver o mais novo.
 
