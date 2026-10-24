@@ -166,7 +166,9 @@ def aplicar_nivel(caso: dict, nivel: int, semente: int) -> dict:
         for i in range(caso["n"]):
             if met[i] is None or i in formatos:
                 continue
-            if caso.get("moeda") and i % 9 == 4:  # estorno contábil: (1.234,56) é NEGATIVO
+            # estorno contábil: (1.234,56) é NEGATIVO. Só onde estorno existe (lançamento, venda devolvida): num cadastro de
+            # salário ele criava um 3º perfil de verdade e o gabarito ("2 perfis") ficava errado (achado na medição nível 5)
+            if caso.get("moeda") and caso["area"] != "rh" and i % 9 == 4:
                 met[i] = -abs(float(met[i]))
                 formatos[i] = "parenteses"
             elif i % 11 == 6 and abs(float(met[i])) >= 1000:  # 12 345,67 com espaço fino (exportação francesa/ERP)

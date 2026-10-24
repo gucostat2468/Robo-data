@@ -108,6 +108,7 @@ def _texto_de(v) -> str:
     return str(v)
 
 
+_RE_NOTA_RODAPE = re.compile(r"(?<=[\d)%])\s*(\*{1,3}|[¹²³⁴⁵⁶⁷⁸⁹⁰]+)$")
 _RE_ESCALA = re.compile(r"\s*(mil|k|mi|mm|milh[aã]o|milh[oõ]es|bi|bilh[aã]o|bilh[oõ]es)\.?$", re.IGNORECASE)
 ESCALAS = {"mil": 1e3, "k": 1e3, "mi": 1e6, "mm": 1e6, "milhao": 1e6, "milhoes": 1e6, "milhão": 1e6, "milhões": 1e6,
            "bi": 1e9, "bilhao": 1e9, "bilhoes": 1e9, "bilhão": 1e9, "bilhões": 1e9}
@@ -126,6 +127,8 @@ def numero_de(v, decimal: str = ","):
     m = _RE_ESCALA.search(s)
     if m and m.start() > 0 and any(ch.isdigit() for ch in s[:m.start()]):
         escala, s = ESCALAS[m.group(1).lower()], s[:m.start()].strip()
+    # nota de rodapé de relatório colada no número: 1.234,56* | 1.234,56** | 1.234,56¹ (achado pelo treino nível 5)
+    s = _RE_NOTA_RODAPE.sub("", s) if any(ch.isdigit() for ch in s) else s
     negativo = False
     if len(s) > 1 and s.endswith("-") and any(ch.isdigit() for ch in s):  # menos no fim (SAP): 1.234,56-
         negativo, s = True, s[:-1].strip()

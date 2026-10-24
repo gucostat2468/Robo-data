@@ -90,3 +90,13 @@ def teste_coluna_quase_numerica_esvazia_invalidos_com_aviso():
     out, rel = _limpar(pd.DataFrame({"nota": valores}, dtype=object))
     assert out["nota"].isna().sum() == 1
     assert any("esvaziados" in a.mensagem for a in rel.avisos)
+
+
+def teste_nota_de_rodape_colada_no_numero():
+    """Treino nível 5: relatório de sistema antigo marca valores com nota de rodapé (1.234,56*); a coluna inteira
+    deixava de ser numérica. O marcador sai; o rodapé do relatório ("Gerado em…") continua sendo removido à parte."""
+    from robo.limpeza import _RE_RODAPE, numero_de
+    assert numero_de("1.234,56*") == 1234.56 and numero_de("1.234,56**") == 1234.56
+    assert numero_de("R$ 10,00¹") == 10.0 and numero_de("(1.000)*") == -1000.0
+    assert numero_de("*") is None and numero_de("abc*") is None and numero_de("12*3") is None
+    assert _RE_RODAPE.match("Gerado em 18/10/2026 às 08:00 por sistema_erp")  # o nome não pode ser reaproveitado

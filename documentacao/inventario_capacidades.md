@@ -30,7 +30,8 @@ Python 3.13.16. 702 testes coletados antes deste ciclo; a suíte completa passou
 | Fábrica sintética com gabarito | Comprovada | `robo/fabrica.py`; boletim: 10 lotes no dia, 10 conferidos com o gabarito | — |
 | Drivers (Ciência de Dados) com tarefa possível e gabarito | **Corrigida neste ciclo** | turno real: o drivers do Vinícius falhou; reproduzido aqui: a NPS da fábrica só tinha a nota, sem atributos — tarefa impossível, critério inadequado. Agora a fábrica gera notas de atributo com pesos conhecidos (`regras_negocio.PESOS_NPS`), o gabarito guarda a ordem verdadeira, a demanda só nasce com atributo e o critério `primeiro_driver` reprova ranking errado | `teste_demandas.py::teste_drivers_*` |
 | Código de protocolo/matrícula tratado como driver | **Corrigida neste ciclo** | `ciencia.IGNORAR_TERMOS` | `teste_codigo_de_protocolo_nao_e_driver` |
-| Treino nível 1–5 com sujeira real | Comprovada | `treino_casos.py`, `laboratorio.py`; achou defeito real da limpeza (cabeçalho repetido) | desafio aberto: valor "1.234,56*" |
+| Treino nível 1–5 com sujeira real | Comprovada | `treino_casos.py`, `laboratorio.py`; achou defeito real da limpeza (cabeçalho repetido) | — |
+| Laboratório nível 5 nas áreas com dinheiro | **Corrigida neste ciclo** | medição (8 casos por área): antes RH 0/8, Financeiro 0/8, Varejo 0/8, Logística 8/8 → depois 8/8 nas quatro. Causas: valor com nota de rodapé "1.234,56*" não virava número (`limpeza._RE_NOTA_RODAPE`); e o caso de RH plantava "estorno" em salário, criando um 3º perfil que o gabarito não previa (estorno agora só em lançamento e venda) | `teste_limpeza.py::teste_nota_de_rodape_colada_no_numero` |
 
 ## 2. PostgreSQL e persistência
 
@@ -92,6 +93,5 @@ Não foi feito de uma vez de propósito: trocar a fonte de verdade num patch só
 1. Conferir no boletim real a cobertura de tabelas e tratar cada "sem causa registrada".
 2. Medir demandas por nível e taxa de acerto por nível (prova de que o nível difícil é mais difícil).
 3. Persistência imediata no PostgreSQL por demanda concluída + reconciliação (passo 2 acima).
-4. Desafio "1.234,56*" na limpeza.
 5. IA local: medir o notebook do dono (precisa dele).
 6. Backend contínuo para tempo quase real (precisa da decisão de custo do dono).
