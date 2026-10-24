@@ -1,11 +1,11 @@
 {
  "versao": 1,
- "gerado_em": "2026-10-24T14:54:34",
+ "gerado_em": "2026-10-24T14:59:40",
  "turno": {
   "estado": "trabalhando",
   "inicio": "2026-10-24T14:30:24",
   "fim_previsto": "2026-10-24T15:10:24",
-  "voltas": 76,
+  "voltas": 95,
   "planilhas": 1
  },
  "funcionarios": 101,
@@ -18,8 +18,8 @@
    "concluidas": 33,
    "parciais": 0,
    "falhas": 1,
-   "treino": 348,
-   "acertos": 315
+   "treino": 351,
+   "acertos": 317
   },
   {
    "andar": 2,
@@ -29,8 +29,8 @@
    "concluidas": 31,
    "parciais": 0,
    "falhas": 2,
-   "treino": 288,
-   "acertos": 268
+   "treino": 295,
+   "acertos": 271
   },
   {
    "andar": 3,
@@ -40,8 +40,8 @@
    "concluidas": 28,
    "parciais": 0,
    "falhas": 0,
-   "treino": 216,
-   "acertos": 176
+   "treino": 224,
+   "acertos": 184
   },
   {
    "andar": 4,
@@ -51,23 +51,71 @@
    "concluidas": 33,
    "parciais": 0,
    "falhas": 0,
-   "treino": 554,
-   "acertos": 504
+   "treino": 565,
+   "acertos": 513
   },
   {
    "andar": 5,
    "pessoas": 23,
    "trabalharam_hoje": 23,
-   "demandas": 45,
-   "concluidas": 45,
+   "demandas": 51,
+   "concluidas": 49,
    "parciais": 0,
-   "falhas": 0,
-   "treino": 406,
-   "acertos": 367
+   "falhas": 2,
+   "treino": 422,
+   "acertos": 378
   }
  ],
  "agora": [],
  "ultimos": [
+  {
+   "quando": "2026-10-24T14:56:15",
+   "funcionario": "Heloísa",
+   "cargo": "Head de AWS, Arquitetura e Governança de Nuvem",
+   "andar": 5,
+   "trabalho": "Medir a saúde do PostgreSQL — nível medio",
+   "estado": "concluida"
+  },
+  {
+   "quando": "2026-10-24T14:56:15",
+   "funcionario": "Ícaro",
+   "cargo": "Sênior de AWS, Linux e Ubuntu",
+   "andar": 5,
+   "trabalho": "SLA das rotinas — nível medio",
+   "estado": "falhou"
+  },
+  {
+   "quando": "2026-10-24T14:56:14",
+   "funcionario": "Nicolas",
+   "cargo": "Especialista em numpy",
+   "andar": 5,
+   "trabalho": "SLA das rotinas — nível medio",
+   "estado": "falhou"
+  },
+  {
+   "quando": "2026-10-24T14:56:13",
+   "funcionario": "Diego",
+   "cargo": "Desenvolvedor Python Pleno",
+   "andar": 5,
+   "trabalho": "Medir a saúde do PostgreSQL — nível medio",
+   "estado": "concluida"
+  },
+  {
+   "quando": "2026-10-24T14:56:13",
+   "funcionario": "Alexandre",
+   "cargo": "Diretor de Tecnologia (CTO)",
+   "andar": 5,
+   "trabalho": "Situação do andar agora — nível medio",
+   "estado": "concluida"
+  },
+  {
+   "quando": "2026-10-24T14:56:12",
+   "funcionario": "Letícia",
+   "cargo": "Desenvolvedora Júnior",
+   "andar": 5,
+   "trabalho": "Medir a saúde do PostgreSQL",
+   "estado": "concluida"
+  },
   {
    "quando": "2026-10-24T14:26:09",
    "funcionario": "Wagner",
@@ -99,54 +147,6 @@
    "andar": 5,
    "trabalho": "Situação do andar agora",
    "estado": "concluida"
-  },
-  {
-   "quando": "2026-10-24T14:26:09",
-   "funcionario": "Marina",
-   "cargo": "Arquiteta de Cloud (AWS)",
-   "andar": 5,
-   "trabalho": "SLA das rotinas — nível medio",
-   "estado": "concluida"
-  },
-  {
-   "quando": "2026-10-24T13:56:11",
-   "funcionario": "Ícaro",
-   "cargo": "Sênior de AWS, Linux e Ubuntu",
-   "andar": 5,
-   "trabalho": "Ronda de saúde do sistema — nível medio",
-   "estado": "concluida"
-  },
-  {
-   "quando": "2026-10-24T13:56:09",
-   "funcionario": "André",
-   "cargo": "Head de Infraestrutura e Segurança",
-   "andar": 5,
-   "trabalho": "Ronda de saúde do sistema",
-   "estado": "concluida"
-  },
-  {
-   "quando": "2026-10-24T13:56:09",
-   "funcionario": "Rodrigo",
-   "cargo": "Analista de Infraestrutura Pleno",
-   "andar": 5,
-   "trabalho": "SLA das rotinas",
-   "estado": "concluida"
-  },
-  {
-   "quando": "2026-10-24T13:56:09",
-   "funcionario": "Heloísa",
-   "cargo": "Head de AWS, Arquitetura e Governança de Nuvem",
-   "andar": 5,
-   "trabalho": "SLA das rotinas — nível medio",
-   "estado": "concluida"
-  },
-  {
-   "quando": "2026-10-24T13:56:07",
-   "funcionario": "Gabriel",
-   "cargo": "Especialista em Tabelas Dinâmicas e Dashboards",
-   "andar": 3,
-   "trabalho": "Perfil e indicadores da base sintética",
-   "estado": "concluida"
   }
  ],
  "sql": {
@@ -172,9 +172,9 @@
   },
   {
    "rotina": "demandas",
-   "execucoes_24h": 16,
+   "execucoes_24h": 17,
    "erros_24h": 0,
-   "ultima": "2026-10-24T14:26:09"
+   "ultima": "2026-10-24T14:56:15"
   },
   {
    "rotina": "dialogo",
@@ -202,9 +202,9 @@
   },
   {
    "rotina": "laboratorio",
-   "execucoes_24h": 38,
+   "execucoes_24h": 39,
    "erros_24h": 0,
-   "ultima": "2026-10-24T14:45:50"
+   "ultima": "2026-10-24T14:55:55"
   },
   {
    "rotina": "licoes",
@@ -226,9 +226,9 @@
   },
   {
    "rotina": "registro",
-   "execucoes_24h": 221,
+   "execucoes_24h": 227,
    "erros_24h": 0,
-   "ultima": "2026-10-24T14:51:34"
+   "ultima": "2026-10-24T14:59:25"
   },
   {
    "rotina": "rh_desempenho",
@@ -244,16 +244,16 @@
   },
   {
    "rotina": "treino",
-   "execucoes_24h": 153,
+   "execucoes_24h": 156,
    "erros_24h": 0,
-   "ultima": "2026-10-24T14:51:19"
+   "ultima": "2026-10-24T14:59:10"
   }
  ],
  "totais": {
-  "demandas": 209,
-  "tentativas_treino": 5763,
-  "conversas": 2472,
-  "trabalhos_com_prova": 1133
+  "demandas": 215,
+  "tentativas_treino": 5808,
+  "conversas": 2506,
+  "trabalhos_com_prova": 1155
  },
  "pessoas": [
   {
@@ -452,7 +452,7 @@
    "ultimo": "",
    "quando": "",
    "estado": "",
-   "situacao": "estagiário: observa (regra do dono) — Observei Caetano (Especialista em Orquestração de Dados (Apache Airflow)) fazendo \"SLA das rotinas\" no nível basico: ter"
+   "situacao": "estagiário: observa (regra do dono) — Observei Letícia (Desenvolvedora Júnior) fazendo \"Medir a saúde do PostgreSQL\" no nível basico: terminou concluida."
   },
   {
    "nome": "Tina",
@@ -661,7 +661,7 @@
    "ultimo": "",
    "quando": "",
    "estado": "",
-   "situacao": "estagiário: observa (regra do dono) — Observei Caetano (Especialista em Orquestração de Dados (Apache Airflow)) fazendo \"SLA das rotinas\" no nível basico: ter"
+   "situacao": "estagiário: observa (regra do dono) — Observei Letícia (Desenvolvedora Júnior) fazendo \"Medir a saúde do PostgreSQL\" no nível basico: terminou concluida."
   },
   {
    "nome": "Felipe",
@@ -892,7 +892,7 @@
    "ultimo": "",
    "quando": "",
    "estado": "",
-   "situacao": "estagiário: observa (regra do dono) — Observei Wagner (Especialista Sênior em Segurança da Informação) fazendo \"Ronda de saúde do sistema\" no nível basico: te"
+   "situacao": "estagiário: observa (regra do dono)"
   },
   {
    "nome": "Lorena",
@@ -1119,9 +1119,9 @@
    "andar": 5,
    "cargo": "Diretor de Tecnologia (CTO)",
    "area": "Engenharia de Dados",
-   "demandas_hoje": 2,
-   "ultimo": "Ronda de saúde do sistema",
-   "quando": "2026-10-24T11:55:42",
+   "demandas_hoje": 3,
+   "ultimo": "Situação do andar agora — nível medio",
+   "quando": "2026-10-24T14:56:13",
    "estado": "concluida",
    "situacao": "trabalho do papel"
   },
@@ -1167,16 +1167,16 @@
    "ultimo": "",
    "quando": "",
    "estado": "",
-   "situacao": "estagiário: observa (regra do dono) — Observei Caetano (Especialista em Orquestração de Dados (Apache Airflow)) fazendo \"SLA das rotinas\" no nível basico: ter"
+   "situacao": "estagiário: observa (regra do dono) — Observei Letícia (Desenvolvedora Júnior) fazendo \"Medir a saúde do PostgreSQL\" no nível basico: terminou concluida."
   },
   {
    "nome": "Diego",
    "andar": 5,
    "cargo": "Desenvolvedor Python Pleno",
    "area": "Engenharia de Dados",
-   "demandas_hoje": 2,
-   "ultimo": "SLA das rotinas",
-   "quando": "2026-10-24T11:55:42",
+   "demandas_hoje": 3,
+   "ultimo": "Medir a saúde do PostgreSQL — nível medio",
+   "quando": "2026-10-24T14:56:12",
    "estado": "concluida",
    "situacao": "trabalho do papel"
   },
@@ -1211,7 +1211,7 @@
    "ultimo": "",
    "quando": "",
    "estado": "",
-   "situacao": "estagiário: observa (regra do dono) — Observei Caetano (Especialista em Orquestração de Dados (Apache Airflow)) fazendo \"SLA das rotinas\" no nível basico: ter"
+   "situacao": "estagiário: observa (regra do dono) — Observei Letícia (Desenvolvedora Júnior) fazendo \"Medir a saúde do PostgreSQL\" no nível basico: terminou concluida."
   },
   {
    "nome": "Gustavo",
@@ -1229,9 +1229,9 @@
    "andar": 5,
    "cargo": "Head de AWS, Arquitetura e Governança de Nuvem",
    "area": "Engenharia de Dados",
-   "demandas_hoje": 3,
-   "ultimo": "SLA das rotinas — nível medio",
-   "quando": "2026-10-24T13:56:09",
+   "demandas_hoje": 4,
+   "ultimo": "Medir a saúde do PostgreSQL — nível medio",
+   "quando": "2026-10-24T14:56:14",
    "estado": "concluida",
    "situacao": "trabalho do papel"
   },
@@ -1251,9 +1251,9 @@
    "andar": 5,
    "cargo": "Desenvolvedora Júnior",
    "area": "Engenharia de Dados",
-   "demandas_hoje": 2,
-   "ultimo": "SLA das rotinas",
-   "quando": "2026-10-24T11:55:37",
+   "demandas_hoje": 3,
+   "ultimo": "Medir a saúde do PostgreSQL",
+   "quando": "2026-10-24T14:56:10",
    "estado": "concluida",
    "situacao": "trabalho do papel"
   },
@@ -1273,10 +1273,10 @@
    "andar": 5,
    "cargo": "Especialista em numpy",
    "area": "Estatística",
-   "demandas_hoje": 2,
-   "ultimo": "Ronda de saúde do sistema",
-   "quando": "2026-10-24T11:55:44",
-   "estado": "concluida",
+   "demandas_hoje": 3,
+   "ultimo": "SLA das rotinas — nível medio",
+   "quando": "2026-10-24T14:56:14",
+   "estado": "falhou",
    "situacao": "trabalho do papel"
   },
   {
@@ -1361,10 +1361,10 @@
    "andar": 5,
    "cargo": "Sênior de AWS, Linux e Ubuntu",
    "area": "Engenharia de Dados",
-   "demandas_hoje": 3,
-   "ultimo": "Ronda de saúde do sistema — nível medio",
-   "quando": "2026-10-24T13:56:10",
-   "estado": "concluida",
+   "demandas_hoje": 4,
+   "ultimo": "SLA das rotinas — nível medio",
+   "quando": "2026-10-24T14:56:15",
+   "estado": "falhou",
    "situacao": "trabalho do papel"
   }
  ]
