@@ -1,12 +1,12 @@
 # Empresa ao vivo
 
-**Boletim das 24/10 12:26** (horário de Brasília) · trabalhando
+**Boletim das 24/10 12:31** (horário de Brasília) · trabalhando
 
 > Atualiza a cada 5 minutos enquanto a empresa trabalha. Recarregue a página para ver o mais novo.
 
 ## Hoje
 
-- **179** demandas, **174** concluídas (97%), 0 parciais, 5 com falha
+- **184** demandas, **179** concluídas (97%), 0 parciais, 5 com falha
 - **101** de 101 funcionários já trabalharam
 - SQL: 4 exercícios, 4 conferidos com o gabarito
 - Fábrica: 16 planilhas, 16 conferidas sem erro
@@ -23,29 +23,29 @@
 | 2º | 16 de 16 | 33 | 31 | 0 | 2 |
 | 3º | 12 de 12 | 28 | 28 | 0 | 0 |
 | 4º | 31 de 31 | 33 | 33 | 0 | 0 |
-| 5º | 23 de 23 | 51 | 49 | 0 | 2 |
+| 5º | 23 de 23 | 56 | 54 | 0 | 2 |
 
 ## Últimas entregas
 
 | Hora | Quem | Trabalho | Resultado |
 |---|---|---|---|
+| 12:27 | Marina (5º) | Medir a saúde do PostgreSQL — nível medio | ✅ concluída |
+| 12:27 | Pietro (5º) | Ronda de saúde do sistema — nível medio | ✅ concluída |
+| 12:27 | Silas (5º) | SLA das rotinas — nível medio | ✅ concluída |
+| 12:27 | Sofia (5º) | Calcular a média de uma métrica da base sintética — nível medio | ✅ concluída |
+| 12:26 | Olívia (5º) | SLA das rotinas — nível medio | ✅ concluída |
 | 11:56 | Heloísa (5º) | Medir a saúde do PostgreSQL — nível medio | ✅ concluída |
 | 11:56 | Ícaro (5º) | SLA das rotinas — nível medio | 🔴 falhou |
 | 11:56 | Nicolas (5º) | SLA das rotinas — nível medio | 🔴 falhou |
 | 11:56 | Diego (5º) | Medir a saúde do PostgreSQL — nível medio | ✅ concluída |
 | 11:56 | Alexandre (5º) | Situação do andar agora — nível medio | ✅ concluída |
-| 11:56 | Letícia (5º) | Medir a saúde do PostgreSQL | ✅ concluída |
-| 11:26 | Wagner (5º) | Ronda de saúde do sistema | ✅ concluída |
-| 11:26 | Caetano (5º) | SLA das rotinas | ✅ concluída |
-| 11:26 | Bianca (5º) | SLA das rotinas | ✅ concluída |
-| 11:26 | Fernanda (5º) | Situação do andar agora | ✅ concluída |
 
 ## Dificuldade (todo o histórico)
 
 | Nível | Demandas | Concluídas | Parciais | Falhas | Acerto |
 |---|--:|--:|--:|--:|--:|
 | basico | 163 | 145 | 0 | 18 | 89% |
-| medio | 9 | 7 | 0 | 2 | 78% |
+| medio | 14 | 12 | 0 | 2 | 86% |
 
 ## Cada funcionário
 
@@ -72,7 +72,7 @@
 | Rafael | Engenheiro de Dados Pleno | trabalho do papel | Conferir no PostgreSQL os lotes da fábrica (✅ concluída) | 2 |
 | Rita | Recepção | trabalho do papel | Conferir no PostgreSQL os lotes da fábrica (✅ concluída) | 2 |
 | Saulo | Supervisor de Planilhas | trabalho do papel | Diagnosticar a planilha original da fábrica (✅ concluída) | 2 |
-| Théo | Estagiário de Engenharia de Dados | estagiário: observa (regra do dono) — Observei Letícia (Desenvolvedora Júnior) fazendo "Me |   | 0 |
+| Théo | Estagiário de Engenharia de Dados | estagiário: observa (regra do dono) — Observei Olívia (Especialista em openpyxl (Excel)) f |   | 0 |
 | Tina | Contatos e NPS | trabalho do papel | Diagnosticar a planilha original da fábrica (✅ concluída) | 2 |
 
 ### 2º andar
@@ -101,7 +101,7 @@
 | Quem | Cargo | Situação | Último trabalho | Hoje |
 |---|---|---|---|--:|
 | Bárbara | Especialista Sênior em Power BI | trabalho do papel | Calcular a média de uma métrica da base sintética (✅ concluída) | 3 |
-| Enzo | Estagiário da Sala Excel | estagiário: observa (regra do dono) — Observei Letícia (Desenvolvedora Júnior) fazendo "Me |   | 0 |
+| Enzo | Estagiário da Sala Excel | estagiário: observa (regra do dono) — Observei Olívia (Especialista em openpyxl (Excel)) f |   | 0 |
 | Felipe | Head de BI e Excel | trabalho do papel | Calcular a média de uma métrica da base sintética (✅ concluída) | 2 |
 | Gabriel | Especialista em Tabelas Dinâmicas e Dash | trabalho do papel | Perfil e indicadores da base sintética (✅ concluída) | 3 |
 | Heitor | Analista Pleno de BI | trabalho do papel | Exercício de SQL no PostgreSQL com os dados da fábrica (✅ concluída) | 2 |
@@ -157,22 +157,22 @@
 | André | Head de Infraestrutura e Segurança | trabalho do papel | Ronda de saúde do sistema (✅ concluída) | 2 |
 | Bianca | Engenheira de Dados Pleno | trabalho do papel | SLA das rotinas (✅ concluída) | 2 |
 | Caetano | Especialista em Orquestração de Dados (A | trabalho do papel | SLA das rotinas (✅ concluída) | 2 |
-| Caíque | Estagiário de DevOps | estagiário: observa (regra do dono) — Observei Letícia (Desenvolvedora Júnior) fazendo "Me |   | 0 |
+| Caíque | Estagiário de DevOps | estagiário: observa (regra do dono) — Observei Olívia (Especialista em openpyxl (Excel)) f |   | 0 |
 | Diego | Desenvolvedor Python Pleno | trabalho do papel | Medir a saúde do PostgreSQL — nível medio (✅ concluída) | 3 |
 | Elisa | Especialista em PyYAML (configuração) | trabalho do papel | Ronda de saúde do sistema (✅ concluída) | 2 |
 | Fernanda | Coordenadora de DevOps e Confiabilidade  | trabalho do papel | Situação do andar agora (✅ concluída) | 2 |
-| Gael | Estagiário de Engenharia de Dados (Airfl | estagiário: observa (regra do dono) — Observei Letícia (Desenvolvedora Júnior) fazendo "Me |   | 0 |
+| Gael | Estagiário de Engenharia de Dados (Airfl | estagiário: observa (regra do dono) — Observei Olívia (Especialista em openpyxl (Excel)) f |   | 0 |
 | Gustavo | Gerente de TI e Infraestrutura | trabalho do papel | Situação do andar agora (✅ concluída) | 2 |
 | Heloísa | Head de AWS, Arquitetura e Governança de | trabalho do papel | Medir a saúde do PostgreSQL — nível medio (✅ concluída) | 4 |
 | Henrique | Head de Engenharia Python | trabalho do papel | Estratégia Python (✅ concluída) | 2 |
 | Letícia | Desenvolvedora Júnior | trabalho do papel | Medir a saúde do PostgreSQL (✅ concluída) | 3 |
-| Marina | Arquiteta de Cloud (AWS) | trabalho do papel | SLA das rotinas — nível medio (✅ concluída) | 3 |
+| Marina | Arquiteta de Cloud (AWS) | trabalho do papel | Medir a saúde do PostgreSQL — nível medio (✅ concluída) | 4 |
 | Nicolas | Especialista em numpy | trabalho do papel | SLA das rotinas — nível medio (🔴 falhou) | 3 |
-| Olívia | Especialista em openpyxl (Excel) | trabalho do papel | Ronda de saúde do sistema (✅ concluída) | 2 |
-| Pietro | Especialista em psycopg (PostgreSQL) | trabalho do papel | Conferir no PostgreSQL os lotes da fábrica (✅ concluída) | 2 |
+| Olívia | Especialista em openpyxl (Excel) | trabalho do papel | SLA das rotinas — nível medio (✅ concluída) | 3 |
+| Pietro | Especialista em psycopg (PostgreSQL) | trabalho do papel | Ronda de saúde do sistema — nível medio (✅ concluída) | 3 |
 | Rodrigo | Analista de Infraestrutura Pleno | trabalho do papel | SLA das rotinas (✅ concluída) | 2 |
-| Silas | Especialista em sqlite3 (memória da empr | trabalho do papel | Ronda de saúde do sistema (✅ concluída) | 2 |
-| Sofia | Especialista em pandas | trabalho do papel | Ronda de saúde do sistema (✅ concluída) | 2 |
+| Silas | Especialista em sqlite3 (memória da empr | trabalho do papel | SLA das rotinas — nível medio (✅ concluída) | 3 |
+| Sofia | Especialista em pandas | trabalho do papel | Calcular a média de uma métrica da base sintética — nível me (✅ concluída) | 3 |
 | Wagner | Especialista Sênior em Segurança da Info | trabalho do papel | Ronda de saúde do sistema (✅ concluída) | 2 |
 | Xavier | Especialista em xlrd (.xls antigo) | trabalho do papel | Ronda de saúde do sistema (✅ concluída) | 2 |
 | Ícaro | Sênior de AWS, Linux e Ubuntu | trabalho do papel | SLA das rotinas — nível medio (🔴 falhou) | 4 |

@@ -1,11 +1,11 @@
 {
  "versao": 1,
- "gerado_em": "2026-10-24T15:26:15",
+ "gerado_em": "2026-10-24T15:31:18",
  "turno": {
   "estado": "trabalhando",
   "inicio": "2026-10-24T15:13:13",
   "fim_previsto": "2026-10-24T15:53:13",
-  "voltas": 39,
+  "voltas": 56,
   "planilhas": 1
  },
  "funcionarios": 101,
@@ -18,8 +18,8 @@
    "concluidas": 33,
    "parciais": 0,
    "falhas": 1,
-   "treino": 383,
-   "acertos": 341
+   "treino": 387,
+   "acertos": 345
   },
   {
    "andar": 2,
@@ -29,8 +29,8 @@
    "concluidas": 31,
    "parciais": 0,
    "falhas": 2,
-   "treino": 318,
-   "acertos": 291
+   "treino": 322,
+   "acertos": 295
   },
   {
    "andar": 3,
@@ -40,8 +40,8 @@
    "concluidas": 28,
    "parciais": 0,
    "falhas": 0,
-   "treino": 236,
-   "acertos": 194
+   "treino": 242,
+   "acertos": 200
   },
   {
    "andar": 4,
@@ -51,23 +51,63 @@
    "concluidas": 33,
    "parciais": 0,
    "falhas": 0,
-   "treino": 608,
-   "acertos": 550
+   "treino": 620,
+   "acertos": 562
   },
   {
    "andar": 5,
    "pessoas": 23,
    "trabalharam_hoje": 23,
-   "demandas": 51,
-   "concluidas": 49,
+   "demandas": 56,
+   "concluidas": 54,
    "parciais": 0,
    "falhas": 2,
-   "treino": 446,
-   "acertos": 401
+   "treino": 465,
+   "acertos": 420
   }
  ],
  "agora": [],
  "ultimos": [
+  {
+   "quando": "2026-10-24T15:27:04",
+   "funcionario": "Marina",
+   "cargo": "Arquiteta de Cloud (AWS)",
+   "andar": 5,
+   "trabalho": "Medir a saúde do PostgreSQL — nível medio",
+   "estado": "concluida"
+  },
+  {
+   "quando": "2026-10-24T15:27:02",
+   "funcionario": "Pietro",
+   "cargo": "Especialista em psycopg (PostgreSQL)",
+   "andar": 5,
+   "trabalho": "Ronda de saúde do sistema — nível medio",
+   "estado": "concluida"
+  },
+  {
+   "quando": "2026-10-24T15:27:02",
+   "funcionario": "Silas",
+   "cargo": "Especialista em sqlite3 (memória da empresa)",
+   "andar": 5,
+   "trabalho": "SLA das rotinas — nível medio",
+   "estado": "concluida"
+  },
+  {
+   "quando": "2026-10-24T15:27:00",
+   "funcionario": "Sofia",
+   "cargo": "Especialista em pandas",
+   "andar": 5,
+   "trabalho": "Calcular a média de uma métrica da base sintética — nível medio",
+   "estado": "concluida"
+  },
+  {
+   "quando": "2026-10-24T15:26:52",
+   "funcionario": "Olívia",
+   "cargo": "Especialista em openpyxl (Excel)",
+   "andar": 5,
+   "trabalho": "SLA das rotinas — nível medio",
+   "estado": "concluida"
+  },
   {
    "quando": "2026-10-24T14:56:15",
    "funcionario": "Heloísa",
@@ -107,46 +147,6 @@
    "andar": 5,
    "trabalho": "Situação do andar agora — nível medio",
    "estado": "concluida"
-  },
-  {
-   "quando": "2026-10-24T14:56:12",
-   "funcionario": "Letícia",
-   "cargo": "Desenvolvedora Júnior",
-   "andar": 5,
-   "trabalho": "Medir a saúde do PostgreSQL",
-   "estado": "concluida"
-  },
-  {
-   "quando": "2026-10-24T14:26:09",
-   "funcionario": "Wagner",
-   "cargo": "Especialista Sênior em Segurança da Informação",
-   "andar": 5,
-   "trabalho": "Ronda de saúde do sistema",
-   "estado": "concluida"
-  },
-  {
-   "quando": "2026-10-24T14:26:09",
-   "funcionario": "Caetano",
-   "cargo": "Especialista em Orquestração de Dados (Apache Airflow)",
-   "andar": 5,
-   "trabalho": "SLA das rotinas",
-   "estado": "concluida"
-  },
-  {
-   "quando": "2026-10-24T14:26:09",
-   "funcionario": "Bianca",
-   "cargo": "Engenheira de Dados Pleno",
-   "andar": 5,
-   "trabalho": "SLA das rotinas",
-   "estado": "concluida"
-  },
-  {
-   "quando": "2026-10-24T14:26:09",
-   "funcionario": "Fernanda",
-   "cargo": "Coordenadora de DevOps e Confiabilidade (SRE)",
-   "andar": 5,
-   "trabalho": "Situação do andar agora",
-   "estado": "concluida"
   }
  ],
  "sql": {
@@ -172,9 +172,9 @@
   },
   {
    "rotina": "demandas",
-   "execucoes_24h": 17,
+   "execucoes_24h": 18,
    "erros_24h": 0,
-   "ultima": "2026-10-24T14:56:15"
+   "ultima": "2026-10-24T15:27:04"
   },
   {
    "rotina": "dialogo",
@@ -202,9 +202,9 @@
   },
   {
    "rotina": "laboratorio",
-   "execucoes_24h": 41,
+   "execucoes_24h": 42,
    "erros_24h": 0,
-   "ultima": "2026-10-24T15:17:08"
+   "ultima": "2026-10-24T15:27:23"
   },
   {
    "rotina": "licoes",
@@ -226,9 +226,9 @@
   },
   {
    "rotina": "registro",
-   "execucoes_24h": 241,
+   "execucoes_24h": 246,
    "erros_24h": 0,
-   "ultima": "2026-10-24T15:22:12"
+   "ultima": "2026-10-24T15:31:18"
   },
   {
    "rotina": "rh_desempenho",
@@ -244,16 +244,16 @@
   },
   {
    "rotina": "treino",
-   "execucoes_24h": 165,
+   "execucoes_24h": 168,
    "erros_24h": 0,
-   "ultima": "2026-10-24T15:21:57"
+   "ultima": "2026-10-24T15:31:03"
   }
  ],
  "totais": {
-  "demandas": 215,
-  "tentativas_treino": 5942,
-  "conversas": 2585,
-  "trabalhos_com_prova": 1209
+  "demandas": 220,
+  "tentativas_treino": 5987,
+  "conversas": 2597,
+  "trabalhos_com_prova": 1229
  },
  "banco": {
   "levantamento": "2026-10-24T15:23:48",
@@ -692,7 +692,7 @@
    "ultimo": "",
    "quando": "",
    "estado": "",
-   "situacao": "estagiário: observa (regra do dono) — Observei Letícia (Desenvolvedora Júnior) fazendo \"Medir a saúde do PostgreSQL\" no nível basico: terminou concluida."
+   "situacao": "estagiário: observa (regra do dono) — Observei Olívia (Especialista em openpyxl (Excel)) fazendo \"SLA das rotinas\" no nível medio: terminou concluida."
   },
   {
    "nome": "Tina",
@@ -901,7 +901,7 @@
    "ultimo": "",
    "quando": "",
    "estado": "",
-   "situacao": "estagiário: observa (regra do dono) — Observei Letícia (Desenvolvedora Júnior) fazendo \"Medir a saúde do PostgreSQL\" no nível basico: terminou concluida."
+   "situacao": "estagiário: observa (regra do dono) — Observei Olívia (Especialista em openpyxl (Excel)) fazendo \"SLA das rotinas\" no nível medio: terminou concluida."
   },
   {
    "nome": "Felipe",
@@ -1407,7 +1407,7 @@
    "ultimo": "",
    "quando": "",
    "estado": "",
-   "situacao": "estagiário: observa (regra do dono) — Observei Letícia (Desenvolvedora Júnior) fazendo \"Medir a saúde do PostgreSQL\" no nível basico: terminou concluida."
+   "situacao": "estagiário: observa (regra do dono) — Observei Olívia (Especialista em openpyxl (Excel)) fazendo \"SLA das rotinas\" no nível medio: terminou concluida."
   },
   {
    "nome": "Diego",
@@ -1451,7 +1451,7 @@
    "ultimo": "",
    "quando": "",
    "estado": "",
-   "situacao": "estagiário: observa (regra do dono) — Observei Letícia (Desenvolvedora Júnior) fazendo \"Medir a saúde do PostgreSQL\" no nível basico: terminou concluida."
+   "situacao": "estagiário: observa (regra do dono) — Observei Olívia (Especialista em openpyxl (Excel)) fazendo \"SLA das rotinas\" no nível medio: terminou concluida."
   },
   {
    "nome": "Gustavo",
@@ -1502,9 +1502,9 @@
    "andar": 5,
    "cargo": "Arquiteta de Cloud (AWS)",
    "area": "Engenharia de Dados",
-   "demandas_hoje": 3,
-   "ultimo": "SLA das rotinas — nível medio",
-   "quando": "2026-10-24T14:26:09",
+   "demandas_hoje": 4,
+   "ultimo": "Medir a saúde do PostgreSQL — nível medio",
+   "quando": "2026-10-24T15:27:02",
    "estado": "concluida",
    "situacao": "trabalho do papel"
   },
@@ -1524,9 +1524,9 @@
    "andar": 5,
    "cargo": "Especialista em openpyxl (Excel)",
    "area": "Engenharia de Dados",
-   "demandas_hoje": 2,
-   "ultimo": "Ronda de saúde do sistema",
-   "quando": "2026-10-24T12:25:51",
+   "demandas_hoje": 3,
+   "ultimo": "SLA das rotinas — nível medio",
+   "quando": "2026-10-24T15:26:52",
    "estado": "concluida",
    "situacao": "trabalho do papel"
   },
@@ -1535,9 +1535,9 @@
    "andar": 5,
    "cargo": "Especialista em psycopg (PostgreSQL)",
    "area": "Engenharia de Dados",
-   "demandas_hoje": 2,
-   "ultimo": "Conferir no PostgreSQL os lotes da fábrica",
-   "quando": "2026-10-24T12:26:26",
+   "demandas_hoje": 3,
+   "ultimo": "Ronda de saúde do sistema — nível medio",
+   "quando": "2026-10-24T15:27:00",
    "estado": "concluida",
    "situacao": "trabalho do papel"
   },
@@ -1557,9 +1557,9 @@
    "andar": 5,
    "cargo": "Especialista em sqlite3 (memória da empresa)",
    "area": "Engenharia de Dados",
-   "demandas_hoje": 2,
-   "ultimo": "Ronda de saúde do sistema",
-   "quando": "2026-10-24T12:26:45",
+   "demandas_hoje": 3,
+   "ultimo": "SLA das rotinas — nível medio",
+   "quando": "2026-10-24T15:27:02",
    "estado": "concluida",
    "situacao": "trabalho do papel"
   },
@@ -1568,9 +1568,9 @@
    "andar": 5,
    "cargo": "Especialista em pandas",
    "area": "Engenharia de Dados",
-   "demandas_hoje": 2,
-   "ultimo": "Ronda de saúde do sistema",
-   "quando": "2026-10-24T12:26:14",
+   "demandas_hoje": 3,
+   "ultimo": "Calcular a média de uma métrica da base sintética — nível medio",
+   "quando": "2026-10-24T15:26:53",
    "estado": "concluida",
    "situacao": "trabalho do papel"
   },
@@ -1618,8 +1618,8 @@
   },
   {
    "nivel": "medio",
-   "demandas": 9,
-   "concluidas": 7,
+   "demandas": 14,
+   "concluidas": 12,
    "parciais": 0,
    "falhas": 2
   }
