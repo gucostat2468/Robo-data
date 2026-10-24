@@ -35,6 +35,7 @@ import hashlib
 import json
 import logging
 import shutil
+import sqlite3
 import threading
 import time
 import zipfile
@@ -212,8 +213,11 @@ def certificar(cfg, designer: str, comp: str) -> dict:
         raise PermissionError(f"{designer} não é o designer de {comp}")
     resultados = []
     for nivel in NIVEIS:
-        caso = criar_caso(cfg, comp, nivel, semente=900_000 + 101 * nivel + int(time.time()) % 997, exame=True)
-        resultados.append((nivel, caso["estado"], (caso.get("revisao") or {}).get("problemas") or []))
+        try:
+            caso = criar_caso(cfg, comp, nivel, semente=900_000 + 101 * nivel + int(time.time()) % 997, exame=True)
+            resultados.append((nivel, caso["estado"], (caso.get("revisao") or {}).get("problemas") or []))
+        except ErroGeracaoCaso as e:  # o exame reprova com a causa (antes a exceção derrubava a rotina inteira)
+            resultados.append((nivel, "falha_geracao", [str(e)]))
     ok = all(e == "validado" for _, e, _ in resultados)
     detalhe = "; ".join(f"nível {n}: {'ok' if e == 'validado' else 'reprovado — ' + '; '.join(p)[:200]}" for n, e, p in resultados)
     with _tb(cfg).tx() as conn:
@@ -227,26 +231,68 @@ def certificar(cfg, designer: str, comp: str) -> dict:
     return {"ok": ok, "detalhe": detalhe}
 
 
+class ErroGeracaoCaso(RuntimeError):
+    """O gerador falhou: o caso fica registrado como 'falha_geracao' com a causa (nunca vira caso validado)."""
+
+
+def _reservar(cfg, comp: str, nivel: int, semente: int, c) -> tuple[str, Path]:
+    """Reserva um id livre no banco ANTES de gerar: a chave primária é o árbitro entre execuções concorrentes.
+    O id é o de sempre (CASO-comp-nN-semente); se já está em uso, ganha um sufixo -rK — a semente continua a mesma e
+    guardada, e reproduz o caso igual. Pasta que já existe pertence a outra execução: nunca é apagada aqui."""
+    base = f"CASO-{comp}-n{nivel}-{semente}"
+    casos = pasta(cfg) / "casos"
+    casos.mkdir(parents=True, exist_ok=True)
+    for k in range(100):
+        cid = base if k == 0 else f"{base}-r{k}"
+        destino = casos / cid
+        if destino.exists():
+            continue
+        try:
+            with _tb(cfg).tx() as conn:
+                conn.execute("INSERT INTO treino_casos (id, criado_em, competencia, nivel, semente, versao_gerador, designer, "
+                             "estado, versao_codigo) VALUES (?,?,?,?,?,?,?,?,?)",
+                             (cid, _agora(), comp, nivel, semente, c.versao, c.designer, "gerando", versao_codigo()))
+        except sqlite3.IntegrityError:
+            continue  # outro processo levou este id
+        try:
+            destino.mkdir(parents=False, exist_ok=False)
+        except FileExistsError:  # pasta apareceu entre a checagem e a reserva: a reserva fica registrada como falha
+            _falhou(cfg, cid, "a pasta do caso já existia (outra execução): nada foi apagado")
+            continue
+        return cid, destino
+    raise ErroGeracaoCaso(f"nenhum id livre para {base} depois de 100 tentativas")
+
+
+def _falhou(cfg, cid: str, causa: str) -> None:
+    with _tb(cfg).tx() as conn:
+        conn.execute("UPDATE treino_casos SET estado=?, revisao=?, revisado_em=? WHERE id=?",
+                     ("falha_geracao", json.dumps({"ok": False, "problemas": [causa]}, ensure_ascii=False), _agora(), cid))
+
+
 def criar_caso(cfg, comp: str, nivel: int, semente: int | None = None, exame: bool = False) -> dict:
-    """Designer gera → revisora confere. Devolve o caso com estado 'validado' ou 'reprovado' (e o motivo)."""
+    """Designer gera → revisora confere. Devolve o caso com estado 'validado' ou 'reprovado' (e o motivo).
+    Falha do gerador: o caso fica 'falha_geracao' com a causa e a exceção sobe (ErroGeracaoCaso)."""
     from robo import memoria
     c = CATALOGO[comp]
     semente = int(semente if semente is not None else time.time_ns() % 1_000_000_007)
-    cid = f"CASO-{comp}-n{nivel}-{semente}"
-    destino = pasta(cfg) / "casos" / cid
-    if destino.exists():
-        shutil.rmtree(destino, ignore_errors=True)
-    destino.mkdir(parents=True)
-    caso = c.gerar(nivel, semente, destino, cfg)
+    cid, destino = _reservar(cfg, comp, nivel, semente, c)
+    try:
+        caso = c.gerar(nivel, semente, destino, cfg)
+    except Exception as e:
+        causa = f"falha na geração: {type(e).__name__}: {str(e)[:300]}"
+        _falhou(cfg, cid, causa)
+        _guardar(cfg, cid, destino, motivo="falha_geracao")  # o que chegou a ser gerado fica como evidência
+        memoria.handover(cfg, f"Sala de Casos: o gerador de {c.nome} falhou ({causa[:200]})", f"treino_{comp}",
+                         SALA["revisor"], cid, responsavel=c.designer)
+        raise ErroGeracaoCaso(f"{cid}: {causa}") from e
     caso.update({"id": cid, "competencia": comp, "nivel": nivel, "semente": semente})
     sha = conteudo_hash(caso.get("arquivo"), caso["gabarito"])
     with _tb(cfg).tx() as conn:
-        conn.execute("INSERT INTO treino_casos (id, criado_em, competencia, nivel, semente, versao_gerador, designer, resumo, "
-                     "parametros, gabarito, arquivo, conteudo_sha256, estado, versao_codigo) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?)",
-                     (cid, _agora(), comp, nivel, semente, c.versao, c.designer, caso.get("resumo", ""),
-                      json.dumps(caso["parametros"], ensure_ascii=False, default=str),
+        conn.execute("UPDATE treino_casos SET resumo=?, parametros=?, gabarito=?, arquivo=?, conteudo_sha256=?, estado=? "
+                     "WHERE id=?",
+                     (caso.get("resumo", ""), json.dumps(caso["parametros"], ensure_ascii=False, default=str),
                       json.dumps(caso["gabarito"], ensure_ascii=False, default=str), caso.get("arquivo"), sha, "proposto",
-                      versao_codigo()))
+                      cid))
     revisao = revisar(cfg, caso, sha)
     caso.update({"estado": "validado" if revisao["ok"] else "reprovado", "revisao": revisao})
     if not exame:
