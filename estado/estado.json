@@ -1,11 +1,11 @@
 {
  "versao": 1,
- "gerado_em": "2026-10-24T13:22:25",
+ "gerado_em": "2026-10-24T13:30:00",
  "turno": {
   "estado": "trabalhando",
   "inicio": "2026-10-24T13:05:00",
   "fim_previsto": "2026-10-24T13:45:00",
-  "voltas": 57,
+  "voltas": 71,
   "planilhas": 1
  },
  "funcionarios": 101,
@@ -14,21 +14,21 @@
    "andar": 1,
    "pessoas": 19,
    "trabalharam_hoje": 19,
-   "demandas": 28,
-   "concluidas": 27,
+   "demandas": 34,
+   "concluidas": 33,
    "parciais": 0,
    "falhas": 1,
-   "treino": 250,
-   "acertos": 226
+   "treino": 255,
+   "acertos": 227
   },
   {
    "andar": 2,
    "pessoas": 16,
    "trabalharam_hoje": 16,
-   "demandas": 26,
-   "concluidas": 25,
+   "demandas": 32,
+   "concluidas": 30,
    "parciais": 0,
-   "falhas": 1,
+   "falhas": 2,
    "treino": 208,
    "acertos": 188
   },
@@ -36,23 +36,23 @@
    "andar": 3,
    "pessoas": 12,
    "trabalharam_hoje": 12,
-   "demandas": 21,
-   "concluidas": 21,
+   "demandas": 27,
+   "concluidas": 27,
    "parciais": 0,
    "falhas": 0,
-   "treino": 156,
-   "acertos": 122
+   "treino": 158,
+   "acertos": 124
   },
   {
    "andar": 4,
    "pessoas": 31,
    "trabalharam_hoje": 31,
-   "demandas": 31,
-   "concluidas": 31,
+   "demandas": 33,
+   "concluidas": 33,
    "parciais": 0,
    "falhas": 0,
-   "treino": 400,
-   "acertos": 355
+   "treino": 408,
+   "acertos": 363
   },
   {
    "andar": 5,
@@ -62,90 +62,90 @@
    "concluidas": 34,
    "parciais": 0,
    "falhas": 0,
-   "treino": 291,
-   "acertos": 258
+   "treino": 306,
+   "acertos": 268
   }
  ],
  "agora": [],
  "ultimos": [
   {
-   "quando": "2026-10-24T12:56:03",
-   "funcionario": "Marina",
-   "cargo": "Arquiteta de Cloud (AWS)",
-   "andar": 5,
-   "trabalho": "Ronda de saúde do sistema",
+   "quando": "2026-10-24T13:27:37",
+   "funcionario": "Bárbara",
+   "cargo": "Especialista Sênior em Power BI",
+   "andar": 3,
+   "trabalho": "Calcular a média de uma métrica da base sintética",
    "estado": "concluida"
   },
   {
-   "quando": "2026-10-24T12:56:01",
-   "funcionario": "Ícaro",
-   "cargo": "Sênior de AWS, Linux e Ubuntu",
-   "andar": 5,
-   "trabalho": "Medir a saúde do PostgreSQL",
-   "estado": "concluida"
-  },
-  {
-   "quando": "2026-10-24T12:55:59",
-   "funcionario": "Heloísa",
-   "cargo": "Head de AWS, Arquitetura e Governança de Nuvem",
-   "andar": 5,
-   "trabalho": "Ronda de saúde do sistema",
-   "estado": "concluida"
-  },
-  {
-   "quando": "2026-10-24T12:55:57",
-   "funcionario": "Elisa",
-   "cargo": "Especialista em PyYAML (configuração)",
-   "andar": 5,
-   "trabalho": "Ronda de saúde do sistema",
-   "estado": "concluida"
-  },
-  {
-   "quando": "2026-10-24T12:55:57",
-   "funcionario": "Roberta",
-   "cargo": "Analista de Treinamento e Desenvolvimento Pleno",
-   "andar": 4,
-   "trabalho": "Desempenho da semana",
-   "estado": "concluida"
-  },
-  {
-   "quando": "2026-10-24T12:55:55",
-   "funcionario": "Saulo",
-   "cargo": "Supervisor de Planilhas",
+   "quando": "2026-10-24T13:27:30",
+   "funcionario": "Marcelo",
+   "cargo": "Gerente de Engenharia de Dados",
    "andar": 1,
    "trabalho": "Diagnosticar a planilha original da fábrica",
    "estado": "concluida"
   },
   {
-   "quando": "2026-10-24T12:55:53",
-   "funcionario": "Xavier",
-   "cargo": "Especialista em xlrd (.xls antigo)",
-   "andar": 5,
-   "trabalho": "Ronda de saúde do sistema",
-   "estado": "concluida"
-  },
-  {
-   "quando": "2026-10-24T12:55:53",
-   "funcionario": "Priscila",
-   "cargo": "Analista de Recrutamento e Seleção Pleno",
-   "andar": 4,
-   "trabalho": "Desempenho da semana",
-   "estado": "concluida"
-  },
-  {
-   "quando": "2026-10-24T12:27:02",
-   "funcionario": "Sílvia",
-   "cargo": "Coordenadora da Sala Excel",
-   "andar": 3,
-   "trabalho": "Exercício de SQL no PostgreSQL com os dados da fábrica — nível medio",
-   "estado": "concluida"
-  },
-  {
-   "quando": "2026-10-24T12:26:54",
-   "funcionario": "Eva",
-   "cargo": "Monitoramento",
+   "quando": "2026-10-24T13:27:27",
+   "funcionario": "Bia",
+   "cargo": "Perfil dos dados",
    "andar": 2,
-   "trabalho": "Conferir no PostgreSQL os lotes da fábrica",
+   "trabalho": "Perfil e indicadores da base sintética",
+   "estado": "concluida"
+  },
+  {
+   "quando": "2026-10-24T13:27:23",
+   "funcionario": "Carla",
+   "cargo": "Coordenadora de Engenharia de Dados",
+   "andar": 1,
+   "trabalho": "Calcular a média de uma métrica da base sintética",
+   "estado": "concluida"
+  },
+  {
+   "quando": "2026-10-24T13:27:16",
+   "funcionario": "Larissa",
+   "cargo": "Analista de Customer Insights Pleno",
+   "andar": 2,
+   "trabalho": "Perfil e indicadores da base sintética",
+   "estado": "concluida"
+  },
+  {
+   "quando": "2026-10-24T13:27:12",
+   "funcionario": "Felipe",
+   "cargo": "Head de BI e Excel",
+   "andar": 3,
+   "trabalho": "Calcular a média de uma métrica da base sintética",
+   "estado": "concluida"
+  },
+  {
+   "quando": "2026-10-24T13:27:04",
+   "funcionario": "Igor",
+   "cargo": "Analista de Dados Júnior",
+   "andar": 2,
+   "trabalho": "Perfil e indicadores da base sintética",
+   "estado": "concluida"
+  },
+  {
+   "quando": "2026-10-24T13:27:01",
+   "funcionario": "Hugo",
+   "cargo": "Analista de Excel Pleno",
+   "andar": 3,
+   "trabalho": "Calcular a média de uma métrica da base sintética",
+   "estado": "concluida"
+  },
+  {
+   "quando": "2026-10-24T13:26:53",
+   "funcionario": "Otto",
+   "cargo": "Auditoria (Validação)",
+   "andar": 1,
+   "trabalho": "Verificar dados pessoais (LGPD) na base sintética",
+   "estado": "concluida"
+  },
+  {
+   "quando": "2026-10-24T13:26:49",
+   "funcionario": "Marcos",
+   "cargo": "Coordenador de Análise e Ciência de Dados",
+   "andar": 2,
+   "trabalho": "Perfil e indicadores da base sintética",
    "estado": "concluida"
   }
  ],
@@ -166,7 +166,7 @@
   },
   {
    "rotina": "caixa_dono",
-   "execucoes_24h": 10,
+   "execucoes_24h": 9,
    "erros_24h": 0,
    "ultima": "2026-10-24T13:04:41"
   },
@@ -174,17 +174,17 @@
    "rotina": "demandas",
    "execucoes_24h": 14,
    "erros_24h": 0,
-   "ultima": "2026-10-24T12:56:03"
+   "ultima": "2026-10-24T13:27:38"
   },
   {
    "rotina": "dialogo",
-   "execucoes_24h": 10,
+   "execucoes_24h": 9,
    "erros_24h": 0,
    "ultima": "2026-10-24T13:04:41"
   },
   {
    "rotina": "fabrica",
-   "execucoes_24h": 29,
+   "execucoes_24h": 27,
    "erros_24h": 0,
    "ultima": "2026-10-24T13:05:04"
   },
@@ -196,39 +196,39 @@
   },
   {
    "rotina": "jornada",
-   "execucoes_24h": 10,
+   "execucoes_24h": 9,
    "erros_24h": 0,
    "ultima": "2026-10-24T13:04:41"
   },
   {
    "rotina": "laboratorio",
-   "execucoes_24h": 32,
+   "execucoes_24h": 31,
    "erros_24h": 0,
    "ultima": "2026-10-24T13:21:37"
   },
   {
    "rotina": "licoes",
-   "execucoes_24h": 8,
+   "execucoes_24h": 7,
    "erros_24h": 0,
    "ultima": "2026-10-24T12:21:23"
   },
   {
    "rotina": "memoria_pg",
-   "execucoes_24h": 22,
+   "execucoes_24h": 23,
    "erros_24h": 0,
-   "ultima": "2026-10-24T13:17:18"
+   "ultima": "2026-10-24T13:29:56"
   },
   {
    "rotina": "paineis",
-   "execucoes_24h": 10,
+   "execucoes_24h": 9,
    "erros_24h": 0,
    "ultima": "2026-10-24T13:04:43"
   },
   {
    "rotina": "registro",
-   "execucoes_24h": 181,
+   "execucoes_24h": 179,
    "erros_24h": 0,
-   "ultima": "2026-10-24T13:22:10"
+   "ultima": "2026-10-24T13:27:38"
   },
   {
    "rotina": "rh_desempenho",
@@ -238,22 +238,22 @@
   },
   {
    "rotina": "ronda_ti",
-   "execucoes_24h": 19,
+   "execucoes_24h": 18,
    "erros_24h": 0,
    "ultima": "2026-10-24T13:04:38"
   },
   {
    "rotina": "treino",
-   "execucoes_24h": 128,
+   "execucoes_24h": 127,
    "erros_24h": 0,
-   "ultima": "2026-10-24T13:21:55"
+   "ultima": "2026-10-24T13:25:59"
   }
  ],
  "totais": {
-  "demandas": 176,
-  "tentativas_treino": 5256,
-  "conversas": 2234,
-  "trabalhos_com_prova": 919
+  "demandas": 196,
+  "tentativas_treino": 5286,
+  "conversas": 2271,
+  "trabalhos_com_prova": 948
  },
  "pessoas": [
   {
@@ -316,11 +316,11 @@
    "andar": 1,
    "cargo": "Coordenadora de Engenharia de Dados",
    "area": "Engenharia de Dados",
-   "demandas_hoje": 1,
-   "ultimo": "Consultar o conhecimento da área",
-   "quando": "2026-10-24T10:55:28",
+   "demandas_hoje": 2,
+   "ultimo": "Calcular a média de uma métrica da base sintética",
+   "quando": "2026-10-24T13:27:16",
    "estado": "concluida",
-   "situacao": "estudo (trabalho do papel bloqueado: ainda não há planilha sintética tratada (Bases-Tratadas/_treino))"
+   "situacao": "trabalho do papel"
   },
   {
    "nome": "Dora",
@@ -360,22 +360,22 @@
    "andar": 1,
    "cargo": "Engenheira de Dados Pleno",
    "area": "Engenharia de Dados",
-   "demandas_hoje": 2,
-   "ultimo": "Consultar o conhecimento da área",
-   "quando": "2026-10-24T11:55:42",
+   "demandas_hoje": 3,
+   "ultimo": "Diagnosticar a planilha original da fábrica",
+   "quando": "2026-10-24T13:26:03",
    "estado": "concluida",
-   "situacao": "estudo (trabalho do papel bloqueado: ainda não há planilha sintética original (Bases-Originais/_treino))"
+   "situacao": "trabalho do papel"
   },
   {
    "nome": "Leo",
    "andar": 1,
    "cargo": "Leitura (Extração)",
    "area": "Engenharia de Dados",
-   "demandas_hoje": 2,
-   "ultimo": "Consultar o conhecimento da área",
-   "quando": "2026-10-24T11:55:46",
+   "demandas_hoje": 3,
+   "ultimo": "Diagnosticar a planilha original da fábrica",
+   "quando": "2026-10-24T13:26:29",
    "estado": "concluida",
-   "situacao": "estudo (trabalho do papel bloqueado: ainda não há planilha sintética original (Bases-Originais/_treino))"
+   "situacao": "trabalho do papel"
   },
   {
    "nome": "Lia",
@@ -393,22 +393,22 @@
    "andar": 1,
    "cargo": "Gerente de Engenharia de Dados",
    "area": "Engenharia de Dados",
-   "demandas_hoje": 2,
-   "ultimo": "Consultar o conhecimento da área",
-   "quando": "2026-10-24T11:55:44",
+   "demandas_hoje": 3,
+   "ultimo": "Diagnosticar a planilha original da fábrica",
+   "quando": "2026-10-24T13:27:27",
    "estado": "concluida",
-   "situacao": "estudo (trabalho do papel bloqueado: ainda não há planilha sintética original (Bases-Originais/_treino))"
+   "situacao": "trabalho do papel"
   },
   {
    "nome": "Otto",
    "andar": 1,
    "cargo": "Auditoria (Validação)",
    "area": "Governança e Privacidade",
-   "demandas_hoje": 1,
-   "ultimo": "Consultar o conhecimento da área",
-   "quando": "2026-10-24T10:55:24",
+   "demandas_hoje": 2,
+   "ultimo": "Verificar dados pessoais (LGPD) na base sintética",
+   "quando": "2026-10-24T13:26:49",
    "estado": "concluida",
-   "situacao": "estudo (trabalho do papel bloqueado: ainda não há planilha sintética tratada (Bases-Tratadas/_treino))"
+   "situacao": "trabalho do papel"
   },
   {
    "nome": "Rafael",
@@ -452,29 +452,29 @@
    "ultimo": "",
    "quando": "",
    "estado": "",
-   "situacao": "estagiário: observa (regra do dono) — Observei Xavier (Especialista em xlrd (.xls antigo)) fazendo \"Ronda de saúde do sistema\" no nível basico: terminou concl"
+   "situacao": "estagiário: observa (regra do dono) — Observei Júlia (Engenheira de Dados Pleno) fazendo \"Diagnosticar a planilha original da fábrica\" no nível basico: termin"
   },
   {
    "nome": "Tina",
    "andar": 1,
    "cargo": "Contatos e NPS",
    "area": "",
-   "demandas_hoje": 1,
-   "ultimo": "Consultar o conhecimento da área",
-   "quando": "2026-10-24T10:55:24",
+   "demandas_hoje": 2,
+   "ultimo": "Diagnosticar a planilha original da fábrica",
+   "quando": "2026-10-24T13:26:35",
    "estado": "concluida",
-   "situacao": "estudo (trabalho do papel bloqueado: ainda não há planilha sintética original (Bases-Originais/_treino))"
+   "situacao": "trabalho do papel"
   },
   {
    "nome": "Bia",
    "andar": 2,
    "cargo": "Perfil dos dados",
    "area": "Análise de Dados",
-   "demandas_hoje": 1,
-   "ultimo": "Consultar o conhecimento da área",
-   "quando": "2026-10-24T10:55:24",
+   "demandas_hoje": 2,
+   "ultimo": "Perfil e indicadores da base sintética",
+   "quando": "2026-10-24T13:27:23",
    "estado": "concluida",
-   "situacao": "estudo (trabalho do papel bloqueado: ainda não há planilha sintética tratada (Bases-Tratadas/_treino))"
+   "situacao": "trabalho do papel"
   },
   {
    "nome": "Caio",
@@ -525,33 +525,33 @@
    "andar": 2,
    "cargo": "Relator",
    "area": "Storytelling e Negócio",
-   "demandas_hoje": 2,
-   "ultimo": "Consultar o conhecimento da área",
-   "quando": "2026-10-24T10:55:25",
+   "demandas_hoje": 3,
+   "ultimo": "Perfil e indicadores da base sintética",
+   "quando": "2026-10-24T13:25:59",
    "estado": "concluida",
-   "situacao": "estudo (trabalho do papel bloqueado: ainda não há planilha sintética tratada (Bases-Tratadas/_treino))"
+   "situacao": "trabalho do papel"
   },
   {
    "nome": "Igor",
    "andar": 2,
    "cargo": "Analista de Dados Júnior",
    "area": "Análise de Dados",
-   "demandas_hoje": 2,
-   "ultimo": "Consultar o conhecimento da área",
-   "quando": "2026-10-24T11:55:44",
+   "demandas_hoje": 3,
+   "ultimo": "Perfil e indicadores da base sintética",
+   "quando": "2026-10-24T13:27:01",
    "estado": "concluida",
-   "situacao": "estudo (trabalho do papel bloqueado: ainda não há planilha sintética tratada (Bases-Tratadas/_treino))"
+   "situacao": "trabalho do papel"
   },
   {
    "nome": "Larissa",
    "andar": 2,
    "cargo": "Analista de Customer Insights Pleno",
    "area": "Customer Insights e Pesquisa",
-   "demandas_hoje": 2,
-   "ultimo": "Consultar o conhecimento da área",
-   "quando": "2026-10-24T11:55:46",
+   "demandas_hoje": 3,
+   "ultimo": "Perfil e indicadores da base sintética",
+   "quando": "2026-10-24T13:27:12",
    "estado": "concluida",
-   "situacao": "estudo (trabalho do papel bloqueado: ainda não há planilha sintética tratada (Bases-Tratadas/_treino))"
+   "situacao": "trabalho do papel"
   },
   {
    "nome": "Lucas",
@@ -573,18 +573,18 @@
    "ultimo": "",
    "quando": "",
    "estado": "",
-   "situacao": "estagiário: observa (regra do dono)"
+   "situacao": "estagiário: observa (regra do dono) — Observei Marcos (Coordenador de Análise e Ciência de Dados) fazendo \"Perfil e indicadores da base sintética\" no nível ba"
   },
   {
    "nome": "Marcos",
    "andar": 2,
    "cargo": "Coordenador de Análise e Ciência de Dados",
    "area": "Análise de Dados",
-   "demandas_hoje": 1,
-   "ultimo": "Consultar o conhecimento da área",
-   "quando": "2026-10-24T10:55:28",
+   "demandas_hoje": 2,
+   "ultimo": "Perfil e indicadores da base sintética",
+   "quando": "2026-10-24T13:26:46",
    "estado": "concluida",
-   "situacao": "estudo (trabalho do papel bloqueado: ainda não há planilha sintética tratada (Bases-Tratadas/_treino))"
+   "situacao": "trabalho do papel"
   },
   {
    "nome": "Natália",
@@ -635,22 +635,22 @@
    "andar": 2,
    "cargo": "Cientista de Dados Sênior",
    "area": "Estatística",
-   "demandas_hoje": 2,
-   "ultimo": "Consultar o conhecimento da área",
-   "quando": "2026-10-24T11:55:41",
-   "estado": "concluida",
-   "situacao": "estudo (trabalho do papel bloqueado: nenhuma das 0 base(s) sintética(s) recentes tem coluna de NPS ou CSAT para ser o alvo (a fábrica gera as regra)"
+   "demandas_hoje": 3,
+   "ultimo": "Drivers do indicador na base sintética",
+   "quando": "2026-10-24T13:26:17",
+   "estado": "falhou",
+   "situacao": "trabalho do papel"
   },
   {
    "nome": "Bárbara",
    "andar": 3,
    "cargo": "Especialista Sênior em Power BI",
    "area": "Storytelling e Negócio",
-   "demandas_hoje": 2,
-   "ultimo": "Consultar o conhecimento da área",
-   "quando": "2026-10-24T11:55:46",
+   "demandas_hoje": 3,
+   "ultimo": "Calcular a média de uma métrica da base sintética",
+   "quando": "2026-10-24T13:27:30",
    "estado": "concluida",
-   "situacao": "estudo (trabalho do papel bloqueado: ainda não há planilha sintética tratada (Bases-Tratadas/_treino))"
+   "situacao": "trabalho do papel"
   },
   {
    "nome": "Enzo",
@@ -661,18 +661,18 @@
    "ultimo": "",
    "quando": "",
    "estado": "",
-   "situacao": "estagiário: observa (regra do dono) — Observei Xavier (Especialista em xlrd (.xls antigo)) fazendo \"Ronda de saúde do sistema\" no nível basico: terminou concl"
+   "situacao": "estagiário: observa (regra do dono) — Observei Júlia (Engenheira de Dados Pleno) fazendo \"Diagnosticar a planilha original da fábrica\" no nível basico: termin"
   },
   {
    "nome": "Felipe",
    "andar": 3,
    "cargo": "Head de BI e Excel",
    "area": "Storytelling e Negócio",
-   "demandas_hoje": 1,
-   "ultimo": "Consultar o conhecimento da área",
-   "quando": "2026-10-24T10:55:24",
+   "demandas_hoje": 2,
+   "ultimo": "Calcular a média de uma métrica da base sintética",
+   "quando": "2026-10-24T13:27:05",
    "estado": "concluida",
-   "situacao": "estudo (trabalho do papel bloqueado: ainda não há planilha sintética tratada (Bases-Tratadas/_treino))"
+   "situacao": "trabalho do papel"
   },
   {
    "nome": "Gabriel",
@@ -701,11 +701,11 @@
    "andar": 3,
    "cargo": "Analista de Excel Pleno",
    "area": "Engenharia de Dados",
-   "demandas_hoje": 2,
-   "ultimo": "Consultar o conhecimento da área",
-   "quando": "2026-10-24T11:55:44",
+   "demandas_hoje": 3,
+   "ultimo": "Calcular a média de uma métrica da base sintética",
+   "quando": "2026-10-24T13:26:53",
    "estado": "concluida",
-   "situacao": "estudo (trabalho do papel bloqueado: ainda não há planilha sintética tratada (Bases-Tratadas/_treino))"
+   "situacao": "trabalho do papel"
   },
   {
    "nome": "Lúcia",
@@ -723,22 +723,22 @@
    "andar": 3,
    "cargo": "Analista de Excel Júnior",
    "area": "Storytelling e Negócio",
-   "demandas_hoje": 2,
-   "ultimo": "Consultar o conhecimento da área",
-   "quando": "2026-10-24T11:55:42",
+   "demandas_hoje": 3,
+   "ultimo": "Calcular a média de uma métrica da base sintética",
+   "quando": "2026-10-24T13:26:38",
    "estado": "concluida",
-   "situacao": "estudo (trabalho do papel bloqueado: ainda não há planilha sintética tratada (Bases-Tratadas/_treino))"
+   "situacao": "trabalho do papel"
   },
   {
    "nome": "Pedro",
    "andar": 3,
    "cargo": "Especialista em Pesquisa de Mercado",
    "area": "Customer Insights e Pesquisa",
-   "demandas_hoje": 2,
-   "ultimo": "Consultar o conhecimento da área",
-   "quando": "2026-10-24T10:55:25",
+   "demandas_hoje": 3,
+   "ultimo": "Calcular a média de uma métrica da base sintética",
+   "quando": "2026-10-24T13:26:06",
    "estado": "concluida",
-   "situacao": "estudo (trabalho do papel bloqueado: ainda não há planilha sintética tratada (Bases-Tratadas/_treino))"
+   "situacao": "trabalho do papel"
   },
   {
    "nome": "Ricardo",
@@ -767,11 +767,11 @@
    "andar": 3,
    "cargo": "Especialista em Trade Marketing",
    "area": "Customer Insights e Pesquisa",
-   "demandas_hoje": 2,
-   "ultimo": "Consultar o conhecimento da área",
-   "quando": "2026-10-24T11:55:42",
+   "demandas_hoje": 3,
+   "ultimo": "Calcular a média de uma métrica da base sintética",
+   "quando": "2026-10-24T13:26:21",
    "estado": "concluida",
-   "situacao": "estudo (trabalho do papel bloqueado: ainda não há planilha sintética tratada (Bases-Tratadas/_treino))"
+   "situacao": "trabalho do papel"
   },
   {
    "nome": "Augusto",
@@ -844,11 +844,11 @@
    "andar": 4,
    "cargo": "Ideias e evolução da plataforma",
    "area": "Storytelling e Negócio",
-   "demandas_hoje": 1,
-   "ultimo": "Consultar o conhecimento da área",
-   "quando": "2026-10-24T10:55:25",
+   "demandas_hoje": 2,
+   "ultimo": "Perfil e indicadores da base sintética",
+   "quando": "2026-10-24T13:26:31",
    "estado": "concluida",
-   "situacao": "estudo (trabalho do papel bloqueado: ainda não há planilha sintética tratada (Bases-Tratadas/_treino))"
+   "situacao": "trabalho do papel"
   },
   {
    "nome": "Isadora",
@@ -892,7 +892,7 @@
    "ultimo": "",
    "quando": "",
    "estado": "",
-   "situacao": "estagiário: observa (regra do dono) — Observei Elisa (Especialista em PyYAML (configuração)) fazendo \"Ronda de saúde do sistema\" no nível basico: terminou con"
+   "situacao": "estagiário: observa (regra do dono) — Observei Vitor (Analista de Governança Pleno) fazendo \"Verificar dados pessoais (LGPD) na base sintética\" no nível basic"
   },
   {
    "nome": "Lorena",
@@ -903,7 +903,7 @@
    "ultimo": "",
    "quando": "",
    "estado": "",
-   "situacao": "estagiário: observa (regra do dono) — Observei Priscila (Analista de Recrutamento e Seleção Pleno) fazendo \"Desempenho da semana\" no nível basico: terminou co"
+   "situacao": "estagiário: observa (regra do dono) — Observei Vitor (Analista de Governança Pleno) fazendo \"Verificar dados pessoais (LGPD) na base sintética\" no nível basic"
   },
   {
    "nome": "Lívia",
@@ -1097,11 +1097,11 @@
    "andar": 4,
    "cargo": "Analista de Governança Pleno",
    "area": "Governança e Privacidade",
-   "demandas_hoje": 2,
-   "ultimo": "Consultar o conhecimento da área",
-   "quando": "2026-10-24T11:55:44",
+   "demandas_hoje": 3,
+   "ultimo": "Verificar dados pessoais (LGPD) na base sintética",
+   "quando": "2026-10-24T13:26:13",
    "estado": "concluida",
-   "situacao": "estudo (trabalho do papel bloqueado: ainda não há planilha sintética tratada (Bases-Tratadas/_treino))"
+   "situacao": "trabalho do papel"
   },
   {
    "nome": "Yasmin",
@@ -1167,7 +1167,7 @@
    "ultimo": "",
    "quando": "",
    "estado": "",
-   "situacao": "estagiário: observa (regra do dono) — Observei Xavier (Especialista em xlrd (.xls antigo)) fazendo \"Ronda de saúde do sistema\" no nível basico: terminou concl"
+   "situacao": "estagiário: observa (regra do dono) — Observei Júlia (Engenheira de Dados Pleno) fazendo \"Diagnosticar a planilha original da fábrica\" no nível basico: termin"
   },
   {
    "nome": "Diego",
@@ -1211,7 +1211,7 @@
    "ultimo": "",
    "quando": "",
    "estado": "",
-   "situacao": "estagiário: observa (regra do dono) — Observei Xavier (Especialista em xlrd (.xls antigo)) fazendo \"Ronda de saúde do sistema\" no nível basico: terminou concl"
+   "situacao": "estagiário: observa (regra do dono) — Observei Júlia (Engenheira de Dados Pleno) fazendo \"Diagnosticar a planilha original da fábrica\" no nível basico: termin"
   },
   {
    "nome": "Gustavo",
