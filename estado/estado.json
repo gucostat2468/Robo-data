@@ -1,11 +1,11 @@
 {
  "versao": 1,
- "gerado_em": "2026-10-24T14:25:08",
+ "gerado_em": "2026-10-24T14:29:31",
  "turno": {
-  "estado": "trabalhando",
+  "estado": "entre turnos: memória salva; o próximo turno começa em poucos minutos",
   "inicio": "2026-10-24T13:47:58",
   "fim_previsto": "2026-10-24T14:27:58",
-  "voltas": 111,
+  "voltas": 118,
   "planilhas": 2
  },
  "funcionarios": 101,
@@ -18,8 +18,8 @@
    "concluidas": 33,
    "parciais": 0,
    "falhas": 1,
-   "treino": 313,
-   "acertos": 283
+   "treino": 316,
+   "acertos": 286
   },
   {
    "andar": 2,
@@ -29,8 +29,8 @@
    "concluidas": 31,
    "parciais": 0,
    "falhas": 2,
-   "treino": 261,
-   "acertos": 241
+   "treino": 265,
+   "acertos": 245
   },
   {
    "andar": 3,
@@ -40,8 +40,8 @@
    "concluidas": 28,
    "parciais": 0,
    "falhas": 0,
-   "treino": 195,
-   "acertos": 159
+   "treino": 200,
+   "acertos": 160
   },
   {
    "andar": 4,
@@ -51,23 +51,63 @@
    "concluidas": 33,
    "parciais": 0,
    "falhas": 0,
-   "treino": 503,
-   "acertos": 455
+   "treino": 504,
+   "acertos": 456
   },
   {
    "andar": 5,
    "pessoas": 23,
    "trabalharam_hoje": 23,
-   "demandas": 40,
-   "concluidas": 40,
+   "demandas": 45,
+   "concluidas": 45,
    "parciais": 0,
    "falhas": 0,
-   "treino": 376,
-   "acertos": 337
+   "treino": 377,
+   "acertos": 338
   }
  ],
  "agora": [],
  "ultimos": [
+  {
+   "quando": "2026-10-24T14:26:09",
+   "funcionario": "Wagner",
+   "cargo": "Especialista Sênior em Segurança da Informação",
+   "andar": 5,
+   "trabalho": "Ronda de saúde do sistema",
+   "estado": "concluida"
+  },
+  {
+   "quando": "2026-10-24T14:26:09",
+   "funcionario": "Caetano",
+   "cargo": "Especialista em Orquestração de Dados (Apache Airflow)",
+   "andar": 5,
+   "trabalho": "SLA das rotinas",
+   "estado": "concluida"
+  },
+  {
+   "quando": "2026-10-24T14:26:09",
+   "funcionario": "Bianca",
+   "cargo": "Engenheira de Dados Pleno",
+   "andar": 5,
+   "trabalho": "SLA das rotinas",
+   "estado": "concluida"
+  },
+  {
+   "quando": "2026-10-24T14:26:09",
+   "funcionario": "Fernanda",
+   "cargo": "Coordenadora de DevOps e Confiabilidade (SRE)",
+   "andar": 5,
+   "trabalho": "Situação do andar agora",
+   "estado": "concluida"
+  },
+  {
+   "quando": "2026-10-24T14:26:09",
+   "funcionario": "Marina",
+   "cargo": "Arquiteta de Cloud (AWS)",
+   "andar": 5,
+   "trabalho": "SLA das rotinas — nível medio",
+   "estado": "concluida"
+  },
   {
    "quando": "2026-10-24T13:56:11",
    "funcionario": "Ícaro",
@@ -107,46 +147,6 @@
    "andar": 3,
    "trabalho": "Perfil e indicadores da base sintética",
    "estado": "concluida"
-  },
-  {
-   "quando": "2026-10-24T13:56:07",
-   "funcionario": "Gustavo",
-   "cargo": "Gerente de TI e Infraestrutura",
-   "andar": 5,
-   "trabalho": "Situação do andar agora",
-   "estado": "concluida"
-  },
-  {
-   "quando": "2026-10-24T13:56:07",
-   "funcionario": "Henrique",
-   "cargo": "Head de Engenharia Python",
-   "andar": 5,
-   "trabalho": "Estratégia Python",
-   "estado": "concluida"
-  },
-  {
-   "quando": "2026-10-24T13:56:04",
-   "funcionario": "Natália",
-   "cargo": "Head de Ciência de Dados",
-   "andar": 2,
-   "trabalho": "Calcular a média de uma métrica da base sintética",
-   "estado": "concluida"
-  },
-  {
-   "quando": "2026-10-24T13:27:37",
-   "funcionario": "Bárbara",
-   "cargo": "Especialista Sênior em Power BI",
-   "andar": 3,
-   "trabalho": "Calcular a média de uma métrica da base sintética",
-   "estado": "concluida"
-  },
-  {
-   "quando": "2026-10-24T13:27:30",
-   "funcionario": "Marcelo",
-   "cargo": "Gerente de Engenharia de Dados",
-   "andar": 1,
-   "trabalho": "Diagnosticar a planilha original da fábrica",
-   "estado": "concluida"
   }
  ],
  "sql": {
@@ -172,9 +172,9 @@
   },
   {
    "rotina": "demandas",
-   "execucoes_24h": 15,
+   "execucoes_24h": 16,
    "erros_24h": 0,
-   "ultima": "2026-10-24T13:56:11"
+   "ultima": "2026-10-24T14:26:09"
   },
   {
    "rotina": "dialogo",
@@ -202,9 +202,9 @@
   },
   {
    "rotina": "laboratorio",
-   "execucoes_24h": 35,
+   "execucoes_24h": 36,
    "erros_24h": 0,
-   "ultima": "2026-10-24T14:13:13"
+   "ultima": "2026-10-24T14:25:37"
   },
   {
    "rotina": "licoes",
@@ -214,9 +214,9 @@
   },
   {
    "rotina": "memoria_pg",
-   "execucoes_24h": 26,
+   "execucoes_24h": 27,
    "erros_24h": 0,
-   "ultima": "2026-10-24T14:25:05"
+   "ultima": "2026-10-24T14:29:28"
   },
   {
    "rotina": "paineis",
@@ -226,9 +226,9 @@
   },
   {
    "rotina": "registro",
-   "execucoes_24h": 203,
+   "execucoes_24h": 207,
    "erros_24h": 0,
-   "ultima": "2026-10-24T14:21:49"
+   "ultima": "2026-10-24T14:27:15"
   },
   {
    "rotina": "rh_desempenho",
@@ -238,22 +238,22 @@
   },
   {
    "rotina": "ronda_ti",
-   "execucoes_24h": 19,
+   "execucoes_24h": 20,
    "erros_24h": 0,
-   "ultima": "2026-10-24T13:47:23"
+   "ultima": "2026-10-24T14:27:15"
   },
   {
    "rotina": "treino",
-   "execucoes_24h": 142,
+   "execucoes_24h": 143,
    "erros_24h": 0,
-   "ultima": "2026-10-24T14:21:34"
+   "ultima": "2026-10-24T14:25:34"
   }
  ],
  "totais": {
-  "demandas": 204,
-  "tentativas_treino": 5599,
-  "conversas": 2392,
-  "trabalhos_com_prova": 1068
+  "demandas": 209,
+  "tentativas_treino": 5613,
+  "conversas": 2408,
+  "trabalhos_com_prova": 1085
  },
  "pessoas": [
   {
@@ -452,7 +452,7 @@
    "ultimo": "",
    "quando": "",
    "estado": "",
-   "situacao": "estagiário: observa (regra do dono) — Observei Gustavo (Gerente de TI e Infraestrutura) fazendo \"Situação do andar agora\" no nível basico: terminou concluida."
+   "situacao": "estagiário: observa (regra do dono) — Observei Caetano (Especialista em Orquestração de Dados (Apache Airflow)) fazendo \"SLA das rotinas\" no nível basico: ter"
   },
   {
    "nome": "Tina",
@@ -573,7 +573,7 @@
    "ultimo": "",
    "quando": "",
    "estado": "",
-   "situacao": "estagiário: observa (regra do dono) — Observei Natália (Head de Ciência de Dados) fazendo \"Calcular a média de uma métrica da base sintética\" no nível basico:"
+   "situacao": "estagiário: observa (regra do dono)"
   },
   {
    "nome": "Marcos",
@@ -661,7 +661,7 @@
    "ultimo": "",
    "quando": "",
    "estado": "",
-   "situacao": "estagiário: observa (regra do dono) — Observei Gustavo (Gerente de TI e Infraestrutura) fazendo \"Situação do andar agora\" no nível basico: terminou concluida."
+   "situacao": "estagiário: observa (regra do dono) — Observei Caetano (Especialista em Orquestração de Dados (Apache Airflow)) fazendo \"SLA das rotinas\" no nível basico: ter"
   },
   {
    "nome": "Felipe",
@@ -892,7 +892,7 @@
    "ultimo": "",
    "quando": "",
    "estado": "",
-   "situacao": "estagiário: observa (regra do dono) — Observei André (Head de Infraestrutura e Segurança) fazendo \"Ronda de saúde do sistema\" no nível basico: terminou conclu"
+   "situacao": "estagiário: observa (regra do dono) — Observei Wagner (Especialista Sênior em Segurança da Informação) fazendo \"Ronda de saúde do sistema\" no nível basico: te"
   },
   {
    "nome": "Lorena",
@@ -1141,9 +1141,9 @@
    "andar": 5,
    "cargo": "Engenheira de Dados Pleno",
    "area": "Engenharia de Dados",
-   "demandas_hoje": 1,
-   "ultimo": "Ronda de saúde do sistema",
-   "quando": "2026-10-24T11:25:40",
+   "demandas_hoje": 2,
+   "ultimo": "SLA das rotinas",
+   "quando": "2026-10-24T14:26:09",
    "estado": "concluida",
    "situacao": "trabalho do papel"
   },
@@ -1152,9 +1152,9 @@
    "andar": 5,
    "cargo": "Especialista em Orquestração de Dados (Apache Airflow)",
    "area": "Engenharia de Dados",
-   "demandas_hoje": 1,
-   "ultimo": "Ronda de saúde do sistema",
-   "quando": "2026-10-24T11:25:34",
+   "demandas_hoje": 2,
+   "ultimo": "SLA das rotinas",
+   "quando": "2026-10-24T14:26:09",
    "estado": "concluida",
    "situacao": "trabalho do papel"
   },
@@ -1167,7 +1167,7 @@
    "ultimo": "",
    "quando": "",
    "estado": "",
-   "situacao": "estagiário: observa (regra do dono) — Observei Gustavo (Gerente de TI e Infraestrutura) fazendo \"Situação do andar agora\" no nível basico: terminou concluida."
+   "situacao": "estagiário: observa (regra do dono) — Observei Caetano (Especialista em Orquestração de Dados (Apache Airflow)) fazendo \"SLA das rotinas\" no nível basico: ter"
   },
   {
    "nome": "Diego",
@@ -1196,9 +1196,9 @@
    "andar": 5,
    "cargo": "Coordenadora de DevOps e Confiabilidade (SRE)",
    "area": "Engenharia de Dados",
-   "demandas_hoje": 1,
-   "ultimo": "Diagnosticar a planilha original da fábrica",
-   "quando": "2026-10-24T11:25:46",
+   "demandas_hoje": 2,
+   "ultimo": "Situação do andar agora",
+   "quando": "2026-10-24T14:26:09",
    "estado": "concluida",
    "situacao": "trabalho do papel"
   },
@@ -1211,7 +1211,7 @@
    "ultimo": "",
    "quando": "",
    "estado": "",
-   "situacao": "estagiário: observa (regra do dono) — Observei Gustavo (Gerente de TI e Infraestrutura) fazendo \"Situação do andar agora\" no nível basico: terminou concluida."
+   "situacao": "estagiário: observa (regra do dono) — Observei Caetano (Especialista em Orquestração de Dados (Apache Airflow)) fazendo \"SLA das rotinas\" no nível basico: ter"
   },
   {
    "nome": "Gustavo",
@@ -1262,9 +1262,9 @@
    "andar": 5,
    "cargo": "Arquiteta de Cloud (AWS)",
    "area": "Engenharia de Dados",
-   "demandas_hoje": 2,
-   "ultimo": "Ronda de saúde do sistema",
-   "quando": "2026-10-24T12:56:01",
+   "demandas_hoje": 3,
+   "ultimo": "SLA das rotinas — nível medio",
+   "quando": "2026-10-24T14:26:09",
    "estado": "concluida",
    "situacao": "trabalho do papel"
   },
@@ -1339,9 +1339,9 @@
    "andar": 5,
    "cargo": "Especialista Sênior em Segurança da Informação",
    "area": "Governança e Privacidade",
-   "demandas_hoje": 1,
-   "ultimo": "Verificar dados pessoais (LGPD) na base sintética",
-   "quando": "2026-10-24T11:25:29",
+   "demandas_hoje": 2,
+   "ultimo": "Ronda de saúde do sistema",
+   "quando": "2026-10-24T14:26:07",
    "estado": "concluida",
    "situacao": "trabalho do papel"
   },
