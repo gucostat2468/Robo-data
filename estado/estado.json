@@ -1,12 +1,12 @@
 {
  "versao": 1,
- "gerado_em": "2026-10-24T01:07:01",
+ "gerado_em": "2026-10-24T01:12:25",
  "turno": {
   "estado": "trabalhando",
   "inicio": "2026-10-24T00:40:35",
   "fim_previsto": "2026-10-24T01:20:35",
-  "voltas": 75,
-  "planilhas": 1
+  "voltas": 89,
+  "planilhas": 2
  },
  "funcionarios": 101,
  "andares": [
@@ -14,60 +14,108 @@
    "andar": 1,
    "pessoas": 19,
    "trabalharam_hoje": 19,
-   "demandas": 1,
-   "concluidas": 0,
+   "demandas": 2,
+   "concluidas": 1,
    "parciais": 0,
    "falhas": 1,
-   "treino": 29,
-   "acertos": 29
+   "treino": 38,
+   "acertos": 37
   },
   {
    "andar": 2,
    "pessoas": 16,
    "trabalharam_hoje": 16,
-   "demandas": 1,
-   "concluidas": 0,
+   "demandas": 3,
+   "concluidas": 2,
    "parciais": 0,
    "falhas": 1,
-   "treino": 26,
-   "acertos": 24
+   "treino": 32,
+   "acertos": 29
   },
   {
    "andar": 3,
    "pessoas": 12,
    "trabalharam_hoje": 12,
-   "demandas": 1,
-   "concluidas": 1,
+   "demandas": 2,
+   "concluidas": 2,
    "parciais": 0,
    "falhas": 0,
-   "treino": 17,
-   "acertos": 16
+   "treino": 24,
+   "acertos": 23
   },
   {
    "andar": 4,
    "pessoas": 31,
    "trabalharam_hoje": 31,
-   "demandas": 2,
-   "concluidas": 2,
+   "demandas": 3,
+   "concluidas": 3,
    "parciais": 0,
    "falhas": 0,
-   "treino": 46,
-   "acertos": 45
+   "treino": 61,
+   "acertos": 60
   },
   {
    "andar": 5,
    "pessoas": 23,
    "trabalharam_hoje": 23,
-   "demandas": 1,
-   "concluidas": 1,
+   "demandas": 2,
+   "concluidas": 2,
    "parciais": 0,
    "falhas": 0,
-   "treino": 32,
-   "acertos": 30
+   "treino": 40,
+   "acertos": 37
   }
  ],
  "agora": [],
  "ultimos": [
+  {
+   "quando": "2026-10-24T01:10:33",
+   "funcionario": "Carolina",
+   "cargo": "Cientista de Dados Pleno",
+   "andar": 2,
+   "trabalho": "Segmentação da base sintética",
+   "estado": "concluida"
+  },
+  {
+   "quando": "2026-10-24T01:10:29",
+   "funcionario": "Ricardo",
+   "cargo": "Gerente da Sala Excel",
+   "andar": 3,
+   "trabalho": "Diagnosticar a planilha original da fábrica",
+   "estado": "concluida"
+  },
+  {
+   "quando": "2026-10-24T01:10:25",
+   "funcionario": "Rafael",
+   "cargo": "Engenheiro de Dados Pleno",
+   "andar": 1,
+   "trabalho": "Diagnosticar a planilha original da fábrica",
+   "estado": "concluida"
+  },
+  {
+   "quando": "2026-10-24T01:10:22",
+   "funcionario": "Diego",
+   "cargo": "Desenvolvedor Python Pleno",
+   "andar": 5,
+   "trabalho": "Ronda de saúde do sistema",
+   "estado": "concluida"
+  },
+  {
+   "quando": "2026-10-24T01:10:20",
+   "funcionario": "Lucas",
+   "cargo": "Cientista de Dados Júnior",
+   "andar": 2,
+   "trabalho": "Anomalias na base sintética",
+   "estado": "concluida"
+  },
+  {
+   "quando": "2026-10-24T01:10:16",
+   "funcionario": "Augusto",
+   "cargo": "Designer de Casos",
+   "andar": 4,
+   "trabalho": "Revisar um caso de treino feito por outro designer",
+   "estado": "concluida"
+  },
   {
    "quando": "2026-10-24T00:40:12",
    "funcionario": "Letícia",
@@ -99,54 +147,6 @@
    "andar": 4,
    "trabalho": "Consultar o conhecimento da área",
    "estado": "concluida"
-  },
-  {
-   "quando": "2026-10-24T00:40:10",
-   "funcionario": "Fábio",
-   "cargo": "Relator",
-   "andar": 2,
-   "trabalho": "Consultar o conhecimento da área",
-   "estado": "falhou"
-  },
-  {
-   "quando": "2026-10-24T00:40:10",
-   "funcionario": "Yasmin",
-   "cargo": "Planejadora de Treino",
-   "andar": 4,
-   "trabalho": "Consultar o conhecimento da área",
-   "estado": "concluida"
-  },
-  {
-   "quando": "2026-10-23T23:49:34",
-   "funcionario": "Bia",
-   "cargo": "Perfil dos dados",
-   "andar": 2,
-   "trabalho": "Exercício de SQL no PostgreSQL com os dados da fábrica",
-   "estado": "falhou"
-  },
-  {
-   "quando": "2026-10-23T23:49:30",
-   "funcionario": "Lúcia",
-   "cargo": "Especialista em Fórmulas e Power Query",
-   "andar": 3,
-   "trabalho": "Exercício de SQL no PostgreSQL com os dados da fábrica",
-   "estado": "falhou"
-  },
-  {
-   "quando": "2026-10-23T23:49:26",
-   "funcionario": "Camila",
-   "cargo": "Analista de Dados Júnior",
-   "andar": 1,
-   "trabalho": "Diagnosticar a planilha original da fábrica",
-   "estado": "concluida"
-  },
-  {
-   "quando": "2026-10-23T23:49:24",
-   "funcionario": "Fernanda",
-   "cargo": "Coordenadora de DevOps e Confiabilidade (SRE)",
-   "andar": 5,
-   "trabalho": "Exercício de SQL no PostgreSQL com os dados da fábrica",
-   "estado": "falhou"
   }
  ],
  "sql": {
@@ -154,8 +154,8 @@
   "concluidos_hoje": 0
  },
  "fabrica": {
-  "lotes_hoje": 1,
-  "conferidos_ok_hoje": 1
+  "lotes_hoje": 2,
+  "conferidos_ok_hoje": 2
  },
  "rotinas": [
   {
@@ -172,9 +172,9 @@
   },
   {
    "rotina": "demandas",
-   "execucoes_24h": 7,
+   "execucoes_24h": 8,
    "erros_24h": 0,
-   "ultima": "2026-10-24T00:40:12"
+   "ultima": "2026-10-24T01:10:34"
   },
   {
    "rotina": "dialogo",
@@ -184,9 +184,9 @@
   },
   {
    "rotina": "fabrica",
-   "execucoes_24h": 14,
+   "execucoes_24h": 16,
    "erros_24h": 0,
-   "ultima": "2026-10-24T00:40:45"
+   "ultima": "2026-10-24T01:11:10"
   },
   {
    "rotina": "ideias",
@@ -202,9 +202,9 @@
   },
   {
    "rotina": "laboratorio",
-   "execucoes_24h": 17,
+   "execucoes_24h": 18,
    "erros_24h": 0,
-   "ultima": "2026-10-24T01:01:11"
+   "ultima": "2026-10-24T01:11:30"
   },
   {
    "rotina": "licoes",
@@ -226,9 +226,9 @@
   },
   {
    "rotina": "registro",
-   "execucoes_24h": 96,
+   "execucoes_24h": 101,
    "erros_24h": 0,
-   "ultima": "2026-10-24T01:03:29"
+   "ultima": "2026-10-24T01:11:45"
   },
   {
    "rotina": "rh_desempenho",
@@ -244,15 +244,15 @@
   },
   {
    "rotina": "treino",
-   "execucoes_24h": 69,
+   "execucoes_24h": 72,
    "erros_24h": 0,
-   "ultima": "2026-10-24T01:03:14"
+   "ultima": "2026-10-24T01:12:25"
   }
  ],
  "totais": {
-  "demandas": 42,
-  "tentativas_treino": 4101,
-  "conversas": 1704,
-  "trabalhos_com_prova": 375
+  "demandas": 48,
+  "tentativas_treino": 4146,
+  "conversas": 1723,
+  "trabalhos_com_prova": 401
  }
 }
