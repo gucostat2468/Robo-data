@@ -1,12 +1,12 @@
 {
  "versao": 1,
- "gerado_em": "2026-10-24T11:37:36",
+ "gerado_em": "2026-10-24T11:38:15",
  "turno": {
-  "estado": "entre turnos: memória salva; o próximo turno começa em poucos minutos",
-  "inicio": "2026-10-24T10:55:45",
-  "fim_previsto": "2026-10-24T11:35:45",
-  "voltas": 112,
-  "planilhas": 2
+  "estado": "trabalhando",
+  "inicio": "2026-10-24T11:38:15",
+  "fim_previsto": "2026-10-24T12:18:15",
+  "voltas": 0,
+  "planilhas": 0
  },
  "funcionarios": 101,
  "andares": [
@@ -166,9 +166,9 @@
   },
   {
    "rotina": "caixa_dono",
-   "execucoes_24h": 7,
+   "execucoes_24h": 8,
    "erros_24h": 0,
-   "ultima": "2026-10-24T10:55:24"
+   "ultima": "2026-10-24T11:38:13"
   },
   {
    "rotina": "demandas",
@@ -178,9 +178,9 @@
   },
   {
    "rotina": "dialogo",
-   "execucoes_24h": 7,
+   "execucoes_24h": 8,
    "erros_24h": 0,
-   "ultima": "2026-10-24T10:55:31"
+   "ultima": "2026-10-24T11:38:14"
   },
   {
    "rotina": "fabrica",
@@ -196,9 +196,9 @@
   },
   {
    "rotina": "jornada",
-   "execucoes_24h": 7,
+   "execucoes_24h": 8,
    "erros_24h": 0,
-   "ultima": "2026-10-24T10:55:24"
+   "ultima": "2026-10-24T11:38:13"
   },
   {
    "rotina": "laboratorio",
@@ -214,15 +214,15 @@
   },
   {
    "rotina": "memoria_pg",
-   "execucoes_24h": 16,
+   "execucoes_24h": 15,
    "erros_24h": 0,
-   "ultima": "2026-10-24T11:37:32"
+   "ultima": "2026-10-24T11:33:51"
   },
   {
    "rotina": "paineis",
-   "execucoes_24h": 7,
+   "execucoes_24h": 8,
    "erros_24h": 0,
-   "ultima": "2026-10-24T10:55:32"
+   "ultima": "2026-10-24T11:38:15"
   },
   {
    "rotina": "registro",
@@ -238,9 +238,9 @@
   },
   {
    "rotina": "ronda_ti",
-   "execucoes_24h": 14,
+   "execucoes_24h": 15,
    "erros_24h": 0,
-   "ultima": "2026-10-24T11:35:09"
+   "ultima": "2026-10-24T11:38:10"
   },
   {
    "rotina": "treino",
@@ -252,7 +252,1120 @@
  "totais": {
   "demandas": 128,
   "tentativas_treino": 4656,
-  "conversas": 1917,
-  "trabalhos_com_prova": 666
- }
+  "conversas": 1930,
+  "trabalhos_com_prova": 670
+ },
+ "pessoas": [
+  {
+   "nome": "Ana",
+   "andar": 1,
+   "cargo": "Modelagem",
+   "area": "Engenharia de Dados",
+   "demandas_hoje": 1,
+   "ultimo": "Diagnosticar a planilha original da fábrica",
+   "quando": "2026-10-24T06:19:59",
+   "estado": "concluida",
+   "situacao": "trabalho do papel"
+  },
+  {
+   "nome": "Beatriz",
+   "andar": 1,
+   "cargo": "Diretora de Dados e Engenharia (CDO)",
+   "area": "Engenharia de Dados",
+   "demandas_hoje": 1,
+   "ultimo": "Situação do andar agora",
+   "quando": "2026-10-24T11:25:41",
+   "estado": "concluida",
+   "situacao": "trabalho do papel"
+  },
+  {
+   "nome": "Beto",
+   "andar": 1,
+   "cargo": "Banco de dados (ELT)",
+   "area": "Engenharia de Dados",
+   "demandas_hoje": 1,
+   "ultimo": "Conferir no PostgreSQL os lotes da fábrica",
+   "quando": "2026-10-24T10:55:26",
+   "estado": "concluida",
+   "situacao": "trabalho do papel"
+  },
+  {
+   "nome": "Bruno",
+   "andar": 1,
+   "cargo": "Analista de Dados Júnior",
+   "area": "Qualidade de Dados",
+   "demandas_hoje": 2,
+   "ultimo": "Diagnosticar a planilha original da fábrica",
+   "quando": "2026-10-24T11:25:36",
+   "estado": "concluida",
+   "situacao": "trabalho do papel"
+  },
+  {
+   "nome": "Camila",
+   "andar": 1,
+   "cargo": "Analista de Dados Júnior",
+   "area": "Governança e Privacidade",
+   "demandas_hoje": 1,
+   "ultimo": "Verificar dados pessoais (LGPD) na base sintética",
+   "quando": "2026-10-24T11:25:45",
+   "estado": "concluida",
+   "situacao": "trabalho do papel"
+  },
+  {
+   "nome": "Carla",
+   "andar": 1,
+   "cargo": "Coordenadora de Engenharia de Dados",
+   "area": "Engenharia de Dados",
+   "demandas_hoje": 1,
+   "ultimo": "Consultar o conhecimento da área",
+   "quando": "2026-10-24T10:55:28",
+   "estado": "concluida",
+   "situacao": "estudo (o trabalho do papel estava bloqueado)"
+  },
+  {
+   "nome": "Dora",
+   "andar": 1,
+   "cargo": "DBA PostgreSQL",
+   "area": "Engenharia de Dados",
+   "demandas_hoje": 1,
+   "ultimo": "Conferir no PostgreSQL os lotes da fábrica",
+   "quando": "2026-10-24T11:25:31",
+   "estado": "concluida",
+   "situacao": "trabalho do papel"
+  },
+  {
+   "nome": "Duda",
+   "andar": 1,
+   "cargo": "Publicação e arquivo",
+   "area": "Governança e Privacidade",
+   "demandas_hoje": 1,
+   "ultimo": "Verificar dados pessoais (LGPD) na base sintética",
+   "quando": "2026-10-24T06:20:09",
+   "estado": "concluida",
+   "situacao": "trabalho do papel"
+  },
+  {
+   "nome": "Eduardo",
+   "andar": 1,
+   "cargo": "Head de Engenharia de Dados",
+   "area": "Engenharia de Dados",
+   "demandas_hoje": 1,
+   "ultimo": "Diagnosticar a planilha original da fábrica",
+   "quando": "2026-10-24T11:25:44",
+   "estado": "concluida",
+   "situacao": "trabalho do papel"
+  },
+  {
+   "nome": "Júlia",
+   "andar": 1,
+   "cargo": "Engenheira de Dados Pleno",
+   "area": "Engenharia de Dados",
+   "demandas_hoje": 1,
+   "ultimo": "Consultar o conhecimento da área",
+   "quando": "2026-10-24T05:49:53",
+   "estado": "concluida",
+   "situacao": "estudo (o trabalho do papel estava bloqueado)"
+  },
+  {
+   "nome": "Leo",
+   "andar": 1,
+   "cargo": "Leitura (Extração)",
+   "area": "Engenharia de Dados",
+   "demandas_hoje": 1,
+   "ultimo": "Consultar o conhecimento da área",
+   "quando": "2026-10-24T05:49:54",
+   "estado": "concluida",
+   "situacao": "estudo (o trabalho do papel estava bloqueado)"
+  },
+  {
+   "nome": "Lia",
+   "andar": 1,
+   "cargo": "Limpeza",
+   "area": "Qualidade de Dados",
+   "demandas_hoje": 1,
+   "ultimo": "Consultar o conhecimento da área",
+   "quando": "2026-10-24T05:49:54",
+   "estado": "concluida",
+   "situacao": "estudo (o trabalho do papel estava bloqueado)"
+  },
+  {
+   "nome": "Marcelo",
+   "andar": 1,
+   "cargo": "Gerente de Engenharia de Dados",
+   "area": "Engenharia de Dados",
+   "demandas_hoje": 1,
+   "ultimo": "Situação do andar agora",
+   "quando": "2026-10-24T05:49:53",
+   "estado": "concluida",
+   "situacao": "trabalho do papel"
+  },
+  {
+   "nome": "Otto",
+   "andar": 1,
+   "cargo": "Auditoria (Validação)",
+   "area": "Governança e Privacidade",
+   "demandas_hoje": 1,
+   "ultimo": "Consultar o conhecimento da área",
+   "quando": "2026-10-24T10:55:24",
+   "estado": "concluida",
+   "situacao": "estudo (o trabalho do papel estava bloqueado)"
+  },
+  {
+   "nome": "Rafael",
+   "andar": 1,
+   "cargo": "Engenheiro de Dados Pleno",
+   "area": "Engenharia de Dados",
+   "demandas_hoje": 1,
+   "ultimo": "Diagnosticar a planilha original da fábrica",
+   "quando": "2026-10-24T01:10:22",
+   "estado": "concluida",
+   "situacao": "trabalho do papel"
+  },
+  {
+   "nome": "Rita",
+   "andar": 1,
+   "cargo": "Recepção",
+   "area": "Engenharia de Dados",
+   "demandas_hoje": 1,
+   "ultimo": "Diagnosticar a planilha original da fábrica",
+   "quando": "2026-10-24T06:20:21",
+   "estado": "concluida",
+   "situacao": "trabalho do papel"
+  },
+  {
+   "nome": "Saulo",
+   "andar": 1,
+   "cargo": "Supervisor de Planilhas",
+   "area": "Qualidade de Dados",
+   "demandas_hoje": 1,
+   "ultimo": "Calcular a média de uma métrica da base sintética",
+   "quando": "2026-10-24T06:20:30",
+   "estado": "concluida",
+   "situacao": "trabalho do papel"
+  },
+  {
+   "nome": "Théo",
+   "andar": 1,
+   "cargo": "Estagiário de Engenharia de Dados",
+   "area": "Engenharia de Dados",
+   "demandas_hoje": 0,
+   "ultimo": "",
+   "quando": "",
+   "estado": "",
+   "situacao": "estagiário: observa (regra do dono) — Observei Dora (DBA PostgreSQL) fazendo \"Conferir no PostgreSQL os lotes da fábrica\" no nível basico: terminou concluida."
+  },
+  {
+   "nome": "Tina",
+   "andar": 1,
+   "cargo": "Contatos e NPS",
+   "area": "",
+   "demandas_hoje": 1,
+   "ultimo": "Consultar o conhecimento da área",
+   "quando": "2026-10-24T10:55:24",
+   "estado": "concluida",
+   "situacao": "estudo (o trabalho do papel estava bloqueado)"
+  },
+  {
+   "nome": "Bia",
+   "andar": 2,
+   "cargo": "Perfil dos dados",
+   "area": "Análise de Dados",
+   "demandas_hoje": 1,
+   "ultimo": "Consultar o conhecimento da área",
+   "quando": "2026-10-24T10:55:24",
+   "estado": "concluida",
+   "situacao": "estudo (o trabalho do papel estava bloqueado)"
+  },
+  {
+   "nome": "Caio",
+   "andar": 2,
+   "cargo": "Indicadores (NPS, CSAT, CES)",
+   "area": "Customer Insights e Pesquisa",
+   "demandas_hoje": 1,
+   "ultimo": "Perfil e indicadores da base sintética",
+   "quando": "2026-10-24T06:20:22",
+   "estado": "concluida",
+   "situacao": "trabalho do papel"
+  },
+  {
+   "nome": "Carolina",
+   "andar": 2,
+   "cargo": "Cientista de Dados Pleno",
+   "area": "Análise de Dados",
+   "demandas_hoje": 2,
+   "ultimo": "Calcular a média de uma métrica da base sintética",
+   "quando": "2026-10-24T11:25:42",
+   "estado": "concluida",
+   "situacao": "trabalho do papel"
+  },
+  {
+   "nome": "Davi",
+   "andar": 2,
+   "cargo": "Estatística",
+   "area": "Estatística",
+   "demandas_hoje": 1,
+   "ultimo": "Calcular a média de uma métrica da base sintética",
+   "quando": "2026-10-24T06:20:11",
+   "estado": "concluida",
+   "situacao": "trabalho do papel"
+  },
+  {
+   "nome": "Eva",
+   "andar": 2,
+   "cargo": "Monitoramento",
+   "area": "Qualidade de Dados",
+   "demandas_hoje": 1,
+   "ultimo": "Diagnosticar a planilha original da fábrica",
+   "quando": "2026-10-24T06:20:34",
+   "estado": "concluida",
+   "situacao": "trabalho do papel"
+  },
+  {
+   "nome": "Fábio",
+   "andar": 2,
+   "cargo": "Relator",
+   "area": "Storytelling e Negócio",
+   "demandas_hoje": 2,
+   "ultimo": "Consultar o conhecimento da área",
+   "quando": "2026-10-24T10:55:25",
+   "estado": "concluida",
+   "situacao": "estudo (o trabalho do papel estava bloqueado)"
+  },
+  {
+   "nome": "Igor",
+   "andar": 2,
+   "cargo": "Analista de Dados Júnior",
+   "area": "Análise de Dados",
+   "demandas_hoje": 1,
+   "ultimo": "Consultar o conhecimento da área",
+   "quando": "2026-10-24T05:49:54",
+   "estado": "concluida",
+   "situacao": "estudo (o trabalho do papel estava bloqueado)"
+  },
+  {
+   "nome": "Larissa",
+   "andar": 2,
+   "cargo": "Analista de Customer Insights Pleno",
+   "area": "Customer Insights e Pesquisa",
+   "demandas_hoje": 1,
+   "ultimo": "Consultar o conhecimento da área",
+   "quando": "2026-10-24T05:49:57",
+   "estado": "concluida",
+   "situacao": "estudo (o trabalho do papel estava bloqueado)"
+  },
+  {
+   "nome": "Lucas",
+   "andar": 2,
+   "cargo": "Cientista de Dados Júnior",
+   "area": "Qualidade de Dados",
+   "demandas_hoje": 2,
+   "ultimo": "Diagnosticar a planilha original da fábrica",
+   "quando": "2026-10-24T11:25:39",
+   "estado": "concluida",
+   "situacao": "trabalho do papel"
+  },
+  {
+   "nome": "Manu",
+   "andar": 2,
+   "cargo": "Estagiária de Análise de Dados",
+   "area": "Análise de Dados",
+   "demandas_hoje": 0,
+   "ultimo": "",
+   "quando": "",
+   "estado": "",
+   "situacao": "estagiário: observa (regra do dono) — Observei Carolina (Cientista de Dados Pleno) fazendo \"Calcular a média de uma métrica da base sintética\" no nível basico"
+  },
+  {
+   "nome": "Marcos",
+   "andar": 2,
+   "cargo": "Coordenador de Análise e Ciência de Dados",
+   "area": "Análise de Dados",
+   "demandas_hoje": 1,
+   "ultimo": "Consultar o conhecimento da área",
+   "quando": "2026-10-24T10:55:28",
+   "estado": "concluida",
+   "situacao": "estudo (o trabalho do papel estava bloqueado)"
+  },
+  {
+   "nome": "Natália",
+   "andar": 2,
+   "cargo": "Head de Ciência de Dados",
+   "area": "Estatística",
+   "demandas_hoje": 1,
+   "ultimo": "Auditoria por amostragem",
+   "quando": "2026-10-24T05:49:53",
+   "estado": "concluida",
+   "situacao": "trabalho do papel"
+  },
+  {
+   "nome": "Patrícia",
+   "andar": 2,
+   "cargo": "Gerente de Analytics e Customer Insights",
+   "area": "Customer Insights e Pesquisa",
+   "demandas_hoje": 1,
+   "ultimo": "Perfil e indicadores da base sintética",
+   "quando": "2026-10-24T11:25:33",
+   "estado": "concluida",
+   "situacao": "trabalho do papel"
+  },
+  {
+   "nome": "Rogério",
+   "andar": 2,
+   "cargo": "Diretor de Analytics, Ciência de Dados e BI",
+   "area": "Customer Insights e Pesquisa",
+   "demandas_hoje": 1,
+   "ultimo": "Situação do andar agora",
+   "quando": "2026-10-24T10:55:28",
+   "estado": "concluida",
+   "situacao": "trabalho do papel"
+  },
+  {
+   "nome": "Sérgio",
+   "andar": 2,
+   "cargo": "Analista de Dados Pleno",
+   "area": "Estatística",
+   "demandas_hoje": 1,
+   "ultimo": "Calcular a média de uma métrica da base sintética",
+   "quando": "2026-10-24T06:20:04",
+   "estado": "concluida",
+   "situacao": "trabalho do papel"
+  },
+  {
+   "nome": "Vinícius",
+   "andar": 2,
+   "cargo": "Cientista de Dados Sênior",
+   "area": "Estatística",
+   "demandas_hoje": 1,
+   "ultimo": "Consultar o conhecimento da área",
+   "quando": "2026-10-24T05:49:53",
+   "estado": "concluida",
+   "situacao": "estudo (o trabalho do papel estava bloqueado)"
+  },
+  {
+   "nome": "Bárbara",
+   "andar": 3,
+   "cargo": "Especialista Sênior em Power BI",
+   "area": "Storytelling e Negócio",
+   "demandas_hoje": 1,
+   "ultimo": "Conferir no PostgreSQL os lotes da fábrica",
+   "quando": "2026-10-24T05:49:55",
+   "estado": "concluida",
+   "situacao": "trabalho do papel"
+  },
+  {
+   "nome": "Enzo",
+   "andar": 3,
+   "cargo": "Estagiário da Sala Excel",
+   "area": "Engenharia de Dados",
+   "demandas_hoje": 0,
+   "ultimo": "",
+   "quando": "",
+   "estado": "",
+   "situacao": "estagiário: observa (regra do dono) — Observei Dora (DBA PostgreSQL) fazendo \"Conferir no PostgreSQL os lotes da fábrica\" no nível basico: terminou concluida."
+  },
+  {
+   "nome": "Felipe",
+   "andar": 3,
+   "cargo": "Head de BI e Excel",
+   "area": "Storytelling e Negócio",
+   "demandas_hoje": 1,
+   "ultimo": "Consultar o conhecimento da área",
+   "quando": "2026-10-24T10:55:24",
+   "estado": "concluida",
+   "situacao": "estudo (o trabalho do papel estava bloqueado)"
+  },
+  {
+   "nome": "Gabriel",
+   "andar": 3,
+   "cargo": "Especialista em Tabelas Dinâmicas e Dashboards",
+   "area": "Storytelling e Negócio",
+   "demandas_hoje": 1,
+   "ultimo": "Calcular a média de uma métrica da base sintética",
+   "quando": "2026-10-24T06:20:16",
+   "estado": "concluida",
+   "situacao": "trabalho do papel"
+  },
+  {
+   "nome": "Heitor",
+   "andar": 3,
+   "cargo": "Analista Pleno de BI",
+   "area": "Análise de Dados",
+   "demandas_hoje": 1,
+   "ultimo": "Conferir no PostgreSQL os lotes da fábrica",
+   "quando": "2026-10-24T06:20:02",
+   "estado": "concluida",
+   "situacao": "trabalho do papel"
+  },
+  {
+   "nome": "Hugo",
+   "andar": 3,
+   "cargo": "Analista de Excel Pleno",
+   "area": "Engenharia de Dados",
+   "demandas_hoje": 1,
+   "ultimo": "Consultar o conhecimento da área",
+   "quando": "2026-10-24T05:49:54",
+   "estado": "concluida",
+   "situacao": "estudo (o trabalho do papel estava bloqueado)"
+  },
+  {
+   "nome": "Lúcia",
+   "andar": 3,
+   "cargo": "Especialista em Fórmulas e Power Query",
+   "area": "Engenharia de Dados",
+   "demandas_hoje": 1,
+   "ultimo": "Calcular a média de uma métrica da base sintética",
+   "quando": "2026-10-24T06:20:25",
+   "estado": "concluida",
+   "situacao": "trabalho do papel"
+  },
+  {
+   "nome": "Paula",
+   "andar": 3,
+   "cargo": "Analista de Excel Júnior",
+   "area": "Storytelling e Negócio",
+   "demandas_hoje": 1,
+   "ultimo": "Consultar o conhecimento da área",
+   "quando": "2026-10-24T05:49:53",
+   "estado": "concluida",
+   "situacao": "estudo (o trabalho do papel estava bloqueado)"
+  },
+  {
+   "nome": "Pedro",
+   "andar": 3,
+   "cargo": "Especialista em Pesquisa de Mercado",
+   "area": "Customer Insights e Pesquisa",
+   "demandas_hoje": 2,
+   "ultimo": "Consultar o conhecimento da área",
+   "quando": "2026-10-24T10:55:25",
+   "estado": "concluida",
+   "situacao": "estudo (o trabalho do papel estava bloqueado)"
+  },
+  {
+   "nome": "Ricardo",
+   "andar": 3,
+   "cargo": "Gerente da Sala Excel",
+   "area": "Storytelling e Negócio",
+   "demandas_hoje": 2,
+   "ultimo": "Situação do andar agora",
+   "quando": "2026-10-24T10:55:28",
+   "estado": "concluida",
+   "situacao": "trabalho do papel"
+  },
+  {
+   "nome": "Sílvia",
+   "andar": 3,
+   "cargo": "Coordenadora da Sala Excel",
+   "area": "Engenharia de Dados",
+   "demandas_hoje": 1,
+   "ultimo": "Calcular a média de uma métrica da base sintética",
+   "quando": "2026-10-24T06:20:36",
+   "estado": "concluida",
+   "situacao": "trabalho do papel"
+  },
+  {
+   "nome": "Tânia",
+   "andar": 3,
+   "cargo": "Especialista em Trade Marketing",
+   "area": "Customer Insights e Pesquisa",
+   "demandas_hoje": 1,
+   "ultimo": "Consultar o conhecimento da área",
+   "quando": "2026-10-24T05:49:53",
+   "estado": "concluida",
+   "situacao": "estudo (o trabalho do papel estava bloqueado)"
+  },
+  {
+   "nome": "Augusto",
+   "andar": 4,
+   "cargo": "Designer de Casos",
+   "area": "Treinamento e Avaliação",
+   "demandas_hoje": 1,
+   "ultimo": "Revisar um caso de treino feito por outro designer",
+   "quando": "2026-10-24T01:10:16",
+   "estado": "concluida",
+   "situacao": "trabalho do papel"
+  },
+  {
+   "nome": "Aurora",
+   "andar": 4,
+   "cargo": "Coordenadora de Demandas",
+   "area": "Treinamento e Avaliação",
+   "demandas_hoje": 0,
+   "ultimo": "",
+   "quando": "",
+   "estado": "",
+   "situacao": "trabalho do papel na rotina demandas"
+  },
+  {
+   "nome": "Bento",
+   "andar": 4,
+   "cargo": "Avaliador Independente de Demandas",
+   "area": "Treinamento e Avaliação",
+   "demandas_hoje": 0,
+   "ultimo": "",
+   "quando": "",
+   "estado": "",
+   "situacao": "trabalho do papel na rotina demandas"
+  },
+  {
+   "nome": "Celina",
+   "andar": 4,
+   "cargo": "Especialista Sênior em Dados de Treino",
+   "area": "Qualidade de Dados",
+   "demandas_hoje": 0,
+   "ultimo": "",
+   "quando": "",
+   "estado": "",
+   "situacao": "trabalho do papel na rotina fabrica"
+  },
+  {
+   "nome": "Cláudia",
+   "andar": 4,
+   "cargo": "Diretora de Operações e Governança",
+   "area": "Governança e Privacidade",
+   "demandas_hoje": 1,
+   "ultimo": "Scorecard da área",
+   "quando": "2026-10-24T10:55:28",
+   "estado": "concluida",
+   "situacao": "trabalho do papel"
+  },
+  {
+   "nome": "Helena",
+   "andar": 4,
+   "cargo": "RH e desenvolvimento da equipe",
+   "area": "Governança e Privacidade",
+   "demandas_hoje": 1,
+   "ultimo": "Situação do andar agora",
+   "quando": "2026-10-24T10:55:24",
+   "estado": "concluida",
+   "situacao": "trabalho do papel"
+  },
+  {
+   "nome": "Iara",
+   "andar": 4,
+   "cargo": "Ideias e evolução da plataforma",
+   "area": "Storytelling e Negócio",
+   "demandas_hoje": 1,
+   "ultimo": "Consultar o conhecimento da área",
+   "quando": "2026-10-24T10:55:25",
+   "estado": "concluida",
+   "situacao": "estudo (o trabalho do papel estava bloqueado)"
+  },
+  {
+   "nome": "Isadora",
+   "andar": 4,
+   "cargo": "Analista Pleno de Distribuição de Demandas",
+   "area": "Treinamento e Avaliação",
+   "demandas_hoje": 0,
+   "ultimo": "",
+   "quando": "",
+   "estado": "",
+   "situacao": "trabalho do papel na rotina demandas"
+  },
+  {
+   "nome": "Joana",
+   "andar": 4,
+   "cargo": "Analista Júnior de Dados Sintéticos",
+   "area": "Engenharia de Dados",
+   "demandas_hoje": 0,
+   "ultimo": "",
+   "quando": "",
+   "estado": "",
+   "situacao": "trabalho do papel na rotina fabrica"
+  },
+  {
+   "nome": "Juliana",
+   "andar": 4,
+   "cargo": "Head de Gente e Gestão",
+   "area": "Pessoas e Cultura",
+   "demandas_hoje": 1,
+   "ultimo": "Auditoria por amostragem",
+   "quando": "2026-10-24T05:49:54",
+   "estado": "concluida",
+   "situacao": "trabalho do papel"
+  },
+  {
+   "nome": "Lara",
+   "andar": 4,
+   "cargo": "Estagiária de Documentação de Dados",
+   "area": "Governança e Privacidade",
+   "demandas_hoje": 0,
+   "ultimo": "",
+   "quando": "",
+   "estado": "",
+   "situacao": "estagiário: observa (regra do dono) — Observei Wagner (Especialista Sênior em Segurança da Informação) fazendo \"Verificar dados pessoais (LGPD) na base sintét"
+  },
+  {
+   "nome": "Lorena",
+   "andar": 4,
+   "cargo": "Estagiária de RH",
+   "area": "Pessoas e Cultura",
+   "demandas_hoje": 0,
+   "ultimo": "",
+   "quando": "",
+   "estado": "",
+   "situacao": "estagiário: observa (regra do dono) — Observei Renata (Gerente de Operações e Governança de Dados) fazendo \"Situação do andar agora\" no nível basico: terminou"
+  },
+  {
+   "nome": "Lívia",
+   "andar": 4,
+   "cargo": "Designer de Casos",
+   "area": "Treinamento e Avaliação",
+   "demandas_hoje": 1,
+   "ultimo": "Revisar um caso de treino feito por outro designer",
+   "quando": "2026-10-24T11:25:45",
+   "estado": "concluida",
+   "situacao": "trabalho do papel"
+  },
+  {
+   "nome": "Marta",
+   "andar": 4,
+   "cargo": "Diretora de Pessoas e Cultura (CHRO)",
+   "area": "Pessoas e Cultura",
+   "demandas_hoje": 1,
+   "ultimo": "Scorecard da área",
+   "quando": "2026-10-24T10:55:29",
+   "estado": "concluida",
+   "situacao": "trabalho do papel"
+  },
+  {
+   "nome": "Mauro",
+   "andar": 4,
+   "cargo": "Analista de Desempenho Sênior",
+   "area": "Pessoas e Cultura",
+   "demandas_hoje": 1,
+   "ultimo": "Desempenho da semana",
+   "quando": "2026-10-24T06:20:01",
+   "estado": "concluida",
+   "situacao": "trabalho do papel"
+  },
+  {
+   "nome": "Murilo",
+   "andar": 4,
+   "cargo": "Designer de Casos",
+   "area": "Treinamento e Avaliação",
+   "demandas_hoje": 1,
+   "ultimo": "Revisar um caso de treino feito por outro designer",
+   "quando": "2026-10-24T11:25:42",
+   "estado": "concluida",
+   "situacao": "trabalho do papel"
+  },
+  {
+   "nome": "Nina",
+   "andar": 4,
+   "cargo": "Assistente do canal",
+   "area": "Storytelling e Negócio",
+   "demandas_hoje": 1,
+   "ultimo": "Calcular a média de uma métrica da base sintética",
+   "quando": "2026-10-24T11:25:37",
+   "estado": "concluida",
+   "situacao": "trabalho do papel"
+  },
+  {
+   "nome": "Otávio",
+   "andar": 4,
+   "cargo": "Head da Sala de Casos",
+   "area": "Treinamento e Avaliação",
+   "demandas_hoje": 1,
+   "ultimo": "Consultar o conhecimento da área",
+   "quando": "2026-10-24T05:49:53",
+   "estado": "concluida",
+   "situacao": "estudo (o trabalho do papel estava bloqueado)"
+  },
+  {
+   "nome": "Priscila",
+   "andar": 4,
+   "cargo": "Analista de Recrutamento e Seleção Pleno",
+   "area": "Pessoas e Cultura",
+   "demandas_hoje": 1,
+   "ultimo": "Situação das contratações",
+   "quando": "2026-10-24T06:20:22",
+   "estado": "concluida",
+   "situacao": "trabalho do papel"
+  },
+  {
+   "nome": "Raquel",
+   "andar": 4,
+   "cargo": "Designer de Casos",
+   "area": "Treinamento e Avaliação",
+   "demandas_hoje": 1,
+   "ultimo": "Revisar um caso de treino feito por outro designer",
+   "quando": "2026-10-24T11:25:45",
+   "estado": "concluida",
+   "situacao": "trabalho do papel"
+  },
+  {
+   "nome": "Renan",
+   "andar": 4,
+   "cargo": "Analista Pleno de Cobertura de Demandas",
+   "area": "Treinamento e Avaliação",
+   "demandas_hoje": 0,
+   "ultimo": "",
+   "quando": "",
+   "estado": "",
+   "situacao": "trabalho do papel na rotina demandas"
+  },
+  {
+   "nome": "Renata",
+   "andar": 4,
+   "cargo": "Gerente de Operações e Governança de Dados",
+   "area": "Governança e Privacidade",
+   "demandas_hoje": 1,
+   "ultimo": "Situação do andar agora",
+   "quando": "2026-10-24T11:25:34",
+   "estado": "concluida",
+   "situacao": "trabalho do papel"
+  },
+  {
+   "nome": "Roberta",
+   "andar": 4,
+   "cargo": "Analista de Treinamento e Desenvolvimento Pleno",
+   "area": "Pessoas e Cultura",
+   "demandas_hoje": 1,
+   "ultimo": "Planos de desenvolvimento 70-20-10",
+   "quando": "2026-10-24T06:20:30",
+   "estado": "concluida",
+   "situacao": "trabalho do papel"
+  },
+  {
+   "nome": "Ruan",
+   "andar": 4,
+   "cargo": "Analista Pleno de Qualidade de Dados Sintéticos",
+   "area": "Qualidade de Dados",
+   "demandas_hoje": 0,
+   "ultimo": "",
+   "quando": "",
+   "estado": "",
+   "situacao": "trabalho do papel na rotina fabrica"
+  },
+  {
+   "nome": "Simone",
+   "andar": 4,
+   "cargo": "Head de Governança de Dados",
+   "area": "Governança e Privacidade",
+   "demandas_hoje": 1,
+   "ultimo": "Auditoria por amostragem",
+   "quando": "2026-10-24T05:49:53",
+   "estado": "concluida",
+   "situacao": "trabalho do papel"
+  },
+  {
+   "nome": "Teodoro",
+   "andar": 4,
+   "cargo": "Coordenador da Fábrica de Planilhas",
+   "area": "Engenharia de Dados",
+   "demandas_hoje": 0,
+   "ultimo": "",
+   "quando": "",
+   "estado": "",
+   "situacao": "trabalho do papel na rotina fabrica"
+  },
+  {
+   "nome": "Tiago",
+   "andar": 4,
+   "cargo": "Analista de People Analytics Pleno",
+   "area": "Pessoas e Cultura",
+   "demandas_hoje": 1,
+   "ultimo": "Indicadores de pessoas",
+   "quando": "2026-10-24T06:20:11",
+   "estado": "concluida",
+   "situacao": "trabalho do papel"
+  },
+  {
+   "nome": "Valéria",
+   "andar": 4,
+   "cargo": "Revisora Independente de Casos",
+   "area": "Treinamento e Avaliação",
+   "demandas_hoje": 1,
+   "ultimo": "Consultar o conhecimento da área",
+   "quando": "2026-10-24T00:40:12",
+   "estado": "concluida",
+   "situacao": "estudo (o trabalho do papel estava bloqueado)"
+  },
+  {
+   "nome": "Vicente",
+   "andar": 4,
+   "cargo": "Analista Sênior de Geração de Demandas",
+   "area": "Treinamento e Avaliação",
+   "demandas_hoje": 0,
+   "ultimo": "",
+   "quando": "",
+   "estado": "",
+   "situacao": "trabalho do papel na rotina demandas"
+  },
+  {
+   "nome": "Vitor",
+   "andar": 4,
+   "cargo": "Analista de Governança Pleno",
+   "area": "Governança e Privacidade",
+   "demandas_hoje": 1,
+   "ultimo": "Consultar o conhecimento da área",
+   "quando": "2026-10-24T05:49:53",
+   "estado": "concluida",
+   "situacao": "estudo (o trabalho do papel estava bloqueado)"
+  },
+  {
+   "nome": "Yasmin",
+   "andar": 4,
+   "cargo": "Planejadora de Treino",
+   "area": "Treinamento e Avaliação",
+   "demandas_hoje": 2,
+   "ultimo": "Revisar um caso de treino feito por outro designer",
+   "quando": "2026-10-24T11:25:47",
+   "estado": "concluida",
+   "situacao": "trabalho do papel"
+  },
+  {
+   "nome": "Alexandre",
+   "andar": 5,
+   "cargo": "Diretor de Tecnologia (CTO)",
+   "area": "Engenharia de Dados",
+   "demandas_hoje": 1,
+   "ultimo": "Scorecard da área",
+   "quando": "2026-10-24T05:49:53",
+   "estado": "concluida",
+   "situacao": "trabalho do papel"
+  },
+  {
+   "nome": "André",
+   "andar": 5,
+   "cargo": "Head de Infraestrutura e Segurança",
+   "area": "Governança e Privacidade",
+   "demandas_hoje": 1,
+   "ultimo": "Auditoria por amostragem",
+   "quando": "2026-10-24T10:55:28",
+   "estado": "concluida",
+   "situacao": "trabalho do papel"
+  },
+  {
+   "nome": "Bianca",
+   "andar": 5,
+   "cargo": "Engenheira de Dados Pleno",
+   "area": "Engenharia de Dados",
+   "demandas_hoje": 1,
+   "ultimo": "Ronda de saúde do sistema",
+   "quando": "2026-10-24T11:25:40",
+   "estado": "concluida",
+   "situacao": "trabalho do papel"
+  },
+  {
+   "nome": "Caetano",
+   "andar": 5,
+   "cargo": "Especialista em Orquestração de Dados (Apache Airflow)",
+   "area": "Engenharia de Dados",
+   "demandas_hoje": 1,
+   "ultimo": "Ronda de saúde do sistema",
+   "quando": "2026-10-24T11:25:34",
+   "estado": "concluida",
+   "situacao": "trabalho do papel"
+  },
+  {
+   "nome": "Caíque",
+   "andar": 5,
+   "cargo": "Estagiário de DevOps",
+   "area": "Engenharia de Dados",
+   "demandas_hoje": 0,
+   "ultimo": "",
+   "quando": "",
+   "estado": "",
+   "situacao": "estagiário: observa (regra do dono) — Observei Dora (DBA PostgreSQL) fazendo \"Conferir no PostgreSQL os lotes da fábrica\" no nível basico: terminou concluida."
+  },
+  {
+   "nome": "Diego",
+   "andar": 5,
+   "cargo": "Desenvolvedor Python Pleno",
+   "area": "Engenharia de Dados",
+   "demandas_hoje": 1,
+   "ultimo": "Ronda de saúde do sistema",
+   "quando": "2026-10-24T01:10:20",
+   "estado": "concluida",
+   "situacao": "trabalho do papel"
+  },
+  {
+   "nome": "Elisa",
+   "andar": 5,
+   "cargo": "Especialista em PyYAML (configuração)",
+   "area": "Governança e Privacidade",
+   "demandas_hoje": 1,
+   "ultimo": "Revisão da biblioteca sob sua responsabilidade",
+   "quando": "2026-10-24T06:20:30",
+   "estado": "concluida",
+   "situacao": "trabalho do papel"
+  },
+  {
+   "nome": "Fernanda",
+   "andar": 5,
+   "cargo": "Coordenadora de DevOps e Confiabilidade (SRE)",
+   "area": "Engenharia de Dados",
+   "demandas_hoje": 1,
+   "ultimo": "Diagnosticar a planilha original da fábrica",
+   "quando": "2026-10-24T11:25:46",
+   "estado": "concluida",
+   "situacao": "trabalho do papel"
+  },
+  {
+   "nome": "Gael",
+   "andar": 5,
+   "cargo": "Estagiário de Engenharia de Dados (Airflow)",
+   "area": "Engenharia de Dados",
+   "demandas_hoje": 0,
+   "ultimo": "",
+   "quando": "",
+   "estado": "",
+   "situacao": "estagiário: observa (regra do dono) — Observei Dora (DBA PostgreSQL) fazendo \"Conferir no PostgreSQL os lotes da fábrica\" no nível basico: terminou concluida."
+  },
+  {
+   "nome": "Gustavo",
+   "andar": 5,
+   "cargo": "Gerente de TI e Infraestrutura",
+   "area": "Engenharia de Dados",
+   "demandas_hoje": 1,
+   "ultimo": "Quadro por andar e nível",
+   "quando": "2026-10-24T10:55:24",
+   "estado": "concluida",
+   "situacao": "trabalho do papel"
+  },
+  {
+   "nome": "Heloísa",
+   "andar": 5,
+   "cargo": "Head de AWS, Arquitetura e Governança de Nuvem",
+   "area": "Engenharia de Dados",
+   "demandas_hoje": 1,
+   "ultimo": "Conferir se o projeto está pronto para servidor",
+   "quando": "2026-10-24T10:55:24",
+   "estado": "concluida",
+   "situacao": "trabalho do papel"
+  },
+  {
+   "nome": "Henrique",
+   "andar": 5,
+   "cargo": "Head de Engenharia Python",
+   "area": "Engenharia de Dados",
+   "demandas_hoje": 1,
+   "ultimo": "Revisão da biblioteca sob sua responsabilidade",
+   "quando": "2026-10-24T10:55:25",
+   "estado": "concluida",
+   "situacao": "trabalho do papel"
+  },
+  {
+   "nome": "Letícia",
+   "andar": 5,
+   "cargo": "Desenvolvedora Júnior",
+   "area": "Engenharia de Dados",
+   "demandas_hoje": 1,
+   "ultimo": "Ronda de saúde do sistema",
+   "quando": "2026-10-24T00:40:10",
+   "estado": "concluida",
+   "situacao": "trabalho do papel"
+  },
+  {
+   "nome": "Marina",
+   "andar": 5,
+   "cargo": "Arquiteta de Cloud (AWS)",
+   "area": "Engenharia de Dados",
+   "demandas_hoje": 1,
+   "ultimo": "Conferir se o projeto está pronto para servidor",
+   "quando": "2026-10-24T11:25:45",
+   "estado": "concluida",
+   "situacao": "trabalho do papel"
+  },
+  {
+   "nome": "Nicolas",
+   "andar": 5,
+   "cargo": "Especialista em numpy",
+   "area": "Estatística",
+   "demandas_hoje": 1,
+   "ultimo": "Revisão da biblioteca sob sua responsabilidade",
+   "quando": "2026-10-24T05:49:53",
+   "estado": "concluida",
+   "situacao": "trabalho do papel"
+  },
+  {
+   "nome": "Olívia",
+   "andar": 5,
+   "cargo": "Especialista em openpyxl (Excel)",
+   "area": "Engenharia de Dados",
+   "demandas_hoje": 1,
+   "ultimo": "Revisão da biblioteca sob sua responsabilidade",
+   "quando": "2026-10-24T05:49:53",
+   "estado": "concluida",
+   "situacao": "trabalho do papel"
+  },
+  {
+   "nome": "Pietro",
+   "andar": 5,
+   "cargo": "Especialista em psycopg (PostgreSQL)",
+   "area": "Engenharia de Dados",
+   "demandas_hoje": 1,
+   "ultimo": "Revisão da biblioteca sob sua responsabilidade",
+   "quando": "2026-10-24T06:19:59",
+   "estado": "concluida",
+   "situacao": "trabalho do papel"
+  },
+  {
+   "nome": "Rodrigo",
+   "andar": 5,
+   "cargo": "Analista de Infraestrutura Pleno",
+   "area": "Engenharia de Dados",
+   "demandas_hoje": 1,
+   "ultimo": "Ronda de saúde do sistema",
+   "quando": "2026-10-24T10:55:29",
+   "estado": "concluida",
+   "situacao": "trabalho do papel"
+  },
+  {
+   "nome": "Silas",
+   "andar": 5,
+   "cargo": "Especialista em sqlite3 (memória da empresa)",
+   "area": "Engenharia de Dados",
+   "demandas_hoje": 1,
+   "ultimo": "Revisão da biblioteca sob sua responsabilidade",
+   "quando": "2026-10-24T06:20:09",
+   "estado": "concluida",
+   "situacao": "trabalho do papel"
+  },
+  {
+   "nome": "Sofia",
+   "andar": 5,
+   "cargo": "Especialista em pandas",
+   "area": "Engenharia de Dados",
+   "demandas_hoje": 1,
+   "ultimo": "Revisão da biblioteca sob sua responsabilidade",
+   "quando": "2026-10-24T05:49:54",
+   "estado": "concluida",
+   "situacao": "trabalho do papel"
+  },
+  {
+   "nome": "Wagner",
+   "andar": 5,
+   "cargo": "Especialista Sênior em Segurança da Informação",
+   "area": "Governança e Privacidade",
+   "demandas_hoje": 1,
+   "ultimo": "Verificar dados pessoais (LGPD) na base sintética",
+   "quando": "2026-10-24T11:25:29",
+   "estado": "concluida",
+   "situacao": "trabalho do papel"
+  },
+  {
+   "nome": "Xavier",
+   "andar": 5,
+   "cargo": "Especialista em xlrd (.xls antigo)",
+   "area": "Engenharia de Dados",
+   "demandas_hoje": 1,
+   "ultimo": "Revisão da biblioteca sob sua responsabilidade",
+   "quando": "2026-10-24T06:20:21",
+   "estado": "concluida",
+   "situacao": "trabalho do papel"
+  },
+  {
+   "nome": "Ícaro",
+   "andar": 5,
+   "cargo": "Sênior de AWS, Linux e Ubuntu",
+   "area": "Engenharia de Dados",
+   "demandas_hoje": 1,
+   "ultimo": "Testar se o último backup volta",
+   "quando": "2026-10-24T11:25:44",
+   "estado": "concluida",
+   "situacao": "trabalho do papel"
+  }
+ ]
 }
