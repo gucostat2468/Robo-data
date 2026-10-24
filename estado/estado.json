@@ -1,12 +1,12 @@
 {
  "versao": 1,
- "gerado_em": "2026-10-24T12:52:39",
+ "gerado_em": "2026-10-24T13:00:40",
  "turno": {
   "estado": "trabalhando",
   "inicio": "2026-10-24T12:21:26",
   "fim_previsto": "2026-10-24T13:01:26",
-  "voltas": 88,
-  "planilhas": 1
+  "voltas": 103,
+  "planilhas": 2
  },
  "funcionarios": 101,
  "andares": [
@@ -14,12 +14,12 @@
    "andar": 1,
    "pessoas": 19,
    "trabalharam_hoje": 19,
-   "demandas": 27,
-   "concluidas": 26,
+   "demandas": 28,
+   "concluidas": 27,
    "parciais": 0,
    "falhas": 1,
-   "treino": 218,
-   "acertos": 197
+   "treino": 225,
+   "acertos": 204
   },
   {
    "andar": 2,
@@ -29,8 +29,8 @@
    "concluidas": 25,
    "parciais": 0,
    "falhas": 1,
-   "treino": 178,
-   "acertos": 160
+   "treino": 187,
+   "acertos": 168
   },
   {
    "andar": 3,
@@ -40,34 +40,98 @@
    "concluidas": 21,
    "parciais": 0,
    "falhas": 0,
-   "treino": 135,
+   "treino": 140,
    "acertos": 108
   },
   {
    "andar": 4,
    "pessoas": 31,
    "trabalharam_hoje": 31,
-   "demandas": 29,
-   "concluidas": 29,
+   "demandas": 31,
+   "concluidas": 31,
    "parciais": 0,
    "falhas": 0,
-   "treino": 348,
-   "acertos": 314
+   "treino": 356,
+   "acertos": 321
   },
   {
    "andar": 5,
    "pessoas": 23,
    "trabalharam_hoje": 23,
-   "demandas": 29,
-   "concluidas": 29,
+   "demandas": 34,
+   "concluidas": 34,
    "parciais": 0,
    "falhas": 0,
-   "treino": 261,
-   "acertos": 228
+   "treino": 262,
+   "acertos": 229
   }
  ],
  "agora": [],
  "ultimos": [
+  {
+   "quando": "2026-10-24T12:56:03",
+   "funcionario": "Marina",
+   "cargo": "Arquiteta de Cloud (AWS)",
+   "andar": 5,
+   "trabalho": "Ronda de saúde do sistema",
+   "estado": "concluida"
+  },
+  {
+   "quando": "2026-10-24T12:56:01",
+   "funcionario": "Ícaro",
+   "cargo": "Sênior de AWS, Linux e Ubuntu",
+   "andar": 5,
+   "trabalho": "Medir a saúde do PostgreSQL",
+   "estado": "concluida"
+  },
+  {
+   "quando": "2026-10-24T12:55:59",
+   "funcionario": "Heloísa",
+   "cargo": "Head de AWS, Arquitetura e Governança de Nuvem",
+   "andar": 5,
+   "trabalho": "Ronda de saúde do sistema",
+   "estado": "concluida"
+  },
+  {
+   "quando": "2026-10-24T12:55:57",
+   "funcionario": "Elisa",
+   "cargo": "Especialista em PyYAML (configuração)",
+   "andar": 5,
+   "trabalho": "Ronda de saúde do sistema",
+   "estado": "concluida"
+  },
+  {
+   "quando": "2026-10-24T12:55:57",
+   "funcionario": "Roberta",
+   "cargo": "Analista de Treinamento e Desenvolvimento Pleno",
+   "andar": 4,
+   "trabalho": "Desempenho da semana",
+   "estado": "concluida"
+  },
+  {
+   "quando": "2026-10-24T12:55:55",
+   "funcionario": "Saulo",
+   "cargo": "Supervisor de Planilhas",
+   "andar": 1,
+   "trabalho": "Diagnosticar a planilha original da fábrica",
+   "estado": "concluida"
+  },
+  {
+   "quando": "2026-10-24T12:55:53",
+   "funcionario": "Xavier",
+   "cargo": "Especialista em xlrd (.xls antigo)",
+   "andar": 5,
+   "trabalho": "Ronda de saúde do sistema",
+   "estado": "concluida"
+  },
+  {
+   "quando": "2026-10-24T12:55:53",
+   "funcionario": "Priscila",
+   "cargo": "Analista de Recrutamento e Seleção Pleno",
+   "andar": 4,
+   "trabalho": "Desempenho da semana",
+   "estado": "concluida"
+  },
   {
    "quando": "2026-10-24T12:27:02",
    "funcionario": "Sílvia",
@@ -83,70 +147,6 @@
    "andar": 2,
    "trabalho": "Conferir no PostgreSQL os lotes da fábrica",
    "estado": "concluida"
-  },
-  {
-   "quando": "2026-10-24T12:26:50",
-   "funcionario": "Rita",
-   "cargo": "Recepção",
-   "andar": 1,
-   "trabalho": "Conferir no PostgreSQL os lotes da fábrica",
-   "estado": "concluida"
-  },
-  {
-   "quando": "2026-10-24T12:26:46",
-   "funcionario": "Silas",
-   "cargo": "Especialista em sqlite3 (memória da empresa)",
-   "andar": 5,
-   "trabalho": "Ronda de saúde do sistema",
-   "estado": "concluida"
-  },
-  {
-   "quando": "2026-10-24T12:26:46",
-   "funcionario": "Tiago",
-   "cargo": "Analista de People Analytics Pleno",
-   "andar": 4,
-   "trabalho": "Desempenho da semana",
-   "estado": "concluida"
-  },
-  {
-   "quando": "2026-10-24T12:26:45",
-   "funcionario": "Lúcia",
-   "cargo": "Especialista em Fórmulas e Power Query",
-   "andar": 3,
-   "trabalho": "Exercício de SQL no PostgreSQL com os dados da fábrica",
-   "estado": "concluida"
-  },
-  {
-   "quando": "2026-10-24T12:26:37",
-   "funcionario": "Caio",
-   "cargo": "Indicadores (NPS, CSAT, CES)",
-   "andar": 2,
-   "trabalho": "Conferir no PostgreSQL os lotes da fábrica",
-   "estado": "concluida"
-  },
-  {
-   "quando": "2026-10-24T12:26:33",
-   "funcionario": "Duda",
-   "cargo": "Publicação e arquivo",
-   "andar": 1,
-   "trabalho": "Conferir no PostgreSQL os lotes da fábrica",
-   "estado": "concluida"
-  },
-  {
-   "quando": "2026-10-24T12:26:29",
-   "funcionario": "Pietro",
-   "cargo": "Especialista em psycopg (PostgreSQL)",
-   "andar": 5,
-   "trabalho": "Conferir no PostgreSQL os lotes da fábrica",
-   "estado": "concluida"
-  },
-  {
-   "quando": "2026-10-24T12:26:29",
-   "funcionario": "Mauro",
-   "cargo": "Analista de Desempenho Sênior",
-   "andar": 4,
-   "trabalho": "Indicadores de pessoas",
-   "estado": "concluida"
   }
  ],
  "sql": {
@@ -154,7 +154,7 @@
   "concluidos_hoje": 4
  },
  "fabrica": {
-  "lotes_hoje": 8,
+  "lotes_hoje": 9,
   "conferidos_ok_hoje": 8
  },
  "rotinas": [
@@ -172,9 +172,9 @@
   },
   {
    "rotina": "demandas",
-   "execucoes_24h": 13,
+   "execucoes_24h": 14,
    "erros_24h": 0,
-   "ultima": "2026-10-24T12:27:02"
+   "ultima": "2026-10-24T12:56:03"
   },
   {
    "rotina": "dialogo",
@@ -184,9 +184,9 @@
   },
   {
    "rotina": "fabrica",
-   "execucoes_24h": 26,
+   "execucoes_24h": 27,
    "erros_24h": 0,
-   "ultima": "2026-10-24T12:27:58"
+   "ultima": "2026-10-24T12:57:33"
   },
   {
    "rotina": "ideias",
@@ -214,9 +214,9 @@
   },
   {
    "rotina": "memoria_pg",
-   "execucoes_24h": 20,
+   "execucoes_24h": 21,
    "erros_24h": 0,
-   "ultima": "2026-10-24T12:47:19"
+   "ultima": "2026-10-24T13:00:36"
   },
   {
    "rotina": "paineis",
@@ -226,9 +226,9 @@
   },
   {
    "rotina": "registro",
-   "execucoes_24h": 165,
+   "execucoes_24h": 168,
    "erros_24h": 0,
-   "ultima": "2026-10-24T12:52:39"
+   "ultima": "2026-10-24T12:57:52"
   },
   {
    "rotina": "rh_desempenho",
@@ -244,16 +244,16 @@
   },
   {
    "rotina": "treino",
-   "execucoes_24h": 117,
+   "execucoes_24h": 119,
    "erros_24h": 0,
-   "ultima": "2026-10-24T12:52:24"
+   "ultima": "2026-10-24T12:57:32"
   }
  ],
  "totais": {
-  "demandas": 168,
-  "tentativas_treino": 5091,
-  "conversas": 2138,
-  "trabalhos_com_prova": 848
+  "demandas": 176,
+  "tentativas_treino": 5121,
+  "conversas": 2157,
+  "trabalhos_com_prova": 869
  },
  "pessoas": [
   {
@@ -437,9 +437,9 @@
    "andar": 1,
    "cargo": "Supervisor de Planilhas",
    "area": "Qualidade de Dados",
-   "demandas_hoje": 1,
-   "ultimo": "Calcular a média de uma métrica da base sintética",
-   "quando": "2026-10-24T06:20:30",
+   "demandas_hoje": 2,
+   "ultimo": "Diagnosticar a planilha original da fábrica",
+   "quando": "2026-10-24T12:55:53",
    "estado": "concluida",
    "situacao": "trabalho do papel"
   },
@@ -452,7 +452,7 @@
    "ultimo": "",
    "quando": "",
    "estado": "",
-   "situacao": "estagiário: observa (regra do dono) — Observei Olívia (Especialista em openpyxl (Excel)) fazendo \"Ronda de saúde do sistema\" no nível basico: terminou conclui"
+   "situacao": "estagiário: observa (regra do dono) — Observei Xavier (Especialista em xlrd (.xls antigo)) fazendo \"Ronda de saúde do sistema\" no nível basico: terminou concl"
   },
   {
    "nome": "Tina",
@@ -573,7 +573,7 @@
    "ultimo": "",
    "quando": "",
    "estado": "",
-   "situacao": "estagiário: observa (regra do dono) — Observei Heitor (Analista Pleno de BI) fazendo \"Exercício de SQL no PostgreSQL com os dados da fábrica\" no nível basico:"
+   "situacao": "estagiário: observa (regra do dono)"
   },
   {
    "nome": "Marcos",
@@ -661,7 +661,7 @@
    "ultimo": "",
    "quando": "",
    "estado": "",
-   "situacao": "estagiário: observa (regra do dono) — Observei Olívia (Especialista em openpyxl (Excel)) fazendo \"Ronda de saúde do sistema\" no nível basico: terminou conclui"
+   "situacao": "estagiário: observa (regra do dono) — Observei Xavier (Especialista em xlrd (.xls antigo)) fazendo \"Ronda de saúde do sistema\" no nível basico: terminou concl"
   },
   {
    "nome": "Felipe",
@@ -892,7 +892,7 @@
    "ultimo": "",
    "quando": "",
    "estado": "",
-   "situacao": "estagiário: observa (regra do dono) — Observei Simone (Head de Governança de Dados) fazendo \"Situação do andar agora\" no nível basico: terminou concluida."
+   "situacao": "estagiário: observa (regra do dono) — Observei Elisa (Especialista em PyYAML (configuração)) fazendo \"Ronda de saúde do sistema\" no nível basico: terminou con"
   },
   {
    "nome": "Lorena",
@@ -903,7 +903,7 @@
    "ultimo": "",
    "quando": "",
    "estado": "",
-   "situacao": "estagiário: observa (regra do dono) — Observei Juliana (Head de Gente e Gestão) fazendo \"Indicadores de pessoas\" no nível basico: terminou concluida."
+   "situacao": "estagiário: observa (regra do dono) — Observei Priscila (Analista de Recrutamento e Seleção Pleno) fazendo \"Desempenho da semana\" no nível basico: terminou co"
   },
   {
    "nome": "Lívia",
@@ -976,9 +976,9 @@
    "andar": 4,
    "cargo": "Analista de Recrutamento e Seleção Pleno",
    "area": "Pessoas e Cultura",
-   "demandas_hoje": 1,
-   "ultimo": "Situação das contratações",
-   "quando": "2026-10-24T06:20:22",
+   "demandas_hoje": 2,
+   "ultimo": "Desempenho da semana",
+   "quando": "2026-10-24T12:55:53",
    "estado": "concluida",
    "situacao": "trabalho do papel"
   },
@@ -1020,9 +1020,9 @@
    "andar": 4,
    "cargo": "Analista de Treinamento e Desenvolvimento Pleno",
    "area": "Pessoas e Cultura",
-   "demandas_hoje": 1,
-   "ultimo": "Planos de desenvolvimento 70-20-10",
-   "quando": "2026-10-24T06:20:30",
+   "demandas_hoje": 2,
+   "ultimo": "Desempenho da semana",
+   "quando": "2026-10-24T12:55:57",
    "estado": "concluida",
    "situacao": "trabalho do papel"
   },
@@ -1167,7 +1167,7 @@
    "ultimo": "",
    "quando": "",
    "estado": "",
-   "situacao": "estagiário: observa (regra do dono) — Observei Olívia (Especialista em openpyxl (Excel)) fazendo \"Ronda de saúde do sistema\" no nível basico: terminou conclui"
+   "situacao": "estagiário: observa (regra do dono) — Observei Xavier (Especialista em xlrd (.xls antigo)) fazendo \"Ronda de saúde do sistema\" no nível basico: terminou concl"
   },
   {
    "nome": "Diego",
@@ -1185,9 +1185,9 @@
    "andar": 5,
    "cargo": "Especialista em PyYAML (configuração)",
    "area": "Governança e Privacidade",
-   "demandas_hoje": 1,
-   "ultimo": "Revisão da biblioteca sob sua responsabilidade",
-   "quando": "2026-10-24T06:20:30",
+   "demandas_hoje": 2,
+   "ultimo": "Ronda de saúde do sistema",
+   "quando": "2026-10-24T12:55:55",
    "estado": "concluida",
    "situacao": "trabalho do papel"
   },
@@ -1211,7 +1211,7 @@
    "ultimo": "",
    "quando": "",
    "estado": "",
-   "situacao": "estagiário: observa (regra do dono) — Observei Olívia (Especialista em openpyxl (Excel)) fazendo \"Ronda de saúde do sistema\" no nível basico: terminou conclui"
+   "situacao": "estagiário: observa (regra do dono) — Observei Xavier (Especialista em xlrd (.xls antigo)) fazendo \"Ronda de saúde do sistema\" no nível basico: terminou concl"
   },
   {
    "nome": "Gustavo",
@@ -1229,9 +1229,9 @@
    "andar": 5,
    "cargo": "Head de AWS, Arquitetura e Governança de Nuvem",
    "area": "Engenharia de Dados",
-   "demandas_hoje": 1,
-   "ultimo": "Conferir se o projeto está pronto para servidor",
-   "quando": "2026-10-24T10:55:24",
+   "demandas_hoje": 2,
+   "ultimo": "Ronda de saúde do sistema",
+   "quando": "2026-10-24T12:55:57",
    "estado": "concluida",
    "situacao": "trabalho do papel"
   },
@@ -1262,9 +1262,9 @@
    "andar": 5,
    "cargo": "Arquiteta de Cloud (AWS)",
    "area": "Engenharia de Dados",
-   "demandas_hoje": 1,
-   "ultimo": "Conferir se o projeto está pronto para servidor",
-   "quando": "2026-10-24T11:25:45",
+   "demandas_hoje": 2,
+   "ultimo": "Ronda de saúde do sistema",
+   "quando": "2026-10-24T12:56:01",
    "estado": "concluida",
    "situacao": "trabalho do papel"
   },
@@ -1350,9 +1350,9 @@
    "andar": 5,
    "cargo": "Especialista em xlrd (.xls antigo)",
    "area": "Engenharia de Dados",
-   "demandas_hoje": 1,
-   "ultimo": "Revisão da biblioteca sob sua responsabilidade",
-   "quando": "2026-10-24T06:20:21",
+   "demandas_hoje": 2,
+   "ultimo": "Ronda de saúde do sistema",
+   "quando": "2026-10-24T12:55:51",
    "estado": "concluida",
    "situacao": "trabalho do papel"
   },
@@ -1361,9 +1361,9 @@
    "andar": 5,
    "cargo": "Sênior de AWS, Linux e Ubuntu",
    "area": "Engenharia de Dados",
-   "demandas_hoje": 1,
-   "ultimo": "Testar se o último backup volta",
-   "quando": "2026-10-24T11:25:44",
+   "demandas_hoje": 2,
+   "ultimo": "Medir a saúde do PostgreSQL",
+   "quando": "2026-10-24T12:55:59",
    "estado": "concluida",
    "situacao": "trabalho do papel"
   }
