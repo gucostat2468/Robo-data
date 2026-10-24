@@ -1,6 +1,6 @@
 # Empresa ao vivo
 
-**Boletim das 24/10 10:04** (horário de Brasília) · entre turnos: memória salva; o próximo turno começa em poucos minutos
+**Boletim das 24/10 10:05** (horário de Brasília) · trabalhando
 
 > Atualiza a cada 5 minutos enquanto a empresa trabalha. Recarregue a página para ver o mais novo.
 
@@ -9,7 +9,7 @@
 - **140** demandas, **138** concluídas (99%), 0 parciais, 2 com falha
 - **101** de 101 funcionários já trabalharam
 - SQL: 4 exercícios, 4 conferidos com o gabarito
-- Fábrica: 9 planilhas, 9 conferidas sem erro
+- Fábrica: 10 planilhas, 9 conferidas sem erro
 
 ## Trabalhando agora
 
