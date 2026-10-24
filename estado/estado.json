@@ -1,43 +1,43 @@
 {
  "versao": 1,
- "gerado_em": "2026-10-24T00:01:09",
+ "gerado_em": "2026-10-24T00:40:35",
  "turno": {
-  "estado": "entre turnos: memória salva; o próximo turno começa em poucos minutos",
-  "inicio": "2026-10-23T23:19:41",
-  "fim_previsto": "2026-10-23T23:59:41",
-  "voltas": 120,
-  "planilhas": 2
+  "estado": "trabalhando",
+  "inicio": "2026-10-24T00:40:35",
+  "fim_previsto": "2026-10-24T01:20:35",
+  "voltas": 0,
+  "planilhas": 1
  },
  "funcionarios": 101,
  "andares": [
   {
    "andar": 1,
    "pessoas": 19,
-   "trabalharam_hoje": 0,
-   "demandas": 0,
+   "trabalharam_hoje": 1,
+   "demandas": 1,
    "concluidas": 0,
    "parciais": 0,
-   "falhas": 0,
+   "falhas": 1,
    "treino": 0,
    "acertos": 0
   },
   {
    "andar": 2,
    "pessoas": 16,
-   "trabalharam_hoje": 0,
-   "demandas": 0,
+   "trabalharam_hoje": 1,
+   "demandas": 1,
    "concluidas": 0,
    "parciais": 0,
-   "falhas": 0,
+   "falhas": 1,
    "treino": 0,
    "acertos": 0
   },
   {
    "andar": 3,
    "pessoas": 12,
-   "trabalharam_hoje": 0,
-   "demandas": 0,
-   "concluidas": 0,
+   "trabalharam_hoje": 1,
+   "demandas": 1,
+   "concluidas": 1,
    "parciais": 0,
    "falhas": 0,
    "treino": 0,
@@ -46,9 +46,9 @@
   {
    "andar": 4,
    "pessoas": 31,
-   "trabalharam_hoje": 0,
-   "demandas": 0,
-   "concluidas": 0,
+   "trabalharam_hoje": 2,
+   "demandas": 2,
+   "concluidas": 2,
    "parciais": 0,
    "falhas": 0,
    "treino": 0,
@@ -57,9 +57,9 @@
   {
    "andar": 5,
    "pessoas": 23,
-   "trabalharam_hoje": 0,
-   "demandas": 0,
-   "concluidas": 0,
+   "trabalharam_hoje": 1,
+   "demandas": 1,
+   "concluidas": 1,
    "parciais": 0,
    "falhas": 0,
    "treino": 0,
@@ -68,6 +68,54 @@
  ],
  "agora": [],
  "ultimos": [
+  {
+   "quando": "2026-10-24T00:40:12",
+   "funcionario": "Letícia",
+   "cargo": "Desenvolvedora Júnior",
+   "andar": 5,
+   "trabalho": "Ronda de saúde do sistema",
+   "estado": "concluida"
+  },
+  {
+   "quando": "2026-10-24T00:40:12",
+   "funcionario": "Bruno",
+   "cargo": "Analista de Dados Júnior",
+   "andar": 1,
+   "trabalho": "Consultar o conhecimento da área",
+   "estado": "falhou"
+  },
+  {
+   "quando": "2026-10-24T00:40:12",
+   "funcionario": "Pedro",
+   "cargo": "Especialista em Pesquisa de Mercado",
+   "andar": 3,
+   "trabalho": "Consultar o conhecimento da área",
+   "estado": "concluida"
+  },
+  {
+   "quando": "2026-10-24T00:40:12",
+   "funcionario": "Valéria",
+   "cargo": "Revisora Independente de Casos",
+   "andar": 4,
+   "trabalho": "Consultar o conhecimento da área",
+   "estado": "concluida"
+  },
+  {
+   "quando": "2026-10-24T00:40:10",
+   "funcionario": "Fábio",
+   "cargo": "Relator",
+   "andar": 2,
+   "trabalho": "Consultar o conhecimento da área",
+   "estado": "falhou"
+  },
+  {
+   "quando": "2026-10-24T00:40:10",
+   "funcionario": "Yasmin",
+   "cargo": "Planejadora de Treino",
+   "andar": 4,
+   "trabalho": "Consultar o conhecimento da área",
+   "estado": "concluida"
+  },
   {
    "quando": "2026-10-23T23:49:34",
    "funcionario": "Bia",
@@ -99,54 +147,6 @@
    "andar": 5,
    "trabalho": "Exercício de SQL no PostgreSQL com os dados da fábrica",
    "estado": "falhou"
-  },
-  {
-   "quando": "2026-10-23T23:49:20",
-   "funcionario": "Raquel",
-   "cargo": "Designer de Casos",
-   "andar": 4,
-   "trabalho": "Verificar dados pessoais (LGPD) na base sintética",
-   "estado": "concluida"
-  },
-  {
-   "quando": "2026-10-23T23:49:18",
-   "funcionario": "Eva",
-   "cargo": "Monitoramento",
-   "andar": 2,
-   "trabalho": "Exercício de SQL no PostgreSQL com os dados da fábrica",
-   "estado": "falhou"
-  },
-  {
-   "quando": "2026-10-23T23:19:25",
-   "funcionario": "Caio",
-   "cargo": "Indicadores (NPS, CSAT, CES)",
-   "andar": 2,
-   "trabalho": "Exercício de SQL no PostgreSQL com os dados da fábrica",
-   "estado": "falhou"
-  },
-  {
-   "quando": "2026-10-23T23:19:21",
-   "funcionario": "Dora",
-   "cargo": "DBA PostgreSQL",
-   "andar": 1,
-   "trabalho": "Exercício de SQL no PostgreSQL com os dados da fábrica",
-   "estado": "falhou"
-  },
-  {
-   "quando": "2026-10-23T23:19:21",
-   "funcionario": "Gabriel",
-   "cargo": "Especialista em Tabelas Dinâmicas e Dashboards",
-   "andar": 3,
-   "trabalho": "Consultar o conhecimento da área",
-   "estado": "falhou"
-  },
-  {
-   "quando": "2026-10-23T23:19:17",
-   "funcionario": "Marina",
-   "cargo": "Arquiteta de Cloud (AWS)",
-   "andar": 5,
-   "trabalho": "Exercício de SQL no PostgreSQL com os dados da fábrica",
-   "estado": "falhou"
   }
  ],
  "sql": {
@@ -154,33 +154,39 @@
   "concluidos_hoje": 0
  },
  "fabrica": {
-  "lotes_hoje": 0,
+  "lotes_hoje": 1,
   "conferidos_ok_hoje": 0
  },
  "rotinas": [
   {
-   "rotina": "caixa_dono",
-   "execucoes_24h": 6,
+   "rotina": "alcadas",
+   "execucoes_24h": 1,
    "erros_24h": 0,
-   "ultima": "2026-10-23T23:19:10"
+   "ultima": "2026-10-24T00:40:14"
+  },
+  {
+   "rotina": "caixa_dono",
+   "execucoes_24h": 7,
+   "erros_24h": 0,
+   "ultima": "2026-10-24T00:40:10"
   },
   {
    "rotina": "demandas",
-   "execucoes_24h": 6,
+   "execucoes_24h": 7,
    "erros_24h": 0,
-   "ultima": "2026-10-23T23:49:34"
+   "ultima": "2026-10-24T00:40:12"
   },
   {
    "rotina": "dialogo",
-   "execucoes_24h": 5,
+   "execucoes_24h": 6,
    "erros_24h": 0,
-   "ultima": "2026-10-23T23:19:25"
+   "ultima": "2026-10-24T00:40:12"
   },
   {
    "rotina": "fabrica",
-   "execucoes_24h": 12,
+   "execucoes_24h": 13,
    "erros_24h": 0,
-   "ultima": "2026-10-23T23:50:23"
+   "ultima": "2026-10-24T00:40:12"
   },
   {
    "rotina": "ideias",
@@ -190,9 +196,9 @@
   },
   {
    "rotina": "jornada",
-   "execucoes_24h": 6,
+   "execucoes_24h": 7,
    "erros_24h": 0,
-   "ultima": "2026-10-23T23:19:10"
+   "ultima": "2026-10-24T00:40:10"
   },
   {
    "rotina": "laboratorio",
@@ -202,21 +208,21 @@
   },
   {
    "rotina": "licoes",
-   "execucoes_24h": 6,
+   "execucoes_24h": 7,
    "erros_24h": 0,
-   "ultima": "2026-10-23T23:19:09"
+   "ultima": "2026-10-24T00:40:09"
   },
   {
    "rotina": "memoria_pg",
-   "execucoes_24h": 9,
+   "execucoes_24h": 8,
    "erros_24h": 0,
-   "ultima": "2026-10-24T00:01:07"
+   "ultima": "2026-10-23T23:56:51"
   },
   {
    "rotina": "paineis",
-   "execucoes_24h": 6,
+   "execucoes_24h": 7,
    "erros_24h": 0,
-   "ultima": "2026-10-23T23:19:27"
+   "ultima": "2026-10-24T00:40:14"
   },
   {
    "rotina": "registro",
@@ -232,9 +238,9 @@
   },
   {
    "rotina": "ronda_ti",
-   "execucoes_24h": 12,
+   "execucoes_24h": 13,
    "erros_24h": 0,
-   "ultima": "2026-10-23T23:58:55"
+   "ultima": "2026-10-24T00:40:01"
   },
   {
    "rotina": "treino",
@@ -244,9 +250,9 @@
   }
  ],
  "totais": {
-  "demandas": 36,
+  "demandas": 42,
   "tentativas_treino": 3951,
-  "conversas": 1668,
-  "trabalhos_com_prova": 315
+  "conversas": 1670,
+  "trabalhos_com_prova": 332
  }
 }
