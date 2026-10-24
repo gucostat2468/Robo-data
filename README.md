@@ -1,6 +1,6 @@
 # Empresa ao vivo
 
-**Boletim das 24/10 16:00** (horário de Brasília) · trabalhando
+**Boletim das 24/10 16:09** (horário de Brasília) · trabalhando
 
 > Atualiza a cada 5 minutos enquanto a empresa trabalha. Recarregue a página para ver o mais novo.
 
@@ -196,14 +196,14 @@
 
 ## Banco de dados
 
-Levantamento das 24/10 15:47: **160 de 201** tabelas com dados (407.256 linhas contadas uma a uma).
+Levantamento das 24/10 16:06: **162 de 201** tabelas com dados (416.225 linhas contadas uma a uma).
 
 
 | Onde | Tabelas | Com dados |
 |---|--:|--:|
-| sqlite | 79 | 61 |
+| sqlite | 79 | 62 |
 | postgres.laboratorio | 15 | 15 |
-| postgres.robo | 82 | 62 |
+| postgres.robo | 82 | 63 |
 | postgres.treino | 22 | 22 |
 | postgres.bruto | 1 | 0 |
 | postgres.tratado | 1 | 0 |
@@ -225,7 +225,6 @@ Vazias e por quê (nada é preenchido para parecer cheio):
 | sqlite | ml_inferencias | funcionalidade não acionada | a sombra só pontua depois que um modelo é aprovado por outra pessoa e promovido, e só demandas criadas depois  |
 | sqlite | propostas_regra | funcionalidade não acionada | nasce de planilha REAL reprovada com correção possível ou de correção do dono no chat |
 | sqlite | regras_aprendidas | funcionalidade não acionada | só existe depois que o dono aprova uma proposta de regra |
-| sqlite | rh_cargos | funcionalidade não acionada | cargo só muda com movimento de RH validado |
 | sqlite | sala_eventos | funcionalidade não acionada | reunião ao vivo aberta pelo dono no painel |
 | sqlite | salas_encerradas | funcionalidade não acionada | reunião ao vivo encerrada |
 | sqlite | telegram_mensagens | funcionalidade não acionada | o grupo do Telegram ainda não foi ligado (precisa do token do @BotFather, que só o dono cria) |
@@ -244,7 +243,6 @@ Vazias e por quê (nada é preenchido para parecer cheio):
 | postgres.robo | memoria_ml_inferencias | funcionalidade não acionada | espelho de ml_inferencias (vazia no SQLite também): a sombra só pontua depois que um modelo é aprovado por out |
 | postgres.robo | memoria_propostas_regra | funcionalidade não acionada | espelho de propostas_regra (vazia no SQLite também): nasce de planilha REAL reprovada com correção possível ou |
 | postgres.robo | memoria_regras_aprendidas | funcionalidade não acionada | espelho de regras_aprendidas (vazia no SQLite também): só existe depois que o dono aprova uma proposta de regr |
-| postgres.robo | memoria_rh_cargos | funcionalidade não acionada | espelho de rh_cargos (vazia no SQLite também): cargo só muda com movimento de RH validado |
 | postgres.robo | memoria_sala_eventos | funcionalidade não acionada | espelho de sala_eventos (vazia no SQLite também): reunião ao vivo aberta pelo dono no painel |
 | postgres.robo | memoria_salas_encerradas | funcionalidade não acionada | espelho de salas_encerradas (vazia no SQLite também): reunião ao vivo encerrada |
 | postgres.robo | memoria_telegram_mensagens | funcionalidade não acionada | espelho de telegram_mensagens (vazia no SQLite também): o grupo do Telegram ainda não foi ligado (precisa do t |

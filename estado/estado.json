@@ -1,11 +1,11 @@
 {
  "versao": 1,
- "gerado_em": "2026-10-24T19:00:54",
+ "gerado_em": "2026-10-24T19:09:17",
  "turno": {
   "estado": "trabalhando",
   "inicio": "2026-10-24T18:55:32",
   "fim_previsto": "2026-10-24T19:35:32",
-  "voltas": 16,
+  "voltas": 32,
   "planilhas": 1
  },
  "funcionarios": 105,
@@ -18,8 +18,8 @@
    "concluidas": 45,
    "parciais": 0,
    "falhas": 1,
-   "treino": 578,
-   "acertos": 525
+   "treino": 588,
+   "acertos": 532
   },
   {
    "andar": 2,
@@ -29,8 +29,8 @@
    "concluidas": 41,
    "parciais": 0,
    "falhas": 2,
-   "treino": 506,
-   "acertos": 466
+   "treino": 511,
+   "acertos": 470
   },
   {
    "andar": 3,
@@ -40,8 +40,8 @@
    "concluidas": 32,
    "parciais": 0,
    "falhas": 0,
-   "treino": 362,
-   "acertos": 309
+   "treino": 368,
+   "acertos": 315
   },
   {
    "andar": 4,
@@ -51,8 +51,8 @@
    "concluidas": 52,
    "parciais": 0,
    "falhas": 0,
-   "treino": 944,
-   "acertos": 843
+   "treino": 951,
+   "acertos": 846
   },
   {
    "andar": 5,
@@ -62,8 +62,8 @@
    "concluidas": 84,
    "parciais": 0,
    "falhas": 2,
-   "treino": 707,
-   "acertos": 608
+   "treino": 709,
+   "acertos": 609
   }
  ],
  "agora": [],
@@ -202,9 +202,9 @@
   },
   {
    "rotina": "laboratorio",
-   "execucoes_24h": 57,
+   "execucoes_24h": 58,
    "erros_24h": 0,
-   "ultima": "2026-10-24T18:55:38"
+   "ultima": "2026-10-24T19:05:56"
   },
   {
    "rotina": "licoes",
@@ -214,9 +214,9 @@
   },
   {
    "rotina": "memoria_pg",
-   "execucoes_24h": 43,
+   "execucoes_24h": 44,
    "erros_24h": 0,
-   "ultima": "2026-10-24T18:49:56"
+   "ultima": "2026-10-24T19:09:12"
   },
   {
    "rotina": "modelos",
@@ -232,9 +232,9 @@
   },
   {
    "rotina": "registro",
-   "execucoes_24h": 342,
+   "execucoes_24h": 345,
    "erros_24h": 0,
-   "ultima": "2026-10-24T18:58:52"
+   "ultima": "2026-10-24T19:05:56"
   },
   {
    "rotina": "rh_desempenho",
@@ -250,30 +250,30 @@
   },
   {
    "rotina": "treino",
-   "execucoes_24h": 231,
+   "execucoes_24h": 233,
    "erros_24h": 0,
-   "ultima": "2026-10-24T19:00:54"
+   "ultima": "2026-10-24T19:05:52"
   }
  ],
  "totais": {
   "demandas": 295,
-  "tentativas_treino": 7048,
-  "conversas": 3061,
-  "trabalhos_com_prova": 1692
+  "tentativas_treino": 7078,
+  "conversas": 3070,
+  "trabalhos_com_prova": 1702
  },
  "banco": {
-  "levantamento": "2026-10-24T18:47:20",
+  "levantamento": "2026-10-24T19:06:19",
   "postgres_conferido": true,
   "erro_postgres": null,
   "tabelas": 201,
-  "com_dados": 160,
-  "linhas": 407256,
+  "com_dados": 162,
+  "linhas": 416225,
   "resumo": {
    "sqlite": {
     "tabelas": 79,
-    "com_dados": 61,
+    "com_dados": 62,
     "vazias": {
-     "vazia: funcionalidade não acionada": 18
+     "vazia: funcionalidade não acionada": 17
     }
    },
    "postgres.laboratorio": {
@@ -283,9 +283,9 @@
    },
    "postgres.robo": {
     "tabelas": 82,
-    "com_dados": 62,
+    "com_dados": 63,
     "vazias": {
-     "vazia: funcionalidade não acionada": 20
+     "vazia: funcionalidade não acionada": 19
     }
    },
    "postgres.treino": {
@@ -387,12 +387,6 @@
     "tabela": "regras_aprendidas",
     "situacao": "funcionalidade não acionada",
     "causa": "só existe depois que o dono aprova uma proposta de regra"
-   },
-   {
-    "onde": "sqlite",
-    "tabela": "rh_cargos",
-    "situacao": "funcionalidade não acionada",
-    "causa": "cargo só muda com movimento de RH validado"
    },
    {
     "onde": "sqlite",
@@ -501,12 +495,6 @@
     "tabela": "memoria_regras_aprendidas",
     "situacao": "funcionalidade não acionada",
     "causa": "espelho de regras_aprendidas (vazia no SQLite também): só existe depois que o dono aprova uma proposta de regra"
-   },
-   {
-    "onde": "postgres.robo",
-    "tabela": "memoria_rh_cargos",
-    "situacao": "funcionalidade não acionada",
-    "causa": "espelho de rh_cargos (vazia no SQLite também): cargo só muda com movimento de RH validado"
    },
    {
     "onde": "postgres.robo",
