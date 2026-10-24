@@ -10,6 +10,7 @@ Regras:
   - só rotas de LEITURA; as que mostram endereço do banco, caminhos do sistema ou IPs ficam de fora (EXCLUIR);
   - antes de publicar, cada arquivo é conferido contra os segredos da configuração e do ambiente: se algum aparecer,
     o arquivo NÃO é publicado e o índice diz qual foi removido (nunca vaza para tapar buraco);
+  - CPF válido, e-mail e telefone saem mascarados (o repositório é público; ver mascarar_pessoais);
   - o ramo guarda só a versão atual (um commit, substituído a cada publicação): é uma cópia derivada; a fonte de
     verdade continua no SQLite e no PostgreSQL, com histórico completo.
 
@@ -132,16 +133,50 @@ def limpar(dados: dict, proibidos: list[str]) -> tuple[dict, list[str]]:
     return bons, removidos
 
 
+_RE_CPF_TEXTO = re.compile(r"(?<!\d)\d{3}\.\d{3}\.\d{3}-\d{2}(?!\d)|(?<![\d.])\d{11}(?![\d.])")
+_RE_EMAIL_TEXTO = re.compile(r"[A-Za-z0-9._%+\-]+@[A-Za-z0-9.\-]+\.[A-Za-z]{2,}")
+_RE_TEL_TEXTO = re.compile(r"(?:\+?55\s?)?\(\d{2}\)\s?9?\d{4}-\d{4}")
+
+
+def mascarar_pessoais(texto: str) -> tuple[str, int]:
+    """O ramo do espelho é público (o repositório é público): CPF válido, e-mail e telefone viram máscara antes de
+    publicar, mesmo os sintéticos (os casos de LGPD do treino têm exemplos com a mesma cara). Devolve (texto, quantos)."""
+    from robo.quadro import cpf_valido
+    n = 0
+
+    def cpf(m):
+        nonlocal n
+        if not cpf_valido(m.group(0)):
+            return m.group(0)  # número de pedido com 11 dígitos não é CPF
+        n += 1
+        return "***.***.***-**"
+
+    def troca(rotulo):
+        def f(m):
+            nonlocal n
+            n += 1
+            return rotulo
+        return f
+    texto = _RE_CPF_TEXTO.sub(cpf, texto)
+    texto = _RE_EMAIL_TEXTO.sub(troca("***@***"), texto)
+    texto = _RE_TEL_TEXTO.sub(troca("(**) *****-****"), texto)
+    return texto, n
+
+
 def escrever(cfg, pasta: Path, codigo_sha: str = "", ligado_desde: float | None = None) -> dict:
     """Grava o espelho em `pasta` (api/<chave>.json + indice.json). Devolve o índice."""
     t0 = time.perf_counter()
     g = gerar(cfg, ligado_desde)
     bons, removidos = limpar(g["dados"], segredos(cfg))
     (pasta / "api").mkdir(parents=True, exist_ok=True)
+    mascarados = 0
     for k, texto in bons.items():
+        texto, n = mascarar_pessoais(texto)
+        mascarados += n
         (pasta / "api" / f"{k}.json").write_text(texto, encoding="utf-8")
     indice = {"versao": VERSAO, "gerado_em": datetime.now().isoformat(timespec="seconds"), "codigo_sha": codigo_sha,
               "chaves": sorted(bons), "removidos_por_seguranca": removidos, "falhas": g["falhas"],
+              "dados_pessoais_mascarados": mascarados,
               "segundos": round(time.perf_counter() - t0, 2)}
     (pasta / "indice.json").write_text(json.dumps(indice, ensure_ascii=False, indent=1), encoding="utf-8")
     return indice

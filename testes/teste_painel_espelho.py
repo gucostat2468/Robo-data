@@ -80,3 +80,14 @@ def teste_estado_diz_se_o_turno_esta_trabalhando(cfg_factory):
     assert pe.gerar(cfg, ligado_desde=inicio)["dados"]["estado"]["ligado"] is True
     assert pe.gerar(cfg, ligado_desde=inicio)["dados"]["estado"]["ligado_desde"] == inicio
     assert pe.gerar(cfg)["dados"]["estado"]["ligado"] is False
+
+
+def teste_dado_pessoal_sai_mascarado_do_espelho_publico():
+    texto = ('{"a": "cliente 529.982.247-25 escreveu de joao.silva@exemplo.com.br, tel (11) 98765-4321", '
+             '"pedido": "12345678901", "outro": "52998224725"}')
+    limpo, n = pe.mascarar_pessoais(texto)
+    assert "529.982.247-25" not in limpo and "joao.silva" not in limpo and "98765-4321" not in limpo
+    assert "52998224725" not in limpo  # CPF válido sem pontuação também
+    assert "12345678901" in limpo  # 11 dígitos sem dígito verificador de CPF: não é dado pessoal
+    assert n == 4
+    json.loads(limpo)  # continua JSON válido
