@@ -43,6 +43,10 @@ NAO_RODAM_NA_NUVEM = {"memoria_pg", "registro", "canal", "treino", "laboratorio"
 # tratou a planilha do turno. Antes a 1ª distribuição de demandas vinha antes e o trabalho que precisa de planilha
 # ficava bloqueado (virava estudo "Consultar o conhecimento").
 DEPOIS_DA_ESTEIRA = ("demandas",)
+# Laço interno do turno: ordem fixa fábrica → esteira → demandas. O resto entra por rotinas.vencidas().
+LACO_ANTES_DA_ESTEIRA = ("canal", "registro", "treino", "laboratorio", "fabrica")
+LACO_DEPOIS_DA_ESTEIRA = ("demandas", "telegram")
+FORA_DAS_VENCIDAS = {*LACO_ANTES_DA_ESTEIRA, *LACO_DEPOIS_DA_ESTEIRA, "memoria_pg"}  # memoria_pg: salvar() a cada 10 min
 LIMITE_MB_PADRAO = 500  # plano gratuito: avisa com 80% (o Neon gratuito dá 0,5 a 1 GB por projeto)
 
 
@@ -267,10 +271,13 @@ def turno(cfg, minutos: float = 20, salvar_a_cada_min: float = 10, pausa_s: floa
     ultimo_boletim = time.monotonic()
     while time.monotonic() < fim and not (parar is not None and parar.is_set()):
         voltas += 1
-        for nome in ("canal", "registro", "treino", "laboratorio", "fabrica"):
+        for nome in LACO_ANTES_DA_ESTEIRA:
             rotinas.executar(cfg, nome, rotinas.funcao(cfg, nome))
         planilhas += _esteira(monitor)
-        for nome in ("demandas", "telegram"):
+        for nome in LACO_DEPOIS_DA_ESTEIRA:
+            rotinas.executar(cfg, nome, rotinas.funcao(cfg, nome))
+        # as demais (diálogo a cada 20 min, ronda de TI, lições...) rodam quando vencem, não só no começo do turno
+        for nome in rotinas.vencidas(cfg, excluir=FORA_DAS_VENCIDAS):
             rotinas.executar(cfg, nome, rotinas.funcao(cfg, nome))
         rotinas.batimento(cfg, sessao)
         if time.monotonic() - ultimo_salvo >= salvar_a_cada_min * 60:

@@ -259,7 +259,24 @@ def estado(cfg) -> list[dict]:
         atrasada = not referencia or datetime.fromisoformat(referencia) < agora - timedelta(hours=horas * 1.5)
         saida.append({"nome": nome, "responsavel": resp, "descricao": descricao, "intervalo_horas": horas,
                       "ultima_execucao": ultima, "ultima_verificacao": verif, "ultimo_status": r.get("ultimo_status"),
-                      "detalhe": r.get("detalhe") or "", "atrasada": atrasada})
+                      "detalhe": r.get("detalhe") or "", "atrasada": atrasada,
+                      "proxima_verificacao": (datetime.fromisoformat(referencia) + timedelta(hours=horas)
+                                              ).isoformat(timespec="seconds") if referencia else None})
+    return saida
+
+
+def vencidas(cfg, agora: datetime | None = None, excluir=()) -> list[str]:
+    """Rotinas cujo intervalo já passou desde a última verificação (ou que nunca rodaram), na ordem de ROTINAS.
+    Serve ao laço do turno: quem não está no laço fixo é chamado quando vence, não só no começo do turno. Não roda
+    nada: quem chama passa cada nome por executar() (trava, registro e idempotência continuam os mesmos)."""
+    agora = agora or datetime.now()
+    saida = []
+    for r in estado(cfg):
+        if r["nome"] in excluir:
+            continue
+        ref = r["ultima_verificacao"] or r["ultima_execucao"]
+        if not ref or datetime.fromisoformat(ref) + timedelta(hours=r["intervalo_horas"]) <= agora:
+            saida.append(r["nome"])
     return saida
 
 
