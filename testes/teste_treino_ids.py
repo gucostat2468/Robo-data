@@ -104,3 +104,34 @@ def teste_exames_repetidos_no_mesmo_segundo_nao_colidem(cfg, monkeypatch):
     assert "UNIQUE" not in r1["detalhe"] + r2["detalhe"]
     ids = [r["id"] for r in _linhas(cfg)]
     assert len(ids) == len(set(ids)) == 10
+
+
+def teste_competencia_saturada_vira_regressao_e_libera_o_tempo(cfg):
+    """Medido no turno real: 100% de acerto no nível 5 em 11 de 15 competências. Repetir não ensina: a pessoa que já
+    conferiu a competência saturada nas últimas horas treina outra (ou nenhuma), e isso fica registrado."""
+    import sqlite3
+    from datetime import datetime
+    treino._tb(cfg)
+    pid = "dba"
+    comps = treino.competencias_de(pid, cfg)
+    assert len(comps) >= 2
+    sat = comps[0]
+    agora = datetime.now().isoformat(timespec="seconds")
+    with sqlite3.connect(cfg.logs / "trabalho.db") as c:
+        c.executemany("INSERT INTO treino_tentativas (data_hora, funcionario, competencia, nivel, acertou) "
+                      "VALUES (?,?,?,?,?)", [(agora, f"p{i}", sat, max(treino.NIVEIS), 1) for i in range(30)])
+        c.execute("INSERT INTO treino_tentativas (data_hora, funcionario, competencia, nivel, acertou) VALUES (?,?,?,?,?)",
+                  (agora, pid, sat, max(treino.NIVEIS), 1))
+    assert sat in treino.saturadas(cfg)
+    dispensadas, feitas, sem_caso = [], [], []
+    ultima = treino._ultima(cfg)
+    from robo import jobs
+    jid = jobs.abrir(cfg, "treino", "sintetico", "TR-x", treino.ROTINA_RESPONSAVEL)
+    treino._rodar_pessoas(cfg, [pid], ultima, "TR-x", jid, feitas, sem_caso, dispensadas)
+    assert dispensadas == [{"funcionario": pid, "competencias": [sat]}]
+    assert all(f["competencia"] != sat for f in feitas)
+    # um erro no nível máximo tira a saturação: volta a treinar
+    with sqlite3.connect(cfg.logs / "trabalho.db") as c:
+        c.execute("INSERT INTO treino_tentativas (data_hora, funcionario, competencia, nivel, acertou) VALUES (?,?,?,?,?)",
+                  (agora, "px", sat, max(treino.NIVEIS), 0))
+    assert sat not in treino.saturadas(cfg)

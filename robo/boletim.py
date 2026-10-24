@@ -102,6 +102,11 @@ def montar(cfg, agora: datetime | None = None, turno: dict | None = None) -> dic
                                                     "FROM rotinas_execucoes WHERE inicio>=? GROUP BY nome ORDER BY nome",
                                                  (desde,))]
         saida["pessoas"] = _pessoas(c, gente, hoje, cfg)
+        try:  # projetos entre andares (robo/projetos.py): quem fez cada etapa e como terminou
+            from robo import projetos
+            saida["projetos"] = projetos.resumo(cfg, 3)
+        except Exception as e:
+            saida["projetos"] = {"erro": type(e).__name__}
         try:  # tempo MEDIDO dos últimos turnos, por natureza (robo/tempo_turno.py)
             from robo import tempo_turno
             saida["tempo_turnos"] = tempo_turno.ultimos(cfg, 6)
@@ -276,6 +281,12 @@ def markdown(d: dict) -> str:
               f"{u['contagens'].get('etapas_esperando_dependencia', 0)}"]
         if len(tt) > 1:
             l.append("- Turnos anteriores (entregas/hora): " + ", ".join(f"{x['entregas_por_hora']:.1f}" for x in tt[1:]))
+    pj = d.get("projetos")
+    if isinstance(pj, list) and pj:
+        l += ["", "## Projetos entre andares (várias pessoas, uma etapa depende da outra)", ""]
+        for x in pj:
+            l.append(f"- {x['titulo']}: **{ESTADOS.get(x['estado'], x['estado'])}** — "
+                     + "; ".join(f"{e['ordem']}. {e['funcionario']} ({e['estado']})" for e in x["etapas"]))
     m = d.get("modelos") or {}
     if m and "erro" not in m:
         l += ["", "## Inteligência própria (modelo de risco das demandas)", ""]

@@ -49,7 +49,11 @@ from robo.treino_casos import CATALOGO, NIVEIS, conteudo_hash
 log = logging.getLogger("robo")
 
 PADRAO = {"habilitado": True, "intervalo_minutos": 2, "por_rodada": 15, "janela_nivel": 5, "sobe_com": 4, "desce_com": 2,
-          "erros_para_handover": 3, "max_tentativas_por_caso": 12, "dias_caso_ativo": 7}
+          "erros_para_handover": 3, "max_tentativas_por_caso": 12, "dias_caso_ativo": 7,
+          # competência SATURADA: as últimas N tentativas no nível máximo (de todos) acertaram. Repetir não ensina nada
+          # (é código determinístico resolvendo o que já resolve): vira teste de regressão, 1 vez a cada X horas por
+          # pessoa, e o tempo vai para trabalho de verdade. Medido no turno real: 11 de 15 competências com 100% no 5.
+          "saturacao_n": 30, "regressao_horas": 24}
 # Começa perto do limite do cargo (pedido do dono: treino difícil de verdade). Os níveis 1 a 3 davam quase 100% de
 # acerto: não mostravam quem sabe. Daqui o nível sobe ou desce pela evidência (4 de 5 certas sobe; 2 de 5 desce).
 NIVEL_INICIAL = {"estagiario": 2, "junior": 3, "pleno": 3, "senior": 4, "especialista": 4, "coordenador": 4, "gerente": 4,
@@ -527,16 +531,16 @@ def _rodada(cfg, quantos, funcionarios) -> dict:
     pessoas.sort(key=quando)  # quem está há mais tempo sem treinar vem primeiro
     if quantos:
         pessoas = pessoas[:int(quantos)]
-    feitas, sem_caso = [], []
+    feitas, sem_caso, dispensadas = [], [], []
     from robo import jobs
     jid = jobs.abrir(cfg, "treino", "sintetico", rid, ROTINA_RESPONSAVEL)
     try:
-        _rodar_pessoas(cfg, pessoas, ultima, rid, jid, feitas, sem_caso)
+        _rodar_pessoas(cfg, pessoas, ultima, rid, jid, feitas, sem_caso, dispensadas)
     except BaseException as e:
         jobs.fechar(cfg, jid, "falhou", {"erro": f"{type(e).__name__}: {e}", "tentativas": len(feitas)})
         raise
     jobs.fechar(cfg, jid, "concluido", {"tentativas": len(feitas), "acertos": sum(f["acertou"] for f in feitas),
-                                        "sem_caso": len(sem_caso)})
+                                        "sem_caso": len(sem_caso), "dispensadas_por_saturacao": len(dispensadas)})
     encerrar_casos(cfg)
     try:
         from robo import interacoes
@@ -544,16 +548,38 @@ def _rodada(cfg, quantos, funcionarios) -> dict:
     except Exception:
         log.exception("Treino: conversas por fatos falharam")
     return {"ok": True, "rodada": rid, "tentativas": len(feitas), "acertos": sum(f["acertou"] for f in feitas),
-            "mudancas_de_nivel": [f for f in feitas if f["mudanca_nivel"]], "sem_caso": sem_caso, "detalhe": feitas}
+            "mudancas_de_nivel": [f for f in feitas if f["mudanca_nivel"]], "sem_caso": sem_caso, "detalhe": feitas,
+            "dispensadas_por_saturacao": dispensadas}
 
 
 ROTINA_RESPONSAVEL = "casos_planejamento"
 
 
-def _rodar_pessoas(cfg, pessoas, ultima, rid, jid, feitas, sem_caso) -> None:
+def saturadas(cfg) -> set[str]:
+    """Competências em que as últimas `saturacao_n` tentativas no nível máximo acertaram todas."""
+    n = int(_c(cfg)["saturacao_n"])
+    saida = set()
+    with _tb(cfg).tx() as c:
+        for (comp,) in c.execute("SELECT DISTINCT competencia FROM treino_tentativas WHERE nivel=?", (max(NIVEIS),)):
+            ult = [r[0] for r in c.execute("SELECT acertou FROM treino_tentativas WHERE competencia=? AND nivel=? "
+                                           "ORDER BY id DESC LIMIT ?", (comp, max(NIVEIS), n))]
+            if len(ult) == n and all(ult):
+                saida.add(comp)
+    return saida
+
+
+def _rodar_pessoas(cfg, pessoas, ultima, rid, jid, feitas, sem_caso, dispensadas=None) -> None:
     from robo import jobs
+    sat = saturadas(cfg)
+    limite = (datetime.now() - timedelta(hours=float(_c(cfg)["regressao_horas"]))).isoformat(timespec="seconds")
     for pid in pessoas:
         comps = competencias_de(pid, cfg)
+        pdis = set(_pdis_abertos(cfg, pid))
+        # saturada e já conferida nas últimas horas: não repete (plano de melhoria do RH sempre treina)
+        dispensa = [c for c in comps if c in sat and c not in pdis and ultima.get((pid, c), "") >= limite]
+        comps = [c for c in comps if c not in dispensa]
+        if dispensa and dispensadas is not None:
+            dispensadas.append({"funcionario": pid, "competencias": dispensa})
         if not comps:
             continue
         comp = min(comps, key=lambda c: ultima.get((pid, c), ""))  # a competência há mais tempo sem prática

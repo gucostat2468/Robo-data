@@ -42,7 +42,9 @@ ORIGEM = "demanda_sintetica"
 PADRAO = {"habilitada": True, "intervalo_minutos": 30, "por_ciclo": 20, "por_dia": 600, "por_pessoa_horas": 6,
           # o 5º andar (TI, nuvem, segurança) recebe trabalho com mais frequência; a equipe de AWS mais que todos
           "horas_por_andar": {"5": 3}, "horas_por_pessoa": {"head_aws": 1, "aws_senior": 1, "cloud_aws": 1},
-          "horas_sem_atividade": 48, "horas_abandono": 6, "avaliacoes_por_ciclo": 3}
+          "horas_sem_atividade": 48, "horas_abandono": 6, "avaliacoes_por_ciclo": 3,
+          # projeto entre andares (robo/projetos.py): no máximo um a cada N horas; 0 desliga
+          "projetos_intervalo_horas": 1}
 
 # =============================================================================== a equipe de demandas (4º andar)
 # Cinco funções complementares. A Sala de Casos (head_casos) planeja os CASOS DE TREINO com gabarito; esta equipe
@@ -1090,6 +1092,15 @@ def rotina(cfg, agora: datetime | None = None) -> dict | None:
                             "motivo": f"{motivo_fila}; nível {nivel}: {motivo_nivel}" if tipo == "trabalho"
                             else f"{motivo_fila}; treinamento no lugar da demanda bloqueada"})
             finais[sid] = _executar_com_job(cfg, sid, p["id"], ferr)  # executa já: nuvem e notebook veem no ciclo
+        # ---- projeto entre andares: várias pessoas, uma etapa depende da outra, revisão independente
+        projeto = None
+        if float(c["projetos_intervalo_horas"]) > 0:
+            jobs.etapa(cfg, jid, "projeto", "dem_gerador")
+            try:
+                from robo import projetos
+                projeto = projetos.ciclo(cfg, agora, float(c["projetos_intervalo_horas"]))
+            except Exception as e:  # o ciclo das demandas continua; o motivo fica no registro do ciclo
+                projeto = {"projeto": None, "motivo": f"{type(e).__name__}: {e}"}
         # ---- estagiários: observam um colega da área num trabalho concluído deste ciclo e registram o que viram
         eventos += observar(cfg, atribuidas, finais)
         # ---- Bento: avaliação independente por amostragem
@@ -1099,7 +1110,7 @@ def rotina(cfg, agora: datetime | None = None) -> dict | None:
         cob = cobertura(cfg, agora=agora)
         concluidas = sum(1 for e in finais.values() if e == "concluida")
         detalhe = {"atribuidas": atribuidas, "estados": finais, "bloqueadas": bloqueadas, "reatribuidas": reatribuidas,
-                   "avaliacoes": avaliacoes, "vagas": vagas, "hoje_antes": hoje,
+                   "avaliacoes": avaliacoes, "vagas": vagas, "hoje_antes": hoje, "projeto": projeto,
                    "puladas": [{"funcionario": e["funcionario"], "motivo": e["motivo"]} for e in eventos if e["evento"] == "pulada"],
                    "cobertura": {"completa": cob["completa"],
                                  "andares": {a: {k: v for k, v in g.items() if k in ("elegiveis", "com_demanda", "sem_demanda")}
@@ -1116,7 +1127,7 @@ def rotina(cfg, agora: datetime | None = None) -> dict | None:
         raise
     return {"elegiveis": len(candidatas), "atribuidas": len(atribuidas), "concluidas": concluidas,
             "bloqueadas": len(bloqueadas), "reatribuidas": len(reatribuidas), "avaliacoes": avaliacoes,
-            "estados": finais, "cobertura_completa": cob["completa"]}
+            "estados": finais, "cobertura_completa": cob["completa"], "projeto": projeto}
 
 
 # =============================================================================== provas técnicas (RH)
