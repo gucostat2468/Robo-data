@@ -32,8 +32,8 @@ log = logging.getLogger("robo")
 
 RAMO = "painel-espelho"
 VERSAO = 1
-# config: pastas e endereço do banco; diagnóstico do celular: IPs da rede de casa; log: caminhos do computador
-EXCLUIR = {"/api/config", "/api/celular/diagnostico", "/api/log", "/api/acesso"}
+# config sai numa versão limpa (_config_limpa); diagnóstico do celular: IPs da rede de casa; acesso: o app responde
+EXCLUIR = {"/api/config", "/api/celular/diagnostico", "/api/acesso"}
 POR_PESSOA = ("/api/funcionario", "/api/treino/pessoa")
 ULTIMAS_SOLICITACOES = 40
 INTERVALO_MIN_S = 9 * 60  # o turno pede a cada boletim (5 min); o espelho sai a cada ~10 min (pesa mais)
@@ -48,24 +48,27 @@ def chave(rota: str, params: dict | None = None) -> str:
     return re.sub(r"[^A-Za-z0-9_=&.\-]", "_", base)
 
 
-def _controle(cfg):
-    """O controle do painel sem ligar nada (sem robô, sem pastas novas): só para as rotas de leitura funcionarem."""
+def _controle(cfg, ligado_desde: float | None = None):
+    """O controle do painel sem ligar nada (sem robô, sem pastas novas): só para as rotas de leitura funcionarem.
+    ligado_desde: hora (time.time) em que o turno da nuvem começou; com ela o painel mostra "ligado" (é o turno que
+    trabalha); sem ela, "pausado" (entre turnos a empresa fica parada)."""
     from robo.monitor import Monitor
     from robo.painel import controle
     c = object.__new__(controle.ControleRobo)
     c.caminho_config, c.cfg, c.erro_config = None, cfg, None
     c.monitor = Monitor(cfg)
-    c._thread, c._parar, c._trava, c._trava_eventos = None, threading.Event(), threading.Lock(), threading.Lock()
-    c.ligado_desde, c.memoria_log = None, controle.MemoriaLog()
+    c._thread = threading.current_thread() if ligado_desde else None  # "ligado" = há uma linha de execução viva
+    c._parar, c._trava, c._trava_eventos = threading.Event(), threading.Lock(), threading.Lock()
+    c.ligado_desde, c.memoria_log = ligado_desde, controle.MemoriaLog()
     c.eventos, c._seq_eventos = collections.deque(maxlen=400), 0
     return c
 
 
-def gerar(cfg) -> dict:
+def gerar(cfg, ligado_desde: float | None = None) -> dict:
     """{chave: resposta} de todas as rotas de leitura, mais a ficha e o treino de cada pessoa e as últimas demandas."""
     from robo import organizacao
     from robo.painel import servidor
-    api = servidor.Api(_controle(cfg), 0)
+    api = servidor.Api(_controle(cfg, ligado_desde), 0)
     saida, falhas = {}, {}
 
     def chamar(rota, params=None):
@@ -78,6 +81,10 @@ def gerar(cfg) -> dict:
     for rota in servidor.ROTAS_GET:
         if rota not in EXCLUIR:
             chamar(rota)
+    try:
+        saida["config"] = _config_limpa(api)
+    except Exception as e:
+        falhas["config"] = f"{type(e).__name__}: {str(e)[:160]}"
     for p in organizacao.lista(cfg, com_contratados=True):
         for rota in POR_PESSOA:
             chamar(rota, {"id": p["id"]})
@@ -85,6 +92,22 @@ def gerar(cfg) -> dict:
         if isinstance(s, dict) and s.get("id"):
             chamar("/api/solicitacao", {"id": s["id"]})
     return {"dados": saida, "falhas": falhas}
+
+
+def _config_limpa(api) -> dict:
+    """A tela de configurações sem o que é do servidor: o banco vira só "ligado/desligado" e as pastas só o nome.
+    A rota original copiaria um config.yaml de exemplo se não existir arquivo: aqui isso não acontece."""
+    from unittest import mock
+
+    from robo.painel import configuracao, servidor
+    with mock.patch.object(configuracao, "garantir_arquivo", lambda caminho: Path("config.yaml")):
+        c = servidor.ROTAS_GET["/api/config"](api, {})
+    b = c.get("banco") or {}
+    c["banco"] = {"habilitado": bool(b.get("habilitado")), "senha_definida": bool(b.get("senha_definida"))}
+    c["pastas"] = {k: Path(v).name for k, v in (c.get("pastas") or {}).items()}
+    c["arquivo_config"] = "turno da nuvem (sem arquivo)"
+    c["somente_leitura"] = True
+    return c
 
 
 def segredos(cfg) -> list[str]:
@@ -109,10 +132,10 @@ def limpar(dados: dict, proibidos: list[str]) -> tuple[dict, list[str]]:
     return bons, removidos
 
 
-def escrever(cfg, pasta: Path, codigo_sha: str = "") -> dict:
+def escrever(cfg, pasta: Path, codigo_sha: str = "", ligado_desde: float | None = None) -> dict:
     """Grava o espelho em `pasta` (api/<chave>.json + indice.json). Devolve o índice."""
     t0 = time.perf_counter()
-    g = gerar(cfg)
+    g = gerar(cfg, ligado_desde)
     bons, removidos = limpar(g["dados"], segredos(cfg))
     (pasta / "api").mkdir(parents=True, exist_ok=True)
     for k, texto in bons.items():
@@ -129,7 +152,8 @@ def _git(*args, cwd: Path, check: bool = True):
     return subprocess.run(["git", *args], cwd=cwd, capture_output=True, text=True, timeout=120, check=check)
 
 
-def publicar(cfg, raiz: Path, pasta: Path, remoto: str = "origin", forcar: bool = False) -> bool:
+def publicar(cfg, raiz: Path, pasta: Path, remoto: str = "origin", forcar: bool = False,
+             ligado_desde: float | None = None) -> bool:
     """Gera e envia o espelho como um único commit no ramo painel-espelho (substitui o anterior). Nunca derruba o turno."""
     if not forcar and time.monotonic() - _ultimo["t"] < INTERVALO_MIN_S:
         return False
@@ -143,7 +167,7 @@ def publicar(cfg, raiz: Path, pasta: Path, remoto: str = "origin", forcar: bool 
         for resto in pasta.iterdir():  # sobras não versionadas de uma volta anterior
             if resto.name != ".git" and resto.is_file():
                 resto.unlink()
-        indice = escrever(cfg, pasta, sha)
+        indice = escrever(cfg, pasta, sha, ligado_desde)
         _git("add", "-A", ".", cwd=pasta)
         _git("-c", "user.name=robo-espelho", "-c", "user.email=robo-espelho@users.noreply.github.com", "commit", "-q",
              "-m", f"espelho do painel {indice['gerado_em']} ({len(indice['chaves'])} respostas)", cwd=pasta)

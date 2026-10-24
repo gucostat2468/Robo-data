@@ -251,6 +251,7 @@ def turno(cfg, minutos: float = 20, salvar_a_cada_min: float = 10, pausa_s: floa
     voltas = 0
     from robo import boletim
     inicio_txt = datetime.now().isoformat(timespec="seconds")
+    inicio_epoca = time.time()
     previsto = (datetime.now() + timedelta(minutes=minutos)).isoformat(timespec="seconds")
 
     def _boletim(estado: str, final: bool = False) -> None:  # o celular acompanha o turno, só no GitHub Actions
@@ -260,7 +261,8 @@ def turno(cfg, minutos: float = 20, salvar_a_cada_min: float = 10, pausa_s: floa
                               "planilhas": planilhas})
             # o painel completo (mesmo do computador, com o escritório 3D) lê este espelho no app do celular
             from robo import painel_espelho
-            painel_espelho.publicar(cfg, RAIZ, Path(cfg.logs).parent / "espelho_git", forcar=final)
+            painel_espelho.publicar(cfg, RAIZ, Path(cfg.logs).parent / "espelho_git", forcar=final,
+                                    ligado_desde=None if final else inicio_epoca)
     _boletim("trabalhando")
     ultimo_boletim = time.monotonic()
     while time.monotonic() < fim and not (parar is not None and parar.is_set()):

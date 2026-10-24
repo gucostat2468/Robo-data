@@ -30,7 +30,11 @@ def teste_espelho_tem_as_rotas_de_leitura_e_nada_sensivel(cfg_factory, tmp_path)
     for k in ("escritorio", "estado", "funcionarios", "central", "estrategia", "agentes", "canal", "gestao"):
         assert k in i["chaves"], k
     assert "funcionario__id=dba" in i["chaves"]  # a ficha de cada pessoa
-    assert not {"config", "log", "celular_diagnostico", "acesso"} & set(i["chaves"])  # pastas, caminhos e IPs: fora
+    assert not {"celular_diagnostico", "acesso"} & set(i["chaves"])  # IPs da rede de casa: fora
+    conf = json.loads((tmp_path / "esp" / "api" / "config.json").read_text(encoding="utf-8"))
+    assert set(conf["banco"]) == {"habilitado", "senha_definida"}  # sem host, usuário nem senha do banco
+    assert all("/" not in v for v in conf["pastas"].values())  # só o nome das pastas, nenhum caminho
+    assert not (tmp_path / "config.yaml").exists()
     esc = json.loads((tmp_path / "esp" / "api" / "escritorio.json").read_text(encoding="utf-8"))
     assert esc  # a mesma resposta que o escritório 3D recebe do servidor
 
@@ -65,3 +69,14 @@ def teste_publica_um_commit_so_e_substitui(cfg_factory, tmp_path):
     indice = json.loads(_git("show", f"{pe.RAMO}:indice.json", cwd=origem))
     assert indice["codigo_sha"] == sha  # o app carrega o painel exatamente desta versão do código
     assert "principal" in _git("branch", cwd=origem)
+
+
+def teste_estado_diz_se_o_turno_esta_trabalhando(cfg_factory):
+    """Na nuvem quem trabalha é o turno: durante ele o painel mostra ligado; entre turnos, pausado (os dois são fato)."""
+    import time
+    cfg = cfg_factory()
+    cfg.criar_pastas()
+    inicio = time.time() - 60
+    assert pe.gerar(cfg, ligado_desde=inicio)["dados"]["estado"]["ligado"] is True
+    assert pe.gerar(cfg, ligado_desde=inicio)["dados"]["estado"]["ligado_desde"] == inicio
+    assert pe.gerar(cfg)["dados"]["estado"]["ligado"] is False
