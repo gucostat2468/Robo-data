@@ -206,6 +206,23 @@ def _esteira(monitor) -> int:
         return 0
 
 
+def garantir_base(cfg, monitor) -> int:
+    """Máquina nova não tem planilha nenhuma, e a fábrica só produz de 30 em 30 min. Sem planilha tratada, quase todo
+    trabalho das áreas de dados fica bloqueado e a pessoa vai estudar por horas (achado no boletim por funcionário).
+    Se faltar, a fábrica produz um lote agora e a esteira trata antes da 1ª distribuição. Devolve as planilhas tratadas."""
+    from robo import demandas, fabrica
+    if demandas.base_tratada(cfg) and demandas.base_original(cfg):
+        return 0
+    try:
+        lote = fabrica.produzir_lote(cfg)
+        log.info("Turno na nuvem: máquina sem planilha tratada; a fábrica produziu %s para o trabalho do turno",
+                 lote.get("arquivo"))
+    except Exception:
+        log.exception("Turno na nuvem: não consegui produzir a planilha do início do turno")
+        return 0
+    return _esteira(monitor)
+
+
 def turno(cfg, minutos: float = 20, salvar_a_cada_min: float = 10, pausa_s: float = 15, parar=None) -> dict:
     """parar: threading.Event opcional. Quando é ligado (SIGTERM do Cloud Run, Ctrl+C), o turno sai do laço e SALVA
     a memória antes de devolver (encerramento gracioso: nada do que foi feito se perde)."""
@@ -227,6 +244,7 @@ def turno(cfg, minutos: float = 20, salvar_a_cada_min: float = 10, pausa_s: floa
         if nome == "fabrica":  # a planilha do turno é tratada ANTES de distribuir trabalho que precisa dela
             planilhas += _esteira(monitor)
     planilhas += _esteira(monitor)
+    planilhas += garantir_base(cfg, monitor)
     for nome in DEPOIS_DA_ESTEIRA:
         rotinas.executar(cfg, nome, rotinas.funcao(cfg, nome))
     ultimo_salvo = time.monotonic()

@@ -631,10 +631,17 @@ def _estado_das_demandas(tb: Trabalho, agora: datetime) -> dict:
     sete = (agora - timedelta(days=7)).isoformat(timespec="seconds")
     por: dict = {}
     with tb.tx() as c:
-        for r in c.execute("SELECT id, funcionario, estado, criada_em, atualizada_em FROM solicitacoes WHERE origem=?",
+        for r in c.execute("SELECT id, funcionario, estado, criada_em, atualizada_em, plano FROM solicitacoes WHERE origem=?",
                            (ORIGEM,)):
             p = por.setdefault(r["funcionario"], {"ultima": "", "ultima_concluida": "", "abertas": [], "carga_7d": 0})
-            p["ultima"] = max(p["ultima"], r["criada_em"])
+            # estudo dado porque o trabalho do papel estava BLOQUEADO não ocupa a vez da pessoa: no próximo ciclo ela
+            # volta a ser candidata a trabalho de verdade (antes ficava 6 h presa no estudo)
+            try:
+                estudo = (json.loads(r["plano"] or "{}") or {}).get("tipo_demanda") == "treinamento"
+            except ValueError:
+                estudo = False
+            if not estudo:
+                p["ultima"] = max(p["ultima"], r["criada_em"])
             if r["estado"] == "concluida":
                 p["ultima_concluida"] = max(p["ultima_concluida"], r["atualizada_em"] or r["criada_em"])
             if r["estado"] not in FINAIS:

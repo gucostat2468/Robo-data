@@ -315,3 +315,22 @@ def teste_trabalho_bloqueado_vai_para_o_proximo_do_papel_e_nao_para_estudo(cfg_f
                                            "'treinamento') ORDER BY id")]
     assert modelo == "demanda:calcular" and json.loads(plano)["tipo_demanda"] == "trabalho"  # trabalho do papel, não estudo
     assert eventos == ["bloqueada", "atribuida"]  # o bloqueio do drivers fica registrado com o motivo
+
+
+def _ultimo_ciclo(cfg) -> dict:
+    with Trabalho(cfg).tx() as c:
+        return json.loads(c.execute("SELECT detalhe FROM demandas_ciclos ORDER BY id DESC LIMIT 1").fetchone()[0])
+
+
+def teste_estudo_por_bloqueio_nao_ocupa_a_vez_da_pessoa(cfg_factory, ferramentas_rapidas, monkeypatch):
+    """Quem recebeu estudo porque o trabalho estava bloqueado volta a ser candidato no ciclo seguinte (antes: 6 h preso)."""
+    cfg = _cfg(cfg_factory, por_ciclo=1, por_pessoa_horas=6)
+    monkeypatch.setattr(demandas, "escolher_ferramenta", lambda cfg, p, ultima=None, usadas=None: "drivers")  # sem base
+    r1 = demandas.rotina(cfg)
+    alvo = _ultimo_ciclo(cfg)["atribuidas"][0]
+    assert r1["atribuidas"] == 1 and alvo["tipo"] == "treinamento"
+    _base(cfg)  # a base chegou: agora há trabalho de verdade
+    monkeypatch.setattr(demandas, "escolher_ferramenta", lambda cfg, p, ultima=None, usadas=None: "calcular")
+    demandas.rotina(cfg)
+    puladas = {x["funcionario"]: x["motivo"] for x in _ultimo_ciclo(cfg)["puladas"]}
+    assert "menos de 6 h" not in puladas.get(alvo["funcionario"], "")  # não ficou preso por causa do estudo

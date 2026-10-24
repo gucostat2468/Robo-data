@@ -197,3 +197,16 @@ def teste_turno_trata_a_planilha_antes_de_distribuir_trabalho(tmp_path, monkeypa
     # e em cada volta do laço também: fábrica → esteira → demandas
     volta = ordem[ordem.index("canal"):]
     assert volta.index("fabrica") < volta.index("ESTEIRA") < volta.index("demandas")
+
+
+def teste_maquina_nova_ganha_planilha_antes_da_distribuicao(cfg_factory):
+    """Máquina nova do turno não tem planilha: sem ela quase todo trabalho das áreas de dados ficava bloqueado."""
+    from robo import demandas, pos_processamento
+    from robo.monitor import Monitor
+    cfg = cfg_factory(fabrica={"linhas_min": 200, "linhas_max": 300})
+    cfg.criar_pastas()
+    assert not demandas.base_tratada(cfg)
+    monitor = Monitor(cfg, ao_processar=lambda r: pos_processamento.registrar(cfg, r))
+    assert nuvem.garantir_base(cfg, monitor) == 1
+    assert demandas.base_tratada(cfg) and demandas.base_original(cfg)
+    assert nuvem.garantir_base(cfg, monitor) == 0  # já tem: não produz outra
