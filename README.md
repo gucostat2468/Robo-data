@@ -1,6 +1,6 @@
 # Empresa ao vivo
 
-**Boletim das 24/10 12:11** (horário de Brasília) · entre turnos: memória salva; o próximo turno começa em poucos minutos
+**Boletim das 24/10 12:13** (horário de Brasília) · trabalhando
 
 > Atualiza a cada 5 minutos enquanto a empresa trabalha. Recarregue a página para ver o mais novo.
 
@@ -9,7 +9,7 @@
 - **179** demandas, **174** concluídas (97%), 0 parciais, 5 com falha
 - **101** de 101 funcionários já trabalharam
 - SQL: 4 exercícios, 4 conferidos com o gabarito
-- Fábrica: 15 planilhas, 15 conferidas sem erro
+- Fábrica: 16 planilhas, 15 conferidas sem erro
 
 ## Trabalhando agora
 
@@ -39,6 +39,13 @@
 | 11:26 | Caetano (5º) | SLA das rotinas | ✅ concluída |
 | 11:26 | Bianca (5º) | SLA das rotinas | ✅ concluída |
 | 11:26 | Fernanda (5º) | Situação do andar agora | ✅ concluída |
+
+## Dificuldade (todo o histórico)
+
+| Nível | Demandas | Concluídas | Parciais | Falhas | Acerto |
+|---|--:|--:|--:|--:|--:|
+| basico | 163 | 145 | 0 | 18 | 89% |
+| medio | 9 | 7 | 0 | 2 | 78% |
 
 ## Cada funcionário
 
@@ -170,6 +177,57 @@
 | Xavier | Especialista em xlrd (.xls antigo) | trabalho do papel | Ronda de saúde do sistema (✅ concluída) | 2 |
 | Ícaro | Sênior de AWS, Linux e Ubuntu | trabalho do papel | SLA das rotinas — nível medio (🔴 falhou) | 4 |
 
+
+## Banco de dados
+
+Levantamento das 24/10 12:04: **152 de 186** tabelas com dados (309.997 linhas contadas uma a uma).
+
+
+| Onde | Tabelas | Com dados |
+|---|--:|--:|
+| sqlite | 74 | 57 |
+| postgres.laboratorio | 15 | 15 |
+| postgres.robo | 75 | 58 |
+| postgres.treino | 22 | 22 |
+
+Vazias e por quê (nada é preenchido para parecer cheio):
+
+| Onde | Tabela | Situação | Causa |
+|---|---|---|---|
+| sqlite | aprendizados_replay | implementada, mas nada a chama | replay() existe, mas nenhuma rotina o chama; e ele só refaz erros REAIS guardados em Bases-Erros |
+| sqlite | aprovacoes | funcionalidade não acionada | só etapa que ALTERA dados pede aprovação do dono; as demandas automáticas nunca alteram dados (publicar planil |
+| sqlite | arquivos | funcionalidade não acionada | anexo enviado numa conversa |
+| sqlite | boas_praticas | funcionalidade não acionada | PDCA: um erro corrigido que não volta por um período vira boa prática |
+| sqlite | caixa_dono_eventos | funcionalidade não acionada | decisão do dono sobre um item da caixa |
+| sqlite | conversas | funcionalidade não acionada | conversa do dono com um funcionário pela ficha ou chat; a nuvem não tem painel |
+| sqlite | decisoes | funcionalidade não acionada | decisão com dono e prazo sai de reunião ou de pedido do dono |
+| sqlite | decisoes_eventos | funcionalidade não acionada | histórico de uma decisão; sem decisão, sem evento |
+| sqlite | mensagens | funcionalidade não acionada | mensagens de uma conversa do dono |
+| sqlite | propostas_regra | funcionalidade não acionada | nasce de planilha REAL reprovada com correção possível ou de correção do dono no chat |
+| sqlite | regras_aprendidas | funcionalidade não acionada | só existe depois que o dono aprova uma proposta de regra |
+| sqlite | rh_cargos | funcionalidade não acionada | cargo só muda com movimento de RH validado |
+| sqlite | sala_eventos | funcionalidade não acionada | reunião ao vivo aberta pelo dono no painel |
+| sqlite | salas_encerradas | funcionalidade não acionada | reunião ao vivo encerrada |
+| sqlite | telegram_mensagens | funcionalidade não acionada | o grupo do Telegram ainda não foi ligado (precisa do token do @BotFather, que só o dono cria) |
+| sqlite | telegram_vinculos | funcionalidade não acionada | ninguém mandou /vincular com o código certo no grupo ainda (precisa dos segredos ROBO_TELEGRAM_TOKEN e ROBO_TE |
+| sqlite | voz_falas | funcionalidade não acionada | cada fala composta pela voz de um funcionário (canal, conversas) |
+| postgres.robo | memoria_aprendizados_replay | implementada, mas nada a chama | espelho de aprendizados_replay (vazia no SQLite também): replay() existe, mas nenhuma rotina o chama; e ele só |
+| postgres.robo | memoria_aprovacoes | funcionalidade não acionada | espelho de aprovacoes (vazia no SQLite também): só etapa que ALTERA dados pede aprovação do dono; as demandas  |
+| postgres.robo | memoria_arquivos | funcionalidade não acionada | espelho de arquivos (vazia no SQLite também): anexo enviado numa conversa |
+| postgres.robo | memoria_boas_praticas | funcionalidade não acionada | espelho de boas_praticas (vazia no SQLite também): PDCA: um erro corrigido que não volta por um período vira b |
+| postgres.robo | memoria_caixa_dono_eventos | funcionalidade não acionada | espelho de caixa_dono_eventos (vazia no SQLite também): decisão do dono sobre um item da caixa |
+| postgres.robo | memoria_conversas | funcionalidade não acionada | espelho de conversas (vazia no SQLite também): conversa do dono com um funcionário pela ficha ou chat; a nuvem |
+| postgres.robo | memoria_decisoes | funcionalidade não acionada | espelho de decisoes (vazia no SQLite também): decisão com dono e prazo sai de reunião ou de pedido do dono |
+| postgres.robo | memoria_decisoes_eventos | funcionalidade não acionada | espelho de decisoes_eventos (vazia no SQLite também): histórico de uma decisão; sem decisão, sem evento |
+| postgres.robo | memoria_mensagens | funcionalidade não acionada | espelho de mensagens (vazia no SQLite também): mensagens de uma conversa do dono |
+| postgres.robo | memoria_propostas_regra | funcionalidade não acionada | espelho de propostas_regra (vazia no SQLite também): nasce de planilha REAL reprovada com correção possível ou |
+| postgres.robo | memoria_regras_aprendidas | funcionalidade não acionada | espelho de regras_aprendidas (vazia no SQLite também): só existe depois que o dono aprova uma proposta de regr |
+| postgres.robo | memoria_rh_cargos | funcionalidade não acionada | espelho de rh_cargos (vazia no SQLite também): cargo só muda com movimento de RH validado |
+| postgres.robo | memoria_sala_eventos | funcionalidade não acionada | espelho de sala_eventos (vazia no SQLite também): reunião ao vivo aberta pelo dono no painel |
+| postgres.robo | memoria_salas_encerradas | funcionalidade não acionada | espelho de salas_encerradas (vazia no SQLite também): reunião ao vivo encerrada |
+| postgres.robo | memoria_telegram_mensagens | funcionalidade não acionada | espelho de telegram_mensagens (vazia no SQLite também): o grupo do Telegram ainda não foi ligado (precisa do t |
+| postgres.robo | memoria_telegram_vinculos | funcionalidade não acionada | espelho de telegram_vinculos (vazia no SQLite também): ninguém mandou /vincular com o código certo no grupo ai |
+| postgres.robo | memoria_voz_falas | funcionalidade não acionada | espelho de voz_falas (vazia no SQLite também): cada fala composta pela voz de um funcionário (canal, conversas |
 
 ---
 Números tirados dos registros da empresa (dado sintético de treino, nunca de cliente).

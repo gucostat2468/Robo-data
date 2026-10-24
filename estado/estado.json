@@ -1,12 +1,12 @@
 {
  "versao": 1,
- "gerado_em": "2026-10-24T15:11:58",
+ "gerado_em": "2026-10-24T15:13:13",
  "turno": {
-  "estado": "entre turnos: memória salva; o próximo turno começa em poucos minutos",
-  "inicio": "2026-10-24T14:30:24",
-  "fim_previsto": "2026-10-24T15:10:24",
-  "voltas": 125,
-  "planilhas": 2
+  "estado": "trabalhando",
+  "inicio": "2026-10-24T15:13:13",
+  "fim_previsto": "2026-10-24T15:53:13",
+  "voltas": 0,
+  "planilhas": 1
  },
  "funcionarios": 101,
  "andares": [
@@ -154,7 +154,7 @@
   "concluidos_hoje": 4
  },
  "fabrica": {
-  "lotes_hoje": 15,
+  "lotes_hoje": 16,
   "conferidos_ok_hoje": 15
  },
  "rotinas": [
@@ -166,9 +166,9 @@
   },
   {
    "rotina": "caixa_dono",
-   "execucoes_24h": 11,
+   "execucoes_24h": 12,
    "erros_24h": 0,
-   "ultima": "2026-10-24T14:30:06"
+   "ultima": "2026-10-24T15:12:53"
   },
   {
    "rotina": "demandas",
@@ -178,9 +178,9 @@
   },
   {
    "rotina": "dialogo",
-   "execucoes_24h": 11,
+   "execucoes_24h": 12,
    "erros_24h": 0,
-   "ultima": "2026-10-24T14:30:06"
+   "ultima": "2026-10-24T15:12:53"
   },
   {
    "rotina": "fabrica",
@@ -196,9 +196,9 @@
   },
   {
    "rotina": "jornada",
-   "execucoes_24h": 11,
+   "execucoes_24h": 12,
    "erros_24h": 0,
-   "ultima": "2026-10-24T14:30:06"
+   "ultima": "2026-10-24T15:12:53"
   },
   {
    "rotina": "laboratorio",
@@ -208,21 +208,21 @@
   },
   {
    "rotina": "licoes",
-   "execucoes_24h": 8,
+   "execucoes_24h": 9,
    "erros_24h": 0,
-   "ultima": "2026-10-24T13:47:39"
+   "ultima": "2026-10-24T15:12:52"
   },
   {
    "rotina": "memoria_pg",
-   "execucoes_24h": 30,
+   "execucoes_24h": 29,
    "erros_24h": 0,
-   "ultima": "2026-10-24T15:11:55"
+   "ultima": "2026-10-24T15:06:40"
   },
   {
    "rotina": "paineis",
-   "execucoes_24h": 11,
+   "execucoes_24h": 12,
    "erros_24h": 0,
-   "ultima": "2026-10-24T14:30:09"
+   "ultima": "2026-10-24T15:12:56"
   },
   {
    "rotina": "registro",
@@ -238,9 +238,9 @@
   },
   {
    "rotina": "ronda_ti",
-   "execucoes_24h": 22,
+   "execucoes_24h": 23,
    "erros_24h": 0,
-   "ultima": "2026-10-24T15:09:56"
+   "ultima": "2026-10-24T15:12:34"
   },
   {
    "rotina": "treino",
@@ -252,8 +252,250 @@
  "totais": {
   "demandas": 215,
   "tentativas_treino": 5867,
-  "conversas": 2543,
-  "trabalhos_com_prova": 1180
+  "conversas": 2560,
+  "trabalhos_com_prova": 1187
+ },
+ "banco": {
+  "levantamento": "2026-10-24T15:04:57",
+  "postgres_conferido": true,
+  "erro_postgres": null,
+  "tabelas": 186,
+  "com_dados": 152,
+  "linhas": 309997,
+  "resumo": {
+   "sqlite": {
+    "tabelas": 74,
+    "com_dados": 57,
+    "vazias": {
+     "vazia: implementada, mas nada a chama": 1,
+     "vazia: funcionalidade não acionada": 16
+    }
+   },
+   "postgres.laboratorio": {
+    "tabelas": 15,
+    "com_dados": 15,
+    "vazias": {}
+   },
+   "postgres.robo": {
+    "tabelas": 75,
+    "com_dados": 58,
+    "vazias": {
+     "vazia: implementada, mas nada a chama": 1,
+     "vazia: funcionalidade não acionada": 16
+    }
+   },
+   "postgres.treino": {
+    "tabelas": 22,
+    "com_dados": 22,
+    "vazias": {}
+   }
+  },
+  "vazias": [
+   {
+    "onde": "sqlite",
+    "tabela": "aprendizados_replay",
+    "situacao": "implementada, mas nada a chama",
+    "causa": "replay() existe, mas nenhuma rotina o chama; e ele só refaz erros REAIS guardados em Bases-Erros"
+   },
+   {
+    "onde": "sqlite",
+    "tabela": "aprovacoes",
+    "situacao": "funcionalidade não acionada",
+    "causa": "só etapa que ALTERA dados pede aprovação do dono; as demandas automáticas nunca alteram dados (publicar planilha fica fora da distribuição)"
+   },
+   {
+    "onde": "sqlite",
+    "tabela": "arquivos",
+    "situacao": "funcionalidade não acionada",
+    "causa": "anexo enviado numa conversa"
+   },
+   {
+    "onde": "sqlite",
+    "tabela": "boas_praticas",
+    "situacao": "funcionalidade não acionada",
+    "causa": "PDCA: um erro corrigido que não volta por um período vira boa prática"
+   },
+   {
+    "onde": "sqlite",
+    "tabela": "caixa_dono_eventos",
+    "situacao": "funcionalidade não acionada",
+    "causa": "decisão do dono sobre um item da caixa"
+   },
+   {
+    "onde": "sqlite",
+    "tabela": "conversas",
+    "situacao": "funcionalidade não acionada",
+    "causa": "conversa do dono com um funcionário pela ficha ou chat; a nuvem não tem painel"
+   },
+   {
+    "onde": "sqlite",
+    "tabela": "decisoes",
+    "situacao": "funcionalidade não acionada",
+    "causa": "decisão com dono e prazo sai de reunião ou de pedido do dono"
+   },
+   {
+    "onde": "sqlite",
+    "tabela": "decisoes_eventos",
+    "situacao": "funcionalidade não acionada",
+    "causa": "histórico de uma decisão; sem decisão, sem evento"
+   },
+   {
+    "onde": "sqlite",
+    "tabela": "mensagens",
+    "situacao": "funcionalidade não acionada",
+    "causa": "mensagens de uma conversa do dono"
+   },
+   {
+    "onde": "sqlite",
+    "tabela": "propostas_regra",
+    "situacao": "funcionalidade não acionada",
+    "causa": "nasce de planilha REAL reprovada com correção possível ou de correção do dono no chat"
+   },
+   {
+    "onde": "sqlite",
+    "tabela": "regras_aprendidas",
+    "situacao": "funcionalidade não acionada",
+    "causa": "só existe depois que o dono aprova uma proposta de regra"
+   },
+   {
+    "onde": "sqlite",
+    "tabela": "rh_cargos",
+    "situacao": "funcionalidade não acionada",
+    "causa": "cargo só muda com movimento de RH validado"
+   },
+   {
+    "onde": "sqlite",
+    "tabela": "sala_eventos",
+    "situacao": "funcionalidade não acionada",
+    "causa": "reunião ao vivo aberta pelo dono no painel"
+   },
+   {
+    "onde": "sqlite",
+    "tabela": "salas_encerradas",
+    "situacao": "funcionalidade não acionada",
+    "causa": "reunião ao vivo encerrada"
+   },
+   {
+    "onde": "sqlite",
+    "tabela": "telegram_mensagens",
+    "situacao": "funcionalidade não acionada",
+    "causa": "o grupo do Telegram ainda não foi ligado (precisa do token do @BotFather, que só o dono cria)"
+   },
+   {
+    "onde": "sqlite",
+    "tabela": "telegram_vinculos",
+    "situacao": "funcionalidade não acionada",
+    "causa": "ninguém mandou /vincular com o código certo no grupo ainda (precisa dos segredos ROBO_TELEGRAM_TOKEN e ROBO_TELEGRAM_CODIGO no GitHub)"
+   },
+   {
+    "onde": "sqlite",
+    "tabela": "voz_falas",
+    "situacao": "funcionalidade não acionada",
+    "causa": "cada fala composta pela voz de um funcionário (canal, conversas)"
+   },
+   {
+    "onde": "postgres.robo",
+    "tabela": "memoria_aprendizados_replay",
+    "situacao": "implementada, mas nada a chama",
+    "causa": "espelho de aprendizados_replay (vazia no SQLite também): replay() existe, mas nenhuma rotina o chama; e ele só refaz erros REAIS guardados em Bases-Erros"
+   },
+   {
+    "onde": "postgres.robo",
+    "tabela": "memoria_aprovacoes",
+    "situacao": "funcionalidade não acionada",
+    "causa": "espelho de aprovacoes (vazia no SQLite também): só etapa que ALTERA dados pede aprovação do dono; as demandas automáticas nunca alteram dados (publicar planilha"
+   },
+   {
+    "onde": "postgres.robo",
+    "tabela": "memoria_arquivos",
+    "situacao": "funcionalidade não acionada",
+    "causa": "espelho de arquivos (vazia no SQLite também): anexo enviado numa conversa"
+   },
+   {
+    "onde": "postgres.robo",
+    "tabela": "memoria_boas_praticas",
+    "situacao": "funcionalidade não acionada",
+    "causa": "espelho de boas_praticas (vazia no SQLite também): PDCA: um erro corrigido que não volta por um período vira boa prática"
+   },
+   {
+    "onde": "postgres.robo",
+    "tabela": "memoria_caixa_dono_eventos",
+    "situacao": "funcionalidade não acionada",
+    "causa": "espelho de caixa_dono_eventos (vazia no SQLite também): decisão do dono sobre um item da caixa"
+   },
+   {
+    "onde": "postgres.robo",
+    "tabela": "memoria_conversas",
+    "situacao": "funcionalidade não acionada",
+    "causa": "espelho de conversas (vazia no SQLite também): conversa do dono com um funcionário pela ficha ou chat; a nuvem não tem painel"
+   },
+   {
+    "onde": "postgres.robo",
+    "tabela": "memoria_decisoes",
+    "situacao": "funcionalidade não acionada",
+    "causa": "espelho de decisoes (vazia no SQLite também): decisão com dono e prazo sai de reunião ou de pedido do dono"
+   },
+   {
+    "onde": "postgres.robo",
+    "tabela": "memoria_decisoes_eventos",
+    "situacao": "funcionalidade não acionada",
+    "causa": "espelho de decisoes_eventos (vazia no SQLite também): histórico de uma decisão; sem decisão, sem evento"
+   },
+   {
+    "onde": "postgres.robo",
+    "tabela": "memoria_mensagens",
+    "situacao": "funcionalidade não acionada",
+    "causa": "espelho de mensagens (vazia no SQLite também): mensagens de uma conversa do dono"
+   },
+   {
+    "onde": "postgres.robo",
+    "tabela": "memoria_propostas_regra",
+    "situacao": "funcionalidade não acionada",
+    "causa": "espelho de propostas_regra (vazia no SQLite também): nasce de planilha REAL reprovada com correção possível ou de correção do dono no chat"
+   },
+   {
+    "onde": "postgres.robo",
+    "tabela": "memoria_regras_aprendidas",
+    "situacao": "funcionalidade não acionada",
+    "causa": "espelho de regras_aprendidas (vazia no SQLite também): só existe depois que o dono aprova uma proposta de regra"
+   },
+   {
+    "onde": "postgres.robo",
+    "tabela": "memoria_rh_cargos",
+    "situacao": "funcionalidade não acionada",
+    "causa": "espelho de rh_cargos (vazia no SQLite também): cargo só muda com movimento de RH validado"
+   },
+   {
+    "onde": "postgres.robo",
+    "tabela": "memoria_sala_eventos",
+    "situacao": "funcionalidade não acionada",
+    "causa": "espelho de sala_eventos (vazia no SQLite também): reunião ao vivo aberta pelo dono no painel"
+   },
+   {
+    "onde": "postgres.robo",
+    "tabela": "memoria_salas_encerradas",
+    "situacao": "funcionalidade não acionada",
+    "causa": "espelho de salas_encerradas (vazia no SQLite também): reunião ao vivo encerrada"
+   },
+   {
+    "onde": "postgres.robo",
+    "tabela": "memoria_telegram_mensagens",
+    "situacao": "funcionalidade não acionada",
+    "causa": "espelho de telegram_mensagens (vazia no SQLite também): o grupo do Telegram ainda não foi ligado (precisa do token do @BotFather, que só o dono cria)"
+   },
+   {
+    "onde": "postgres.robo",
+    "tabela": "memoria_telegram_vinculos",
+    "situacao": "funcionalidade não acionada",
+    "causa": "espelho de telegram_vinculos (vazia no SQLite também): ninguém mandou /vincular com o código certo no grupo ainda (precisa dos segredos ROBO_TELEGRAM_TOKEN e RO"
+   },
+   {
+    "onde": "postgres.robo",
+    "tabela": "memoria_voz_falas",
+    "situacao": "funcionalidade não acionada",
+    "causa": "espelho de voz_falas (vazia no SQLite também): cada fala composta pela voz de um funcionário (canal, conversas)"
+   }
+  ]
  },
  "pessoas": [
   {
@@ -1366,6 +1608,22 @@
    "quando": "2026-10-24T14:56:15",
    "estado": "falhou",
    "situacao": "trabalho do papel"
+  }
+ ],
+ "niveis": [
+  {
+   "nivel": "basico",
+   "demandas": 163,
+   "concluidas": 145,
+   "parciais": 0,
+   "falhas": 18
+  },
+  {
+   "nivel": "medio",
+   "demandas": 9,
+   "concluidas": 7,
+   "parciais": 0,
+   "falhas": 2
   }
  ]
 }
