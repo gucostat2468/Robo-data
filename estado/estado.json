@@ -1,11 +1,11 @@
 {
  "versao": 1,
- "gerado_em": "2026-10-24T16:57:37",
+ "gerado_em": "2026-10-24T17:03:41",
  "turno": {
   "estado": "trabalhando",
   "inicio": "2026-10-24T16:38:39",
   "fim_previsto": "2026-10-24T17:18:39",
-  "voltas": 59,
+  "voltas": 74,
   "planilhas": 1
  },
  "funcionarios": 105,
@@ -18,8 +18,8 @@
    "concluidas": 34,
    "parciais": 0,
    "falhas": 1,
-   "treino": 481,
-   "acertos": 433
+   "treino": 482,
+   "acertos": 434
   },
   {
    "andar": 2,
@@ -29,8 +29,8 @@
    "concluidas": 34,
    "parciais": 0,
    "falhas": 2,
-   "treino": 408,
-   "acertos": 377
+   "treino": 410,
+   "acertos": 379
   },
   {
    "andar": 3,
@@ -40,8 +40,8 @@
    "concluidas": 29,
    "parciais": 0,
    "falhas": 0,
-   "treino": 300,
-   "acertos": 250
+   "treino": 302,
+   "acertos": 252
   },
   {
    "andar": 4,
@@ -51,8 +51,8 @@
    "concluidas": 37,
    "parciais": 0,
    "falhas": 0,
-   "treino": 770,
-   "acertos": 696
+   "treino": 779,
+   "acertos": 704
   },
   {
    "andar": 5,
@@ -62,8 +62,8 @@
    "concluidas": 66,
    "parciais": 0,
    "falhas": 2,
-   "treino": 568,
-   "acertos": 503
+   "treino": 584,
+   "acertos": 514
   }
  ],
  "agora": [],
@@ -214,9 +214,9 @@
   },
   {
    "rotina": "memoria_pg",
-   "execucoes_24h": 36,
+   "execucoes_24h": 37,
    "erros_24h": 0,
-   "ultima": "2026-10-24T16:51:18"
+   "ultima": "2026-10-24T17:03:38"
   },
   {
    "rotina": "modelos",
@@ -232,9 +232,9 @@
   },
   {
    "rotina": "registro",
-   "execucoes_24h": 293,
+   "execucoes_24h": 296,
    "erros_24h": 0,
-   "ultima": "2026-10-24T16:57:09"
+   "ultima": "2026-10-24T17:01:20"
   },
   {
    "rotina": "rh_desempenho",
@@ -250,24 +250,24 @@
   },
   {
    "rotina": "treino",
-   "execucoes_24h": 201,
+   "execucoes_24h": 203,
    "erros_24h": 0,
-   "ultima": "2026-10-24T16:56:54"
+   "ultima": "2026-10-24T17:01:05"
   }
  ],
  "totais": {
   "demandas": 241,
-  "tentativas_treino": 6478,
-  "conversas": 2823,
-  "trabalhos_com_prova": 1421
+  "tentativas_treino": 6508,
+  "conversas": 2833,
+  "trabalhos_com_prova": 1429
  },
  "banco": {
-  "levantamento": "2026-10-24T16:49:11",
+  "levantamento": "2026-10-24T17:01:50",
   "postgres_conferido": true,
   "erro_postgres": null,
-  "tabelas": 196,
+  "tabelas": 201,
   "com_dados": 160,
-  "linhas": 358913,
+  "linhas": 362298,
   "resumo": {
    "sqlite": {
     "tabelas": 79,
@@ -282,16 +282,37 @@
     "vazias": {}
    },
    "postgres.robo": {
-    "tabelas": 80,
+    "tabelas": 82,
     "com_dados": 62,
     "vazias": {
-     "vazia: funcionalidade não acionada": 18
+     "vazia: funcionalidade não acionada": 20
     }
    },
    "postgres.treino": {
     "tabelas": 22,
     "com_dados": 22,
     "vazias": {}
+   },
+   "postgres.bruto": {
+    "tabelas": 1,
+    "com_dados": 0,
+    "vazias": {
+     "vazia: funcionalidade não acionada": 1
+    }
+   },
+   "postgres.tratado": {
+    "tabelas": 1,
+    "com_dados": 0,
+    "vazias": {
+     "vazia: funcionalidade não acionada": 1
+    }
+   },
+   "postgres.analitico": {
+    "tabelas": 1,
+    "com_dados": 0,
+    "vazias": {
+     "vazia: funcionalidade não acionada": 1
+    }
    }
   },
   "vazias": [
@@ -405,6 +426,12 @@
    },
    {
     "onde": "postgres.robo",
+    "tabela": "lotes",
+    "situacao": "funcionalidade não acionada",
+    "causa": "um lote por planilha REAL carregada no PostgreSQL (as da fábrica vão para treino.lotes)"
+   },
+   {
+    "onde": "postgres.robo",
     "tabela": "memoria_aprendizados_replay",
     "situacao": "funcionalidade não acionada",
     "causa": "espelho de aprendizados_replay (vazia no SQLite também): o replay diário (licoes.replay_diario, 1x por dia) refaz erros da esteira guardados em Bases-Erros; sem"
@@ -510,6 +537,30 @@
     "tabela": "memoria_voz_falas",
     "situacao": "funcionalidade não acionada",
     "causa": "espelho de voz_falas (vazia no SQLite também): cada fala composta pela voz de um funcionário (canal, conversas)"
+   },
+   {
+    "onde": "postgres.robo",
+    "tabela": "ocorrencias",
+    "situacao": "funcionalidade não acionada",
+    "causa": "erros e avisos de cada planilha REAL carregada no PostgreSQL"
+   },
+   {
+    "onde": "postgres.bruto",
+    "tabela": "(schema vazio)",
+    "situacao": "funcionalidade não acionada",
+    "causa": "schema sem nenhuma tabela (cópia em texto de cada planilha REAL, como chegou); nasce quando acontecer: planilha sua processada com o banco ligado"
+   },
+   {
+    "onde": "postgres.tratado",
+    "tabela": "(schema vazio)",
+    "situacao": "funcionalidade não acionada",
+    "causa": "schema sem nenhuma tabela (tabelas tratadas das planilhas REAIS aprovadas); nasce quando acontecer: planilha sua aprovada com o banco ligado"
+   },
+   {
+    "onde": "postgres.analitico",
+    "tabela": "(schema vazio)",
+    "situacao": "funcionalidade não acionada",
+    "causa": "schema sem nenhuma tabela (modelos SQL (modelos_sql/) sobre o tratado real); nasce quando acontecer: planilha real aprovada + modelos_sql"
    }
   ]
  },

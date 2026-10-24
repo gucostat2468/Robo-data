@@ -1,6 +1,6 @@
 # Empresa ao vivo
 
-**Boletim das 24/10 13:57** (horário de Brasília) · trabalhando
+**Boletim das 24/10 14:03** (horário de Brasília) · trabalhando
 
 > Atualiza a cada 5 minutos enquanto a empresa trabalha. Recarregue a página para ver o mais novo.
 
@@ -192,15 +192,18 @@
 
 ## Banco de dados
 
-Levantamento das 24/10 13:49: **160 de 196** tabelas com dados (358.913 linhas contadas uma a uma).
+Levantamento das 24/10 14:01: **160 de 201** tabelas com dados (362.298 linhas contadas uma a uma).
 
 
 | Onde | Tabelas | Com dados |
 |---|--:|--:|
 | sqlite | 79 | 61 |
 | postgres.laboratorio | 15 | 15 |
-| postgres.robo | 80 | 62 |
+| postgres.robo | 82 | 62 |
 | postgres.treino | 22 | 22 |
+| postgres.bruto | 1 | 0 |
+| postgres.tratado | 1 | 0 |
+| postgres.analitico | 1 | 0 |
 
 Vazias e por quê (nada é preenchido para parecer cheio):
 
@@ -224,6 +227,7 @@ Vazias e por quê (nada é preenchido para parecer cheio):
 | sqlite | telegram_mensagens | funcionalidade não acionada | o grupo do Telegram ainda não foi ligado (precisa do token do @BotFather, que só o dono cria) |
 | sqlite | telegram_vinculos | funcionalidade não acionada | ninguém mandou /vincular com o código certo no grupo ainda (precisa dos segredos ROBO_TELEGRAM_TOKEN e ROBO_TE |
 | sqlite | voz_falas | funcionalidade não acionada | cada fala composta pela voz de um funcionário (canal, conversas) |
+| postgres.robo | lotes | funcionalidade não acionada | um lote por planilha REAL carregada no PostgreSQL (as da fábrica vão para treino.lotes) |
 | postgres.robo | memoria_aprendizados_replay | funcionalidade não acionada | espelho de aprendizados_replay (vazia no SQLite também): o replay diário (licoes.replay_diario, 1x por dia) re |
 | postgres.robo | memoria_aprovacoes | funcionalidade não acionada | espelho de aprovacoes (vazia no SQLite também): só etapa que ALTERA dados pede aprovação do dono; as demandas  |
 | postgres.robo | memoria_arquivos | funcionalidade não acionada | espelho de arquivos (vazia no SQLite também): anexo enviado numa conversa |
@@ -242,6 +246,10 @@ Vazias e por quê (nada é preenchido para parecer cheio):
 | postgres.robo | memoria_telegram_mensagens | funcionalidade não acionada | espelho de telegram_mensagens (vazia no SQLite também): o grupo do Telegram ainda não foi ligado (precisa do t |
 | postgres.robo | memoria_telegram_vinculos | funcionalidade não acionada | espelho de telegram_vinculos (vazia no SQLite também): ninguém mandou /vincular com o código certo no grupo ai |
 | postgres.robo | memoria_voz_falas | funcionalidade não acionada | espelho de voz_falas (vazia no SQLite também): cada fala composta pela voz de um funcionário (canal, conversas |
+| postgres.robo | ocorrencias | funcionalidade não acionada | erros e avisos de cada planilha REAL carregada no PostgreSQL |
+| postgres.bruto | (schema vazio) | funcionalidade não acionada | schema sem nenhuma tabela (cópia em texto de cada planilha REAL, como chegou); nasce quando acontecer: planilh |
+| postgres.tratado | (schema vazio) | funcionalidade não acionada | schema sem nenhuma tabela (tabelas tratadas das planilhas REAIS aprovadas); nasce quando acontecer: planilha s |
+| postgres.analitico | (schema vazio) | funcionalidade não acionada | schema sem nenhuma tabela (modelos SQL (modelos_sql/) sobre o tratado real); nasce quando acontecer: planilha  |
 
 ---
 Números tirados dos registros da empresa (dado sintético de treino, nunca de cliente).
