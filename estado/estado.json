@@ -1,14 +1,14 @@
 {
  "versao": 1,
- "gerado_em": "2026-10-24T15:55:06",
+ "gerado_em": "2026-10-24T15:55:59",
  "turno": {
-  "estado": "entre turnos: memória salva; o próximo turno começa em poucos minutos",
-  "inicio": "2026-10-24T15:13:13",
-  "fim_previsto": "2026-10-24T15:53:13",
-  "voltas": 110,
-  "planilhas": 2
+  "estado": "trabalhando",
+  "inicio": "2026-10-24T15:55:59",
+  "fim_previsto": "2026-10-24T16:35:59",
+  "voltas": 0,
+  "planilhas": 1
  },
- "funcionarios": 101,
+ "funcionarios": 105,
  "andares": [
   {
    "andar": 1,
@@ -23,7 +23,7 @@
   },
   {
    "andar": 2,
-   "pessoas": 16,
+   "pessoas": 18,
    "trabalharam_hoje": 16,
    "demandas": 33,
    "concluidas": 31,
@@ -45,7 +45,7 @@
   },
   {
    "andar": 4,
-   "pessoas": 31,
+   "pessoas": 32,
    "trabalharam_hoje": 31,
    "demandas": 33,
    "concluidas": 33,
@@ -56,7 +56,7 @@
   },
   {
    "andar": 5,
-   "pessoas": 23,
+   "pessoas": 24,
    "trabalharam_hoje": 23,
    "demandas": 56,
    "concluidas": 54,
@@ -154,7 +154,7 @@
   "concluidos_hoje": 4
  },
  "fabrica": {
-  "lotes_hoje": 17,
+  "lotes_hoje": 18,
   "conferidos_ok_hoje": 17
  },
  "rotinas": [
@@ -166,9 +166,9 @@
   },
   {
    "rotina": "caixa_dono",
-   "execucoes_24h": 12,
+   "execucoes_24h": 13,
    "erros_24h": 0,
-   "ultima": "2026-10-24T15:12:53"
+   "ultima": "2026-10-24T15:55:43"
   },
   {
    "rotina": "demandas",
@@ -178,9 +178,9 @@
   },
   {
    "rotina": "dialogo",
-   "execucoes_24h": 12,
+   "execucoes_24h": 13,
    "erros_24h": 0,
-   "ultima": "2026-10-24T15:12:53"
+   "ultima": "2026-10-24T15:55:43"
   },
   {
    "rotina": "fabrica",
@@ -196,9 +196,9 @@
   },
   {
    "rotina": "jornada",
-   "execucoes_24h": 12,
+   "execucoes_24h": 13,
    "erros_24h": 0,
-   "ultima": "2026-10-24T15:12:53"
+   "ultima": "2026-10-24T15:55:42"
   },
   {
    "rotina": "laboratorio",
@@ -214,15 +214,21 @@
   },
   {
    "rotina": "memoria_pg",
-   "execucoes_24h": 33,
+   "execucoes_24h": 32,
    "erros_24h": 0,
-   "ultima": "2026-10-24T15:55:02"
+   "ultima": "2026-10-24T15:52:03"
+  },
+  {
+   "rotina": "modelos",
+   "execucoes_24h": 1,
+   "erros_24h": 0,
+   "ultima": "2026-10-24T15:55:46"
   },
   {
    "rotina": "paineis",
-   "execucoes_24h": 12,
+   "execucoes_24h": 13,
    "erros_24h": 0,
-   "ultima": "2026-10-24T15:12:56"
+   "ultima": "2026-10-24T15:55:45"
   },
   {
    "rotina": "registro",
@@ -238,9 +244,9 @@
   },
   {
    "rotina": "ronda_ti",
-   "execucoes_24h": 24,
+   "execucoes_24h": 25,
    "erros_24h": 0,
-   "ultima": "2026-10-24T15:52:25"
+   "ultima": "2026-10-24T15:55:39"
   },
   {
    "rotina": "treino",
@@ -252,16 +258,16 @@
  "totais": {
   "demandas": 220,
   "tentativas_treino": 6090,
-  "conversas": 2649,
-  "trabalhos_com_prova": 1264
+  "conversas": 2663,
+  "trabalhos_com_prova": 1271
  },
  "banco": {
-  "levantamento": "2026-10-24T15:52:44",
+  "levantamento": "2026-10-24T15:49:43",
   "postgres_conferido": true,
   "erro_postgres": null,
   "tabelas": 186,
   "com_dados": 152,
-  "linhas": 329607,
+  "linhas": 328522,
   "resumo": {
    "sqlite": {
     "tabelas": 74,
@@ -794,6 +800,17 @@
    "situacao": "trabalho do papel"
   },
   {
+   "nome": "Leandro",
+   "andar": 2,
+   "cargo": "Engenheiro de Machine Learning Sênior",
+   "area": "Estatística",
+   "demandas_hoje": 0,
+   "ultimo": "",
+   "quando": "",
+   "estado": "",
+   "situacao": "sem trabalho ainda"
+  },
+  {
    "nome": "Lucas",
    "andar": 2,
    "cargo": "Cientista de Dados Júnior",
@@ -847,6 +864,17 @@
    "quando": "2026-10-24T11:25:33",
    "estado": "concluida",
    "situacao": "trabalho do papel"
+  },
+  {
+   "nome": "Rebeca",
+   "andar": 2,
+   "cargo": "Líder de Engenharia de IA e Machine Learning",
+   "area": "Estatística",
+   "demandas_hoje": 0,
+   "ultimo": "",
+   "quando": "",
+   "estado": "",
+   "situacao": "sem trabalho ainda"
   },
   {
    "nome": "Rogério",
@@ -1067,6 +1095,17 @@
    "quando": "2026-10-24T10:55:28",
    "estado": "concluida",
    "situacao": "trabalho do papel"
+  },
+  {
+   "nome": "Fabiana",
+   "andar": 4,
+   "cargo": "Engenheira de Avaliação e Segurança de IA",
+   "area": "Governança e Privacidade",
+   "demandas_hoje": 0,
+   "ultimo": "",
+   "quando": "",
+   "estado": "",
+   "situacao": "sem trabalho ainda"
   },
   {
    "nome": "Helena",
@@ -1487,6 +1526,17 @@
    "situacao": "trabalho do papel"
   },
   {
+   "nome": "Jonas",
+   "andar": 5,
+   "cargo": "Engenheiro de MLOps e Plataforma de Modelos",
+   "area": "Engenharia de Dados",
+   "demandas_hoje": 0,
+   "ultimo": "",
+   "quando": "",
+   "estado": "",
+   "situacao": "sem trabalho ainda"
+  },
+  {
    "nome": "Letícia",
    "andar": 5,
    "cargo": "Desenvolvedora Júnior",
@@ -1608,6 +1658,46 @@
    "situacao": "trabalho do papel"
   }
  ],
+ "modelos": {
+  "finalidade": "risco_demanda",
+  "rotuladas_agora": 177,
+  "minimo_para_treinar": 60,
+  "datasets": 1,
+  "maior_dataset": 177,
+  "modelos": [
+   {
+    "id": "risco_demanda-v1",
+    "estado": "reprovado",
+    "criado_por": "ml_engenheiro"
+   }
+  ],
+  "referencia": null,
+  "inferencias_sombra": 0,
+  "uso_operacional": "desligado: o modelo só roda em sombra até o dono decidir usá-lo em alguma escolha da empresa",
+  "ultima_avaliacao": {
+   "modelo": "risco_demanda-v1",
+   "resultado": "avaliado_reprovado",
+   "quem": "ml_avaliador",
+   "candidato": {
+    "n": 27,
+    "taxa_real": 0.074074,
+    "log_loss": 0.68113,
+    "brier": 0.074049,
+    "auc": 0.18
+   },
+   "baseline": {
+    "n": 27,
+    "taxa_real": 0.074074,
+    "log_loss": 0.2465,
+    "brier": 0.06874,
+    "auc": 0.72
+   },
+   "motivos": [
+    "AUC 0.180 abaixo do mínimo 0.55",
+    "não bate o baseline (log loss 0.6811 ≥ 0.2465)"
+   ]
+  }
+ },
  "niveis": [
   {
    "nivel": "basico",

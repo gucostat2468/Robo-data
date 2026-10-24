@@ -1,15 +1,15 @@
 # Empresa ao vivo
 
-**Boletim das 24/10 12:55** (horário de Brasília) · entre turnos: memória salva; o próximo turno começa em poucos minutos
+**Boletim das 24/10 12:55** (horário de Brasília) · trabalhando
 
 > Atualiza a cada 5 minutos enquanto a empresa trabalha. Recarregue a página para ver o mais novo.
 
 ## Hoje
 
 - **184** demandas, **179** concluídas (97%), 0 parciais, 5 com falha
-- **101** de 101 funcionários já trabalharam
+- **101** de 105 funcionários já trabalharam
 - SQL: 4 exercícios, 4 conferidos com o gabarito
-- Fábrica: 17 planilhas, 17 conferidas sem erro
+- Fábrica: 18 planilhas, 17 conferidas sem erro
 
 ## Trabalhando agora
 
@@ -20,10 +20,10 @@
 | Andar | Trabalharam | Demandas | Concluídas | Parciais | Falhas |
 |---|--:|--:|--:|--:|--:|
 | 1º | 19 de 19 | 34 | 33 | 0 | 1 |
-| 2º | 16 de 16 | 33 | 31 | 0 | 2 |
+| 2º | 16 de 18 | 33 | 31 | 0 | 2 |
 | 3º | 12 de 12 | 28 | 28 | 0 | 0 |
-| 4º | 31 de 31 | 33 | 33 | 0 | 0 |
-| 5º | 23 de 23 | 56 | 54 | 0 | 2 |
+| 4º | 31 de 32 | 33 | 33 | 0 | 0 |
+| 5º | 23 de 24 | 56 | 54 | 0 | 2 |
 
 ## Últimas entregas
 
@@ -49,7 +49,7 @@
 
 ## Cada funcionário
 
-101 de 101 no trabalho do papel, observando (estagiário) ou na rotina própria da equipe; 0 precisam de atenção.
+101 de 105 no trabalho do papel, observando (estagiário) ou na rotina própria da equipe; 4 precisam de atenção.
 
 ### 1º andar
 
@@ -87,11 +87,13 @@
 | Fábio | Relator | trabalho do papel | Perfil e indicadores da base sintética (✅ concluída) | 3 |
 | Igor | Analista de Dados Júnior | trabalho do papel | Perfil e indicadores da base sintética (✅ concluída) | 3 |
 | Larissa | Analista de Customer Insights Pleno | trabalho do papel | Perfil e indicadores da base sintética (✅ concluída) | 3 |
+| Leandro | Engenheiro de Machine Learning Sênior | sem trabalho ainda |   | 0 |
 | Lucas | Cientista de Dados Júnior | trabalho do papel | Diagnosticar a planilha original da fábrica (✅ concluída) | 2 |
 | Manu | Estagiária de Análise de Dados | estagiário: observa (regra do dono) |   | 0 |
 | Marcos | Coordenador de Análise e Ciência de Dado | trabalho do papel | Perfil e indicadores da base sintética (✅ concluída) | 2 |
 | Natália | Head de Ciência de Dados | trabalho do papel | Calcular a média de uma métrica da base sintética (✅ concluída) | 3 |
 | Patrícia | Gerente de Analytics e Customer Insights | trabalho do papel | Perfil e indicadores da base sintética (✅ concluída) | 1 |
+| Rebeca | Líder de Engenharia de IA e Machine Lear | sem trabalho ainda |   | 0 |
 | Rogério | Diretor de Analytics, Ciência de Dados e | trabalho do papel | Situação do andar agora (✅ concluída) | 1 |
 | Sérgio | Analista de Dados Pleno | trabalho do papel | Conferir no PostgreSQL os lotes da fábrica (✅ concluída) | 2 |
 | Vinícius | Cientista de Dados Sênior | trabalho do papel | Drivers do indicador na base sintética (🔴 falhou) | 3 |
@@ -122,6 +124,7 @@
 | Bento | Avaliador Independente de Demandas | trabalho do papel na rotina demandas |   | 0 |
 | Celina | Especialista Sênior em Dados de Treino | trabalho do papel na rotina fabrica |   | 0 |
 | Cláudia | Diretora de Operações e Governança | trabalho do papel | Scorecard da área (✅ concluída) | 1 |
+| Fabiana | Engenheira de Avaliação e Segurança de I | sem trabalho ainda |   | 0 |
 | Helena | RH e desenvolvimento da equipe | trabalho do papel | Situação do andar agora (✅ concluída) | 1 |
 | Iara | Ideias e evolução da plataforma | trabalho do papel | Perfil e indicadores da base sintética (✅ concluída) | 2 |
 | Isadora | Analista Pleno de Distribuição de Demand | trabalho do papel na rotina demandas |   | 0 |
@@ -165,6 +168,7 @@
 | Gustavo | Gerente de TI e Infraestrutura | trabalho do papel | Situação do andar agora (✅ concluída) | 2 |
 | Heloísa | Head de AWS, Arquitetura e Governança de | trabalho do papel | Medir a saúde do PostgreSQL — nível medio (✅ concluída) | 4 |
 | Henrique | Head de Engenharia Python | trabalho do papel | Estratégia Python (✅ concluída) | 2 |
+| Jonas | Engenheiro de MLOps e Plataforma de Mode | sem trabalho ainda |   | 0 |
 | Letícia | Desenvolvedora Júnior | trabalho do papel | Medir a saúde do PostgreSQL (✅ concluída) | 3 |
 | Marina | Arquiteta de Cloud (AWS) | trabalho do papel | Medir a saúde do PostgreSQL — nível medio (✅ concluída) | 4 |
 | Nicolas | Especialista em numpy | trabalho do papel | SLA das rotinas — nível medio (🔴 falhou) | 3 |
@@ -178,9 +182,16 @@
 | Ícaro | Sênior de AWS, Linux e Ubuntu | trabalho do papel | SLA das rotinas — nível medio (🔴 falhou) | 4 |
 
 
+## Inteligência própria (modelo de risco das demandas)
+
+- risco_demanda-v1: **reprovado** (treinado por ml_engenheiro)
+- Última avaliação independente (ml_avaliador): risco_demanda-v1 reprovado — log loss 0.681 contra baseline 0.246; motivos: AUC 0.180 abaixo do mínimo 0.55; não bate o baseline (log loss 0.6811 ≥ 0.2465)
+- Referência em sombra: nenhuma; 0 previsões em sombra
+- Uso operacional: desligado: o modelo só roda em sombra até o dono decidir usá-lo em alguma escolha da empresa
+
 ## Banco de dados
 
-Levantamento das 24/10 12:52: **152 de 186** tabelas com dados (329.607 linhas contadas uma a uma).
+Levantamento das 24/10 12:49: **152 de 186** tabelas com dados (328.522 linhas contadas uma a uma).
 
 
 | Onde | Tabelas | Com dados |
