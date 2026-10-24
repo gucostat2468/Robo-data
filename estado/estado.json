@@ -1,11 +1,11 @@
 {
  "versao": 1,
- "gerado_em": "2026-10-24T22:24:18",
+ "gerado_em": "2026-10-24T22:30:53",
  "turno": {
   "estado": "trabalhando",
   "inicio": "2026-10-24T21:58:36",
   "fim_previsto": "2026-10-24T22:38:36",
-  "voltas": 65,
+  "voltas": 81,
   "planilhas": 1
  },
  "funcionarios": 105,
@@ -18,8 +18,8 @@
    "concluidas": 51,
    "parciais": 0,
    "falhas": 1,
-   "treino": 735,
-   "acertos": 650
+   "treino": 745,
+   "acertos": 658
   },
   {
    "andar": 2,
@@ -29,8 +29,8 @@
    "concluidas": 50,
    "parciais": 0,
    "falhas": 2,
-   "treino": 650,
-   "acertos": 598
+   "treino": 658,
+   "acertos": 606
   },
   {
    "andar": 3,
@@ -51,23 +51,39 @@
    "concluidas": 55,
    "parciais": 0,
    "falhas": 0,
-   "treino": 1201,
-   "acertos": 1051
+   "treino": 1212,
+   "acertos": 1062
   },
   {
    "andar": 5,
    "pessoas": 24,
    "trabalharam_hoje": 24,
-   "demandas": 111,
-   "concluidas": 109,
+   "demandas": 113,
+   "concluidas": 111,
    "parciais": 0,
    "falhas": 2,
-   "treino": 899,
-   "acertos": 745
+   "treino": 900,
+   "acertos": 746
   }
  ],
  "agora": [],
  "ultimos": [
+  {
+   "quando": "2026-10-24T22:29:07",
+   "funcionario": "Marina",
+   "cargo": "Arquiteta de Cloud (AWS)",
+   "andar": 5,
+   "trabalho": "Ronda de saúde do sistema — nível dificil",
+   "estado": "concluida"
+  },
+  {
+   "quando": "2026-10-24T22:29:07",
+   "funcionario": "Heloísa",
+   "cargo": "Head de AWS, Arquitetura e Governança de Nuvem",
+   "andar": 5,
+   "trabalho": "SLA das rotinas — nível profissional",
+   "estado": "concluida"
+  },
   {
    "quando": "2026-10-24T21:59:07",
    "funcionario": "Xavier",
@@ -131,22 +147,6 @@
    "andar": 5,
    "trabalho": "Ronda de saúde do sistema — nível profissional",
    "estado": "concluida"
-  },
-  {
-   "quando": "2026-10-24T21:29:05",
-   "funcionario": "Marina",
-   "cargo": "Arquiteta de Cloud (AWS)",
-   "andar": 5,
-   "trabalho": "Conferir se o projeto está pronto para servidor — nível dificil",
-   "estado": "concluida"
-  },
-  {
-   "quando": "2026-10-24T21:29:04",
-   "funcionario": "Pietro",
-   "cargo": "Especialista em psycopg (PostgreSQL)",
-   "andar": 5,
-   "trabalho": "Medir a saúde do PostgreSQL — nível dificil",
-   "estado": "concluida"
   }
  ],
  "sql": {
@@ -172,9 +172,9 @@
   },
   {
    "rotina": "demandas",
-   "execucoes_24h": 29,
+   "execucoes_24h": 30,
    "erros_24h": 0,
-   "ultima": "2026-10-24T21:59:07"
+   "ultima": "2026-10-24T22:29:07"
   },
   {
    "rotina": "dialogo",
@@ -202,9 +202,9 @@
   },
   {
    "rotina": "laboratorio",
-   "execucoes_24h": 71,
+   "execucoes_24h": 72,
    "erros_24h": 0,
-   "ultima": "2026-10-24T22:13:13"
+   "ultima": "2026-10-24T22:26:33"
   },
   {
    "rotina": "licoes",
@@ -234,7 +234,7 @@
    "rotina": "registro",
    "execucoes_24h": 420,
    "erros_24h": 0,
-   "ultima": "2026-10-24T22:20:23"
+   "ultima": "2026-10-24T22:29:22"
   },
   {
    "rotina": "rh_desempenho",
@@ -244,7 +244,7 @@
   },
   {
    "rotina": "ronda_ti",
-   "execucoes_24h": 38,
+   "execucoes_24h": 37,
    "erros_24h": 0,
    "ultima": "2026-10-24T21:58:17"
   },
@@ -252,14 +252,14 @@
    "rotina": "treino",
    "execucoes_24h": 286,
    "erros_24h": 0,
-   "ultima": "2026-10-24T22:20:08"
+   "ultima": "2026-10-24T22:29:05"
   }
  ],
  "totais": {
-  "demandas": 345,
-  "tentativas_treino": 7900,
-  "conversas": 3276,
-  "trabalhos_com_prova": 2051
+  "demandas": 347,
+  "tentativas_treino": 7930,
+  "conversas": 3283,
+  "trabalhos_com_prova": 2064
  },
  "banco": {
   "levantamento": "2026-10-24T22:21:58",
@@ -749,7 +749,7 @@
    "ultimo": "",
    "quando": "",
    "estado": "",
-   "situacao": "estagiário: observa (regra do dono) — Observei Jonas (Engenheiro de MLOps e Plataforma de Modelos) fazendo \"SLA das rotinas\" no nível dificil: terminou conclu"
+   "situacao": "estagiário: observa (regra do dono) — Observei Marina (Arquiteta de Cloud (AWS)) fazendo \"Ronda de saúde do sistema\" no nível dificil: terminou concluida."
   },
   {
    "nome": "Tina",
@@ -881,7 +881,7 @@
    "ultimo": "",
    "quando": "",
    "estado": "",
-   "situacao": "estagiário: observa (regra do dono) — Observei Leandro (Engenheiro de Machine Learning Sênior) fazendo \"Anomalias na base sintética\" no nível medio: terminou "
+   "situacao": "estagiário: observa (regra do dono)"
   },
   {
    "nome": "Marcos",
@@ -980,7 +980,7 @@
    "ultimo": "",
    "quando": "",
    "estado": "",
-   "situacao": "estagiário: observa (regra do dono) — Observei Jonas (Engenheiro de MLOps e Plataforma de Modelos) fazendo \"SLA das rotinas\" no nível dificil: terminou conclu"
+   "situacao": "estagiário: observa (regra do dono) — Observei Marina (Arquiteta de Cloud (AWS)) fazendo \"Ronda de saúde do sistema\" no nível dificil: terminou concluida."
   },
   {
    "nome": "Felipe",
@@ -1222,7 +1222,7 @@
    "ultimo": "",
    "quando": "",
    "estado": "",
-   "situacao": "estagiário: observa (regra do dono) — Observei Fabiana (Engenheira de Avaliação e Segurança de IA) fazendo \"Diagnosticar a planilha original da fábrica\" no ní"
+   "situacao": "estagiário: observa (regra do dono)"
   },
   {
    "nome": "Lorena",
@@ -1233,7 +1233,7 @@
    "ultimo": "",
    "quando": "",
    "estado": "",
-   "situacao": "estagiário: observa (regra do dono) — Observei Fabiana (Engenheira de Avaliação e Segurança de IA) fazendo \"Diagnosticar a planilha original da fábrica\" no ní"
+   "situacao": "estagiário: observa (regra do dono)"
   },
   {
    "nome": "Lívia",
@@ -1497,7 +1497,7 @@
    "ultimo": "",
    "quando": "",
    "estado": "",
-   "situacao": "estagiário: observa (regra do dono) — Observei Jonas (Engenheiro de MLOps e Plataforma de Modelos) fazendo \"SLA das rotinas\" no nível dificil: terminou conclu"
+   "situacao": "estagiário: observa (regra do dono) — Observei Marina (Arquiteta de Cloud (AWS)) fazendo \"Ronda de saúde do sistema\" no nível dificil: terminou concluida."
   },
   {
    "nome": "Diego",
@@ -1541,7 +1541,7 @@
    "ultimo": "",
    "quando": "",
    "estado": "",
-   "situacao": "estagiário: observa (regra do dono) — Observei Jonas (Engenheiro de MLOps e Plataforma de Modelos) fazendo \"SLA das rotinas\" no nível dificil: terminou conclu"
+   "situacao": "estagiário: observa (regra do dono) — Observei Marina (Arquiteta de Cloud (AWS)) fazendo \"Ronda de saúde do sistema\" no nível dificil: terminou concluida."
   },
   {
    "nome": "Gustavo",
@@ -1559,9 +1559,9 @@
    "andar": 5,
    "cargo": "Head de AWS, Arquitetura e Governança de Nuvem",
    "area": "Engenharia de Dados",
-   "demandas_hoje": 9,
-   "ultimo": "Ronda de saúde do sistema — nível profissional",
-   "quando": "2026-10-24T21:29:05",
+   "demandas_hoje": 10,
+   "ultimo": "SLA das rotinas — nível profissional",
+   "quando": "2026-10-24T22:29:07",
    "estado": "concluida",
    "situacao": "trabalho do papel"
   },
@@ -1603,9 +1603,9 @@
    "andar": 5,
    "cargo": "Arquiteta de Cloud (AWS)",
    "area": "Engenharia de Dados",
-   "demandas_hoje": 8,
-   "ultimo": "Conferir se o projeto está pronto para servidor — nível dificil",
-   "quando": "2026-10-24T21:29:04",
+   "demandas_hoje": 9,
+   "ultimo": "Ronda de saúde do sistema — nível dificil",
+   "quando": "2026-10-24T22:29:05",
    "estado": "concluida",
    "situacao": "trabalho do papel"
   },
@@ -1711,7 +1711,7 @@
  ],
  "modelos": {
   "finalidade": "risco_demanda",
-  "rotuladas_agora": 302,
+  "rotuladas_agora": 304,
   "minimo_para_treinar": 60,
   "datasets": 6,
   "maior_dataset": 296,
@@ -1790,15 +1790,15 @@
   },
   {
    "nivel": "dificil",
-   "demandas": 38,
-   "concluidas": 38,
+   "demandas": 39,
+   "concluidas": 39,
    "parciais": 0,
    "falhas": 0
   },
   {
    "nivel": "profissional",
-   "demandas": 3,
-   "concluidas": 3,
+   "demandas": 4,
+   "concluidas": 4,
    "parciais": 0,
    "falhas": 0
   }
