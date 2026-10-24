@@ -1,11 +1,11 @@
 {
  "versao": 1,
- "gerado_em": "2026-10-24T20:28:11",
+ "gerado_em": "2026-10-24T20:33:25",
  "turno": {
   "estado": "trabalhando",
   "inicio": "2026-10-24T20:28:11",
   "fim_previsto": "2026-10-24T21:08:11",
-  "voltas": 0,
+  "voltas": 18,
   "planilhas": 1
  },
  "funcionarios": 105,
@@ -18,8 +18,8 @@
    "concluidas": 51,
    "parciais": 0,
    "falhas": 1,
-   "treino": 639,
-   "acertos": 573
+   "treino": 651,
+   "acertos": 581
   },
   {
    "andar": 2,
@@ -29,8 +29,8 @@
    "concluidas": 48,
    "parciais": 0,
    "falhas": 2,
-   "treino": 560,
-   "acertos": 516
+   "treino": 569,
+   "acertos": 525
   },
   {
    "andar": 3,
@@ -40,8 +40,8 @@
    "concluidas": 39,
    "parciais": 0,
    "falhas": 0,
-   "treino": 403,
-   "acertos": 343
+   "treino": 408,
+   "acertos": 345
   },
   {
    "andar": 4,
@@ -51,23 +51,55 @@
    "concluidas": 54,
    "parciais": 0,
    "falhas": 0,
-   "treino": 1041,
-   "acertos": 920
+   "treino": 1057,
+   "acertos": 935
   },
   {
    "andar": 5,
    "pessoas": 24,
    "trabalharam_hoje": 24,
-   "demandas": 93,
-   "concluidas": 91,
+   "demandas": 97,
+   "concluidas": 95,
    "parciais": 0,
    "falhas": 2,
-   "treino": 780,
-   "acertos": 662
+   "treino": 783,
+   "acertos": 664
   }
  ],
  "agora": [],
  "ultimos": [
+  {
+   "quando": "2026-10-24T20:28:58",
+   "funcionario": "Bianca",
+   "cargo": "Engenheira de Dados Pleno",
+   "andar": 5,
+   "trabalho": "Procurar segredos no repositório público — nível medio",
+   "estado": "concluida"
+  },
+  {
+   "quando": "2026-10-24T20:28:58",
+   "funcionario": "Fernanda",
+   "cargo": "Coordenadora de DevOps e Confiabilidade (SRE)",
+   "andar": 5,
+   "trabalho": "SLA das rotinas — nível medio",
+   "estado": "concluida"
+  },
+  {
+   "quando": "2026-10-24T20:28:57",
+   "funcionario": "Wagner",
+   "cargo": "Especialista Sênior em Segurança da Informação",
+   "andar": 5,
+   "trabalho": "Medir a saúde do PostgreSQL — nível medio",
+   "estado": "concluida"
+  },
+  {
+   "quando": "2026-10-24T20:28:57",
+   "funcionario": "Caetano",
+   "cargo": "Especialista em Orquestração de Dados (Apache Airflow)",
+   "andar": 5,
+   "trabalho": "Procurar segredos no repositório público — nível medio",
+   "estado": "concluida"
+  },
   {
    "quando": "2026-10-24T19:59:02",
    "funcionario": "Ícaro",
@@ -115,38 +147,6 @@
    "andar": 5,
    "trabalho": "SLA das rotinas — nível dificil",
    "estado": "concluida"
-  },
-  {
-   "quando": "2026-10-24T19:58:45",
-   "funcionario": "Gabriel",
-   "cargo": "Especialista em Tabelas Dinâmicas e Dashboards",
-   "andar": 3,
-   "trabalho": "Segmentação da base sintética — nível medio",
-   "estado": "concluida"
-  },
-  {
-   "quando": "2026-10-24T19:58:45",
-   "funcionario": "Gustavo",
-   "cargo": "Gerente de TI e Infraestrutura",
-   "andar": 5,
-   "trabalho": "SLA das rotinas — nível dificil",
-   "estado": "concluida"
-  },
-  {
-   "quando": "2026-10-24T19:58:44",
-   "funcionario": "Natália",
-   "cargo": "Head de Ciência de Dados",
-   "andar": 2,
-   "trabalho": "Drivers do indicador na base sintética — nível dificil",
-   "estado": "concluida"
-  },
-  {
-   "quando": "2026-10-24T19:29:07",
-   "funcionario": "Bárbara",
-   "cargo": "Especialista Sênior em Power BI",
-   "andar": 3,
-   "trabalho": "Perfil e indicadores da base sintética — nível medio",
-   "estado": "concluida"
   }
  ],
  "sql": {
@@ -155,7 +155,7 @@
  },
  "fabrica": {
   "lotes_hoje": 27,
-  "conferidos_ok_hoje": 26
+  "conferidos_ok_hoje": 27
  },
  "rotinas": [
   {
@@ -172,9 +172,9 @@
   },
   {
    "rotina": "demandas",
-   "execucoes_24h": 26,
+   "execucoes_24h": 27,
    "erros_24h": 0,
-   "ultima": "2026-10-24T19:59:02"
+   "ultima": "2026-10-24T20:28:58"
   },
   {
    "rotina": "dialogo",
@@ -184,9 +184,9 @@
   },
   {
    "rotina": "fabrica",
-   "execucoes_24h": 48,
+   "execucoes_24h": 49,
    "erros_24h": 0,
-   "ultima": "2026-10-24T19:44:03"
+   "ultima": "2026-10-24T20:28:25"
   },
   {
    "rotina": "ideias",
@@ -232,9 +232,9 @@
   },
   {
    "rotina": "registro",
-   "execucoes_24h": 376,
+   "execucoes_24h": 381,
    "erros_24h": 0,
-   "ultima": "2026-10-24T20:23:31"
+   "ultima": "2026-10-24T20:33:25"
   },
   {
    "rotina": "rh_desempenho",
@@ -250,16 +250,16 @@
   },
   {
    "rotina": "treino",
-   "execucoes_24h": 255,
+   "execucoes_24h": 258,
    "erros_24h": 0,
-   "ultima": "2026-10-24T20:23:26"
+   "ultima": "2026-10-24T20:33:10"
   }
  ],
  "totais": {
-  "demandas": 324,
-  "tentativas_treino": 7374,
-  "conversas": 3150,
-  "trabalhos_com_prova": 1847
+  "demandas": 328,
+  "tentativas_treino": 7419,
+  "conversas": 3162,
+  "trabalhos_com_prova": 1866
  },
  "banco": {
   "levantamento": "2026-10-24T20:19:33",
@@ -749,7 +749,7 @@
    "ultimo": "",
    "quando": "",
    "estado": "",
-   "situacao": "estagiário: observa (regra do dono) — Observei Gustavo (Gerente de TI e Infraestrutura) fazendo \"SLA das rotinas\" no nível dificil: terminou concluida."
+   "situacao": "estagiário: observa (regra do dono) — Observei Caetano (Especialista em Orquestração de Dados (Apache Airflow)) fazendo \"Procurar segredos no repositório públ"
   },
   {
    "nome": "Tina",
@@ -881,7 +881,7 @@
    "ultimo": "",
    "quando": "",
    "estado": "",
-   "situacao": "estagiário: observa (regra do dono) — Observei Natália (Head de Ciência de Dados) fazendo \"Drivers do indicador na base sintética\" no nível dificil: terminou "
+   "situacao": "estagiário: observa (regra do dono)"
   },
   {
    "nome": "Marcos",
@@ -980,7 +980,7 @@
    "ultimo": "",
    "quando": "",
    "estado": "",
-   "situacao": "estagiário: observa (regra do dono) — Observei Gustavo (Gerente de TI e Infraestrutura) fazendo \"SLA das rotinas\" no nível dificil: terminou concluida."
+   "situacao": "estagiário: observa (regra do dono) — Observei Caetano (Especialista em Orquestração de Dados (Apache Airflow)) fazendo \"Procurar segredos no repositório públ"
   },
   {
    "nome": "Felipe",
@@ -1222,7 +1222,7 @@
    "ultimo": "",
    "quando": "",
    "estado": "",
-   "situacao": "estagiário: observa (regra do dono) — Observei André (Head de Infraestrutura e Segurança) fazendo \"SLA das rotinas\" no nível dificil: terminou concluida."
+   "situacao": "estagiário: observa (regra do dono) — Observei Wagner (Especialista Sênior em Segurança da Informação) fazendo \"Medir a saúde do PostgreSQL\" no nível medio: t"
   },
   {
    "nome": "Lorena",
@@ -1471,9 +1471,9 @@
    "andar": 5,
    "cargo": "Engenheira de Dados Pleno",
    "area": "Engenharia de Dados",
-   "demandas_hoje": 3,
-   "ultimo": "Medir a saúde do PostgreSQL — nível medio",
-   "quando": "2026-10-24T17:27:33",
+   "demandas_hoje": 4,
+   "ultimo": "Procurar segredos no repositório público — nível medio",
+   "quando": "2026-10-24T20:28:57",
    "estado": "concluida",
    "situacao": "trabalho do papel"
   },
@@ -1482,9 +1482,9 @@
    "andar": 5,
    "cargo": "Especialista em Orquestração de Dados (Apache Airflow)",
    "area": "Engenharia de Dados",
-   "demandas_hoje": 3,
-   "ultimo": "Medir a saúde do PostgreSQL — nível medio",
-   "quando": "2026-10-24T17:27:27",
+   "demandas_hoje": 4,
+   "ultimo": "Procurar segredos no repositório público — nível medio",
+   "quando": "2026-10-24T20:28:57",
    "estado": "concluida",
    "situacao": "trabalho do papel"
   },
@@ -1497,7 +1497,7 @@
    "ultimo": "",
    "quando": "",
    "estado": "",
-   "situacao": "estagiário: observa (regra do dono) — Observei Gustavo (Gerente de TI e Infraestrutura) fazendo \"SLA das rotinas\" no nível dificil: terminou concluida."
+   "situacao": "estagiário: observa (regra do dono) — Observei Caetano (Especialista em Orquestração de Dados (Apache Airflow)) fazendo \"Procurar segredos no repositório públ"
   },
   {
    "nome": "Diego",
@@ -1526,9 +1526,9 @@
    "andar": 5,
    "cargo": "Coordenadora de DevOps e Confiabilidade (SRE)",
    "area": "Engenharia de Dados",
-   "demandas_hoje": 3,
-   "ultimo": "Ronda de saúde do sistema — nível medio",
-   "quando": "2026-10-24T17:27:40",
+   "demandas_hoje": 4,
+   "ultimo": "SLA das rotinas — nível medio",
+   "quando": "2026-10-24T20:28:58",
    "estado": "concluida",
    "situacao": "trabalho do papel"
   },
@@ -1541,7 +1541,7 @@
    "ultimo": "",
    "quando": "",
    "estado": "",
-   "situacao": "estagiário: observa (regra do dono) — Observei Gustavo (Gerente de TI e Infraestrutura) fazendo \"SLA das rotinas\" no nível dificil: terminou concluida."
+   "situacao": "estagiário: observa (regra do dono) — Observei Caetano (Especialista em Orquestração de Dados (Apache Airflow)) fazendo \"Procurar segredos no repositório públ"
   },
   {
    "nome": "Gustavo",
@@ -1680,9 +1680,9 @@
    "andar": 5,
    "cargo": "Especialista Sênior em Segurança da Informação",
    "area": "Governança e Privacidade",
-   "demandas_hoje": 3,
-   "ultimo": "SLA das rotinas — nível medio",
-   "quando": "2026-10-24T17:27:21",
+   "demandas_hoje": 4,
+   "ultimo": "Medir a saúde do PostgreSQL — nível medio",
+   "quando": "2026-10-24T20:28:55",
    "estado": "concluida",
    "situacao": "trabalho do papel"
   },
@@ -1711,7 +1711,7 @@
  ],
  "modelos": {
   "finalidade": "risco_demanda",
-  "rotuladas_agora": 281,
+  "rotuladas_agora": 285,
   "minimo_para_treinar": 60,
   "datasets": 5,
   "maior_dataset": 272,
@@ -1778,8 +1778,8 @@
   },
   {
    "nivel": "medio",
-   "demandas": 73,
-   "concluidas": 71,
+   "demandas": 77,
+   "concluidas": 75,
    "parciais": 0,
    "falhas": 2
   },
