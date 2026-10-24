@@ -1,8 +1,8 @@
 {
  "versao": 1,
- "gerado_em": "2026-10-24T18:50:00",
+ "gerado_em": "2026-10-24T18:53:02",
  "turno": {
-  "estado": "trabalhando",
+  "estado": "entre turnos: memória salva; o próximo turno começa em poucos minutos",
   "inicio": "2026-10-24T18:10:16",
   "fim_previsto": "2026-10-24T18:50:16",
   "voltas": 93,
@@ -214,9 +214,9 @@
   },
   {
    "rotina": "memoria_pg",
-   "execucoes_24h": 43,
+   "execucoes_24h": 44,
    "erros_24h": 0,
-   "ultima": "2026-10-24T18:49:56"
+   "ultima": "2026-10-24T18:52:58"
   },
   {
    "rotina": "modelos",
@@ -232,15 +232,21 @@
   },
   {
    "rotina": "registro",
-   "execucoes_24h": 338,
+   "execucoes_24h": 339,
    "erros_24h": 0,
-   "ultima": "2026-10-24T18:46:29"
+   "ultima": "2026-10-24T18:50:04"
+  },
+  {
+   "rotina": "rh_desempenho",
+   "execucoes_24h": 1,
+   "erros_24h": 0,
+   "ultima": "2026-10-24T18:50:04"
   },
   {
    "rotina": "ronda_ti",
-   "execucoes_24h": 29,
+   "execucoes_24h": 30,
    "erros_24h": 0,
-   "ultima": "2026-10-24T18:09:46"
+   "ultima": "2026-10-24T18:50:03"
   },
   {
    "rotina": "treino",
@@ -253,21 +259,21 @@
   "demandas": 287,
   "tentativas_treino": 7003,
   "conversas": 3031,
-  "trabalhos_com_prova": 1658
+  "trabalhos_com_prova": 1662
  },
  "banco": {
-  "levantamento": "2026-10-24T18:47:20",
+  "levantamento": "2026-10-24T18:50:26",
   "postgres_conferido": true,
   "erro_postgres": null,
   "tabelas": 201,
-  "com_dados": 160,
-  "linhas": 407256,
+  "com_dados": 161,
+  "linhas": 408519,
   "resumo": {
    "sqlite": {
     "tabelas": 79,
-    "com_dados": 61,
+    "com_dados": 62,
     "vazias": {
-     "vazia: funcionalidade não acionada": 18
+     "vazia: funcionalidade não acionada": 17
     }
    },
    "postgres.laboratorio": {
@@ -381,12 +387,6 @@
     "tabela": "regras_aprendidas",
     "situacao": "funcionalidade não acionada",
     "causa": "só existe depois que o dono aprova uma proposta de regra"
-   },
-   {
-    "onde": "sqlite",
-    "tabela": "rh_cargos",
-    "situacao": "funcionalidade não acionada",
-    "causa": "cargo só muda com movimento de RH validado"
    },
    {
     "onde": "sqlite",
