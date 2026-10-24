@@ -1,12 +1,12 @@
 {
  "versao": 1,
- "gerado_em": "2026-10-24T16:25:41",
+ "gerado_em": "2026-10-24T16:32:49",
  "turno": {
   "estado": "trabalhando",
   "inicio": "2026-10-24T15:55:59",
   "fim_previsto": "2026-10-24T16:35:59",
-  "voltas": 93,
-  "planilhas": 1
+  "voltas": 111,
+  "planilhas": 2
  },
  "funcionarios": 105,
  "andares": [
@@ -18,8 +18,8 @@
    "concluidas": 33,
    "parciais": 0,
    "falhas": 1,
-   "treino": 443,
-   "acertos": 399
+   "treino": 445,
+   "acertos": 401
   },
   {
    "andar": 2,
@@ -29,8 +29,8 @@
    "concluidas": 33,
    "parciais": 0,
    "falhas": 2,
-   "treino": 372,
-   "acertos": 343
+   "treino": 380,
+   "acertos": 351
   },
   {
    "andar": 3,
@@ -40,8 +40,8 @@
    "concluidas": 28,
    "parciais": 0,
    "falhas": 0,
-   "treino": 276,
-   "acertos": 232
+   "treino": 278,
+   "acertos": 234
   },
   {
    "andar": 4,
@@ -51,8 +51,8 @@
    "concluidas": 34,
    "parciais": 0,
    "falhas": 0,
-   "treino": 710,
-   "acertos": 641
+   "treino": 720,
+   "acertos": 651
   },
   {
    "andar": 5,
@@ -62,8 +62,8 @@
    "concluidas": 59,
    "parciais": 0,
    "falhas": 2,
-   "treino": 531,
-   "acertos": 466
+   "treino": 539,
+   "acertos": 474
   }
  ],
  "agora": [],
@@ -154,8 +154,8 @@
   "concluidos_hoje": 4
  },
  "fabrica": {
-  "lotes_hoje": 18,
-  "conferidos_ok_hoje": 18
+  "lotes_hoje": 19,
+  "conferidos_ok_hoje": 19
  },
  "rotinas": [
   {
@@ -172,9 +172,9 @@
   },
   {
    "rotina": "demandas",
-   "execucoes_24h": 19,
+   "execucoes_24h": 20,
    "erros_24h": 0,
-   "ultima": "2026-10-24T15:57:07"
+   "ultima": "2026-10-24T16:26:58"
   },
   {
    "rotina": "dialogo",
@@ -184,9 +184,9 @@
   },
   {
    "rotina": "fabrica",
-   "execucoes_24h": 39,
+   "execucoes_24h": 41,
    "erros_24h": 0,
-   "ultima": "2026-10-24T15:56:11"
+   "ultima": "2026-10-24T16:26:28"
   },
   {
    "rotina": "ideias",
@@ -214,9 +214,9 @@
   },
   {
    "rotina": "memoria_pg",
-   "execucoes_24h": 34,
+   "execucoes_24h": 35,
    "erros_24h": 0,
-   "ultima": "2026-10-24T16:20:34"
+   "ultima": "2026-10-24T16:32:46"
   },
   {
    "rotina": "modelos",
@@ -232,9 +232,9 @@
   },
   {
    "rotina": "registro",
-   "execucoes_24h": 273,
+   "execucoes_24h": 276,
    "erros_24h": 0,
-   "ultima": "2026-10-24T16:25:26"
+   "ultima": "2026-10-24T16:29:42"
   },
   {
    "rotina": "rh_desempenho",
@@ -250,24 +250,24 @@
   },
   {
    "rotina": "treino",
-   "execucoes_24h": 188,
+   "execucoes_24h": 190,
    "erros_24h": 0,
-   "ultima": "2026-10-24T16:25:11"
+   "ultima": "2026-10-24T16:29:27"
   }
  ],
  "totais": {
   "demandas": 228,
-  "tentativas_treino": 6283,
-  "conversas": 2742,
-  "trabalhos_com_prova": 1334
+  "tentativas_treino": 6313,
+  "conversas": 2746,
+  "trabalhos_com_prova": 1349
  },
  "banco": {
-  "levantamento": "2026-10-24T16:18:42",
+  "levantamento": "2026-10-24T16:30:57",
   "postgres_conferido": true,
   "erro_postgres": null,
   "tabelas": 196,
   "com_dados": 160,
-  "linhas": 339145,
+  "linhas": 348510,
   "resumo": {
    "sqlite": {
     "tabelas": 79,
@@ -710,7 +710,7 @@
    "ultimo": "",
    "quando": "",
    "estado": "",
-   "situacao": "estagiário: observa (regra do dono) — Observei Jonas (Engenheiro de MLOps e Plataforma de Modelos) fazendo \"Integridade, promoção e monitoramento dos modelos\""
+   "situacao": "estagiário: observa (regra do dono)"
   },
   {
    "nome": "Tina",
@@ -842,7 +842,7 @@
    "ultimo": "",
    "quando": "",
    "estado": "",
-   "situacao": "estagiário: observa (regra do dono) — Observei Leandro (Engenheiro de Machine Learning Sênior) fazendo \"Calcular a média de uma métrica da base sintética\" no "
+   "situacao": "estagiário: observa (regra do dono)"
   },
   {
    "nome": "Marcos",
@@ -941,7 +941,7 @@
    "ultimo": "",
    "quando": "",
    "estado": "",
-   "situacao": "estagiário: observa (regra do dono) — Observei Jonas (Engenheiro de MLOps e Plataforma de Modelos) fazendo \"Integridade, promoção e monitoramento dos modelos\""
+   "situacao": "estagiário: observa (regra do dono)"
   },
   {
    "nome": "Felipe",
@@ -1183,7 +1183,7 @@
    "ultimo": "",
    "quando": "",
    "estado": "",
-   "situacao": "estagiário: observa (regra do dono) — Observei Fabiana (Engenheira de Avaliação e Segurança de IA) fazendo \"Verificar dados pessoais (LGPD) na base sintética\""
+   "situacao": "estagiário: observa (regra do dono)"
   },
   {
    "nome": "Lorena",
@@ -1194,7 +1194,7 @@
    "ultimo": "",
    "quando": "",
    "estado": "",
-   "situacao": "estagiário: observa (regra do dono) — Observei Fabiana (Engenheira de Avaliação e Segurança de IA) fazendo \"Verificar dados pessoais (LGPD) na base sintética\""
+   "situacao": "estagiário: observa (regra do dono)"
   },
   {
    "nome": "Lívia",
@@ -1458,7 +1458,7 @@
    "ultimo": "",
    "quando": "",
    "estado": "",
-   "situacao": "estagiário: observa (regra do dono) — Observei Jonas (Engenheiro de MLOps e Plataforma de Modelos) fazendo \"Integridade, promoção e monitoramento dos modelos\""
+   "situacao": "estagiário: observa (regra do dono)"
   },
   {
    "nome": "Diego",
@@ -1502,7 +1502,7 @@
    "ultimo": "",
    "quando": "",
    "estado": "",
-   "situacao": "estagiário: observa (regra do dono) — Observei Jonas (Engenheiro de MLOps e Plataforma de Modelos) fazendo \"Integridade, promoção e monitoramento dos modelos\""
+   "situacao": "estagiário: observa (regra do dono)"
   },
   {
    "nome": "Gustavo",
