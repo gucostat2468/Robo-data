@@ -11,6 +11,7 @@ from __future__ import annotations
 
 import csv
 import json
+import re
 from datetime import datetime
 from pathlib import Path
 
@@ -60,6 +61,7 @@ def _gravar_linhas(pasta_logs: Path, linhas: list[dict]) -> None:
 
 
 PREFIXO_SINTETICO = "TREINO_"
+_RE_DATA = re.compile(r"^\d{4}-\d{2}-\d{2}")
 
 
 def eh_sintetico(nome_arquivo) -> bool:
@@ -79,6 +81,10 @@ def ler(pasta_logs: Path, limite: int | None = None, incluir_sinteticos: bool = 
     if pendente.exists():  # linhas que esperam o CSV ser fechado no Excel também aparecem no painel
         linhas += [{k: str(v) for k, v in json.loads(l).items()} for l in pendente.read_text(encoding="utf-8").splitlines() if l.strip()]
     linhas.reverse()
+    # linha com outra coisa no lugar da data é linha cortada (defeito antigo da restauração entre turnos da nuvem, já corrigido em
+    # registro_total): com as colunas deslocadas, uma planilha de treino passava por real. Não entra em conta nenhuma;
+    # o registro original continua guardado no banco.
+    linhas = [x for x in linhas if not x.get("data_hora") or _RE_DATA.match(str(x["data_hora"]))]
     if not incluir_sinteticos:
         linhas = [x for x in linhas if not eh_sintetico(x.get("arquivo"))]
     return linhas[:limite] if limite else linhas

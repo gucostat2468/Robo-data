@@ -184,8 +184,10 @@ def _capturar_linhas(c, caminho: Path, nome: str) -> int:
     n = cur["linhas"]
     for linha in dados.decode("utf-8", errors="replace").split("\n")[:-1]:
         n += 1
+        # a linha vai EXATAMENTE como foi escrita (com o \\r do CSV, se houver): a restauração junta com \\n e recria o
+        # arquivo byte a byte — mesma geração, mesmo tamanho, e a captura seguinte continua do ponto certo
         c.execute("INSERT OR IGNORE INTO arquivos_linhas (arquivo, geracao, n_linha, conteudo, capturado_em) VALUES (?,?,?,?,?)",
-                  (nome, geracao, n, linha.rstrip("\r"), _agora()))
+                  (nome, geracao, n, linha, _agora()))
     _salvar_cursor(c, chave, nova_pos, n)
     return n - cur["linhas"]
 
@@ -290,6 +292,14 @@ def _destino_restauracao(cfg, nome: str) -> Path | None:
     return None  # config.yaml (sem senhas) e relatórios de erro ficam só no banco, como prova
 
 
+def _alinhar_cursor(c, prefixo: str, arquivo: Path, linhas: int) -> None:
+    """Achado na nuvem: linhas do histórico chegavam cortadas ("EINO_estoque…" no lugar da data). O CSV é gravado com
+    \\r\\n e a captura guardava a linha sem o \\r; a restauração recriava um arquivo menor e a captura seguinte
+    continuava de uma posição antiga, no meio das linhas novas. Aqui o cursor aponta para o fim REAL do arquivo
+    recriado: a próxima captura pega só o que for escrito depois."""
+    _salvar_cursor(c, f"{prefixo}:{_geracao(arquivo)}", arquivo.stat().st_size, linhas)
+
+
 def restaurar_arquivos(cfg) -> dict:
     """O caminho de volta: recria, a partir do banco, os arquivos que a empresa usa para trabalhar (canal, estado da TI,
     âncora, RH, equipe contratada…) numa máquina nova. Recria BYTE A BYTE o que foi capturado — por isso a captura
@@ -313,6 +323,10 @@ def restaurar_arquivos(cfg) -> dict:
                                               "ORDER BY n_linha", (r["arquivo"], r["geracao"]))]
             destino.parent.mkdir(parents=True, exist_ok=True)
             destino.write_bytes(("\n".join(linhas) + "\n").encode("utf-8"))
+            if _geracao(destino) == r["geracao"]:  # recriado byte a byte: a captura continua do fim
+                _alinhar_cursor(c, f"linhas:{r['arquivo']}", destino, len(linhas))
+            # senão (linhas antigas guardadas sem o \\r): vira uma geração nova e é capturado inteiro UMA vez; dali em
+            # diante as linhas vão com o \\r e a restauração fica exata
             feitos["linhas"] += 1
         canal = Path(cfg.logs) / "canal" / "mensagens.jsonl"
         if not canal.exists():
@@ -325,6 +339,7 @@ def restaurar_arquivos(cfg) -> dict:
                         d = {k: m[k] for k in ("id", "data_hora", "canal", "autor", "nome", "papel", "tipo", "texto")}
                         d.update(json.loads(m["extra"] or "{}"))  # mesma ordem de chaves do Canal.postar
                         f.write((json.dumps(d, ensure_ascii=False) + "\n").encode("utf-8"))
+                _alinhar_cursor(c, "canal", canal, len(msgs))
                 feitos["canal"] = len(msgs)
     return feitos
 

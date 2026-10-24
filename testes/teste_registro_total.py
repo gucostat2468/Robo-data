@@ -122,3 +122,82 @@ def teste_maquina_nova_recebe_os_arquivos_byte_a_byte(cfg_factory, tmp_path):
     Canal(nova).postar("dba", "terceira, já na máquina nova", "banco")
     rt.capturar(nova)
     assert [r[0] for r in _q(nova, "SELECT id FROM canal_mensagens ORDER BY id")] == [1, 2, 3]  # o contador continuou
+
+
+def _nova_maquina(cfg, guardado):
+    """Como o turno da nuvem: só o banco volta (cópia pela API de backup do SQLite, que leva o WAL junto)."""
+    import shutil
+    import sqlite3
+    with sqlite3.connect(cfg.logs / "trabalho.db") as origem, sqlite3.connect(guardado) as copia:
+        origem.backup(copia)
+    shutil.rmtree(cfg.logs)
+    cfg.logs.mkdir(parents=True)
+    shutil.copy(guardado, cfg.logs / "trabalho.db")
+
+
+def teste_historico_atravessa_turnos_sem_cortar_linhas(cfg_factory, tmp_path):
+    """Achado no app do celular: na nuvem, linhas do histórico chegavam cortadas ("EINO_estoque…" no lugar da data).
+    O CSV é gravado com \\r\\n; a restauração recriava com \\n (arquivo menor) e a captura seguinte continuava da posição
+    antiga, cortando o começo das linhas novas. Três turnos seguidos têm de devolver o histórico intacto."""
+    import shutil
+    from robo import historico, registro_total
+
+    def linha(i):
+        return {"data_hora": f"2026-10-24 1{i}:00:00", "arquivo": f"TREINO_x_{i}.xlsx", "status": "sucesso",
+                "linhas_entrada": 10, "linhas_saida": 9, "erros": 0, "avisos": 1, "duracao_seg": "13,2",
+                "saidas": "s", "id": f"id{i}"}
+    cfg = cfg_factory()
+    cfg.criar_pastas()
+    historico.registrar(cfg.logs, linha(1))
+    registro_total.capturar(cfg)
+    for turno in (2, 3, 4):  # cada turno: máquina nova (logs apagados, só o banco volta), uma linha nova, captura
+        _nova_maquina(cfg, tmp_path / f"db{turno}")
+        registro_total.restaurar_arquivos(cfg)
+        historico.registrar(cfg.logs, linha(turno))
+        registro_total.capturar(cfg)
+    linhas = historico.ler(cfg.logs, incluir_sinteticos=True)
+    assert [x["arquivo"] for x in linhas] == [f"TREINO_x_{i}.xlsx" for i in (4, 3, 2, 1)]
+    assert all(x["data_hora"].startswith("2026-10-24") and x["id"] for x in linhas)
+
+
+def teste_historico_antigo_guardado_sem_cr_se_recupera(cfg_factory, tmp_path):
+    """O banco da nuvem já tem linhas guardadas sem o \\r (antes da correção). Restaurar, escrever e capturar de novo
+    precisa manter tudo: a 1ª restauração vira uma geração nova capturada inteira uma vez; dali em diante é exato."""
+    import shutil
+    import sqlite3
+    from robo import historico, registro_total
+
+    cfg = cfg_factory()
+    cfg.criar_pastas()
+    registro_total.capturar(cfg)  # cria as tabelas
+    cab = "﻿" + ";".join(historico.CABECALHO)
+    antigas = [cab, "2026-10-23 10:00:00;TREINO_a.xlsx;sucesso;5;5;0;0;1,0;s;ida",
+               "2026-10-23 11:00:00;TREINO_b.xlsx;sucesso;5;5;0;0;1,0;s;idb"]
+    with sqlite3.connect(cfg.logs / "trabalho.db") as c:
+        for n, txt in enumerate(antigas, 1):  # como a versão antiga guardava: sem o \r
+            c.execute("INSERT INTO arquivos_linhas (arquivo, geracao, n_linha, conteudo, capturado_em) VALUES (?,?,?,?,?)",
+                      ("logs/historico_processamentos.csv", "legado", n, txt, "2026-10-23T12:00:00"))
+    for turno in (1, 2, 3):
+        _nova_maquina(cfg, tmp_path / f"db{turno}")
+        registro_total.restaurar_arquivos(cfg)
+        historico.registrar(cfg.logs, {"data_hora": f"2026-10-24 0{turno}:00:00", "arquivo": f"TREINO_n{turno}.xlsx",
+                                       "status": "sucesso", "id": f"n{turno}"})
+        registro_total.capturar(cfg)
+    linhas = historico.ler(cfg.logs, incluir_sinteticos=True)
+    assert [x["arquivo"] for x in linhas] == ["TREINO_n3.xlsx", "TREINO_n2.xlsx", "TREINO_n1.xlsx",
+                                             "TREINO_b.xlsx", "TREINO_a.xlsx"]
+    assert all(x["data_hora"][:4] == "2026" for x in linhas)
+
+
+def teste_linha_cortada_do_historico_nao_conta_como_real(cfg_factory):
+    """As linhas já cortadas na nuvem (colunas deslocadas) ficam guardadas no banco, mas não entram em número nenhum:
+    deslocadas, o nome da planilha de treino caía fora da coluna 'arquivo' e ela passava por real."""
+    from robo import central, historico
+    cfg = cfg_factory()
+    cfg.criar_pastas()
+    historico.registrar(cfg.logs, {"data_hora": "2026-10-24 10:00:00", "arquivo": "vendas.xlsx", "status": "sucesso",
+                                   "linhas_entrada": 3, "linhas_saida": 3, "erros": 0, "avisos": 0, "id": "v1"})
+    with open(historico.arquivo_historico(cfg.logs), "a", encoding="utf-8") as f:  # como a nuvem deixou
+        f.write("EINO_estoque_x.xlsx;sucesso;2497;2494;0;2;13,2;TREINO_estoque_x.xlsx | t;20261024_155548_TREINO\r\n")
+    assert [x["arquivo"] for x in historico.ler(cfg.logs, incluir_sinteticos=True)] == ["vendas.xlsx"]
+    assert central.montar(cfg, 1)["totais"]["recebidos"] in (0, 1)  # a Central não quebra mais com o '13,2'
