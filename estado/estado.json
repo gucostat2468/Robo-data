@@ -1,12 +1,12 @@
 {
  "versao": 1,
- "gerado_em": "2026-10-24T11:21:24",
+ "gerado_em": "2026-10-24T11:26:42",
  "turno": {
   "estado": "trabalhando",
   "inicio": "2026-10-24T10:55:45",
   "fim_previsto": "2026-10-24T11:35:45",
-  "voltas": 75,
-  "planilhas": 1
+  "voltas": 91,
+  "planilhas": 2
  },
  "funcionarios": 101,
  "andares": [
@@ -14,23 +14,23 @@
    "andar": 1,
    "pessoas": 19,
    "trabalharam_hoje": 19,
-   "demandas": 14,
-   "concluidas": 13,
+   "demandas": 19,
+   "concluidas": 18,
    "parciais": 0,
    "falhas": 1,
-   "treino": 117,
-   "acertos": 108
+   "treino": 127,
+   "acertos": 118
   },
   {
    "andar": 2,
    "pessoas": 16,
    "trabalharam_hoje": 16,
-   "demandas": 15,
-   "concluidas": 14,
+   "demandas": 18,
+   "concluidas": 17,
    "parciais": 0,
    "falhas": 1,
-   "treino": 96,
-   "acertos": 88
+   "treino": 107,
+   "acertos": 99
   },
   {
    "andar": 3,
@@ -40,112 +40,112 @@
    "concluidas": 13,
    "parciais": 0,
    "falhas": 0,
-   "treino": 73,
-   "acertos": 63
+   "treino": 80,
+   "acertos": 66
   },
   {
    "andar": 4,
    "pessoas": 31,
    "trabalharam_hoje": 31,
-   "demandas": 15,
-   "concluidas": 15,
+   "demandas": 21,
+   "concluidas": 21,
    "parciais": 0,
    "falhas": 0,
-   "treino": 186,
-   "acertos": 175
+   "treino": 199,
+   "acertos": 182
   },
   {
    "andar": 5,
    "pessoas": 23,
    "trabalharam_hoje": 23,
-   "demandas": 15,
-   "concluidas": 15,
+   "demandas": 21,
+   "concluidas": 21,
    "parciais": 0,
    "falhas": 0,
-   "treino": 143,
-   "acertos": 127
+   "treino": 147,
+   "acertos": 131
   }
  ],
  "agora": [],
  "ultimos": [
   {
-   "quando": "2026-10-24T10:55:30",
-   "funcionario": "Rodrigo",
-   "cargo": "Analista de Infraestrutura Pleno",
+   "quando": "2026-10-24T11:25:47",
+   "funcionario": "Fernanda",
+   "cargo": "Coordenadora de DevOps e Confiabilidade (SRE)",
    "andar": 5,
-   "trabalho": "Ronda de saúde do sistema",
+   "trabalho": "Diagnosticar a planilha original da fábrica",
    "estado": "concluida"
   },
   {
-   "quando": "2026-10-24T10:55:29",
-   "funcionario": "Rogério",
-   "cargo": "Diretor de Analytics, Ciência de Dados e BI",
-   "andar": 2,
-   "trabalho": "Situação do andar agora",
-   "estado": "concluida"
-  },
-  {
-   "quando": "2026-10-24T10:55:29",
-   "funcionario": "Marta",
-   "cargo": "Diretora de Pessoas e Cultura (CHRO)",
+   "quando": "2026-10-24T11:25:47",
+   "funcionario": "Yasmin",
+   "cargo": "Planejadora de Treino",
    "andar": 4,
-   "trabalho": "Scorecard da área",
+   "trabalho": "Revisar um caso de treino feito por outro designer",
    "estado": "concluida"
   },
   {
-   "quando": "2026-10-24T10:55:28",
-   "funcionario": "Beto",
-   "cargo": "Banco de dados (ELT)",
+   "quando": "2026-10-24T11:25:46",
+   "funcionario": "Camila",
+   "cargo": "Analista de Dados Júnior",
    "andar": 1,
-   "trabalho": "Conferir no PostgreSQL os lotes da fábrica",
+   "trabalho": "Verificar dados pessoais (LGPD) na base sintética",
    "estado": "concluida"
   },
   {
-   "quando": "2026-10-24T10:55:28",
-   "funcionario": "Marcos",
-   "cargo": "Coordenador de Análise e Ciência de Dados",
-   "andar": 2,
-   "trabalho": "Consultar o conhecimento da área",
+   "quando": "2026-10-24T11:25:45",
+   "funcionario": "Eduardo",
+   "cargo": "Head de Engenharia de Dados",
+   "andar": 1,
+   "trabalho": "Diagnosticar a planilha original da fábrica",
    "estado": "concluida"
   },
   {
-   "quando": "2026-10-24T10:55:28",
-   "funcionario": "Cláudia",
-   "cargo": "Diretora de Operações e Governança",
+   "quando": "2026-10-24T11:25:45",
+   "funcionario": "Lívia",
+   "cargo": "Designer de Casos",
    "andar": 4,
-   "trabalho": "Scorecard da área",
+   "trabalho": "Revisar um caso de treino feito por outro designer",
    "estado": "concluida"
   },
   {
-   "quando": "2026-10-24T10:55:28",
-   "funcionario": "Ricardo",
-   "cargo": "Gerente da Sala Excel",
-   "andar": 3,
-   "trabalho": "Situação do andar agora",
-   "estado": "concluida"
-  },
-  {
-   "quando": "2026-10-24T10:55:28",
-   "funcionario": "André",
-   "cargo": "Head de Infraestrutura e Segurança",
+   "quando": "2026-10-24T11:25:45",
+   "funcionario": "Marina",
+   "cargo": "Arquiteta de Cloud (AWS)",
    "andar": 5,
-   "trabalho": "Auditoria por amostragem",
+   "trabalho": "Conferir se o projeto está pronto para servidor",
    "estado": "concluida"
   },
   {
-   "quando": "2026-10-24T10:55:28",
-   "funcionario": "Carla",
-   "cargo": "Coordenadora de Engenharia de Dados",
-   "andar": 1,
-   "trabalho": "Consultar o conhecimento da área",
+   "quando": "2026-10-24T11:25:45",
+   "funcionario": "Raquel",
+   "cargo": "Designer de Casos",
+   "andar": 4,
+   "trabalho": "Revisar um caso de treino feito por outro designer",
    "estado": "concluida"
   },
   {
-   "quando": "2026-10-24T10:55:25",
-   "funcionario": "Otto",
-   "cargo": "Auditoria (Validação)",
-   "andar": 1,
-   "trabalho": "Consultar o conhecimento da área",
+   "quando": "2026-10-24T11:25:44",
+   "funcionario": "Carolina",
+   "cargo": "Cientista de Dados Pleno",
+   "andar": 2,
+   "trabalho": "Calcular a média de uma métrica da base sintética",
+   "estado": "concluida"
+  },
+  {
+   "quando": "2026-10-24T11:25:44",
+   "funcionario": "Ícaro",
+   "cargo": "Sênior de AWS, Linux e Ubuntu",
+   "andar": 5,
+   "trabalho": "Testar se o último backup volta",
+   "estado": "concluida"
+  },
+  {
+   "quando": "2026-10-24T11:25:42",
+   "funcionario": "Murilo",
+   "cargo": "Designer de Casos",
+   "andar": 4,
+   "trabalho": "Revisar um caso de treino feito por outro designer",
    "estado": "concluida"
   }
  ],
@@ -154,8 +154,8 @@
   "concluidos_hoje": 0
  },
  "fabrica": {
-  "lotes_hoje": 5,
-  "conferidos_ok_hoje": 5
+  "lotes_hoje": 6,
+  "conferidos_ok_hoje": 6
  },
  "rotinas": [
   {
@@ -172,9 +172,9 @@
   },
   {
    "rotina": "demandas",
-   "execucoes_24h": 10,
+   "execucoes_24h": 11,
    "erros_24h": 0,
-   "ultima": "2026-10-24T10:55:30"
+   "ultima": "2026-10-24T11:25:47"
   },
   {
    "rotina": "dialogo",
@@ -184,9 +184,9 @@
   },
   {
    "rotina": "fabrica",
-   "execucoes_24h": 20,
+   "execucoes_24h": 22,
    "erros_24h": 0,
-   "ultima": "2026-10-24T10:55:51"
+   "ultima": "2026-10-24T11:26:42"
   },
   {
    "rotina": "ideias",
@@ -202,9 +202,9 @@
   },
   {
    "rotina": "laboratorio",
-   "execucoes_24h": 21,
+   "execucoes_24h": 22,
    "erros_24h": 0,
-   "ultima": "2026-10-24T11:16:06"
+   "ultima": "2026-10-24T11:26:42"
   },
   {
    "rotina": "licoes",
@@ -226,9 +226,9 @@
   },
   {
    "rotina": "registro",
-   "execucoes_24h": 114,
+   "execucoes_24h": 119,
    "erros_24h": 0,
-   "ultima": "2026-10-24T11:18:22"
+   "ultima": "2026-10-24T11:26:31"
   },
   {
    "rotina": "rh_desempenho",
@@ -244,15 +244,15 @@
   },
   {
    "rotina": "treino",
-   "execucoes_24h": 82,
+   "execucoes_24h": 85,
    "erros_24h": 0,
-   "ultima": "2026-10-24T11:18:07"
+   "ultima": "2026-10-24T11:26:39"
   }
  ],
  "totais": {
-  "demandas": 108,
-  "tentativas_treino": 4566,
-  "conversas": 1886,
-  "trabalhos_com_prova": 611
+  "demandas": 128,
+  "tentativas_treino": 4611,
+  "conversas": 1912,
+  "trabalhos_com_prova": 651
  }
 }
