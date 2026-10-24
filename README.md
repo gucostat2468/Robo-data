@@ -1,6 +1,6 @@
 # Empresa ao vivo
 
-**Boletim das 24/10 15:53** (horário de Brasília) · entre turnos: memória salva; o próximo turno começa em poucos minutos
+**Boletim das 24/10 15:55** (horário de Brasília) · trabalhando
 
 > Atualiza a cada 5 minutos enquanto a empresa trabalha. Recarregue a página para ver o mais novo.
 
@@ -9,7 +9,7 @@
 - **251** demandas, **246** concluídas (98%), 0 parciais, 5 com falha
 - **105** de 105 funcionários já trabalharam
 - SQL: 5 exercícios, 5 conferidos com o gabarito
-- Fábrica: 24 planilhas, 24 conferidas sem erro
+- Fábrica: 25 planilhas, 24 conferidas sem erro
 
 ## Trabalhando agora
 
@@ -188,18 +188,19 @@
 - risco_demanda-v1: **reprovado** (treinado por ml_engenheiro)
 - risco_demanda-v2: **reprovado** (treinado por ml_engenheiro)
 - risco_demanda-v3: **reprovado** (treinado por ml_engenheiro)
-- Última avaliação independente (ml_avaliador): risco_demanda-v3 reprovado — log loss 0.064 contra baseline 0.098; motivos: o teste tem uma classe só: não dá para medir separação
+- risco_demanda-v4: **reprovado** (treinado por ml_engenheiro)
+- Última avaliação independente (ml_avaliador): risco_demanda-v4 reprovado — log loss 0.092 contra baseline 0.061; motivos: o teste tem uma classe só: não dá para medir separação; não bate o baseline (log loss 0.0918 ≥ 0.0606)
 - Referência em sombra: nenhuma; 0 previsões em sombra
 - Uso operacional: desligado: o modelo só roda em sombra até o dono decidir usá-lo em alguma escolha da empresa
 
 ## Banco de dados
 
-Levantamento das 24/10 15:50: **161 de 201** tabelas com dados (408.519 linhas contadas uma a uma).
+Levantamento das 24/10 15:47: **160 de 201** tabelas com dados (407.256 linhas contadas uma a uma).
 
 
 | Onde | Tabelas | Com dados |
 |---|--:|--:|
-| sqlite | 79 | 62 |
+| sqlite | 79 | 61 |
 | postgres.laboratorio | 15 | 15 |
 | postgres.robo | 82 | 62 |
 | postgres.treino | 22 | 22 |
@@ -223,6 +224,7 @@ Vazias e por quê (nada é preenchido para parecer cheio):
 | sqlite | ml_inferencias | funcionalidade não acionada | a sombra só pontua depois que um modelo é aprovado por outra pessoa e promovido, e só demandas criadas depois  |
 | sqlite | propostas_regra | funcionalidade não acionada | nasce de planilha REAL reprovada com correção possível ou de correção do dono no chat |
 | sqlite | regras_aprendidas | funcionalidade não acionada | só existe depois que o dono aprova uma proposta de regra |
+| sqlite | rh_cargos | funcionalidade não acionada | cargo só muda com movimento de RH validado |
 | sqlite | sala_eventos | funcionalidade não acionada | reunião ao vivo aberta pelo dono no painel |
 | sqlite | salas_encerradas | funcionalidade não acionada | reunião ao vivo encerrada |
 | sqlite | telegram_mensagens | funcionalidade não acionada | o grupo do Telegram ainda não foi ligado (precisa do token do @BotFather, que só o dono cria) |

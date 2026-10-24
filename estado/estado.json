@@ -1,11 +1,11 @@
 {
  "versao": 1,
- "gerado_em": "2026-10-24T18:53:02",
+ "gerado_em": "2026-10-24T18:55:32",
  "turno": {
-  "estado": "entre turnos: memória salva; o próximo turno começa em poucos minutos",
-  "inicio": "2026-10-24T18:10:16",
-  "fim_previsto": "2026-10-24T18:50:16",
-  "voltas": 93,
+  "estado": "trabalhando",
+  "inicio": "2026-10-24T18:55:32",
+  "fim_previsto": "2026-10-24T19:35:32",
+  "voltas": 0,
   "planilhas": 1
  },
  "funcionarios": 105,
@@ -154,7 +154,7 @@
   "concluidos_hoje": 5
  },
  "fabrica": {
-  "lotes_hoje": 24,
+  "lotes_hoje": 25,
   "conferidos_ok_hoje": 24
  },
  "rotinas": [
@@ -166,9 +166,9 @@
   },
   {
    "rotina": "caixa_dono",
-   "execucoes_24h": 15,
+   "execucoes_24h": 16,
    "erros_24h": 0,
-   "ultima": "2026-10-24T18:09:55"
+   "ultima": "2026-10-24T18:55:11"
   },
   {
    "rotina": "demandas",
@@ -178,9 +178,9 @@
   },
   {
    "rotina": "dialogo",
-   "execucoes_24h": 15,
+   "execucoes_24h": 16,
    "erros_24h": 0,
-   "ultima": "2026-10-24T18:09:55"
+   "ultima": "2026-10-24T18:55:11"
   },
   {
    "rotina": "fabrica",
@@ -196,9 +196,9 @@
   },
   {
    "rotina": "jornada",
-   "execucoes_24h": 15,
+   "execucoes_24h": 16,
    "erros_24h": 0,
-   "ultima": "2026-10-24T18:09:55"
+   "ultima": "2026-10-24T18:55:11"
   },
   {
    "rotina": "laboratorio",
@@ -214,21 +214,21 @@
   },
   {
    "rotina": "memoria_pg",
-   "execucoes_24h": 44,
+   "execucoes_24h": 43,
    "erros_24h": 0,
-   "ultima": "2026-10-24T18:52:58"
+   "ultima": "2026-10-24T18:49:56"
   },
   {
    "rotina": "modelos",
-   "execucoes_24h": 3,
+   "execucoes_24h": 4,
    "erros_24h": 0,
-   "ultima": "2026-10-24T18:09:57"
+   "ultima": "2026-10-24T18:55:13"
   },
   {
    "rotina": "paineis",
-   "execucoes_24h": 15,
+   "execucoes_24h": 16,
    "erros_24h": 0,
-   "ultima": "2026-10-24T18:09:57"
+   "ultima": "2026-10-24T18:55:13"
   },
   {
    "rotina": "registro",
@@ -244,9 +244,9 @@
   },
   {
    "rotina": "ronda_ti",
-   "execucoes_24h": 30,
+   "execucoes_24h": 31,
    "erros_24h": 0,
-   "ultima": "2026-10-24T18:50:03"
+   "ultima": "2026-10-24T18:55:07"
   },
   {
    "rotina": "treino",
@@ -258,22 +258,22 @@
  "totais": {
   "demandas": 287,
   "tentativas_treino": 7003,
-  "conversas": 3031,
-  "trabalhos_com_prova": 1662
+  "conversas": 3045,
+  "trabalhos_com_prova": 1669
  },
  "banco": {
-  "levantamento": "2026-10-24T18:50:26",
+  "levantamento": "2026-10-24T18:47:20",
   "postgres_conferido": true,
   "erro_postgres": null,
   "tabelas": 201,
-  "com_dados": 161,
-  "linhas": 408519,
+  "com_dados": 160,
+  "linhas": 407256,
   "resumo": {
    "sqlite": {
     "tabelas": 79,
-    "com_dados": 62,
+    "com_dados": 61,
     "vazias": {
-     "vazia: funcionalidade não acionada": 17
+     "vazia: funcionalidade não acionada": 18
     }
    },
    "postgres.laboratorio": {
@@ -387,6 +387,12 @@
     "tabela": "regras_aprendidas",
     "situacao": "funcionalidade não acionada",
     "causa": "só existe depois que o dono aprova uma proposta de regra"
+   },
+   {
+    "onde": "sqlite",
+    "tabela": "rh_cargos",
+    "situacao": "funcionalidade não acionada",
+    "causa": "cargo só muda com movimento de RH validado"
    },
    {
     "onde": "sqlite",
@@ -1719,8 +1725,8 @@
   "finalidade": "risco_demanda",
   "rotuladas_agora": 244,
   "minimo_para_treinar": 60,
-  "datasets": 3,
-  "maior_dataset": 224,
+  "datasets": 4,
+  "maior_dataset": 244,
   "modelos": [
    {
     "id": "risco_demanda-v1",
@@ -1736,31 +1742,37 @@
     "id": "risco_demanda-v3",
     "estado": "reprovado",
     "criado_por": "ml_engenheiro"
+   },
+   {
+    "id": "risco_demanda-v4",
+    "estado": "reprovado",
+    "criado_por": "ml_engenheiro"
    }
   ],
   "referencia": null,
   "inferencias_sombra": 0,
   "uso_operacional": "desligado: o modelo só roda em sombra até o dono decidir usá-lo em alguma escolha da empresa",
   "ultima_avaliacao": {
-   "modelo": "risco_demanda-v3",
+   "modelo": "risco_demanda-v4",
    "resultado": "avaliado_reprovado",
    "quem": "ml_avaliador",
    "candidato": {
-    "n": 34,
+    "n": 37,
     "taxa_real": 0.0,
-    "log_loss": 0.06364,
-    "brier": 0.004028,
+    "log_loss": 0.091841,
+    "brier": 0.007742,
     "auc": null
    },
    "baseline": {
-    "n": 34,
+    "n": 37,
     "taxa_real": 0.0,
-    "log_loss": 0.097989,
-    "brier": 0.023821,
+    "log_loss": 0.060581,
+    "brier": 0.006443,
     "auc": null
    },
    "motivos": [
-    "o teste tem uma classe só: não dá para medir separação"
+    "o teste tem uma classe só: não dá para medir separação",
+    "não bate o baseline (log loss 0.0918 ≥ 0.0606)"
    ]
   }
  },
