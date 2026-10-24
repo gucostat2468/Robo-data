@@ -472,8 +472,22 @@ def limpar_tabela(df: pd.DataFrame, tabela: str, cfg: dict, regra: dict, rel: Re
                       exemplos=[str(df.loc[i].dropna().iloc[0])[:80] for i in rodape])
             df = df.drop(index=rodape)
 
+    # 6c. cabeçalho repetido no meio dos dados (relatório exportado por páginas repete o cabeçalho a cada página).
+    # Achado pelo treino nível 5: a linha "ID | Canal | Valor" virava dado, criava o grupo "Canal" e somava uma linha.
+    # É cabeçalho quando a maioria das células preenchidas tem o NOME da própria coluna.
+    if len(df) and len(df.columns) > 1:
+        def _eh_cabecalho(linha):
+            cheias = [(c, v) for c, v in linha.items() if isinstance(v, str) and v.strip()]
+            iguais = sum(1 for c, v in cheias if normalizar_nome_coluna(v) == c)
+            return len(cheias) >= 2 and iguais >= 2 and iguais >= 0.6 * max(1, linha.notna().sum())
+        repetido = df.apply(_eh_cabecalho, axis=1)
+        if repetido.any():
+            rel.aviso("Cabeçalho repetido no meio da tabela removido (quebra de página do relatório)", tabela=tabela,
+                      quantidade=int(repetido.sum()), exemplos=[f"linha {i}" for i in df.index[repetido][:5]])
+            df = df[~repetido]
+
     # 7. tipos
-    tipos_forcados = {normalizar_nome_coluna(k): str(v).lower() for k, v in (regra.get("tipos") or {}).items()}
+    tipos_forcados ={normalizar_nome_coluna(k): str(v).lower() for k, v in (regra.get("tipos") or {}).items()}
     for col, tipo in tipos_forcados.items():
         if tipo not in TIPOS_VALIDOS:
             rel.erro(f"Tipo '{tipo}' inválido no config.yaml (use: {', '.join(sorted(TIPOS_VALIDOS))})", tabela=tabela, coluna=col)

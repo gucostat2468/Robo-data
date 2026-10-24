@@ -565,8 +565,26 @@ def rotina(cfg) -> dict | None:
         return None
     r = rodada(cfg)
     exportar(cfg)
-    return {k: r[k] for k in ("estudada", "avaliada", "aplicada")} | {"novas": sum(r["novas"].values()),
-                                                                       "integra": r["integridade"]["integra"]}
+    saida = {k: r[k] for k in ("estudada", "avaliada", "aplicada")} | {"novas": sum(r["novas"].values()),
+                                                                        "integra": r["integridade"]["integra"]}
+    rp = replay_diario(cfg)
+    if rp:
+        saida["replay"] = rp
+    return saida
+
+
+def replay_diario(cfg) -> dict | None:
+    """Uma vez por dia: refaz os últimos erros REAIS da esteira (aprendizados.replay) para provar se a lição virou
+    comportamento. Antes existia e nenhuma rotina chamava."""
+    tb = Trabalho(cfg)
+    m = tb.memorias("aprendizados_replay_dia", limite=1)
+    if m and datetime.fromisoformat(m[0]["criada_em"]) > datetime.now() - timedelta(hours=24):
+        return None
+    from robo import aprendizados
+    r = aprendizados.replay(cfg, limite=10)
+    tb.lembrar("aprendizados_replay_dia", datetime.now().strftime("%Y-%m-%d"),
+               f"{r['testados']} erro(s) real(is) refeito(s), {r['reincidiram']} ainda acontecem", "coord_engenharia")
+    return r
 
 
 # =============================================================================== consulta

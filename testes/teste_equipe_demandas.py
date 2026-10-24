@@ -185,7 +185,8 @@ def teste_cobertura_por_andar_e_area_so_completa_com_todos(cfg_factory, ferramen
     cob = demandas.cobertura(cfg)
     assert set(cob["andares"]) == {1, 2, 3, 4, 5} and cob["areas"]
     assert sum(len(a["sem_demanda"]) for a in cob["andares"].values()) > 0
-    assert all("observação" in m for a in cob["andares"].values() for m in a["justificados"].values())
+    # justificativa é sempre registrada: estagiário em observação ou equipe cujo trabalho é a própria rotina
+    assert all("observação" in m or "rotina" in m for a in cob["andares"].values() for m in a["justificados"].values())
     cfg.dados["demandas"]["por_ciclo"] = 1000
     assert demandas.rotina(cfg)["cobertura_completa"] is True
     with sqlite3.connect(cfg.logs / "trabalho.db") as c:  # prova de trabalho dos cinco: uma etapa de cada no ciclo
@@ -217,17 +218,32 @@ def teste_treinamento_estuda_o_assunto_da_demanda_bloqueada(cfg_factory, monkeyp
 
 
 # ----------------------------------------------------------------------------------------------- SQL e 5º andar
-def teste_area_de_dados_alterna_sql_com_a_ferramenta_propria(cfg_factory):
+def teste_cada_um_faz_o_trabalho_do_papel_em_rodizio(cfg_factory):
+    """Pedido do dono: cada funcionário faz o SEU papel, sem repetir sempre a mesma coisa."""
     cfg = _cfg(cfg_factory)
-    from robo.sql_treino import AREAS_DE_DADOS
-    pessoa = next(p for p in organizacao.lista(cfg) if organizacao.area_de(p["id"]) in AREAS_DE_DADOS
-                  and "sql_treino" in organizacao.ferramentas_de(p["id"], p["andar"])
-                  and len(organizacao.ferramentas_de(p["id"], p["andar"])) > 1
-                  and organizacao.pode_usar(p["id"], "sql_treino", cfg, producao=True))
-    primeira = demandas.escolher_ferramenta(cfg, pessoa)
-    segunda = demandas.escolher_ferramenta(cfg, pessoa, ultima=primeira)
-    assert primeira == "sql_treino" and segunda != "sql_treino"
-    assert demandas.escolher_ferramenta(cfg, pessoa, ultima=segunda) == "sql_treino"
+    gente = organizacao.por_id()
+    # o RH faz RH (antes o 4º andar inteiro conferia LGPD), a Sala de Casos revisa casos, o 5º andar opera a TI
+    rh = demandas.candidatas(cfg, gente["rh_rs"])
+    assert rh[0] == "recrutamento" and {"desempenho", "people_analytics"} <= set(rh) and "dados_pessoais" not in rh
+    assert demandas.candidatas(cfg, gente["casos_engenharia"]) == ["revisar_caso"]
+    assert demandas.candidatas(cfg, gente["head_aws"])[0] == "prontidao_nuvem"
+    assert demandas.candidatas(cfg, gente["aws_senior"])[0] == "restauracao_backup"
+    assert "dados_pessoais" in demandas.candidatas(cfg, gente["gov_pleno_lgpd"])
+    # rodízio: em 4 demandas seguidas, 4 trabalhos diferentes para quem tem 4 ou mais no papel
+    pessoa, usadas = gente["cd_senior_drivers"], []
+    for _ in range(4):
+        usadas.insert(0, demandas.escolher_ferramenta(cfg, pessoa, usadas=usadas))
+    assert len(set(usadas)) == 4 and "sql_treino" in usadas and usadas[-1] == "drivers"  # especialidade primeiro
+
+
+def teste_equipes_com_rotina_propria_nao_recebem_trabalho_de_outra_area(cfg_factory, ferramentas_rapidas):
+    cfg = _cfg(cfg_factory, por_ciclo=200)
+    demandas.rotina(cfg)
+    with sqlite3.connect(cfg.logs / "trabalho.db") as c:
+        receberam = {r[0] for r in c.execute("SELECT funcionario FROM solicitacoes WHERE origem='demanda_sintetica'")}
+        motivos = dict(c.execute("SELECT funcionario, motivo FROM demandas_registro WHERE evento='pulada'").fetchall())
+    for pid in organizacao.ROTINA_PROPRIA:
+        assert pid not in receberam and "rotina" in motivos[pid]
 
 
 def teste_quinto_andar_e_aws_trabalham_mais_vezes(cfg_factory):
@@ -256,3 +272,15 @@ def teste_sql_profissional_tem_conferencia_cruzada_de_sql_por_colega(cfg_factory
     assert cruz["parametros"]["nivel"] == "medio" and cruz["parametros"]["arquivo"] == "TREINO_nps_1_2_3.xlsx"
     n = str(plano["etapas"].index(cruz) + 1)
     assert {"tipo": "verdadeiro", "chave": "confere"} in plano["criterios_por_etapa"][n]
+
+
+def teste_estagiario_observa_e_registra_sem_executar(cfg_factory, ferramentas_rapidas):
+    cfg = _cfg(cfg_factory, por_ciclo=200)
+    demandas.rotina(cfg)
+    estagiarios = {p["id"] for p in organizacao.lista() if organizacao.nivel_de(p["id"], p) == "estagiario"}
+    with sqlite3.connect(cfg.logs / "trabalho.db") as c:
+        executaram = {r[0] for r in c.execute("SELECT funcionario FROM solicitacoes WHERE origem='demanda_sintetica'")}
+        observaram = {r[0] for r in c.execute("SELECT funcionario FROM demandas_registro WHERE evento='observou'")}
+        memoria = {r[0] for r in c.execute("SELECT funcionario FROM experiencias WHERE origem='observacao'")}
+    assert not (estagiarios & executaram)          # regra do dono: estagiário não executa
+    assert observaram and observaram <= estagiarios and observaram == memoria  # mas observa e fica registrado

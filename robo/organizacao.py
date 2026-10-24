@@ -48,12 +48,43 @@ ORDEM_RISCO = {"baixo": 0, "medio": 1, "alto": 2}
 FERRAMENTAS_COMUNS = ["conhecimento", "historico", "laboratorio"]
 # Ferramentas por andar
 FERRAMENTAS_ANDAR = {
-    1: ["diagnosticar_planilha", "consulta_sql", "dados_pessoais"],
+    1: ["diagnosticar_planilha", "consulta_sql"],
     2: ["calcular", "perfil_indicadores", "resumo_executivo", "consulta_sql"],
     3: ["calcular", "perfil_indicadores"],
-    4: ["dados_pessoais", "resumo_executivo"],
+    4: ["resumo_executivo"],
     5: ["ronda_ti", "orquestracao", "postgres_saude", "segredos_repo", "restauracao_backup"],
 }
+# O TRABALHO DO PAPEL: o que cada área faz de verdade (pedido do dono: "cada funcionário faz o seu papel").
+# Antes a ferramenta vinha do ANDAR e o andar inteiro fazia a mesma coisa (o 4º andar todo conferia LGPD, até o RH e
+# a equipe de demandas). Agora a área define o trabalho, e a pessoa faz rodízio entre os trabalhos da área.
+TRABALHO_DA_AREA = {
+    "Engenharia de Dados": ["diagnosticar_planilha", "consulta_sql", "anomalias"],
+    "Qualidade de Dados": ["diagnosticar_planilha", "anomalias", "perfil_indicadores"],
+    "Governança e Privacidade": ["dados_pessoais", "diagnosticar_planilha"],
+    "Análise de Dados": ["perfil_indicadores", "segmentacao", "calcular"],
+    "Estatística": ["calcular", "drivers", "anomalias"],
+    "Customer Insights e Pesquisa": ["perfil_indicadores", "drivers", "segmentacao"],
+    "Storytelling e Negócio": ["perfil_indicadores", "calcular"],
+    "Pessoas e Cultura": ["desempenho", "people_analytics", "desenvolvimento", "recrutamento"],
+    "Treinamento e Avaliação": ["revisar_caso"],
+}
+# Andares cujo trabalho é do ANDAR (a área da ficha diz a formação, não o que a pessoa faz aqui)
+TRABALHO_DO_ANDAR = {
+    3: ["calcular", "perfil_indicadores", "segmentacao"],                       # Sala Excel e BI: contas, indicadores
+    5: ["ronda_ti", "orquestracao", "postgres_saude", "segredos_repo", "restauracao_backup"],  # TI: operação da casa
+}
+# Quem já tem trabalho próprio numa rotina da empresa (registrado em jobs) e não recebe demanda de outra coisa
+ROTINA_PROPRIA = {**{p: "demandas" for p in ("dem_coordenador", "dem_gerador", "dem_distribuidor", "dem_cobertura",
+                                            "dem_avaliador")},
+                  **{p: "fabrica" for p in ("fab_coordenador", "fab_gerador", "fab_conferente", "fab_revisor")}}
+
+
+def trabalho_do_papel(pid: str, andar: int) -> list[str]:
+    """Os trabalhos da função da pessoa, na ordem de prioridade (o rodízio das demandas anda por esta lista)."""
+    andar = int(andar or 1)
+    return list(TRABALHO_DO_ANDAR.get(andar) or TRABALHO_DA_AREA.get(area_de(pid), []))
+
+
 # Ferramentas extras por pessoa (especialidade)
 LIDERES = ["ger_engenharia", "coord_engenharia", "ger_analise", "coord_analise", "excel_supervisor", "coord_excel",
            "ger_operacoes", "canal_helena", "ger_ti", "coord_devops",
@@ -69,7 +100,7 @@ FERRAMENTAS_PESSOA = {
     "fab_coordenador": ["fabrica"], "fab_gerador": ["fabrica"], "fab_conferente": ["fabrica"], "fab_revisor": ["fabrica"],
     "dem_coordenador": ["demandas"], "dem_gerador": ["demandas"], "dem_distribuidor": ["demandas"],
     "dem_cobertura": ["demandas"], "dem_avaliador": ["demandas"],
-    "head_aws": ["prontidao_nuvem"], "cloud_aws": ["prontidao_nuvem"],
+    "head_aws": ["prontidao_nuvem"], "cloud_aws": ["prontidao_nuvem"], "aws_senior": ["restauracao_backup", "postgres_saude"],
 }
 # Sala de Casos (4º andar): a revisão independente de casos de treino é a ferramenta de trabalho de todos eles
 for _pid in ("head_casos", "casos_engenharia", "casos_analytics", "casos_governanca", "casos_ti", "casos_revisor",
@@ -298,7 +329,8 @@ def revisor_de(pid: str, cfg=None) -> str:
 def ferramentas_de(pid: str, andar: int) -> list[str]:
     from robo import lideranca
     from robo.sql_treino import AREAS_DE_DADOS
-    fs = list(FERRAMENTAS_COMUNS) + FERRAMENTAS_ANDAR.get(int(andar or 1), []) + FERRAMENTAS_PESSOA.get(pid, [])
+    fs = (list(FERRAMENTAS_COMUNS) + FERRAMENTAS_ANDAR.get(int(andar or 1), []) + FERRAMENTAS_PESSOA.get(pid, [])
+          + trabalho_do_papel(pid, andar))
     if area_de(pid) in AREAS_DE_DADOS:  # engenharia, análise, estatística, qualidade e insights treinam SQL de verdade
         fs.append("sql_treino")
     fs += (lideranca.POR_ID.get(pid) or {}).get("ferramentas", [])

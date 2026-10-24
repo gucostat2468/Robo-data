@@ -45,18 +45,18 @@ def teste_cada_competencia_cada_nivel_caso_valido_e_robo_acerta(cfg, comp):
 
 
 def teste_nivel_sobe_com_4_de_5_e_desce_com_2_de_5_sempre_com_prova(cfg, monkeypatch):
-    pid = "eng_estagiario"  # estagiário começa no nível 1
-    assert treino.nivel_atual(cfg, pid, "historico") == 1
-    for i in range(5):
-        treino.tentar(cfg, pid, "historico", treino.criar_caso(cfg, "historico", 1, semente=50 + i), "T")
+    pid = "eng_estagiario"  # estagiário começa no nível 2 (treino endurecido: começa perto do limite do cargo)
     assert treino.nivel_atual(cfg, pid, "historico") == 2
+    for i in range(5):
+        treino.tentar(cfg, pid, "historico", treino.criar_caso(cfg, "historico", 2, semente=50 + i), "T")
+    assert treino.nivel_atual(cfg, pid, "historico") == 3
     monkeypatch.setattr(CATALOGO["historico"], "corrigir", lambda caso, r: (False, 0.0, "erro_de_teste", "forçado"))
     for i in range(5):
-        treino.tentar(cfg, pid, "historico", treino.criar_caso(cfg, "historico", 2, semente=80 + i), "T")
-    assert treino.nivel_atual(cfg, pid, "historico") == 1
+        treino.tentar(cfg, pid, "historico", treino.criar_caso(cfg, "historico", 3, semente=80 + i), "T")
+    assert treino.nivel_atual(cfg, pid, "historico") == 2
     c = _banco(cfg)
     ev = [dict(r) for r in c.execute("SELECT de, para, evidencia FROM treino_niveis_eventos WHERE funcionario=? ORDER BY id", (pid,))]
-    assert [(e["de"], e["para"]) for e in ev] == [(None, 1), (1, 2), (2, 1)]
+    assert [(e["de"], e["para"]) for e in ev] == [(None, 2), (2, 3), (3, 2)]
     assert all(e["evidencia"].count("T") == 5 for e in ev[1:])  # cada mudança cita as 5 tentativas
     with pytest.raises(sqlite3.DatabaseError):
         c.execute("UPDATE treino_tentativas SET acertou=1")  # tentativa não muda depois de gravada
@@ -65,7 +65,7 @@ def teste_nivel_sobe_com_4_de_5_e_desce_com_2_de_5_sempre_com_prova(cfg, monkeyp
     c.close()
 
 
-def teste_erro_vira_licao_da_pessoa_e_so_conta_quando_ela_acerta_depois(cfg, monkeypatch):
+def teste_erro_vira_licao_da_pessoa_e_da_equipe_e_so_conta_quando_ela_acerta_depois(cfg, monkeypatch):
     pid = "ana_junior_faixas"
     original = CATALOGO["calculo"].corrigir
     monkeypatch.setattr(CATALOGO["calculo"], "corrigir", lambda caso, r: (False, 0.0, "numero_errado", "forçado"))
@@ -73,9 +73,11 @@ def teste_erro_vira_licao_da_pessoa_e_so_conta_quando_ela_acerta_depois(cfg, mon
     c = _banco(cfg)
     lic = c.execute("SELECT l.id FROM licoes l WHERE l.origem_tipo='treino' AND l.origem_ref='calculo:1:numero_errado'").fetchone()
     donos = [r[0] for r in c.execute("SELECT funcionario FROM licoes_funcionario WHERE licao_id=?", (lic["id"],))]
-    assert donos == [pid]  # a lição do erro é de quem errou
+    assert pid in donos  # a lição do erro é de quem errou...
+    assert set(donos) - {pid} == set(treino.colegas_que_aprendem(cfg, pid, "calculo"))  # ...e da equipe da mesma área
     licoes.rodada(cfg)
-    estado = lambda: c.execute("SELECT estado FROM licoes_funcionario WHERE licao_id=?", (lic["id"],)).fetchone()[0]  # noqa: E731
+    estado = lambda: c.execute("SELECT estado FROM licoes_funcionario WHERE licao_id=? AND funcionario=?",  # noqa: E731
+                               (lic["id"], pid)).fetchone()[0]
     assert estado() != "aplicada"
     monkeypatch.setattr(CATALOGO["calculo"], "corrigir", original)
     assert treino.tentar(cfg, pid, "calculo", treino.criar_caso(cfg, "calculo", 1, semente=8), "T")["acertou"]
@@ -144,3 +146,26 @@ def teste_analise_reconhece_nps_com_codigo_99():
     from robo.analise import detectar_indicadores
     df = pd.DataFrame({"nota_nps": [10, 9, 8, 7, 6, 5, 99, 10, 9, 3, 10, 8]})
     assert detectar_indicadores(df, {"nota_nps": "numero"}, {}) == {"nps": "nota_nps"}
+
+
+def teste_recalibracao_sobe_ate_o_cargo_uma_vez_e_registra(cfg):
+    pid = "eng_estagiario"
+    with treino._tb(cfg).tx() as c:  # alguém que ficou para trás no nível 1 antes do treino endurecido
+        c.execute("INSERT INTO treino_niveis (funcionario, competencia, nivel, desde) VALUES (?,?,?,?)",
+                  (pid, "historico", 1, "2026-01-01T00:00:00"))
+    assert treino.recalibrar(cfg) == 1 and treino.nivel_atual(cfg, pid, "historico") == 2
+    assert treino.recalibrar(cfg) == 0  # uma vez só
+    ev = _banco(cfg).execute("SELECT de, para, motivo FROM treino_niveis_eventos WHERE funcionario=?", (pid,)).fetchall()
+    assert [(e["de"], e["para"]) for e in ev] == [(1, 2)] and "a pedido do dono" in ev[0]["motivo"]
+
+
+def teste_erro_vira_licao_para_os_colegas_da_mesma_area(cfg, monkeypatch):
+    from robo import organizacao
+    pid = "limpeza"
+    colegas = treino.colegas_que_aprendem(cfg, pid, "limpeza")
+    assert colegas and all(organizacao.area_de(x) == organizacao.area_de(pid) for x in colegas)
+    monkeypatch.setattr(CATALOGO["limpeza"], "corrigir", lambda caso, r: (False, 0.0, "linhas_erradas", "forçado"))
+    treino.tentar(cfg, pid, "limpeza", treino.criar_caso(cfg, "limpeza", 3, semente=7), "T")
+    c = _banco(cfg)
+    com_licao = {r[0] for r in c.execute("SELECT funcionario FROM licoes_funcionario")}
+    assert {pid, *colegas} <= com_licao  # quem errou e a equipe da área estudam a mesma lição

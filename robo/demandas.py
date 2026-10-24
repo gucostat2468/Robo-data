@@ -256,6 +256,25 @@ def _sql(cfg, pessoa):
             [{"tipo": "verdadeiro", "chave": "confere"}])
 
 
+COMPETENCIAS_REVISAVEIS = ("limpeza", "calculo", "indicadores", "lgpd", "anomalias", "segmentacao", "drivers")
+
+
+def _caso_para_revisar(cfg, pessoa):
+    """Sala de Casos: um caso de treino validado e recente, feito por OUTRO designer (ninguém revisa o que criou)."""
+    from robo import treino
+    with treino._tb(cfg).tx() as c:
+        linhas = c.execute(
+            "SELECT * FROM treino_casos WHERE estado='validado' AND designer<>? AND competencia IN (%s) "
+            "ORDER BY criado_em DESC LIMIT 30" % ",".join("?" * len(COMPETENCIAS_REVISAVEIS)),
+            (pessoa["id"], *COMPETENCIAS_REVISAVEIS)).fetchall()
+    for r in linhas:
+        if r["arquivo"] and not Path(r["arquivo"]).exists():
+            continue  # arquivo já guardado no arquivo morto: revisar exigiria desarquivar
+        caso = {**treino._carregar(r), "sha": r["conteudo_sha256"]}
+        return {"caso": caso}, []
+    return "nenhum caso de treino validado de outro designer disponível para revisão agora"
+
+
 def _pergunta_da_area(cfg, pessoa):
     from robo import organizacao
     area = organizacao.area_de(pessoa["id"]) or "dados"
@@ -362,6 +381,9 @@ CATALOGO: dict[str, Modelo] = {m.ferramenta: m for m in [
            "laboratorio_exercicios", BASICOS),
     Modelo("historico", "Últimas execuções do robô", "Ler o histórico e resumir as últimas execuções.",
            "histórico de execuções", BASICOS),
+    Modelo("revisar_caso", "Revisar um caso de treino feito por outro designer",
+           "Conferir de forma independente um caso de treino: íntegro, reprodutível pela semente e com gabarito certo.",
+           "integridade, reprodução e conferência do caso por outro caminho", BASICOS, _caso_para_revisar),
     Modelo("conhecimento", "Consultar o conhecimento da área",
            "Achar no conhecimento da empresa (manuais, lições, handovers) o que vale para a própria área.",
            "fonte do conhecimento (manual, lição ou handover)", BASICOS + [{"tipo": "dados", "chave": "fonte"}],
@@ -737,25 +759,42 @@ def _refazer_conta(etapa: dict, criterio: dict) -> list[str]:
 
 
 # =============================================================================== o ciclo (Aurora assina)
-def escolher_ferramenta(cfg, pessoa: dict, ultima: str | None = None) -> str | None:
-    """A ferramenta mais específica da pessoa (a que menos gente tem), entre as do contrato que o catálogo cobre.
-    Quem é das áreas de dados alterna: uma demanda de SQL, uma da ferramenta própria (ultima = ferramenta da anterior)."""
-    from robo import ferramentas, organizacao
-    suas = [f for f in organizacao.ferramentas_de(pessoa["id"], pessoa["andar"])
-            if f in CATALOGO and f in ferramentas.REGISTRO and organizacao.pode_usar(pessoa["id"], f, cfg, producao=True)]
+def candidatas(cfg, pessoa: dict) -> list[str]:
+    """Os trabalhos da FUNÇÃO da pessoa que o catálogo cobre e que ela pode fazer, em ordem: os da especialidade
+    (contrato pessoal e liderança), depois os da área/andar (organizacao.trabalho_do_papel), depois o treino de SQL
+    (áreas de dados). As
+    ferramentas que todo mundo tem (conhecimento, histórico, laboratório) só entram se não houver nada da função."""
+    from robo import ferramentas, lideranca, organizacao
+    from robo.sql_treino import AREAS_DE_DADOS
+    pid, andar = pessoa["id"], pessoa["andar"]
+    contrato = organizacao.ferramentas_de(pid, andar)
+    especialidade = (list(organizacao.FERRAMENTAS_PESSOA.get(pid, []))
+                     + list((lideranca.POR_ID.get(pid) or {}).get("ferramentas", []))
+                     + (["reuniao_andar"] if pid in organizacao.LIDERES else []))
+    sql = ["sql_treino"] if organizacao.area_de(pid) in AREAS_DE_DADOS else []
+    ordem = (especialidade + organizacao.trabalho_do_papel(pid, andar) + sql
+             + [f for f in contrato if f not in GERAIS] + list(GERAIS))
+    ok = [f for f in dict.fromkeys(ordem) if f in contrato and f in CATALOGO and f in ferramentas.REGISTRO
+          and organizacao.pode_usar(pid, f, cfg, producao=True)]
+    proprias = [f for f in ok if f not in GERAIS]
+    return proprias or ok
+
+
+def escolher_ferramenta(cfg, pessoa: dict, ultima: str | None = None, usadas: list[str] | None = None) -> str | None:
+    """Rodízio dentro do papel: o trabalho da função que a pessoa fez há MAIS tempo (nunca feito vem primeiro; empate,
+    a ordem do papel). `usadas` = ferramentas das últimas demandas, da mais recente para a mais antiga."""
+    suas = candidatas(cfg, pessoa)
     if not suas:
         return None
-    if "sql_treino" in suas and ultima != "sql_treino":
-        return "sql_treino"
-    raridade = _raridade(cfg)
-    outras = [f for f in suas if f != "sql_treino"] or suas
-    return sorted(outras, key=lambda f: (f in GERAIS, raridade.get(f, 0), f))[0]
+    usadas = list(usadas or ([ultima] if ultima else []))
+    recencia = {f: (usadas.index(f) if f in usadas else len(usadas) + 1) for f in suas}
+    return max(suas, key=lambda f: (recencia[f], -suas.index(f)))
 
 
-def _escolher(cfg, pessoa, ultima):
-    """Chama escolher_ferramenta com a última ferramenta só se ela aceitar (testes antigos trocam a função)."""
+def _escolher(cfg, pessoa, ultima, usadas=None):
+    """Chama escolher_ferramenta com o histórico só se ela aceitar (testes antigos trocam a função)."""
     try:
-        return escolher_ferramenta(cfg, pessoa, ultima)
+        return escolher_ferramenta(cfg, pessoa, ultima, usadas)
     except TypeError:
         return escolher_ferramenta(cfg, pessoa)
 
@@ -790,6 +829,31 @@ def _executar_com_job(cfg, sid: str, pid: str, ferramenta: str) -> str:
     finally:
         jobs.fechar(cfg, jid, "concluido" if estado == "concluida" else "falhou", {"solicitacao": sid, "estado": estado})
     return estado
+
+
+def observar(cfg, atribuidas: list[dict], finais: dict) -> list[dict]:
+    """Regra do dono: estagiário não executa, OBSERVA. Cada estagiário acompanha um trabalho concluído neste ciclo,
+    da própria área (ou do andar), e a observação fica registrada no ciclo e na memória dele (o que viu, de quem)."""
+    from robo import memoria, organizacao
+    gente = organizacao.por_id(cfg)
+    feitos = [a for a in atribuidas if finais.get(a["solicitacao"]) in ("concluida", "concluida_parcialmente")]
+    eventos = []
+    for p in organizacao.lista(cfg):
+        if organizacao.nivel_de(p["id"], p) != "estagiario" or not feitos:
+            continue
+        area = organizacao.area_de(p["id"])
+        alvo = (next((a for a in feitos if organizacao.area_de(a["funcionario"]) == area), None)
+                or next((a for a in feitos if (gente.get(a["funcionario"]) or {}).get("andar") == p["andar"]), None))
+        if not alvo:
+            continue
+        quem = gente.get(alvo["funcionario"]) or {}
+        titulo = CATALOGO[alvo["ferramenta"]].titulo if alvo["ferramenta"] in CATALOGO else alvo["ferramenta"]
+        texto = (f"Observei {quem.get('nome', alvo['funcionario'])} ({quem.get('papel', '')}) fazendo \"{titulo}\" no nível "
+                 f"{alvo['nivel']}: terminou {finais.get(alvo['solicitacao'])}.")
+        memoria.experiencia(cfg, p["id"], "aprendizado", texto, "observacao", alvo["solicitacao"])
+        eventos.append({"funcionario": p["id"], "andar": p["andar"], "evento": "observou", "solicitacao": alvo["solicitacao"],
+                        "ferramenta": alvo["ferramenta"], "motivo": texto, "responsavel": "dem_distribuidor"})
+    return eventos
 
 
 def _registrar(tb: Trabalho, ciclo: str, eventos: list[dict]) -> None:
@@ -833,7 +897,10 @@ def rotina(cfg, agora: datetime | None = None) -> dict | None:
             nivel_cargo, e = organizacao.nivel_de(p["id"], p), estado.get(p["id"]) or {}
             horas = intervalo_da_pessoa(c, p)
             limite_pessoa = (agora - timedelta(hours=horas)).isoformat(timespec="seconds")
-            motivo = (NIVEIS_SEM_DEMANDA.get(nivel_cargo) or ("já tem uma demanda aberta" if e.get("abertas") else "")
+            motivo = (NIVEIS_SEM_DEMANDA.get(nivel_cargo)
+                      or (f"o trabalho do papel é a rotina {organizacao.ROTINA_PROPRIA[p['id']]} (registrada em jobs)"
+                          if p["id"] in organizacao.ROTINA_PROPRIA else "")
+                      or ("já tem uma demanda aberta" if e.get("abertas") else "")
                       or (f"recebeu demanda há menos de {horas:g} h" if e.get("ultima", "") > limite_pessoa else ""))
             if motivo:
                 eventos.append({"funcionario": p["id"], "andar": p["andar"], "evento": "pulada", "motivo": motivo,
@@ -851,9 +918,9 @@ def rotina(cfg, agora: datetime | None = None) -> dict | None:
             if len(atribuidas) >= vagas:
                 break
             hist = _historico(tb, p["id"])
-            ultima = next((h["modelo"].split(":", 1)[1] for h in hist if (h.get("modelo") or "").startswith("demanda:")
-                           and h.get("tipo_demanda") == "trabalho"), None)
-            ferr = _escolher(cfg, p, ultima)
+            usadas = [h["modelo"].split(":", 1)[1] for h in hist if (h.get("modelo") or "").startswith("demanda:")
+                      and h.get("tipo_demanda") == "trabalho"]
+            ferr = _escolher(cfg, p, usadas[0] if usadas else None, usadas)
             nivel, motivo_nivel = nivel_para(organizacao.nivel_de(p["id"], p), hist)
             sid, motivo = (criar_demanda(cfg, p, ferr, nivel, motivo_nivel=motivo_nivel) if ferr
                            else (None, "nenhuma ferramenta do contrato está no catálogo de demandas"))
@@ -878,6 +945,8 @@ def rotina(cfg, agora: datetime | None = None) -> dict | None:
                             "motivo": f"{motivo_fila}; nível {nivel}: {motivo_nivel}" if tipo == "trabalho"
                             else f"{motivo_fila}; treinamento no lugar da demanda bloqueada"})
             finais[sid] = _executar_com_job(cfg, sid, p["id"], ferr)  # executa já: nuvem e notebook veem no ciclo
+        # ---- estagiários: observam um colega da área num trabalho concluído deste ciclo e registram o que viram
+        eventos += observar(cfg, atribuidas, finais)
         # ---- Bento: avaliação independente por amostragem
         jobs.etapa(cfg, jid, "avaliacao", "dem_avaliador")
         avaliacoes = avaliar(cfg, int(c["avaliacoes_por_ciclo"]), agora)

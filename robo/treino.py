@@ -49,8 +49,11 @@ log = logging.getLogger("robo")
 
 PADRAO = {"habilitado": True, "intervalo_minutos": 2, "por_rodada": 15, "janela_nivel": 5, "sobe_com": 4, "desce_com": 2,
           "erros_para_handover": 3, "max_tentativas_por_caso": 12, "dias_caso_ativo": 7}
-NIVEL_INICIAL = {"estagiario": 1, "junior": 1, "pleno": 2, "senior": 2, "especialista": 3, "coordenador": 3, "gerente": 3,
-                 "diretor": 3, "head": 4}
+# Começa perto do limite do cargo (pedido do dono: treino difícil de verdade). Os níveis 1 a 3 davam quase 100% de
+# acerto: não mostravam quem sabe. Daqui o nível sobe ou desce pela evidência (4 de 5 certas sobe; 2 de 5 desce).
+NIVEL_INICIAL = {"estagiario": 2, "junior": 3, "pleno": 3, "senior": 4, "especialista": 4, "coordenador": 4, "gerente": 4,
+                 "diretor": 4, "head": 5}
+RECALIBRACAO = "recalibração: treino endurecido a pedido do dono (começa perto do limite do cargo)"
 
 SALA = {"head": "head_casos", "revisor": "casos_revisor", "planejador": "casos_planejamento",
         "designers": ["casos_engenharia", "casos_analytics", "casos_governanca", "casos_ti"]}
@@ -160,6 +163,30 @@ def nivel_atual(cfg, pid: str, comp: str, c=None) -> int:
         return ler(c)
     with _tb(cfg).tx() as conn:
         return ler(conn)
+
+
+def recalibrar(cfg) -> int:
+    """Uma vez só: quem está abaixo do novo nível inicial do cargo sobe até ele, com o evento registrado (de, para,
+    motivo). Nunca desce ninguém. Devolve quantos níveis mudaram."""
+    gente = organizacao.por_id(cfg)
+    mudou = 0
+    with _tb(cfg).tx() as conn:
+        if conn.execute("SELECT 1 FROM treino_niveis_eventos WHERE motivo=? LIMIT 1", (RECALIBRACAO,)).fetchone():
+            return 0
+        for r in conn.execute("SELECT funcionario, competencia, nivel FROM treino_niveis").fetchall():
+            p = gente.get(r["funcionario"]) or {}
+            alvo = NIVEL_INICIAL.get(organizacao.nivel_de(r["funcionario"], p), 3)
+            if int(r["nivel"]) < alvo:
+                conn.execute("UPDATE treino_niveis SET nivel=?, desde=? WHERE funcionario=? AND competencia=?",
+                             (alvo, _agora(), r["funcionario"], r["competencia"]))
+                conn.execute("INSERT INTO treino_niveis_eventos (data_hora, funcionario, competencia, de, para, motivo, "
+                             "evidencia) VALUES (?,?,?,?,?,?,?)", (_agora(), r["funcionario"], r["competencia"],
+                                                                   int(r["nivel"]), alvo, RECALIBRACAO, "cargo"))
+                mudou += 1
+        if not mudou:  # marca que já foi feita, mesmo sem nada para subir
+            conn.execute("INSERT INTO treino_niveis_eventos (data_hora, funcionario, competencia, de, para, motivo, "
+                         "evidencia) VALUES (?,?,?,?,?,?,?)", (_agora(), "", "", None, None, RECALIBRACAO, "nada a subir"))
+    return mudou
 
 
 # =============================================================================== Sala de Casos: certificação e revisão
@@ -342,6 +369,14 @@ def tentar(cfg, pid: str, comp: str, caso: dict, rodada: str = "") -> dict:
     return r
 
 
+def colegas_que_aprendem(cfg, pid: str, comp: str, limite: int = 12) -> list[str]:
+    """Quem é da MESMA área de quem errou e também treina esta competência (estagiários incluídos: estudar é
+    observar). Limite para a lição não virar ruído para a empresa inteira."""
+    area = organizacao.area_de(pid)
+    gente = [p for p in organizacao.lista(cfg) if p["id"] != pid and organizacao.area_de(p["id"]) == area]
+    return [p["id"] for p in gente if comp in competencias_de(p["id"], cfg)][:limite]
+
+
 def _aprender_com_o_erro(cfg, pid, p, c, caso, tipo, detalhe) -> None:
     from robo import licoes, memoria
     ref = f"{c.id}:{caso['nivel']}:{tipo}"
@@ -351,6 +386,9 @@ def _aprender_com_o_erro(cfg, pid, p, c, caso, tipo, detalhe) -> None:
                        f"{caso['nivel']} ou acima.", f"{c.nome} {tipo.replace('_', ' ')} nível {caso['nivel']}",
                        f"acertar {c.nome} no nível {caso['nivel']} ou acima", p.get("andar"), pid, "pessoa", "casos_planejamento")
     licoes.atribuir(cfg, "treino", ref, pid, "casos_planejamento")
+    if lid:  # 1º erro deste tipo: a equipe da mesma área que treina esta competência estuda junto (aprende com o colega)
+        for colega in colegas_que_aprendem(cfg, pid, c.id):
+            licoes.atribuir(cfg, "treino", ref, colega, "casos_planejamento")
     with _tb(cfg).tx() as conn:
         n = conn.execute("SELECT COUNT(*) FROM treino_tentativas WHERE competencia=? AND nivel=? AND tipo_erro=? AND data_hora>=?",
                          (c.id, caso["nivel"], tipo, (datetime.now() - timedelta(days=7)).isoformat(timespec="seconds"))).fetchone()[0]
@@ -499,8 +537,12 @@ def rotina(cfg) -> dict | None:
         ult = c.execute("SELECT MAX(data_hora) FROM treino_tentativas").fetchone()[0]
     if ult and datetime.now() - datetime.fromisoformat(ult) < timedelta(minutes=float(k["intervalo_minutos"])):
         return None
+    recalibrados = recalibrar(cfg)
     r = rodada(cfg, int(k["por_rodada"]))
-    return {x: r.get(x) for x in ("rodada", "tentativas", "acertos", "sem_caso")}
+    saida = {x: r.get(x) for x in ("rodada", "tentativas", "acertos", "sem_caso")}
+    if recalibrados:
+        saida["recalibrados"] = recalibrados
+    return saida
 
 
 def decidir_nivel(nivel: int, certas: int, janela: int, sobe_com: int = 4, desce_com: int = 2) -> int:

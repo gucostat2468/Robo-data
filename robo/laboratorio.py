@@ -46,7 +46,9 @@ PADRAO = {"habilitado": True, "intervalo_minutos": 10}
 NIVEIS = {1: "básico (título, R$, data em texto, duplicata, Total)",
           2: "escritório (título em várias linhas, nulos como '-' e 'N/A', subtotal no meio, espaços sobrando)",
           3: "exportação de sistema (número americano, datas misturadas com número de série, coluna vazia, rodapé)",
-          4: "formatos difíceis de número (menos no fim como no SAP, sinal − copiado de PDF, '1,2 mil')"}
+          4: "formatos difíceis de número (menos no fim como no SAP, sinal − copiado de PDF, '1,2 mil')",
+          5: "sistema antigo (cabeçalho em duas linhas, cabeçalho repetido a cada página, linhas vazias no meio, "
+             "negativo contábil entre parênteses, milhar separado por espaço)"}
 _prontos: set[str] = set()
 
 
@@ -157,11 +159,22 @@ def aplicar_nivel(caso: dict, nivel: int, semente: int) -> dict:
                 met[i] = -abs(float(met[i]))
                 formatos[i] = ["sap", "unicode"][i % 2]
         caso["formatos"] = formatos
+    if nivel >= 5:  # sistema antigo: formatos de número que planilha de verdade traz e que confundem conversão
+        met = caso["rotulos"][caso["metrica"]]
+        formatos = caso.setdefault("formatos", {})
+        for i in range(caso["n"]):
+            if met[i] is None or i in formatos:
+                continue
+            if caso.get("moeda") and i % 9 == 4:  # estorno contábil: (1.234,56) é NEGATIVO
+                met[i] = -abs(float(met[i]))
+                formatos[i] = "parenteses"
+            elif i % 11 == 6 and abs(float(met[i])) >= 1000:  # 12 345,67 com espaço fino (exportação francesa/ERP)
+                formatos[i] = "espaco"
     return caso
 
 
 def escrever_sujo(caso: dict, caminho: Path) -> None:
-    """Planilha como chega na vida real, com a sujeira do nível do caso (1, 2 ou 3)."""
+    """Planilha como chega na vida real, com a sujeira do nível do caso (1 a 5)."""
     from openpyxl import Workbook
     nivel = caso.get("nivel", 1)
     rot = caso["rotulos"]
@@ -180,6 +193,9 @@ def escrever_sujo(caso: dict, caminho: Path) -> None:
     if nivel >= 3:  # coluna vazia no meio (sem cabeçalho e sem dados)
         meio = len(cab) // 2
         cab_escrito = cab_escrito[:meio] + [None] + cab_escrito[meio:]
+    if nivel >= 5:  # cabeçalho em duas linhas: um "grupo" por cima, como relatório de sistema antigo
+        ws.append(["Identificação"] + [None] * (len(cab_escrito) // 2 - 1) + ["Dados do registro"]
+                  + [None] * (len(cab_escrito) - len(cab_escrito) // 2 - 1))
     ws.append(cab_escrito)
 
     def celula(c, v, i):
@@ -200,6 +216,10 @@ def escrever_sujo(caso: dict, caminho: Path) -> None:
                 return _br(abs(v)).replace("R$ ", "") + "-"          # 1.234,56-  (menos no fim)
             if fmt == "unicode":
                 return "\u2212" + _br(abs(v)).replace("R$ ", "")      # −1.234,56  (sinal copiado de PDF)
+            if fmt == "parenteses":
+                return "(" + _br(abs(v)).replace("R$ ", "") + ")"     # (1.234,56)  negativo contábil
+            if fmt == "espaco":
+                return f"{v:,.2f}".replace(",", "\u202f").replace(".", ",")  # 12 345,67 (espaço fino)
             if nivel == 3:
                 return f"{v:,.2f}"           # padrão americano: 1,234.56
             if caso.get("moeda"):
@@ -222,6 +242,10 @@ def escrever_sujo(caso: dict, caminho: Path) -> None:
             linha = linha[:meio] + [None] + linha[meio:]
         linhas.append(linha)
     for i, linha in enumerate(linhas):
+        if nivel >= 5 and i and i % 60 == 0:  # quebra de página do relatório: o cabeçalho se repete no meio dos dados
+            ws.append(cab_escrito)
+        if nivel >= 5 and i and i % 37 == 0:  # linha totalmente vazia no meio da tabela
+            ws.append([])
         ws.append(linha)
         if nivel >= 2 and i == caso.get("subtotal_em"):  # subtotal no meio da tabela
             ws.append([f"Subtotal {str(rot[cab[1]][i])}"] + [None] * (len(linha) - 1))

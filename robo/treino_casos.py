@@ -111,11 +111,11 @@ def _g_limpeza(nivel, semente, pasta, cfg):
     from robo import laboratorio
     from openpyxl import load_workbook
     area = laboratorio.AREAS[semente % len(laboratorio.AREAS)]
-    caso = laboratorio.aplicar_nivel(laboratorio.gerar(area, semente), min(nivel, 4), semente)
+    caso = laboratorio.aplicar_nivel(laboratorio.gerar(area, semente), nivel, semente)
     arq = pasta / f"treino_{area}_{semente}.xlsx"
     laboratorio.escrever_sujo(caso, arq)
     rng = _rng(semente, nivel, "limpeza")
-    defeito = nivel == 5 or (nivel >= 2 and rng.random() < 0.3)
+    defeito = nivel >= 2 and rng.random() < 0.3  # no nível 5 o desafio é a sujeira de sistema antigo, não só barrar
     celulas = []
     if defeito:  # fórmula quebrada no meio dos dados: a planilha TEM que ser barrada
         wb = load_workbook(arq)
@@ -126,9 +126,9 @@ def _g_limpeza(nivel, semente, pasta, cfg):
             ws.cell(int(k), alvo_col, "#REF!")
             celulas.append(int(k))
         wb.save(arq)
-    return {"arquivo": str(arq), "parametros": {"area": area, "nivel_sujeira": min(nivel, 4), "defeito": defeito},
+    return {"arquivo": str(arq), "parametros": {"area": area, "nivel_sujeira": nivel, "defeito": defeito},
             "gabarito": {"aprovaria": not defeito, "linhas": caso["n"], "celulas_ref": celulas},
-            "resumo": f"planilha de {area} com sujeira nível {min(nivel, 4)}" + (" e fórmula quebrada (#REF!)" if defeito else "")}
+            "resumo": f"planilha de {area} com sujeira nível {nivel}" + (" e fórmula quebrada (#REF!)" if defeito else "")}
 
 
 def _x_limpeza(cfg, sb, pid, caso):
@@ -190,7 +190,7 @@ _SEGUNDA = {"varejo": "Canal de Venda", "educacao_nps": "Modalidade", "financeir
 def _g_calculo(nivel, semente, pasta, cfg):
     from robo import laboratorio
     area = laboratorio.AREAS[(semente // 7) % len(laboratorio.AREAS)]
-    caso = laboratorio.aplicar_nivel(laboratorio.gerar(area, semente), min(nivel, 4), semente)
+    caso = laboratorio.aplicar_nivel(laboratorio.gerar(area, semente), nivel, semente)
     arq = pasta / f"treino_calc_{area}_{semente}.xlsx"
     laboratorio.escrever_sujo(caso, arq)
     verdade = laboratorio.verdade(caso)
@@ -214,9 +214,9 @@ def _g_calculo(nivel, semente, pasta, cfg):
     from robo import conferencia
     esperado = conferencia.valores_pandas(op, dados, met, por)
     return {"arquivo": str(arq), "parametros": {"area": area, "pergunta": pergunta, "op": op, "por": por, "filtros": filtros,
-                                                "metrica": met, "nivel_sujeira": min(nivel, 4)},
+                                                "metrica": met, "nivel_sujeira": nivel},
             "gabarito": {"valores": {k: (None if isinstance(v, float) and math.isnan(v) else v) for k, v in esperado.items()}},
-            "resumo": f"“{pergunta}” numa planilha de {area} com sujeira nível {min(nivel, 4)}"}
+            "resumo": f"“{pergunta}” numa planilha de {area} com sujeira nível {nivel}"}
 
 
 def _x_calculo(cfg, sb, pid, caso):
@@ -282,7 +282,7 @@ def _v_calculo(caso, cfg):
 # =============================================================================== 3. indicadores (perfil_indicadores)
 def _g_indicadores(nivel, semente, pasta, cfg):
     from robo import laboratorio
-    caso = laboratorio.aplicar_nivel(laboratorio.gerar("educacao_nps", semente), min(nivel, 4), semente)
+    caso = laboratorio.aplicar_nivel(laboratorio.gerar("educacao_nps", semente), nivel, semente)
     rng = _rng(semente, nivel, "indicadores")
     nota = caso["rotulos"]["Nota NPS"] = np.array(caso["rotulos"]["Nota NPS"], dtype=object)
     codigos = []
@@ -295,9 +295,9 @@ def _g_indicadores(nivel, semente, pasta, cfg):
     laboratorio.escrever_sujo(caso, arq)
     validas = [int(x) for x in nota if x is not None and 0 <= int(x) <= 10]
     nps = 100 * (sum(x >= 9 for x in validas) - sum(x <= 6 for x in validas)) / len(validas)
-    return {"arquivo": str(arq), "parametros": {"nivel_sujeira": min(nivel, 4), "codigos_99": codigos},
+    return {"arquivo": str(arq), "parametros": {"nivel_sujeira": nivel, "codigos_99": codigos},
             "gabarito": {"nps": nps, "n": len(validas)},
-            "resumo": f"pesquisa NPS com sujeira nível {min(nivel, 4)}" + (f" e {len(codigos)} código(s) 99" if codigos else "")}
+            "resumo": f"pesquisa NPS com sujeira nível {nivel}" + (f" e {len(codigos)} código(s) 99" if codigos else "")}
 
 
 def _x_indicadores(cfg, sb, pid, caso):
@@ -1282,6 +1282,9 @@ def _v_orquestracao(caso, cfg):
     pool = _orq_pool()
     cen = caso["parametros"]["cenario"]
     problemas = []
+    faltam = sorted(set(pool) - {e["nome"] for e in cen["estado"]})
+    if faltam:  # caso feito antes de rotinas novas existirem: a ferramenta acusaria atraso nelas (caso injusto)
+        problemas.append(f"cenário desatualizado: faltam as rotinas {', '.join(faltam)}")
     atrasadas = sorted(e["nome"] for e in cen["estado"] if e["nome"] in pool and e["verif_min_atras"] > 1.5 * pool[e["nome"]])
     com_erro, lentas = [], []
     for nome in pool:
@@ -1508,17 +1511,17 @@ def _v_revisao(caso, cfg):
 
 # =============================================================================== catálogo
 CATALOGO: dict[str, Competencia] = {c.id: c for c in [
-    Competencia("limpeza", "Limpar e barrar planilha", "diagnosticar_planilha", "casos_engenharia", "limpeza-2",
+    Competencia("limpeza", "Limpar e barrar planilha", "diagnosticar_planilha", "casos_engenharia", "limpeza-3",
                 {1: "título, R$, data em texto, duplicata, Total", 2: "+ nulos '-'/'N/A', subtotal, espaços; às vezes #REF!",
                  3: "+ número americano, datas misturadas, coluna vazia, rodapé", 4: "+ SAP '1.234,56-', '−' de PDF, 'R$ 1,2 mil'",
-                 5: "nível 4 + fórmula quebrada que TEM que barrar"},
+                 5: "sistema antigo: cabeçalho em duas linhas e repetido, linhas vazias, (1.234,56), 12 345,67; às vezes #REF!"},
                 _g_limpeza, _x_limpeza, _c_limpeza, _v_limpeza, descricao="O pipeline real em diagnóstico: contar as linhas certas e barrar defeito."),
-    Competencia("calculo", "Calcular o pedido", "calcular", "casos_analytics", "calculo-1",
+    Competencia("calculo", "Calcular o pedido", "calcular", "casos_analytics", "calculo-2",
                 {1: "uma conta por segmento", 2: "conta com filtro", 3: "mediana por segmento", 4: "conta na sujeira nível 4",
-                 5: "conta por dois segmentos"}, _g_calculo, _x_calculo, _c_calculo, _v_calculo,
+                 5: "conta por dois segmentos na sujeira de sistema antigo"}, _g_calculo, _x_calculo, _c_calculo, _v_calculo,
                 descricao="Entender o pedido em português e acertar o número de cada grupo."),
-    Competencia("indicadores", "NPS com a base certa", "perfil_indicadores", "casos_analytics", "indicadores-2",
-                {1: "NPS limpo", 2: "+ vazios", 3: "+ código 99 (não sabe)", 4: "+ sujeira de sistema", 5: "tudo junto"},
+    Competencia("indicadores", "NPS com a base certa", "perfil_indicadores", "casos_analytics", "indicadores-3",
+                {1: "NPS limpo", 2: "+ vazios", 3: "+ código 99 (não sabe)", 4: "+ sujeira de sistema", 5: "tudo junto + sistema antigo"},
                 _g_indicadores, _x_indicadores, _c_indicadores, _v_indicadores, descricao="NPS e base (n) certos."),
     Competencia("lgpd", "Achar dado pessoal", "dados_pessoais", "casos_governanca", "lgpd-2",
                 {1: "colunas com nome óbvio", 2: "nomes neutros", 3: "formatos crus (+55, só dígitos)",
@@ -1547,7 +1550,7 @@ CATALOGO: dict[str, Competencia] = {c.id: c for c in [
                 {1: "painel sem senha", 2: "+ senha do banco no config", 3: "+ erros no log", 4: "+ código novo sem aviso",
                  5: "problemas sorteados (achar também o que NÃO existe)"}, _g_ronda_ti, _x_ronda_ti, _c_ronda_ti, _v_ronda_ti,
                 descricao="Detectar exatamente os problemas plantados no computador de teste."),
-    Competencia("orquestracao", "SLA das rotinas (Airflow)", "orquestracao", "casos_ti", "orquestracao-1",
+    Competencia("orquestracao", "SLA das rotinas (Airflow)", "orquestracao", "casos_ti", "orquestracao-2",
                 {1: "uma rotina com erro", 2: "+ uma atrasada", 3: "+ uma lenta", 4: "+ iscas: erro já resolvido, lentidão antiga, "
                  "histórico curto", 5: "quantidades sorteadas + rotina perto do limite (achar também o que NÃO é problema)"},
                 _g_orquestracao, _x_orquestracao, _c_orquestracao, _v_orquestracao,
