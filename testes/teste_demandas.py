@@ -203,3 +203,11 @@ def teste_planilha_sintetica_vira_solicitacao_marcada_sem_proposta_de_regra(cfg_
     assert Trabalho(cfg).solicitacao(sid)["origem"] == "sintetica" and propostas == []
     sid2 = pos_processamento.registrar(cfg, _resultado(tmp_path / "pesquisa_real.xlsx", SUCESSO))
     assert Trabalho(cfg).solicitacao(sid2)["origem"] == "automatica" and len(propostas) == 1
+
+
+def teste_cada_demanda_usa_o_proprio_preparo():
+    """consulta_sql e sql_treino tinham preparos com o mesmo nome: um apagava o outro e toda consulta_sql falhava."""
+    assert demandas.CATALOGO["consulta_sql"].preparar is demandas._sql_lotes
+    assert demandas.CATALOGO["sql_treino"].preparar is demandas._sql
+    nomes = [m.preparar.__name__ for m in demandas.CATALOGO.values() if m.preparar]
+    assert len(set(nomes)) == len({id(m.preparar) for m in demandas.CATALOGO.values() if m.preparar})

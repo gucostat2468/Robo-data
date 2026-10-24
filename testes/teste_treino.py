@@ -169,3 +169,16 @@ def teste_erro_vira_licao_para_os_colegas_da_mesma_area(cfg, monkeypatch):
     c = _banco(cfg)
     com_licao = {r[0] for r in c.execute("SELECT funcionario FROM licoes_funcionario")}
     assert {pid, *colegas} <= com_licao  # quem errou e a equipe da área estudam a mesma lição
+
+
+def teste_caso_guardado_e_reconferido_antes_de_reusar(cfg, monkeypatch):
+    """Caso de dias atrás cuja verdade mudou (janela de 7 dias, quadro, rotinas) sai da fila em vez de reprovar alguém."""
+    velho = treino.criar_caso(cfg, "historico", 2, semente=91)
+    with treino._tb(cfg).tx() as c:
+        c.execute("UPDATE treino_casos SET criado_em='2026-01-01T00:00:00' WHERE id=?", (velho["id"],))
+    monkeypatch.setattr(CATALOGO["historico"], "conferir", lambda caso, cfg: ["janela andou: gabarito não vale mais"]
+                        if caso["id"] == velho["id"] else [])
+    novo = treino.obter_caso(cfg, "historico", 2, "eng_estagiario")
+    assert novo and novo["id"] != velho["id"]
+    r = _banco(cfg).execute("SELECT estado, revisao FROM treino_casos WHERE id=?", (velho["id"],)).fetchone()
+    assert r["estado"] == "encerrado" and "janela andou" in r["revisao"]

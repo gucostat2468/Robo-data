@@ -1511,16 +1511,16 @@ def _v_revisao(caso, cfg):
 
 # =============================================================================== catálogo
 CATALOGO: dict[str, Competencia] = {c.id: c for c in [
-    Competencia("limpeza", "Limpar e barrar planilha", "diagnosticar_planilha", "casos_engenharia", "limpeza-3",
+    Competencia("limpeza", "Limpar e barrar planilha", "diagnosticar_planilha", "casos_engenharia", "limpeza-4",
                 {1: "título, R$, data em texto, duplicata, Total", 2: "+ nulos '-'/'N/A', subtotal, espaços; às vezes #REF!",
                  3: "+ número americano, datas misturadas, coluna vazia, rodapé", 4: "+ SAP '1.234,56-', '−' de PDF, 'R$ 1,2 mil'",
                  5: "sistema antigo: cabeçalho em duas linhas e repetido, linhas vazias, (1.234,56), 12 345,67; às vezes #REF!"},
                 _g_limpeza, _x_limpeza, _c_limpeza, _v_limpeza, descricao="O pipeline real em diagnóstico: contar as linhas certas e barrar defeito."),
-    Competencia("calculo", "Calcular o pedido", "calcular", "casos_analytics", "calculo-2",
+    Competencia("calculo", "Calcular o pedido", "calcular", "casos_analytics", "calculo-3",
                 {1: "uma conta por segmento", 2: "conta com filtro", 3: "mediana por segmento", 4: "conta na sujeira nível 4",
                  5: "conta por dois segmentos na sujeira de sistema antigo"}, _g_calculo, _x_calculo, _c_calculo, _v_calculo,
                 descricao="Entender o pedido em português e acertar o número de cada grupo."),
-    Competencia("indicadores", "NPS com a base certa", "perfil_indicadores", "casos_analytics", "indicadores-3",
+    Competencia("indicadores", "NPS com a base certa", "perfil_indicadores", "casos_analytics", "indicadores-4",
                 {1: "NPS limpo", 2: "+ vazios", 3: "+ código 99 (não sabe)", 4: "+ sujeira de sistema", 5: "tudo junto + sistema antigo"},
                 _g_indicadores, _x_indicadores, _c_indicadores, _v_indicadores, descricao="NPS e base (n) certos."),
     Competencia("lgpd", "Achar dado pessoal", "dados_pessoais", "casos_governanca", "lgpd-2",

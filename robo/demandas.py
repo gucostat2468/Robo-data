@@ -238,6 +238,25 @@ def _com_indicador(cfg, pessoa):
             "(a fábrica gera as regras nps e csat_ces; a demanda volta quando houver um lote delas)")
 
 
+def _sql_lotes(cfg, pessoa):
+    """Leitura real no PostgreSQL: os lotes sintéticos que a esteira gravou no schema treino (demanda consulta_sql).
+    Antes tinha o mesmo nome do preparo do exercício de SQL e era substituída por ele: toda consulta_sql falhava."""
+    if not (cfg.banco or {}).get("habilitado"):
+        return "PostgreSQL desligado nas Configurações: consulta SQL não roda"
+    from robo.banco import Banco
+    try:
+        with Banco(cfg.banco, cfg.base).conectar() as conn:
+            existe = conn.execute("SELECT to_regclass('treino.lotes')").fetchone()[0]
+            n = conn.execute("SELECT COUNT(*) FROM treino.lotes").fetchone()[0] if existe else 0
+    except Exception as e:
+        return f"PostgreSQL indisponível ({type(e).__name__})"
+    if not n:
+        return "o schema treino ainda não tem lotes (nenhuma planilha da fábrica foi carregada)"
+    return ({"sql": "SELECT arquivo, status, linhas_entrada, linhas_saida, erros FROM treino.lotes "
+                    "ORDER BY processado_em DESC LIMIT 20"},
+            [{"tipo": "linhas_min", "n": min(int(n), 20)}])
+
+
 def _sql(cfg, pessoa):
     """Exercício de SQL: um lote da fábrica que já está no PostgreSQL e tem gabarito conferido. Cada pessoa pega um lote
     diferente (rodízio pelo id), para a turma não responder sempre a mesma pergunta."""
@@ -332,7 +351,7 @@ CATALOGO: dict[str, Modelo] = {m.ferramenta: m for m in [
            "Apontar valores fora do padrão com a linha de origem.", "lista de anomalias com linha", BASICOS, _com_tratada),
     Modelo("consulta_sql", "Conferir no PostgreSQL os lotes da fábrica",
            "Ler, em transação somente leitura, os lotes sintéticos gravados no schema treino.",
-           "linhas devolvidas pelo PostgreSQL", BASICOS, _sql),
+           "linhas devolvidas pelo PostgreSQL", BASICOS, _sql_lotes),
     Modelo("sql_treino", "Exercício de SQL no PostgreSQL com os dados da fábrica",
            "Responder com SQL (somente leitura) uma pergunta sobre um lote real do banco, e bater com o gabarito.",
            "o SQL, o resultado do banco e a conferência com o gabarito do lote", BASICOS, _sql),

@@ -304,9 +304,18 @@ def obter_caso(cfg, comp: str, nivel: int, pid: str) -> dict | None:
         params = json.loads(row["parametros"])
         intacto = (not row["arquivo"] or Path(row["arquivo"]).exists()) and ("logs" not in params or Path(params["logs"]).exists())
         if intacto:
-            return _carregar(row)
-        with _tb(cfg).tx() as conn:  # arquivos do caso sumiram: sai da fila (refazível pela semente), não trava ninguém
-            conn.execute("UPDATE treino_casos SET estado='encerrado', encerrado_em=? WHERE id=?", (_agora(), row["id"]))
+            caso = _carregar(row)
+            problemas = _ainda_vale(c, caso, row, cfg)
+            if not problemas:
+                return caso
+            motivo = "caso desatualizado na reconferência: " + "; ".join(problemas)[:500]
+        else:
+            motivo = "arquivos do caso sumiram (refazível pela semente)"
+        with _tb(cfg).tx() as conn:  # sai da fila com o motivo; não trava nem reprova ninguém injustamente
+            conn.execute("UPDATE treino_casos SET estado='encerrado', encerrado_em=?, revisao=? WHERE id=?",
+                         (_agora(), json.dumps({"encerrado_por": SALA["revisor"], "motivo": motivo}, ensure_ascii=False),
+                          row["id"]))
+        return obter_caso(cfg, comp, nivel, pid)  # o próximo da fila, ou um caso novo
     if not certificado(cfg, c.designer, comp):
         r = certificar(cfg, c.designer, comp)
         if not r["ok"]:
@@ -316,6 +325,21 @@ def obter_caso(cfg, comp: str, nivel: int, pid: str) -> dict | None:
         if caso["estado"] == "validado":
             return caso
     return None
+
+
+REVALIDAR_APOS_MIN = 30
+
+
+def _ainda_vale(c, caso: dict, row, cfg) -> list[str]:
+    """Reconferência do revisor antes de REUSAR um caso guardado: a verdade de alguns casos depende de agora (janela
+    de 7 dias do desempenho, quadro de funcionários, rotinas existentes). Achado no treino endurecido: casos de dias
+    atrás reprovavam quem acertava. Caso recém-criado (menos de 30 min) não precisa."""
+    try:
+        if datetime.now() - datetime.fromisoformat(row["criado_em"]) < timedelta(minutes=REVALIDAR_APOS_MIN):
+            return []
+        return list(c.conferir({**caso, "nivel": caso["nivel"], "semente": caso["semente"]}, cfg) or [])
+    except Exception as e:
+        return [f"reconferência quebrou ({type(e).__name__}: {e})"]
 
 
 # =============================================================================== a tentativa

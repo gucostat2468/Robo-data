@@ -48,7 +48,8 @@ NIVEIS = {1: "básico (título, R$, data em texto, duplicata, Total)",
           3: "exportação de sistema (número americano, datas misturadas com número de série, coluna vazia, rodapé)",
           4: "formatos difíceis de número (menos no fim como no SAP, sinal − copiado de PDF, '1,2 mil')",
           5: "sistema antigo (cabeçalho em duas linhas, cabeçalho repetido a cada página, linhas vazias no meio, "
-             "negativo contábil entre parênteses, milhar separado por espaço)"}
+             "negativo contábil entre parênteses, milhar separado por espaço, data com mês abreviado 05/jan/2026, valor com "
+             "marca de nota de rodapé 1.234,56*)"}
 _prontos: set[str] = set()
 
 
@@ -202,6 +203,8 @@ def escrever_sujo(caso: dict, caminho: Path) -> None:
         if v is None or (isinstance(v, float) and math.isnan(v)):
             return ["-", "N/A", ""][i % 3]
         if isinstance(v, date):
+            if nivel >= 5 and i % 5 == 0:   # mês abreviado em português, como sistema antigo exporta: 05/jan/2026
+                return f"{v.day:02d}/{['jan', 'fev', 'mar', 'abr', 'mai', 'jun', 'jul', 'ago', 'set', 'out', 'nov', 'dez'][v.month - 1]}/{v.year}"
             if nivel >= 3 and i % 3 == 1:   # número de série do Excel (célula sem formato de data)
                 return (v - date(1899, 12, 30)).days
             if nivel >= 3 and i % 3 == 2:
@@ -220,6 +223,8 @@ def escrever_sujo(caso: dict, caminho: Path) -> None:
                 return "(" + _br(abs(v)).replace("R$ ", "") + ")"     # (1.234,56)  negativo contábil
             if fmt == "espaco":
                 return f"{v:,.2f}".replace(",", "\u202f").replace(".", ",")  # 12 345,67 (espaço fino)
+            if nivel >= 5 and i % 13 == 5 and caso.get("moeda"):
+                return _br(v).replace("R$ ", "") + "*"                        # 1.234,56* (nota de rodapé do relatório)
             if nivel == 3:
                 return f"{v:,.2f}"           # padrão americano: 1,234.56
             if caso.get("moeda"):

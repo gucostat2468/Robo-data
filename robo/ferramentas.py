@@ -81,12 +81,36 @@ def _pasta_artefatos(cfg, ref: str) -> Path:
 
 
 # ----------------------------------------------------------------------------- ferramentas
+MANUAL_DO_TRABALHO = Path(__file__).resolve().parents[1] / "conhecimento" / "_trabalho_por_ferramenta.md"
+
+
+def manual_do_trabalho(pergunta: str) -> dict | None:
+    """Seção do manual do trabalho cujo título é exatamente o nome da ferramenta perguntada ("Nome: descrição").
+    Fica fora da busca geral (arquivo com '_'): palavras genéricas dele não podem ganhar de um handover real."""
+    if not MANUAL_DO_TRABALHO.exists():
+        return None
+    nome = str(pergunta or "").split(":")[0].strip().lower()
+    if not nome:
+        return None
+    for bloco in MANUAL_DO_TRABALHO.read_text(encoding="utf-8").split("\n## ")[1:]:
+        titulo, _, corpo = bloco.partition("\n")
+        if titulo.split(":")[0].strip().lower() == nome:
+            return {"titulo": titulo.strip(), "corpo": corpo.strip(), "arquivo": str(MANUAL_DO_TRABALHO)}
+    return None
+
+
 def f_conhecimento(cfg, pergunta: str = "", quem: str | None = None, registrar_uso: bool = True, especifico: bool = False,
                    **_) -> dict:
     """registrar_uso=False: prova de recuperação do treino — achar a lição não é o mesmo que usá-la no trabalho, então
     não conta como 'aplicada' no caderno. especifico=True (demandas): a abertura geral de um manual não serve como
     resposta; procura nas outras fontes e, se nada específico existir, diz que não sabe (lacuna real da empresa)."""
     from robo import canal
+    if especifico:  # pergunta sobre o TRABALHO de uma ferramenta: o manual do trabalho responde pelo nome exato
+        secao = manual_do_trabalho(pergunta)
+        if secao:
+            return resultado(True, "conhecimento", f"{secao['titulo']}: {secao['corpo'][:1500]}",
+                             {"fonte": secao["arquivo"]}, evidencia=f"manual {Path(secao['arquivo']).name}, seção "
+                                                                    f"“{secao['titulo']}”")
     t = canal.normalizar(pergunta)
     pont = [(canal._pontuar(t, v["chaves"]), i) for i, v in enumerate(canal.CONHECIMENTO)]
     melhor = max(pont) if pont else (0, -1)
