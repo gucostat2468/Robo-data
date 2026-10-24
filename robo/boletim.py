@@ -52,7 +52,7 @@ def montar(cfg, agora: datetime | None = None, turno: dict | None = None) -> dic
         andares[p["andar"]]["pessoas"] += 1
     saida = {"versao": VERSAO, "gerado_em": agora.isoformat(timespec="seconds"), "turno": turno or {},
              "funcionarios": len(gente), "andares": [], "agora": [], "ultimos": [], "sql": {}, "fabrica": {},
-             "rotinas": [], "totais": {}}
+             "rotinas": [], "totais": {}, "banco": _banco(cfg)}
     if not db.exists():
         saida["andares"] = list(andares.values())
         return saida
@@ -102,6 +102,15 @@ def montar(cfg, agora: datetime | None = None, turno: dict | None = None) -> dic
                                                     "FROM rotinas_execucoes WHERE inicio>=? GROUP BY nome ORDER BY nome",
                                                  (desde,))]
         saida["pessoas"] = _pessoas(c, gente, hoje, cfg)
+        # prova de que o nível é trabalho diferente e não só rótulo: acerto por nível em todo o histórico
+        saida["niveis"] = [{"nivel": nv or "sem nível", "demandas": n, "concluidas": int(ok or 0), "parciais": int(pa or 0),
+                            "falhas": int(fa or 0)}
+                           for nv, n, ok, pa, fa in _q(c, "SELECT json_extract(plano,'$.nivel') nv, COUNT(*), "
+                                                          "SUM(estado='concluida'), SUM(estado='concluida_parcialmente'), "
+                                                          "SUM(estado='falhou') FROM solicitacoes WHERE origem='demanda_sintetica' "
+                                                          "AND COALESCE(json_extract(plano,'$.tipo_demanda'),'') != 'treinamento' "
+                                                          "GROUP BY 1 ORDER BY CASE nv WHEN 'basico' THEN 1 WHEN 'medio' THEN 2 "
+                                                          "WHEN 'dificil' THEN 3 WHEN 'profissional' THEN 4 ELSE 5 END")]
         tot = lambda sql: (_q(c, sql) or [(0,)])[0][0] or 0  # noqa: E731
         saida["totais"] = {"demandas": tot("SELECT COUNT(*) FROM solicitacoes WHERE origem='demanda_sintetica'"),
                            "tentativas_treino": tot("SELECT COUNT(*) FROM treino_tentativas"),
@@ -140,7 +149,7 @@ def _pessoas(c, gente: dict, hoje: str, cfg=None) -> list[dict]:
                 tipo = json.loads(plano or "{}").get("tipo_demanda") or "trabalho"
             except ValueError:
                 tipo = "trabalho"
-            item.update(ultimo=titulo, quando=quando, estado=estado)
+            item.update(ultimo=titulo or "", quando=quando or "", estado=estado or "")
             if tipo == "treinamento":
                 item["situacao"] = "estudo (o trabalho do papel estava bloqueado)"
             else:
@@ -159,6 +168,28 @@ def _pessoas(c, gente: dict, hoje: str, cfg=None) -> list[dict]:
             item["situacao"] = f"estudo (trabalho do papel bloqueado: {bloqueio[pid][:110]})"
         saida.append(item)
     return saida
+
+
+def _banco(cfg) -> dict:
+    """Cobertura das tabelas (SQLite e PostgreSQL) do último levantamento do turno (cobertura_banco, a cada salvamento).
+    Só nomes de tabela, contagens e a causa de cada vazia: nenhum conteúdo, nenhum endereço de banco."""
+    arq = Path(cfg.logs) / "cobertura_banco.json"
+    if not arq.exists():
+        return {}
+    try:
+        r = json.loads(arq.read_text(encoding="utf-8"))
+    except (OSError, ValueError):
+        return {}
+    from robo.cobertura_banco import COM_DADOS
+    itens = r.get("itens") or []
+    onde = lambda i: i["onde"] if i["onde"] == "sqlite" else f"postgres.{i.get('schema')}"  # noqa: E731
+    return {"levantamento": r.get("levantamento"), # conferido = o levantamento CONTOU tabelas no PostgreSQL (banco desligado não conta como conferido)
+            "postgres_conferido": not r.get("erro_postgres") and any(i["onde"] == "postgres" for i in itens),
+            "erro_postgres": (r.get("erro_postgres") or "")[:120].split(":")[0] or None,
+            "tabelas": len(itens), "com_dados": sum(i["situacao"] == COM_DADOS for i in itens),
+            "linhas": sum(int(i.get("linhas") or 0) for i in itens), "resumo": r.get("resumo") or {},
+            "vazias": [{"onde": onde(i), "tabela": i["tabela"], "situacao": i["situacao"].replace("vazia: ", ""),
+                        "causa": (i.get("causa") or "")[:160]} for i in itens if i["situacao"] != COM_DADOS]}
 
 
 # =============================================================================== versão para ler no navegador
@@ -203,6 +234,11 @@ def markdown(d: dict) -> str:
     l += ["", "## Últimas entregas", "", "| Hora | Quem | Trabalho | Resultado |", "|---|---|---|---|"]
     l += [f"| {_hora(u.get('quando'))[-5:]} | {u['funcionario']} ({u.get('andar')}º) | {u.get('trabalho', '')} | "
           f"{ESTADOS.get(u.get('estado'), u.get('estado'))} |" for u in d.get("ultimos") or []]
+    if d.get("niveis"):
+        l += ["", "## Dificuldade (todo o histórico)", "", "| Nível | Demandas | Concluídas | Parciais | Falhas | Acerto |",
+              "|---|--:|--:|--:|--:|--:|"]
+        l += [f"| {n['nivel']} | {n['demandas']} | {n['concluidas']} | {n['parciais']} | {n['falhas']} | "
+              f"{100 * n['concluidas'] / n['demandas']:.0f}% |" for n in d["niveis"] if n["demandas"]]
     pessoas = d.get("pessoas") or []
     if pessoas:
         fora = [x for x in pessoas if "FORA" in x["situacao"] or x["situacao"].startswith(("sem trabalho", "estudo"))]
@@ -215,6 +251,18 @@ def markdown(d: dict) -> str:
                   f"{('(' + ESTADOS.get(x['estado'], x['estado']) + ')') if x['estado'] else ''} | {x['demandas_hoje']} |"
                   for x in pessoas if x["andar"] == andar]
             l.append("")
+    b = d.get("banco") or {}
+    if b:
+        l += ["", "## Banco de dados", "",
+              f"Levantamento das {_hora(b.get('levantamento'))}: **{b['com_dados']} de {b['tabelas']}** tabelas com dados "
+              f"({b['linhas']:,} linhas contadas uma a uma).".replace(",", "."),
+              "" if b.get("postgres_conferido") else f"> PostgreSQL NÃO conferido neste levantamento ({b.get('erro_postgres') or 'banco desligado'}).",
+              "", "| Onde | Tabelas | Com dados |", "|---|--:|--:|"]
+        l += [f"| {k} | {v['tabelas']} | {v['com_dados']} |" for k, v in (b.get("resumo") or {}).items()]
+        if b.get("vazias"):
+            l += ["", "Vazias e por quê (nada é preenchido para parecer cheio):", "",
+                  "| Onde | Tabela | Situação | Causa |", "|---|---|---|---|"]
+            l += [f"| {v['onde']} | {v['tabela']} | {v['situacao']} | {v['causa'][:110]} |" for v in b["vazias"]]
     l += ["", "---", "Números tirados dos registros da empresa (dado sintético de treino, nunca de cliente)."]
     return "\n".join(l) + "\n"
 
@@ -231,6 +279,8 @@ MARCA = "BOLETIM-JSON:"
 def mensagem(dados: dict) -> str:
     """Primeira linha legível; depois a marca e o JSON compacto numa linha só."""
     leve = {k: v for k, v in dados.items() if k != "pessoas"}
+    if leve.get("banco"):  # a lista de vazias fica só no arquivo: a mensagem leva o resumo
+        leve["banco"] = {k: v for k, v in leve["banco"].items() if k != "vazias"}
     return f"boletim {dados['gerado_em']}\n\n{MARCA}{json.dumps(leve, ensure_ascii=False, separators=(',', ':'), default=str)}\n"
 
 

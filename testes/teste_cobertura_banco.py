@@ -35,7 +35,8 @@ def teste_levantamento_explica_cada_vazia_e_nao_inventa(cfg_factory):
     r = cb.levantar(cfg)
     por = {i["tabela"]: i for i in r["itens"] if i["onde"] == "sqlite"}
     assert por["solicitacoes"]["situacao"] == cb.NAO_ACIONADA and "pedido" in por["solicitacoes"]["gatilho"]
-    assert por["aprendizados_replay"]["situacao"] == cb.DESCONECTADA
+    # o replay é chamado todo dia (licoes.replay_diario): vazio só por falta de planilha barrada, não por desligamento
+    assert por["aprendizados_replay"]["situacao"] == cb.NAO_ACIONADA and "replay_diario" in por["aprendizados_replay"]["causa"]
     assert por["tabela_misteriosa"]["situacao"] == cb.SEM_CAUSA  # sem causa conhecida não ganha desculpa inventada
     assert por["tabela_misteriosa"]["linhas"] == 0
     with sqlite3.connect(cfg.logs / "trabalho.db") as c:

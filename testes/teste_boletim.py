@@ -84,3 +84,45 @@ def teste_versao_para_navegador(cfg_factory):
     md = boletim.markdown(boletim.montar(cfg))
     assert md.startswith("# Empresa ao vivo") and "| Andar |" in md and "Trabalhando agora" in md
     assert boletim._hora("2026-10-23T23:19:41") == "23/10 20:19"  # UTC → Brasília
+
+
+def teste_boletim_mostra_a_cobertura_real_das_tabelas(cfg_factory):
+    """O dono (e a auditoria) vê no celular quais tabelas têm dados e a causa de cada vazia, do levantamento do turno."""
+    from robo import cobertura_banco as cb
+    cfg = cfg_factory()
+    cfg.criar_pastas()
+    assert boletim.montar(cfg)["banco"] == {}  # sem levantamento: não inventa cobertura
+    jobs.fechar(cfg, jobs.abrir(cfg, "demanda", "sintetico", None, "dba"), "concluido", {})  # um trabalho real gravado
+    cb.salvar_relatorio(cfg, cb.levantar(cfg))
+    b = boletim.montar(cfg)["banco"]
+    assert b["tabelas"] > 30 and 0 < b["com_dados"] < b["tabelas"]
+    assert not b["postgres_conferido"]  # banco desligado neste teste: nunca dito como conferido
+    vazia = {v["tabela"]: v for v in b["vazias"]}["solicitacoes"]
+    assert vazia["onde"] == "sqlite" and vazia["situacao"] == "funcionalidade não acionada" and vazia["causa"]
+    md = boletim.markdown(boletim.montar(cfg))
+    assert "## Banco de dados" in md and "| sqlite | solicitacoes |" in md and "PostgreSQL NÃO conferido" in md
+    leve = boletim.ler_mensagem(boletim.mensagem(boletim.montar(cfg)))
+    assert "vazias" not in leve["banco"] and leve["banco"]["tabelas"] == b["tabelas"]  # a mensagem leva só o resumo
+
+
+def teste_boletim_mede_acerto_por_nivel(cfg_factory):
+    """Os níveis precisam ser trabalho diferente: o boletim mostra o acerto de cada nível, tirado das demandas reais."""
+    import sqlite3
+    cfg = cfg_factory()
+    cfg.criar_pastas()
+    boletim.montar(cfg)
+    from robo.trabalho import Trabalho
+    Trabalho(cfg)
+    with sqlite3.connect(cfg.logs / "trabalho.db") as c:
+        for i, (nv, est) in enumerate([("basico", "concluida"), ("basico", "concluida"), ("dificil", "falhou"),
+                                       ("dificil", "concluida"), ("medio", "concluida")]):
+            c.execute("INSERT INTO solicitacoes (id, tipo, origem, estado, funcionario, andar, plano, criada_em) "
+                      "VALUES (?,?,?,?,?,?,?,?)", (f"s{i}", "demanda", "demanda_sintetica", est, "dba", 1,
+                                                   json.dumps({"nivel": nv}), "2026-10-24T10:00:00"))
+        c.execute("INSERT INTO solicitacoes (id, tipo, origem, estado, funcionario, andar, plano, criada_em) VALUES "
+                  "('t1','demanda','demanda_sintetica','concluida','dba',1,?, '2026-10-24T10:00:00')",
+                  (json.dumps({"nivel": "basico", "tipo_demanda": "treinamento"}),))  # estudo não conta como nível
+    n = {x["nivel"]: x for x in boletim.montar(cfg)["niveis"]}
+    assert list(n) == ["basico", "medio", "dificil"]
+    assert n["basico"]["demandas"] == 2 and n["dificil"]["falhas"] == 1 and n["dificil"]["concluidas"] == 1
+    assert "| dificil | 2 | 1 | 0 | 1 | 50% |" in boletim.markdown(boletim.montar(cfg))

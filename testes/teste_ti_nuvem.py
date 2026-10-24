@@ -161,6 +161,7 @@ def teste_sinal_de_parada_encerra_o_turno_salvando(tmp_path, monkeypatch):
     monkeypatch.setattr(nuvem, "salvar", lambda cfg: chamadas.append("salvar") or {"ok": True})
     monkeypatch.setattr(nuvem, "tamanho_mb", lambda cfg: 1.0)
     monkeypatch.setattr(nuvem, "_esteira", lambda m: 0)
+    monkeypatch.setattr(nuvem, "garantir_base", lambda cfg, m: 0)  # a fábrica real demoraria mais que o relógio abaixo
     monkeypatch.setattr(rotinas, "executar", lambda *a, **k: None)
     monkeypatch.setattr(rotinas, "funcao", lambda *a, **k: None)
     monkeypatch.setattr(rotinas, "abrir_sessao", lambda cfg: {"sessao": 1})
@@ -188,12 +189,13 @@ def teste_turno_trata_a_planilha_antes_de_distribuir_trabalho(tmp_path, monkeypa
     monkeypatch.setattr(rotinas, "executar", lambda cfg, nome, f: ordem.append(nome))
     monkeypatch.setattr(rotinas, "funcao", lambda *a, **k: None)
     monkeypatch.setattr(rotinas, "abrir_sessao", lambda cfg: {"sessao": 1})
-    monkeypatch.setattr(rotinas, "batimento", lambda *a, **k: None)
-    cfg = nuvem.config_da_nuvem(tmp_path, "postgresql://u:p@127.0.0.1:1/x")
+    monkeypatch.setattr(nuvem, "garantir_base", lambda cfg, m: ordem.append("BASE") or 0)
     parar = threading.Event()
-    threading.Timer(0.3, parar.set).start()
+    # para no fim da 1ª volta (determinístico: antes um relógio de 0,3 s falhava com a máquina carregada)
+    monkeypatch.setattr(rotinas, "batimento", lambda *a, **k: parar.set())
+    cfg = nuvem.config_da_nuvem(tmp_path, "postgresql://u:p@127.0.0.1:1/x")
     nuvem.turno(cfg, minutos=5, pausa_s=60, parar=parar)
-    assert ordem.index("fabrica") < ordem.index("ESTEIRA") < ordem.index("demandas")
+    assert ordem.index("fabrica") < ordem.index("ESTEIRA") < ordem.index("BASE") < ordem.index("demandas")
     # e em cada volta do laço também: fábrica → esteira → demandas
     volta = ordem[ordem.index("canal"):]
     assert volta.index("fabrica") < volta.index("ESTEIRA") < volta.index("demandas")

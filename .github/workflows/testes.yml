@@ -1,0 +1,85 @@
+# Barreira de qualidade: toda mudança de código passa pela suíte de testes antes de ser considerada pronta.
+# Banco de teste ISOLADO: um PostgreSQL descartável que nasce e morre com o job (nunca o banco da empresa, nunca o Neon).
+# Nenhum segredo é usado aqui: o banco de teste aceita conexão local sem senha e some ao fim do job.
+name: Testes
+
+on:
+  push:
+    paths-ignore: ["nuvem/ligar", "**.md"]
+  pull_request:
+  workflow_dispatch:
+
+concurrency:
+  group: testes-${{ github.ref }}
+  cancel-in-progress: true   # um push novo cancela a conferência do push anterior (só o mais novo importa)
+
+permissions:
+  contents: read             # só lê o código: não publica, não comenta, não mexe em nada
+
+jobs:
+  rapidos:
+    name: Sintaxe e importação
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-python@v6
+        with:
+          python-version: "3.13"
+          cache: pip
+          cache-dependency-path: requisitos.txt
+      - run: python -m pip install -r requisitos-dev.txt
+      - name: Compilar todo o código (erro de sintaxe para aqui)
+        run: python -m compileall -q robo testes
+      - name: Importar cada módulo do robô (import quebrado para aqui)
+        run: |
+          python - <<'EOF'
+          import importlib, pkgutil, robo
+          falhas = []
+          for m in pkgutil.walk_packages(robo.__path__, "robo."):
+              try:
+                  importlib.import_module(m.name)
+              except Exception as e:
+                  falhas.append(f"{m.name}: {type(e).__name__}: {e}")
+          print("\n".join(falhas) or "todos os módulos importaram")
+          raise SystemExit(1 if falhas else 0)
+          EOF
+      - name: Coletar os testes (teste que nem carrega para aqui)
+        run: python -m pytest --collect-only -q -p no:cacheprovider | tail -1
+
+  completos:
+    name: Suíte completa com PostgreSQL
+    needs: rapidos
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_HOST_AUTH_METHOD: trust   # banco descartável do job, só acessível dentro da máquina do teste
+        ports: ["5432:5432"]
+        options: >-
+          --health-cmd "pg_isready -U postgres" --health-interval 5s --health-timeout 5s --health-retries 20
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-python@v6
+        with:
+          python-version: "3.13"
+          cache: pip
+          cache-dependency-path: requisitos.txt
+      - run: python -m pip install -r requisitos-dev.txt
+      - name: Suíte completa (inclui persistência no PostgreSQL de teste)
+        env:
+          ROBO_TESTE_PG: "host=127.0.0.1 port=5432 user=postgres dbname=postgres"
+        # os testes do Apache Airflow ficam de fora aqui (pedem um ambiente próprio do Airflow); o resumo diz quantos
+        run: python -m pytest -q -p no:cacheprovider -rs 2>&1 | tee resultado.txt; exit ${PIPESTATUS[0]}
+      - name: Resumo
+        if: always()
+        run: |
+          {
+            echo "### Resultado da suíte"
+            echo '```'
+            tail -1 resultado.txt
+            grep -E "^SKIPPED" resultado.txt | sed 's/^SKIPPED //' | sort | uniq -c | head -20
+            echo '```'
+          } >> "$GITHUB_STEP_SUMMARY"

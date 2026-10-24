@@ -137,8 +137,9 @@ CAUSAS: dict[str, tuple[str, str, str, str]] = {
     "instantaneos_sqlite": (NAO_ACIONADA, "cópia do SQLite inteiro gravada pelo turno da nuvem logo DEPOIS deste "
                             "levantamento (no 1º salvamento ainda não há nenhuma)", "salvamento do turno da nuvem",
                             "robo/nuvem.py"),
-    "aprendizados_replay": (DESCONECTADA, "replay() existe, mas nenhuma rotina o chama; e ele só refaz erros REAIS "
-                            "guardados em Bases-Erros", "chamar aprendizados.replay (ainda não ligado)", "robo/aprendizados.py"),
+    "aprendizados_replay": (NAO_ACIONADA, "o replay diário (licoes.replay_diario, 1x por dia) refaz erros da esteira "
+                            "guardados em Bases-Erros; sem planilha barrada guardada, não há o que refazer",
+                            "planilha barrada na esteira + rotina licoes do dia", "robo/aprendizados.py, robo/licoes.py"),
 }
 
 # Schemas do PostgreSQL e o que os enche
