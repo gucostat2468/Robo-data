@@ -93,7 +93,7 @@ Não foi feito de uma vez de propósito: trocar a fonte de verdade num patch só
 ## Backlog ordenado (impacto × risco)
 
 1. Conferir no boletim real a cobertura de tabelas e tratar cada "sem causa registrada".
-2. Níveis na prática: o boletim real mostra só básico (163) e médio (9) — ninguém chegou ao difícil (1 demanda a cada 6 h, todos começam no básico).
+2. Níveis na prática: o boletim real mostrava só básico (163) e médio (9). **Corrigido:** a 1ª demanda começa no início do cargo, com recalibração única; conferir no boletim que difícil e profissional passam a aparecer.
 3. Persistência imediata no PostgreSQL por demanda concluída + reconciliação (passo 2 acima).
 5. IA local: medir o notebook do dono (precisa dele).
 6. Backend contínuo para tempo quase real (precisa da decisão de custo do dono).

@@ -41,6 +41,8 @@ def ferramenta_ok(monkeypatch):
         return _ok()
     monkeypatch.setattr(ferramentas, "executar", falsa)
     monkeypatch.setattr(demandas, "escolher_ferramenta", lambda cfg, p: "ronda_ti")  # sem preparar: nunca bloqueia
+    # a ferramenta falsa não entrega arquivo: fica tudo no básico (1 etapa), o nível tem testes próprios
+    monkeypatch.setattr(demandas, "INICIO_DO_CARGO", {})
     return chamadas
 
 

@@ -69,8 +69,14 @@ def teste_provas_tecnicas_da_equipe():
 # ----------------------------------------------------------------------------------------------- níveis
 def teste_nivel_sobe_desce_e_respeita_o_teto():
     c = lambda e, n, t="trabalho": {"estado": e, "nivel": n, "tipo_demanda": t}
-    assert demandas.nivel_para("gerente", [])[0] == "basico"
-    assert demandas.nivel_para("gerente", [c("concluida", "basico")] * 2)[0] == "medio"
+    assert demandas.nivel_para("gerente", [])[0] == "dificil"  # 1ª demanda no início do cargo
+    assert demandas.nivel_para("junior", [])[0] == "basico" and demandas.nivel_para("senior", [])[0] == "medio"
+    # recalibração: head com histórico todo no básico (de antes da regra) vai ao início do cargo; quem caiu por falha não
+    assert demandas.nivel_para("head", [c("concluida", "basico")])[0] == "dificil"
+    assert demandas.nivel_para("head", [c("falhou", "dificil")])[0] == "medio"
+    assert demandas.nivel_para("head", [c("concluida", "medio"), c("falhou", "dificil")])[0] == "medio"
+    assert demandas.nivel_para("gerente", [c("concluida", "basico")] * 2)[0] == "dificil"  # recalibrado
+    assert demandas.nivel_para("senior", [c("concluida", "medio")] * 2)[0] == "dificil"  # sobe com prova
     assert demandas.nivel_para("gerente", [c("concluida", "dificil")] * 2)[0] == "profissional"
     assert demandas.nivel_para("pleno", [c("concluida", "medio")] * 2)[0] == "medio"  # teto do pleno
     assert demandas.nivel_para("junior", [c("concluida", "basico")] * 5)[0] == "basico"  # teto do júnior

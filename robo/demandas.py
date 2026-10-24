@@ -98,6 +98,11 @@ NIVEIS = ("basico", "medio", "dificil", "profissional")
 TETO_DO_CARGO = {"junior": "basico", "pleno": "medio", "senior": "dificil", "especialista": "dificil",
                  "coordenador": "dificil", "gerente": "profissional", "head": "profissional", "diretor": "profissional"}
 SOBE_COM = 2  # demandas concluídas seguidas no nível atual para subir um nível
+# 1ª demanda de cada cargo: júnior e pleno começam no básico; sênior/especialista/coordenador no médio; gerente, head
+# e diretor no difícil. Daí para cima só com prova (SOBE_COM concluídas seguidas). Antes todos começavam no básico e,
+# com 1 demanda a cada 6 h, o boletim real mostrou só básico (163) e médio (9): nenhum head chegou ao difícil.
+INICIO_DO_CARGO = {"junior": "basico", "pleno": "basico", "senior": "medio", "especialista": "medio",
+                   "coordenador": "medio", "gerente": "dificil", "head": "dificil", "diretor": "dificil"}
 NIVEIS_SEM_DEMANDA = {"estagiario": "estagiário fica em modo de observação (regra do dono)"}
 # ferramentas que não entram na distribuição automática, e por quê (registrado no ciclo)
 FORA_DA_DISTRIBUICAO = {
@@ -596,8 +601,19 @@ def nivel_para(cargo: str, historico: list[dict]) -> tuple[str, str]:
     hist = [h for h in historico if h.get("tipo_demanda", "trabalho") == "trabalho" and h["estado"] in FINAIS
             and h["estado"] != "cancelada"]
     if not hist:
-        return "basico", "primeira demanda: começa no básico"
+        inicio = INICIO_DO_CARGO.get(cargo, "basico")
+        if NIVEIS.index(inicio) > NIVEIS.index(teto):
+            inicio = teto
+        return inicio, f"primeira demanda: começa no {inicio} (início do cargo {cargo}; sobe só com entregas concluídas)"
     atual = hist[0]["nivel"] if hist[0]["nivel"] in NIVEIS else "basico"
+    inicio = INICIO_DO_CARGO.get(cargo, "basico")
+    if NIVEIS.index(inicio) > NIVEIS.index(teto):
+        inicio = teto
+    # recalibração: quem NUNCA trabalhou no nível de início do cargo (histórico de antes desta regra) e não falhou na
+    # última vai para ele; quem já esteve lá e caiu por falha segue a regra normal (desce, prova, sobe)
+    if hist[0]["estado"] != "falhou" and all(NIVEIS.index(h["nivel"]) < NIVEIS.index(inicio)
+                                             for h in hist if h["nivel"] in NIVEIS):
+        return inicio, f"recalibrado para o início do cargo ({cargo}: {inicio}); o histórico era todo abaixo dele"
     i = NIVEIS.index(atual)
     if hist[0]["estado"] == "falhou":
         novo, motivo = NIVEIS[max(0, i - 1)], f"a última ({hist[0]['estado']}) não foi concluída: desce para revisar a base"
@@ -1112,7 +1128,8 @@ def provas() -> dict:
                    {"a": {"ultima": "2026-10-23T08:00:00", "ultima_concluida": "2026-10-23T08:00:00", "carga_7d": 3}},
                    agora, 48)
     return {
-        "dem_gerador": [("Primeira demanda no básico", nivel_para("senior", [])[0] == "basico"),
+        "dem_gerador": [("Primeira demanda no início do cargo (sênior no médio, júnior no básico)",
+                         nivel_para("senior", [])[0] == "medio" and nivel_para("junior", [])[0] == "basico"),
                         ("Sobe depois de 2 concluídas", nivel_para("senior", [c("concluida", "basico")] * 2)[0] == "medio"),
                         ("Nunca passa do teto do cargo", nivel_para("junior", [c("concluida", "basico")] * 2)[0] == "basico"),
                         ("Desce depois de falha", nivel_para("gerente", [c("falhou", "dificil")])[0] == "medio")],

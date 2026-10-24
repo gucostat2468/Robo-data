@@ -17,7 +17,20 @@ Tudo abaixo roda na nuvem gratuita do GitHub e no PostgreSQL gratuito (Neon). O 
 gratuito tem um limite mensal; ao chegar nele, o Neon suspende o banco até o mês seguinte (o plano grátis não
 cobra nada e os dados ficam guardados). Confira em neon.tech → seu projeto → **Usage** na primeira semana.
 
-## 2. O app (página "Empresa ao Vivo" no Claude)
+## 2. O app no Floot (instalável no iPhone)
+
+Endereço: **https://robo-de-planilhas-ao-vivo.floot.app** (pedido do dono: usar o Floot dos conectores).
+
+- Lê o mesmo boletim público (`estado/estado.json` do ramo `painel-celular`) no servidor do Floot; não fala com o
+  banco, não guarda segredo e não tem nenhum botão que altere a empresa (somente leitura).
+- Abas: Geral, Pessoas (busca e filtro por andar), Banco (tabelas com dados e a causa de cada vazia), Níveis e IA.
+- Mostra sempre o horário do boletim (Brasília) e há quantos minutos ele saiu; acima de 10 min avisa que o dado está
+  desatualizado. Consulta a cada 5 min e quando você volta para o app. Não é tempo real.
+- Instalar: abra o endereço no **Safari** do iPhone → botão Compartilhar → **Adicionar à Tela de Início**.
+- O app é público como o repositório (mostra só nomes e cargos dos funcionários virtuais e contagens). Para tirá-lo
+  do ar: floot.com → projeto "Robô de Planilhas — Empresa ao vivo" → despublicar.
+
+## 3. O app (página "Empresa ao Vivo" no Claude)
 
 1. Abra o link da página no **app do Claude** no celular (o mesmo que você usa para conversar comigo).
 2. Na primeira vez, ele pede para usar o conector do **GitHub**: toque em **Permitir**. Se o GitHub ainda não
