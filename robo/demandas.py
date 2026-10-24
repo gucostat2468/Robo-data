@@ -290,9 +290,25 @@ def _caso_para_revisar(cfg, pessoa):
             (pessoa["id"], *COMPETENCIAS_REVISAVEIS)).fetchall()
     for r in linhas:
         if r["arquivo"] and not Path(r["arquivo"]).exists():
-            continue  # arquivo já guardado no arquivo morto: revisar exigiria desarquivar
+            continue  # arquivo de outra máquina (cada turno da nuvem começa numa nova) ou guardado no arquivo morto
         caso = {**treino._carregar(r), "sha": r["conteudo_sha256"]}
         return {"caso": caso}, []
+    # nenhum caso com arquivo nesta máquina: a Sala produz um caso novo (o designer da competência cria, o revisor da
+    # Sala valida) e esta pessoa faz a revisão independente dele. Nunca revisa o que ela mesma criou.
+    from robo.treino_casos import CATALOGO as COMPETENCIAS
+    import zlib
+    ordem = sorted(COMPETENCIAS_REVISAVEIS, key=lambda x: zlib.crc32(f"{pessoa['id']}{_agora()[:13]}{x}".encode()))
+    for comp in ordem:
+        if COMPETENCIAS[comp].designer == pessoa["id"]:
+            continue
+        try:
+            novo = treino.criar_caso(cfg, comp, 3)
+        except Exception:
+            continue
+        if novo.get("estado") == "validado":
+            with treino._tb(cfg).tx() as c:
+                r = c.execute("SELECT * FROM treino_casos WHERE id=?", (novo["id"],)).fetchone()
+            return {"caso": {**treino._carregar(r), "sha": r["conteudo_sha256"]}}, []
     return "nenhum caso de treino validado de outro designer disponível para revisão agora"
 
 

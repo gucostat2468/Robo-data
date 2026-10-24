@@ -120,9 +120,11 @@ def _pessoas(c, gente: dict, hoje: str, cfg=None) -> list[dict]:
             c, "SELECT funcionario, titulo, modelo, estado, criada_em, plano FROM solicitacoes WHERE origem='demanda_sintetica' "
                "ORDER BY criada_em"):
         ultima[pid] = (titulo, modelo, estado, quando, plano)
-    evento = {}
+    evento, bloqueio = {}, {}
     for pid, ev, motivo, quando in _q(c, "SELECT funcionario, evento, motivo, data_hora FROM demandas_registro ORDER BY id"):
         evento[pid] = (ev, motivo, quando)
+        if ev in ("bloqueada", "sem_trabalho"):
+            bloqueio[pid] = motivo
     hoje_n = {pid: n for pid, n in _q(c, "SELECT funcionario, COUNT(*) FROM solicitacoes WHERE origem='demanda_sintetica' "
                                          "AND criada_em>=? GROUP BY 1", (hoje,))}
     saida = []
@@ -153,8 +155,8 @@ def _pessoas(c, gente: dict, hoje: str, cfg=None) -> list[dict]:
             item["situacao"] = f"trabalho do papel na rotina {organizacao.ROTINA_PROPRIA[pid]}"
         elif not u:
             item["situacao"] = f"sem trabalho ainda ({ev[1][:120]})" if ev else "sem trabalho ainda"
-        if ev and ev[0] in ("bloqueada", "sem_trabalho") and item["situacao"].startswith("estudo"):
-            item["situacao"] += f": {ev[1][:120]}"
+        if item["situacao"].startswith("estudo") and bloqueio.get(pid):
+            item["situacao"] = f"estudo (trabalho do papel bloqueado: {bloqueio[pid][:110]})"
         saida.append(item)
     return saida
 

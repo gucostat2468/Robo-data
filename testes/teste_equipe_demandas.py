@@ -284,3 +284,17 @@ def teste_estagiario_observa_e_registra_sem_executar(cfg_factory, ferramentas_ra
         memoria = {r[0] for r in c.execute("SELECT funcionario FROM experiencias WHERE origem='observacao'")}
     assert not (estagiarios & executaram)          # regra do dono: estagiário não executa
     assert observaram and observaram <= estagiarios and observaram == memoria  # mas observa e fica registrado
+
+
+def teste_sala_de_casos_revisa_mesmo_em_maquina_nova(cfg_factory):
+    """Na nuvem cada turno começa numa máquina nova: os casos antigos não têm arquivo aqui. A Sala produz um caso novo
+    e a pessoa revisa (antes a revisão ficava bloqueada e virava estudo)."""
+    cfg = _cfg(cfg_factory)
+    pessoa = organizacao.por_id()["casos_revisor"]
+    r = demandas._caso_para_revisar(cfg, pessoa)
+    assert not isinstance(r, str), r
+    caso = r[0]["caso"]
+    from robo.treino_casos import CATALOGO as COMP
+    assert COMP[caso["competencia"]].designer != pessoa["id"] and caso["sha"]
+    res = ferramentas.executar("revisar_caso", cfg, caso=caso)
+    assert res["ok"] and res["dados"]["aprovado"], res["texto"]
