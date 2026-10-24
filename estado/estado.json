@@ -1,11 +1,11 @@
 {
  "versao": 1,
- "gerado_em": "2026-10-24T16:01:14",
+ "gerado_em": "2026-10-24T16:08:14",
  "turno": {
   "estado": "trabalhando",
   "inicio": "2026-10-24T15:55:59",
   "fim_previsto": "2026-10-24T16:35:59",
-  "voltas": 18,
+  "voltas": 36,
   "planilhas": 1
  },
  "funcionarios": 105,
@@ -18,8 +18,8 @@
    "concluidas": 33,
    "parciais": 0,
    "falhas": 1,
-   "treino": 417,
-   "acertos": 374
+   "treino": 424,
+   "acertos": 380
   },
   {
    "andar": 2,
@@ -29,8 +29,8 @@
    "concluidas": 33,
    "parciais": 0,
    "falhas": 2,
-   "treino": 349,
-   "acertos": 322
+   "treino": 354,
+   "acertos": 327
   },
   {
    "andar": 3,
@@ -40,8 +40,8 @@
    "concluidas": 28,
    "parciais": 0,
    "falhas": 0,
-   "treino": 260,
-   "acertos": 216
+   "treino": 264,
+   "acertos": 220
   },
   {
    "andar": 4,
@@ -51,8 +51,8 @@
    "concluidas": 34,
    "parciais": 0,
    "falhas": 0,
-   "treino": 665,
-   "acertos": 602
+   "treino": 674,
+   "acertos": 610
   },
   {
    "andar": 5,
@@ -62,7 +62,7 @@
    "concluidas": 59,
    "parciais": 0,
    "falhas": 2,
-   "treino": 493,
+   "treino": 496,
    "acertos": 438
   }
  ],
@@ -214,9 +214,9 @@
   },
   {
    "rotina": "memoria_pg",
-   "execucoes_24h": 32,
+   "execucoes_24h": 33,
    "erros_24h": 0,
-   "ultima": "2026-10-24T15:52:03"
+   "ultima": "2026-10-24T16:08:11"
   },
   {
    "rotina": "modelos",
@@ -232,9 +232,9 @@
   },
   {
    "rotina": "registro",
-   "execucoes_24h": 261,
+   "execucoes_24h": 263,
    "erros_24h": 0,
-   "ultima": "2026-10-24T16:00:58"
+   "ultima": "2026-10-24T16:05:19"
   },
   {
    "rotina": "rh_desempenho",
@@ -250,30 +250,30 @@
   },
   {
    "rotina": "treino",
-   "execucoes_24h": 178,
+   "execucoes_24h": 180,
    "erros_24h": 0,
-   "ultima": "2026-10-24T16:00:43"
+   "ultima": "2026-10-24T16:05:04"
   }
  ],
  "totais": {
   "demandas": 228,
-  "tentativas_treino": 6135,
-  "conversas": 2683,
-  "trabalhos_com_prova": 1296
+  "tentativas_treino": 6163,
+  "conversas": 2696,
+  "trabalhos_com_prova": 1303
  },
  "banco": {
-  "levantamento": "2026-10-24T15:49:43",
+  "levantamento": "2026-10-24T16:06:19",
   "postgres_conferido": true,
   "erro_postgres": null,
-  "tabelas": 186,
-  "com_dados": 152,
-  "linhas": 328522,
+  "tabelas": 191,
+  "com_dados": 156,
+  "linhas": 336627,
   "resumo": {
    "sqlite": {
-    "tabelas": 74,
-    "com_dados": 57,
+    "tabelas": 79,
+    "com_dados": 61,
     "vazias": {
-     "vazia: funcionalidade não acionada": 17
+     "vazia: funcionalidade não acionada": 18
     }
    },
    "postgres.laboratorio": {
@@ -348,6 +348,12 @@
     "tabela": "mensagens",
     "situacao": "funcionalidade não acionada",
     "causa": "mensagens de uma conversa do dono"
+   },
+   {
+    "onde": "sqlite",
+    "tabela": "ml_inferencias",
+    "situacao": "funcionalidade não acionada",
+    "causa": "a sombra só pontua depois que um modelo é aprovado por outra pessoa e promovido, e só demandas criadas depois do dataset dele"
    },
    {
     "onde": "sqlite",

@@ -1,6 +1,6 @@
 # Empresa ao vivo
 
-**Boletim das 24/10 13:01** (horário de Brasília) · trabalhando
+**Boletim das 24/10 13:08** (horário de Brasília) · trabalhando
 
 > Atualiza a cada 5 minutos enquanto a empresa trabalha. Recarregue a página para ver o mais novo.
 
@@ -192,12 +192,12 @@
 
 ## Banco de dados
 
-Levantamento das 24/10 12:49: **152 de 186** tabelas com dados (328.522 linhas contadas uma a uma).
+Levantamento das 24/10 13:06: **156 de 191** tabelas com dados (336.627 linhas contadas uma a uma).
 
 
 | Onde | Tabelas | Com dados |
 |---|--:|--:|
-| sqlite | 74 | 57 |
+| sqlite | 79 | 61 |
 | postgres.laboratorio | 15 | 15 |
 | postgres.robo | 75 | 58 |
 | postgres.treino | 22 | 22 |
@@ -215,6 +215,7 @@ Vazias e por quê (nada é preenchido para parecer cheio):
 | sqlite | decisoes | funcionalidade não acionada | decisão com dono e prazo sai de reunião ou de pedido do dono |
 | sqlite | decisoes_eventos | funcionalidade não acionada | histórico de uma decisão; sem decisão, sem evento |
 | sqlite | mensagens | funcionalidade não acionada | mensagens de uma conversa do dono |
+| sqlite | ml_inferencias | funcionalidade não acionada | a sombra só pontua depois que um modelo é aprovado por outra pessoa e promovido, e só demandas criadas depois  |
 | sqlite | propostas_regra | funcionalidade não acionada | nasce de planilha REAL reprovada com correção possível ou de correção do dono no chat |
 | sqlite | regras_aprendidas | funcionalidade não acionada | só existe depois que o dono aprova uma proposta de regra |
 | sqlite | rh_cargos | funcionalidade não acionada | cargo só muda com movimento de RH validado |
