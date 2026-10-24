@@ -1,11 +1,11 @@
 {
  "versao": 1,
- "gerado_em": "2026-10-24T19:41:05",
+ "gerado_em": "2026-10-24T19:43:49",
  "turno": {
-  "estado": "entre turnos: memória salva; o próximo turno começa em poucos minutos",
-  "inicio": "2026-10-24T18:55:32",
-  "fim_previsto": "2026-10-24T19:35:32",
-  "voltas": 80,
+  "estado": "trabalhando",
+  "inicio": "2026-10-24T19:43:49",
+  "fim_previsto": "2026-10-24T20:23:49",
+  "voltas": 0,
   "planilhas": 1
  },
  "funcionarios": 105,
@@ -154,7 +154,7 @@
   "concluidos_hoje": 6
  },
  "fabrica": {
-  "lotes_hoje": 25,
+  "lotes_hoje": 26,
   "conferidos_ok_hoje": 25
  },
  "rotinas": [
@@ -166,9 +166,9 @@
   },
   {
    "rotina": "caixa_dono",
-   "execucoes_24h": 16,
+   "execucoes_24h": 17,
    "erros_24h": 0,
-   "ultima": "2026-10-24T18:55:11"
+   "ultima": "2026-10-24T19:43:32"
   },
   {
    "rotina": "demandas",
@@ -178,9 +178,9 @@
   },
   {
    "rotina": "dialogo",
-   "execucoes_24h": 16,
+   "execucoes_24h": 17,
    "erros_24h": 0,
-   "ultima": "2026-10-24T18:55:11"
+   "ultima": "2026-10-24T19:43:33"
   },
   {
    "rotina": "fabrica",
@@ -196,9 +196,9 @@
   },
   {
    "rotina": "jornada",
-   "execucoes_24h": 16,
+   "execucoes_24h": 17,
    "erros_24h": 0,
-   "ultima": "2026-10-24T18:55:11"
+   "ultima": "2026-10-24T19:43:32"
   },
   {
    "rotina": "laboratorio",
@@ -208,27 +208,27 @@
   },
   {
    "rotina": "licoes",
-   "execucoes_24h": 10,
+   "execucoes_24h": 11,
    "erros_24h": 0,
-   "ultima": "2026-10-24T18:09:54"
+   "ultima": "2026-10-24T19:43:32"
   },
   {
    "rotina": "memoria_pg",
-   "execucoes_24h": 47,
+   "execucoes_24h": 46,
    "erros_24h": 0,
-   "ultima": "2026-10-24T19:41:00"
+   "ultima": "2026-10-24T19:36:06"
   },
   {
    "rotina": "modelos",
-   "execucoes_24h": 4,
+   "execucoes_24h": 5,
    "erros_24h": 0,
-   "ultima": "2026-10-24T18:55:13"
+   "ultima": "2026-10-24T19:43:36"
   },
   {
    "rotina": "paineis",
-   "execucoes_24h": 16,
+   "execucoes_24h": 17,
    "erros_24h": 0,
-   "ultima": "2026-10-24T18:55:13"
+   "ultima": "2026-10-24T19:43:36"
   },
   {
    "rotina": "registro",
@@ -244,9 +244,9 @@
   },
   {
    "rotina": "ronda_ti",
-   "execucoes_24h": 32,
+   "execucoes_24h": 33,
    "erros_24h": 0,
-   "ultima": "2026-10-24T19:37:48"
+   "ultima": "2026-10-24T19:43:24"
   },
   {
    "rotina": "treino",
@@ -258,16 +258,16 @@
  "totais": {
   "demandas": 315,
   "tentativas_treino": 7188,
-  "conversas": 3099,
-  "trabalhos_com_prova": 1762
+  "conversas": 3113,
+  "trabalhos_com_prova": 1770
  },
  "banco": {
-  "levantamento": "2026-10-24T19:38:11",
+  "levantamento": "2026-10-24T19:33:12",
   "postgres_conferido": true,
   "erro_postgres": null,
   "tabelas": 201,
   "com_dados": 162,
-  "linhas": 421884,
+  "linhas": 420477,
   "resumo": {
    "sqlite": {
     "tabelas": 79,
@@ -1713,8 +1713,8 @@
   "finalidade": "risco_demanda",
   "rotuladas_agora": 272,
   "minimo_para_treinar": 60,
-  "datasets": 4,
-  "maior_dataset": 244,
+  "datasets": 5,
+  "maior_dataset": 272,
   "modelos": [
    {
     "id": "risco_demanda-v1",
@@ -1735,32 +1735,36 @@
     "id": "risco_demanda-v4",
     "estado": "reprovado",
     "criado_por": "ml_engenheiro"
+   },
+   {
+    "id": "risco_demanda-v5",
+    "estado": "reprovado",
+    "criado_por": "ml_engenheiro"
    }
   ],
   "referencia": null,
   "inferencias_sombra": 0,
   "uso_operacional": "desligado: o modelo só roda em sombra até o dono decidir usá-lo em alguma escolha da empresa",
   "ultima_avaliacao": {
-   "modelo": "risco_demanda-v4",
+   "modelo": "risco_demanda-v5",
    "resultado": "avaliado_reprovado",
    "quem": "ml_avaliador",
    "candidato": {
-    "n": 37,
+    "n": 41,
     "taxa_real": 0.0,
-    "log_loss": 0.091841,
-    "brier": 0.007742,
+    "log_loss": 0.037631,
+    "brier": 0.007875,
     "auc": null
    },
    "baseline": {
-    "n": 37,
+    "n": 41,
     "taxa_real": 0.0,
-    "log_loss": 0.060581,
-    "brier": 0.006443,
+    "log_loss": 0.097923,
+    "brier": 0.026769,
     "auc": null
    },
    "motivos": [
-    "o teste tem uma classe só: não dá para medir separação",
-    "não bate o baseline (log loss 0.0918 ≥ 0.0606)"
+    "o teste tem uma classe só: não dá para medir separação"
    ]
   }
  },
