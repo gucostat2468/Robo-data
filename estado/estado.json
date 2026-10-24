@@ -1,12 +1,12 @@
 {
  "versao": 1,
- "gerado_em": "2026-10-24T01:23:17",
+ "gerado_em": "2026-10-24T05:50:14",
  "turno": {
-  "estado": "entre turnos: memória salva; o próximo turno começa em poucos minutos",
-  "inicio": "2026-10-24T00:40:35",
-  "fim_previsto": "2026-10-24T01:20:35",
-  "voltas": 106,
-  "planilhas": 2
+  "estado": "trabalhando",
+  "inicio": "2026-10-24T05:50:14",
+  "fim_previsto": "2026-10-24T06:30:14",
+  "voltas": 0,
+  "planilhas": 1
  },
  "funcionarios": 101,
  "andares": [
@@ -14,8 +14,8 @@
    "andar": 1,
    "pessoas": 19,
    "trabalharam_hoje": 19,
-   "demandas": 2,
-   "concluidas": 1,
+   "demandas": 6,
+   "concluidas": 5,
    "parciais": 0,
    "falhas": 1,
    "treino": 45,
@@ -25,8 +25,8 @@
    "andar": 2,
    "pessoas": 16,
    "trabalharam_hoje": 16,
-   "demandas": 3,
-   "concluidas": 2,
+   "demandas": 7,
+   "concluidas": 6,
    "parciais": 0,
    "falhas": 1,
    "treino": 33,
@@ -36,8 +36,8 @@
    "andar": 3,
    "pessoas": 12,
    "trabalharam_hoje": 12,
-   "demandas": 2,
-   "concluidas": 2,
+   "demandas": 6,
+   "concluidas": 6,
    "parciais": 0,
    "falhas": 0,
    "treino": 26,
@@ -47,8 +47,8 @@
    "andar": 4,
    "pessoas": 31,
    "trabalharam_hoje": 31,
-   "demandas": 3,
-   "concluidas": 3,
+   "demandas": 7,
+   "concluidas": 7,
    "parciais": 0,
    "falhas": 0,
    "treino": 67,
@@ -58,8 +58,8 @@
    "andar": 5,
    "pessoas": 23,
    "trabalharam_hoje": 23,
-   "demandas": 2,
-   "concluidas": 2,
+   "demandas": 6,
+   "concluidas": 6,
    "parciais": 0,
    "falhas": 0,
    "treino": 54,
@@ -69,83 +69,83 @@
  "agora": [],
  "ultimos": [
   {
-   "quando": "2026-10-24T01:10:33",
-   "funcionario": "Carolina",
-   "cargo": "Cientista de Dados Pleno",
-   "andar": 2,
-   "trabalho": "Segmentação da base sintética",
-   "estado": "concluida"
-  },
-  {
-   "quando": "2026-10-24T01:10:29",
-   "funcionario": "Ricardo",
-   "cargo": "Gerente da Sala Excel",
+   "quando": "2026-10-24T05:49:57",
+   "funcionario": "Bárbara",
+   "cargo": "Especialista Sênior em Power BI",
    "andar": 3,
-   "trabalho": "Diagnosticar a planilha original da fábrica",
+   "trabalho": "Conferir no PostgreSQL os lotes da fábrica",
    "estado": "concluida"
   },
   {
-   "quando": "2026-10-24T01:10:25",
-   "funcionario": "Rafael",
-   "cargo": "Engenheiro de Dados Pleno",
-   "andar": 1,
-   "trabalho": "Diagnosticar a planilha original da fábrica",
-   "estado": "concluida"
-  },
-  {
-   "quando": "2026-10-24T01:10:22",
-   "funcionario": "Diego",
-   "cargo": "Desenvolvedor Python Pleno",
-   "andar": 5,
-   "trabalho": "Ronda de saúde do sistema",
-   "estado": "concluida"
-  },
-  {
-   "quando": "2026-10-24T01:10:20",
-   "funcionario": "Lucas",
-   "cargo": "Cientista de Dados Júnior",
+   "quando": "2026-10-24T05:49:57",
+   "funcionario": "Larissa",
+   "cargo": "Analista de Customer Insights Pleno",
    "andar": 2,
-   "trabalho": "Anomalias na base sintética",
+   "trabalho": "Consultar o conhecimento da área",
    "estado": "concluida"
   },
   {
-   "quando": "2026-10-24T01:10:16",
-   "funcionario": "Augusto",
-   "cargo": "Designer de Casos",
-   "andar": 4,
-   "trabalho": "Revisar um caso de treino feito por outro designer",
+   "quando": "2026-10-24T05:49:54",
+   "funcionario": "Leo",
+   "cargo": "Leitura (Extração)",
+   "andar": 1,
+   "trabalho": "Consultar o conhecimento da área",
    "estado": "concluida"
   },
   {
-   "quando": "2026-10-24T00:40:12",
-   "funcionario": "Letícia",
-   "cargo": "Desenvolvedora Júnior",
-   "andar": 5,
-   "trabalho": "Ronda de saúde do sistema",
+   "quando": "2026-10-24T05:49:54",
+   "funcionario": "Hugo",
+   "cargo": "Analista de Excel Pleno",
+   "andar": 3,
+   "trabalho": "Consultar o conhecimento da área",
    "estado": "concluida"
   },
   {
-   "quando": "2026-10-24T00:40:12",
-   "funcionario": "Bruno",
+   "quando": "2026-10-24T05:49:54",
+   "funcionario": "Igor",
    "cargo": "Analista de Dados Júnior",
-   "andar": 1,
-   "trabalho": "Consultar o conhecimento da área",
-   "estado": "falhou"
-  },
-  {
-   "quando": "2026-10-24T00:40:12",
-   "funcionario": "Pedro",
-   "cargo": "Especialista em Pesquisa de Mercado",
-   "andar": 3,
+   "andar": 2,
    "trabalho": "Consultar o conhecimento da área",
    "estado": "concluida"
   },
   {
-   "quando": "2026-10-24T00:40:12",
-   "funcionario": "Valéria",
-   "cargo": "Revisora Independente de Casos",
+   "quando": "2026-10-24T05:49:54",
+   "funcionario": "Sofia",
+   "cargo": "Especialista em pandas",
+   "andar": 5,
+   "trabalho": "Revisão da biblioteca sob sua responsabilidade",
+   "estado": "concluida"
+  },
+  {
+   "quando": "2026-10-24T05:49:54",
+   "funcionario": "Juliana",
+   "cargo": "Head de Gente e Gestão",
    "andar": 4,
+   "trabalho": "Auditoria por amostragem",
+   "estado": "concluida"
+  },
+  {
+   "quando": "2026-10-24T05:49:54",
+   "funcionario": "Lia",
+   "cargo": "Limpeza",
+   "andar": 1,
    "trabalho": "Consultar o conhecimento da área",
+   "estado": "concluida"
+  },
+  {
+   "quando": "2026-10-24T05:49:53",
+   "funcionario": "Vinícius",
+   "cargo": "Cientista de Dados Sênior",
+   "andar": 2,
+   "trabalho": "Consultar o conhecimento da área",
+   "estado": "concluida"
+  },
+  {
+   "quando": "2026-10-24T05:49:53",
+   "funcionario": "Alexandre",
+   "cargo": "Diretor de Tecnologia (CTO)",
+   "andar": 5,
+   "trabalho": "Scorecard da área",
    "estado": "concluida"
   }
  ],
@@ -154,7 +154,7 @@
   "concluidos_hoje": 0
  },
  "fabrica": {
-  "lotes_hoje": 2,
+  "lotes_hoje": 3,
   "conferidos_ok_hoje": 2
  },
  "rotinas": [
@@ -168,25 +168,25 @@
    "rotina": "caixa_dono",
    "execucoes_24h": 7,
    "erros_24h": 0,
-   "ultima": "2026-10-24T00:40:10"
+   "ultima": "2026-10-24T05:49:53"
   },
   {
    "rotina": "demandas",
-   "execucoes_24h": 8,
+   "execucoes_24h": 9,
    "erros_24h": 0,
-   "ultima": "2026-10-24T01:10:34"
+   "ultima": "2026-10-24T05:49:57"
   },
   {
    "rotina": "dialogo",
-   "execucoes_24h": 6,
+   "execucoes_24h": 7,
    "erros_24h": 0,
-   "ultima": "2026-10-24T00:40:12"
+   "ultima": "2026-10-24T05:49:58"
   },
   {
    "rotina": "fabrica",
-   "execucoes_24h": 16,
+   "execucoes_24h": 17,
    "erros_24h": 0,
-   "ultima": "2026-10-24T01:11:10"
+   "ultima": "2026-10-24T05:49:58"
   },
   {
    "rotina": "ideias",
@@ -198,11 +198,11 @@
    "rotina": "jornada",
    "execucoes_24h": 7,
    "erros_24h": 0,
-   "ultima": "2026-10-24T00:40:10"
+   "ultima": "2026-10-24T05:49:53"
   },
   {
    "rotina": "laboratorio",
-   "execucoes_24h": 18,
+   "execucoes_24h": 16,
    "erros_24h": 0,
    "ultima": "2026-10-24T01:11:30"
   },
@@ -210,23 +210,23 @@
    "rotina": "licoes",
    "execucoes_24h": 7,
    "erros_24h": 0,
-   "ultima": "2026-10-24T00:40:09"
+   "ultima": "2026-10-24T05:49:52"
   },
   {
    "rotina": "memoria_pg",
-   "execucoes_24h": 12,
+   "execucoes_24h": 10,
    "erros_24h": 0,
-   "ultima": "2026-10-24T01:23:13"
+   "ultima": "2026-10-24T01:20:14"
   },
   {
    "rotina": "paineis",
    "execucoes_24h": 7,
    "erros_24h": 0,
-   "ultima": "2026-10-24T00:40:14"
+   "ultima": "2026-10-24T05:49:59"
   },
   {
    "rotina": "registro",
-   "execucoes_24h": 105,
+   "execucoes_24h": 92,
    "erros_24h": 0,
    "ultima": "2026-10-24T01:20:21"
   },
@@ -238,21 +238,21 @@
   },
   {
    "rotina": "ronda_ti",
-   "execucoes_24h": 14,
+   "execucoes_24h": 13,
    "erros_24h": 0,
-   "ultima": "2026-10-24T01:20:21"
+   "ultima": "2026-10-24T05:49:46"
   },
   {
    "rotina": "treino",
-   "execucoes_24h": 74,
+   "execucoes_24h": 65,
    "erros_24h": 0,
    "ultima": "2026-10-24T01:17:01"
   }
  ],
  "totais": {
-  "demandas": 48,
+  "demandas": 68,
   "tentativas_treino": 4176,
-  "conversas": 1735,
-  "trabalhos_com_prova": 412
+  "conversas": 1741,
+  "trabalhos_com_prova": 442
  }
 }
