@@ -1,12 +1,12 @@
 {
  "versao": 1,
- "gerado_em": "2026-10-24T12:20:37",
+ "gerado_em": "2026-10-24T12:21:26",
  "turno": {
-  "estado": "entre turnos: memória salva; o próximo turno começa em poucos minutos",
-  "inicio": "2026-10-24T11:38:15",
-  "fim_previsto": "2026-10-24T12:18:15",
-  "voltas": 119,
-  "planilhas": 1
+  "estado": "trabalhando",
+  "inicio": "2026-10-24T12:21:26",
+  "fim_previsto": "2026-10-24T13:01:26",
+  "voltas": 0,
+  "planilhas": 0
  },
  "funcionarios": 101,
  "andares": [
@@ -166,9 +166,9 @@
   },
   {
    "rotina": "caixa_dono",
-   "execucoes_24h": 8,
+   "execucoes_24h": 9,
    "erros_24h": 0,
-   "ultima": "2026-10-24T11:38:13"
+   "ultima": "2026-10-24T12:21:24"
   },
   {
    "rotina": "demandas",
@@ -178,9 +178,9 @@
   },
   {
    "rotina": "dialogo",
-   "execucoes_24h": 8,
+   "execucoes_24h": 9,
    "erros_24h": 0,
-   "ultima": "2026-10-24T11:38:14"
+   "ultima": "2026-10-24T12:21:24"
   },
   {
    "rotina": "fabrica",
@@ -196,9 +196,9 @@
   },
   {
    "rotina": "jornada",
-   "execucoes_24h": 8,
+   "execucoes_24h": 9,
    "erros_24h": 0,
-   "ultima": "2026-10-24T11:38:13"
+   "ultima": "2026-10-24T12:21:24"
   },
   {
    "rotina": "laboratorio",
@@ -208,21 +208,21 @@
   },
   {
    "rotina": "licoes",
-   "execucoes_24h": 7,
+   "execucoes_24h": 8,
    "erros_24h": 0,
-   "ultima": "2026-10-24T10:55:24"
+   "ultima": "2026-10-24T12:21:23"
   },
   {
    "rotina": "memoria_pg",
-   "execucoes_24h": 19,
+   "execucoes_24h": 18,
    "erros_24h": 0,
-   "ultima": "2026-10-24T12:20:33"
+   "ultima": "2026-10-24T12:15:56"
   },
   {
    "rotina": "paineis",
-   "execucoes_24h": 8,
+   "execucoes_24h": 9,
    "erros_24h": 0,
-   "ultima": "2026-10-24T11:38:15"
+   "ultima": "2026-10-24T12:21:26"
   },
   {
    "rotina": "registro",
@@ -238,9 +238,9 @@
   },
   {
    "rotina": "ronda_ti",
-   "execucoes_24h": 16,
+   "execucoes_24h": 17,
    "erros_24h": 0,
-   "ultima": "2026-10-24T12:18:01"
+   "ultima": "2026-10-24T12:21:14"
   },
   {
    "rotina": "treino",
@@ -252,8 +252,8 @@
  "totais": {
   "demandas": 148,
   "tentativas_treino": 4896,
-  "conversas": 2053,
-  "trabalhos_com_prova": 764
+  "conversas": 2066,
+  "trabalhos_com_prova": 769
  },
  "pessoas": [
   {
@@ -320,7 +320,7 @@
    "ultimo": "Consultar o conhecimento da área",
    "quando": "2026-10-24T10:55:28",
    "estado": "concluida",
-   "situacao": "estudo (o trabalho do papel estava bloqueado)"
+   "situacao": "estudo (trabalho do papel bloqueado: ainda não há planilha sintética tratada (Bases-Tratadas/_treino))"
   },
   {
    "nome": "Dora",
@@ -364,7 +364,7 @@
    "ultimo": "Consultar o conhecimento da área",
    "quando": "2026-10-24T11:55:42",
    "estado": "concluida",
-   "situacao": "estudo (o trabalho do papel estava bloqueado)"
+   "situacao": "estudo (trabalho do papel bloqueado: ainda não há planilha sintética original (Bases-Originais/_treino))"
   },
   {
    "nome": "Leo",
@@ -375,7 +375,7 @@
    "ultimo": "Consultar o conhecimento da área",
    "quando": "2026-10-24T11:55:46",
    "estado": "concluida",
-   "situacao": "estudo (o trabalho do papel estava bloqueado)"
+   "situacao": "estudo (trabalho do papel bloqueado: ainda não há planilha sintética original (Bases-Originais/_treino))"
   },
   {
    "nome": "Lia",
@@ -386,7 +386,7 @@
    "ultimo": "Consultar o conhecimento da área",
    "quando": "2026-10-24T05:49:54",
    "estado": "concluida",
-   "situacao": "estudo (o trabalho do papel estava bloqueado)"
+   "situacao": "estudo (trabalho do papel bloqueado: ainda não há planilha sintética original (Bases-Originais/_treino))"
   },
   {
    "nome": "Marcelo",
@@ -397,7 +397,7 @@
    "ultimo": "Consultar o conhecimento da área",
    "quando": "2026-10-24T11:55:44",
    "estado": "concluida",
-   "situacao": "estudo (o trabalho do papel estava bloqueado)"
+   "situacao": "estudo (trabalho do papel bloqueado: ainda não há planilha sintética original (Bases-Originais/_treino))"
   },
   {
    "nome": "Otto",
@@ -408,7 +408,7 @@
    "ultimo": "Consultar o conhecimento da área",
    "quando": "2026-10-24T10:55:24",
    "estado": "concluida",
-   "situacao": "estudo (o trabalho do papel estava bloqueado)"
+   "situacao": "estudo (trabalho do papel bloqueado: ainda não há planilha sintética tratada (Bases-Tratadas/_treino))"
   },
   {
    "nome": "Rafael",
@@ -463,7 +463,7 @@
    "ultimo": "Consultar o conhecimento da área",
    "quando": "2026-10-24T10:55:24",
    "estado": "concluida",
-   "situacao": "estudo (o trabalho do papel estava bloqueado)"
+   "situacao": "estudo (trabalho do papel bloqueado: ainda não há planilha sintética original (Bases-Originais/_treino))"
   },
   {
    "nome": "Bia",
@@ -474,7 +474,7 @@
    "ultimo": "Consultar o conhecimento da área",
    "quando": "2026-10-24T10:55:24",
    "estado": "concluida",
-   "situacao": "estudo (o trabalho do papel estava bloqueado)"
+   "situacao": "estudo (trabalho do papel bloqueado: ainda não há planilha sintética tratada (Bases-Tratadas/_treino))"
   },
   {
    "nome": "Caio",
@@ -529,7 +529,7 @@
    "ultimo": "Consultar o conhecimento da área",
    "quando": "2026-10-24T10:55:25",
    "estado": "concluida",
-   "situacao": "estudo (o trabalho do papel estava bloqueado)"
+   "situacao": "estudo (trabalho do papel bloqueado: ainda não há planilha sintética tratada (Bases-Tratadas/_treino))"
   },
   {
    "nome": "Igor",
@@ -540,7 +540,7 @@
    "ultimo": "Consultar o conhecimento da área",
    "quando": "2026-10-24T11:55:44",
    "estado": "concluida",
-   "situacao": "estudo (o trabalho do papel estava bloqueado)"
+   "situacao": "estudo (trabalho do papel bloqueado: ainda não há planilha sintética tratada (Bases-Tratadas/_treino))"
   },
   {
    "nome": "Larissa",
@@ -551,7 +551,7 @@
    "ultimo": "Consultar o conhecimento da área",
    "quando": "2026-10-24T11:55:46",
    "estado": "concluida",
-   "situacao": "estudo (o trabalho do papel estava bloqueado)"
+   "situacao": "estudo (trabalho do papel bloqueado: ainda não há planilha sintética tratada (Bases-Tratadas/_treino))"
   },
   {
    "nome": "Lucas",
@@ -584,7 +584,7 @@
    "ultimo": "Consultar o conhecimento da área",
    "quando": "2026-10-24T10:55:28",
    "estado": "concluida",
-   "situacao": "estudo (o trabalho do papel estava bloqueado)"
+   "situacao": "estudo (trabalho do papel bloqueado: ainda não há planilha sintética tratada (Bases-Tratadas/_treino))"
   },
   {
    "nome": "Natália",
@@ -595,7 +595,7 @@
    "ultimo": "Consultar o conhecimento da área",
    "quando": "2026-10-24T11:55:42",
    "estado": "concluida",
-   "situacao": "estudo (o trabalho do papel estava bloqueado)"
+   "situacao": "estudo (trabalho do papel bloqueado: ainda não há planilha sintética tratada (Bases-Tratadas/_treino))"
   },
   {
    "nome": "Patrícia",
@@ -639,7 +639,7 @@
    "ultimo": "Consultar o conhecimento da área",
    "quando": "2026-10-24T11:55:41",
    "estado": "concluida",
-   "situacao": "estudo (o trabalho do papel estava bloqueado)"
+   "situacao": "estudo (trabalho do papel bloqueado: nenhuma das 0 base(s) sintética(s) recentes tem coluna de NPS ou CSAT para ser o alvo (a fábrica gera as regra)"
   },
   {
    "nome": "Bárbara",
@@ -650,7 +650,7 @@
    "ultimo": "Consultar o conhecimento da área",
    "quando": "2026-10-24T11:55:46",
    "estado": "concluida",
-   "situacao": "estudo (o trabalho do papel estava bloqueado)"
+   "situacao": "estudo (trabalho do papel bloqueado: ainda não há planilha sintética tratada (Bases-Tratadas/_treino))"
   },
   {
    "nome": "Enzo",
@@ -672,7 +672,7 @@
    "ultimo": "Consultar o conhecimento da área",
    "quando": "2026-10-24T10:55:24",
    "estado": "concluida",
-   "situacao": "estudo (o trabalho do papel estava bloqueado)"
+   "situacao": "estudo (trabalho do papel bloqueado: ainda não há planilha sintética tratada (Bases-Tratadas/_treino))"
   },
   {
    "nome": "Gabriel",
@@ -705,7 +705,7 @@
    "ultimo": "Consultar o conhecimento da área",
    "quando": "2026-10-24T11:55:44",
    "estado": "concluida",
-   "situacao": "estudo (o trabalho do papel estava bloqueado)"
+   "situacao": "estudo (trabalho do papel bloqueado: ainda não há planilha sintética tratada (Bases-Tratadas/_treino))"
   },
   {
    "nome": "Lúcia",
@@ -727,7 +727,7 @@
    "ultimo": "Consultar o conhecimento da área",
    "quando": "2026-10-24T11:55:42",
    "estado": "concluida",
-   "situacao": "estudo (o trabalho do papel estava bloqueado)"
+   "situacao": "estudo (trabalho do papel bloqueado: ainda não há planilha sintética tratada (Bases-Tratadas/_treino))"
   },
   {
    "nome": "Pedro",
@@ -738,7 +738,7 @@
    "ultimo": "Consultar o conhecimento da área",
    "quando": "2026-10-24T10:55:25",
    "estado": "concluida",
-   "situacao": "estudo (o trabalho do papel estava bloqueado)"
+   "situacao": "estudo (trabalho do papel bloqueado: ainda não há planilha sintética tratada (Bases-Tratadas/_treino))"
   },
   {
    "nome": "Ricardo",
@@ -771,7 +771,7 @@
    "ultimo": "Consultar o conhecimento da área",
    "quando": "2026-10-24T11:55:42",
    "estado": "concluida",
-   "situacao": "estudo (o trabalho do papel estava bloqueado)"
+   "situacao": "estudo (trabalho do papel bloqueado: ainda não há planilha sintética tratada (Bases-Tratadas/_treino))"
   },
   {
    "nome": "Augusto",
@@ -848,7 +848,7 @@
    "ultimo": "Consultar o conhecimento da área",
    "quando": "2026-10-24T10:55:25",
    "estado": "concluida",
-   "situacao": "estudo (o trabalho do papel estava bloqueado)"
+   "situacao": "estudo (trabalho do papel bloqueado: ainda não há planilha sintética tratada (Bases-Tratadas/_treino))"
   },
   {
    "nome": "Isadora",
@@ -1101,7 +1101,7 @@
    "ultimo": "Consultar o conhecimento da área",
    "quando": "2026-10-24T11:55:44",
    "estado": "concluida",
-   "situacao": "estudo (o trabalho do papel estava bloqueado)"
+   "situacao": "estudo (trabalho do papel bloqueado: ainda não há planilha sintética tratada (Bases-Tratadas/_treino))"
   },
   {
    "nome": "Yasmin",

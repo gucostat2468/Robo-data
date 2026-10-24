@@ -1,6 +1,6 @@
 # Empresa ao vivo
 
-**Boletim das 24/10 09:20** (horário de Brasília) · entre turnos: memória salva; o próximo turno começa em poucos minutos
+**Boletim das 24/10 09:21** (horário de Brasília) · trabalhando
 
 > Atualiza a cada 5 minutos enquanto a empresa trabalha. Recarregue a página para ver o mais novo.
 
@@ -53,58 +53,58 @@
 | Beto | Banco de dados (ELT) | trabalho do papel | Conferir no PostgreSQL os lotes da fábrica (✅ concluída) | 1 |
 | Bruno | Analista de Dados Júnior | trabalho do papel | Diagnosticar a planilha original da fábrica (✅ concluída) | 2 |
 | Camila | Analista de Dados Júnior | trabalho do papel | Verificar dados pessoais (LGPD) na base sintética (✅ concluída) | 1 |
-| Carla | Coordenadora de Engenharia de Dados | estudo (o trabalho do papel estava bloqueado) | Consultar o conhecimento da área (✅ concluída) | 1 |
+| Carla | Coordenadora de Engenharia de Dados | estudo (trabalho do papel bloqueado: ainda não há planilha sintética tratada (Bases-Tratad | Consultar o conhecimento da área (✅ concluída) | 1 |
 | Dora | DBA PostgreSQL | trabalho do papel | Conferir no PostgreSQL os lotes da fábrica (✅ concluída) | 1 |
 | Duda | Publicação e arquivo | trabalho do papel | Verificar dados pessoais (LGPD) na base sintética (✅ concluída) | 1 |
 | Eduardo | Head de Engenharia de Dados | trabalho do papel | Diagnosticar a planilha original da fábrica (✅ concluída) | 1 |
-| Júlia | Engenheira de Dados Pleno | estudo (o trabalho do papel estava bloqueado) | Consultar o conhecimento da área (✅ concluída) | 2 |
-| Leo | Leitura (Extração) | estudo (o trabalho do papel estava bloqueado) | Consultar o conhecimento da área (✅ concluída) | 2 |
-| Lia | Limpeza | estudo (o trabalho do papel estava bloqueado) | Consultar o conhecimento da área (✅ concluída) | 1 |
-| Marcelo | Gerente de Engenharia de Dados | estudo (o trabalho do papel estava bloqueado) | Consultar o conhecimento da área (✅ concluída) | 2 |
-| Otto | Auditoria (Validação) | estudo (o trabalho do papel estava bloqueado) | Consultar o conhecimento da área (✅ concluída) | 1 |
+| Júlia | Engenheira de Dados Pleno | estudo (trabalho do papel bloqueado: ainda não há planilha sintética original (Bases-Origi | Consultar o conhecimento da área (✅ concluída) | 2 |
+| Leo | Leitura (Extração) | estudo (trabalho do papel bloqueado: ainda não há planilha sintética original (Bases-Origi | Consultar o conhecimento da área (✅ concluída) | 2 |
+| Lia | Limpeza | estudo (trabalho do papel bloqueado: ainda não há planilha sintética original (Bases-Origi | Consultar o conhecimento da área (✅ concluída) | 1 |
+| Marcelo | Gerente de Engenharia de Dados | estudo (trabalho do papel bloqueado: ainda não há planilha sintética original (Bases-Origi | Consultar o conhecimento da área (✅ concluída) | 2 |
+| Otto | Auditoria (Validação) | estudo (trabalho do papel bloqueado: ainda não há planilha sintética tratada (Bases-Tratad | Consultar o conhecimento da área (✅ concluída) | 1 |
 | Rafael | Engenheiro de Dados Pleno | trabalho do papel | Conferir no PostgreSQL os lotes da fábrica (✅ concluída) | 2 |
 | Rita | Recepção | trabalho do papel | Diagnosticar a planilha original da fábrica (✅ concluída) | 1 |
 | Saulo | Supervisor de Planilhas | trabalho do papel | Calcular a média de uma métrica da base sintética (✅ concluída) | 1 |
 | Théo | Estagiário de Engenharia de Dados | estagiário: observa (regra do dono) — Observei Letícia (Desenvolvedora Júnior) fazendo "SL |   | 0 |
-| Tina | Contatos e NPS | estudo (o trabalho do papel estava bloqueado) | Consultar o conhecimento da área (✅ concluída) | 1 |
+| Tina | Contatos e NPS | estudo (trabalho do papel bloqueado: ainda não há planilha sintética original (Bases-Origi | Consultar o conhecimento da área (✅ concluída) | 1 |
 
 ### 2º andar
 
 | Quem | Cargo | Situação | Último trabalho | Hoje |
 |---|---|---|---|--:|
-| Bia | Perfil dos dados | estudo (o trabalho do papel estava bloqueado) | Consultar o conhecimento da área (✅ concluída) | 1 |
+| Bia | Perfil dos dados | estudo (trabalho do papel bloqueado: ainda não há planilha sintética tratada (Bases-Tratad | Consultar o conhecimento da área (✅ concluída) | 1 |
 | Caio | Indicadores (NPS, CSAT, CES) | trabalho do papel | Perfil e indicadores da base sintética (✅ concluída) | 1 |
 | Carolina | Cientista de Dados Pleno | trabalho do papel | Calcular a média de uma métrica da base sintética (✅ concluída) | 2 |
 | Davi | Estatística | trabalho do papel | Calcular a média de uma métrica da base sintética (✅ concluída) | 1 |
 | Eva | Monitoramento | trabalho do papel | Diagnosticar a planilha original da fábrica (✅ concluída) | 1 |
-| Fábio | Relator | estudo (o trabalho do papel estava bloqueado) | Consultar o conhecimento da área (✅ concluída) | 2 |
-| Igor | Analista de Dados Júnior | estudo (o trabalho do papel estava bloqueado) | Consultar o conhecimento da área (✅ concluída) | 2 |
-| Larissa | Analista de Customer Insights Pleno | estudo (o trabalho do papel estava bloqueado) | Consultar o conhecimento da área (✅ concluída) | 2 |
+| Fábio | Relator | estudo (trabalho do papel bloqueado: ainda não há planilha sintética tratada (Bases-Tratad | Consultar o conhecimento da área (✅ concluída) | 2 |
+| Igor | Analista de Dados Júnior | estudo (trabalho do papel bloqueado: ainda não há planilha sintética tratada (Bases-Tratad | Consultar o conhecimento da área (✅ concluída) | 2 |
+| Larissa | Analista de Customer Insights Pleno | estudo (trabalho do papel bloqueado: ainda não há planilha sintética tratada (Bases-Tratad | Consultar o conhecimento da área (✅ concluída) | 2 |
 | Lucas | Cientista de Dados Júnior | trabalho do papel | Diagnosticar a planilha original da fábrica (✅ concluída) | 2 |
 | Manu | Estagiária de Análise de Dados | estagiário: observa (regra do dono) — Observei Igor (Analista de Dados Júnior) fazendo "Co |   | 0 |
-| Marcos | Coordenador de Análise e Ciência de Dado | estudo (o trabalho do papel estava bloqueado) | Consultar o conhecimento da área (✅ concluída) | 1 |
-| Natália | Head de Ciência de Dados | estudo (o trabalho do papel estava bloqueado) | Consultar o conhecimento da área (✅ concluída) | 2 |
+| Marcos | Coordenador de Análise e Ciência de Dado | estudo (trabalho do papel bloqueado: ainda não há planilha sintética tratada (Bases-Tratad | Consultar o conhecimento da área (✅ concluída) | 1 |
+| Natália | Head de Ciência de Dados | estudo (trabalho do papel bloqueado: ainda não há planilha sintética tratada (Bases-Tratad | Consultar o conhecimento da área (✅ concluída) | 2 |
 | Patrícia | Gerente de Analytics e Customer Insights | trabalho do papel | Perfil e indicadores da base sintética (✅ concluída) | 1 |
 | Rogério | Diretor de Analytics, Ciência de Dados e | trabalho do papel | Situação do andar agora (✅ concluída) | 1 |
 | Sérgio | Analista de Dados Pleno | trabalho do papel | Calcular a média de uma métrica da base sintética (✅ concluída) | 1 |
-| Vinícius | Cientista de Dados Sênior | estudo (o trabalho do papel estava bloqueado) | Consultar o conhecimento da área (✅ concluída) | 2 |
+| Vinícius | Cientista de Dados Sênior | estudo (trabalho do papel bloqueado: nenhuma das 0 base(s) sintética(s) recentes tem colun | Consultar o conhecimento da área (✅ concluída) | 2 |
 
 ### 3º andar
 
 | Quem | Cargo | Situação | Último trabalho | Hoje |
 |---|---|---|---|--:|
-| Bárbara | Especialista Sênior em Power BI | estudo (o trabalho do papel estava bloqueado) | Consultar o conhecimento da área (✅ concluída) | 2 |
+| Bárbara | Especialista Sênior em Power BI | estudo (trabalho do papel bloqueado: ainda não há planilha sintética tratada (Bases-Tratad | Consultar o conhecimento da área (✅ concluída) | 2 |
 | Enzo | Estagiário da Sala Excel | estagiário: observa (regra do dono) — Observei Letícia (Desenvolvedora Júnior) fazendo "SL |   | 0 |
-| Felipe | Head de BI e Excel | estudo (o trabalho do papel estava bloqueado) | Consultar o conhecimento da área (✅ concluída) | 1 |
+| Felipe | Head de BI e Excel | estudo (trabalho do papel bloqueado: ainda não há planilha sintética tratada (Bases-Tratad | Consultar o conhecimento da área (✅ concluída) | 1 |
 | Gabriel | Especialista em Tabelas Dinâmicas e Dash | trabalho do papel | Calcular a média de uma métrica da base sintética (✅ concluída) | 1 |
 | Heitor | Analista Pleno de BI | trabalho do papel | Conferir no PostgreSQL os lotes da fábrica (✅ concluída) | 1 |
-| Hugo | Analista de Excel Pleno | estudo (o trabalho do papel estava bloqueado) | Consultar o conhecimento da área (✅ concluída) | 2 |
+| Hugo | Analista de Excel Pleno | estudo (trabalho do papel bloqueado: ainda não há planilha sintética tratada (Bases-Tratad | Consultar o conhecimento da área (✅ concluída) | 2 |
 | Lúcia | Especialista em Fórmulas e Power Query | trabalho do papel | Calcular a média de uma métrica da base sintética (✅ concluída) | 1 |
-| Paula | Analista de Excel Júnior | estudo (o trabalho do papel estava bloqueado) | Consultar o conhecimento da área (✅ concluída) | 2 |
-| Pedro | Especialista em Pesquisa de Mercado | estudo (o trabalho do papel estava bloqueado) | Consultar o conhecimento da área (✅ concluída) | 2 |
+| Paula | Analista de Excel Júnior | estudo (trabalho do papel bloqueado: ainda não há planilha sintética tratada (Bases-Tratad | Consultar o conhecimento da área (✅ concluída) | 2 |
+| Pedro | Especialista em Pesquisa de Mercado | estudo (trabalho do papel bloqueado: ainda não há planilha sintética tratada (Bases-Tratad | Consultar o conhecimento da área (✅ concluída) | 2 |
 | Ricardo | Gerente da Sala Excel | trabalho do papel | Situação do andar agora (✅ concluída) | 2 |
 | Sílvia | Coordenadora da Sala Excel | trabalho do papel | Calcular a média de uma métrica da base sintética (✅ concluída) | 1 |
-| Tânia | Especialista em Trade Marketing | estudo (o trabalho do papel estava bloqueado) | Consultar o conhecimento da área (✅ concluída) | 2 |
+| Tânia | Especialista em Trade Marketing | estudo (trabalho do papel bloqueado: ainda não há planilha sintética tratada (Bases-Tratad | Consultar o conhecimento da área (✅ concluída) | 2 |
 
 ### 4º andar
 
@@ -116,7 +116,7 @@
 | Celina | Especialista Sênior em Dados de Treino | trabalho do papel na rotina fabrica |   | 0 |
 | Cláudia | Diretora de Operações e Governança | trabalho do papel | Scorecard da área (✅ concluída) | 1 |
 | Helena | RH e desenvolvimento da equipe | trabalho do papel | Situação do andar agora (✅ concluída) | 1 |
-| Iara | Ideias e evolução da plataforma | estudo (o trabalho do papel estava bloqueado) | Consultar o conhecimento da área (✅ concluída) | 1 |
+| Iara | Ideias e evolução da plataforma | estudo (trabalho do papel bloqueado: ainda não há planilha sintética tratada (Bases-Tratad | Consultar o conhecimento da área (✅ concluída) | 1 |
 | Isadora | Analista Pleno de Distribuição de Demand | trabalho do papel na rotina demandas |   | 0 |
 | Joana | Analista Júnior de Dados Sintéticos | trabalho do papel na rotina fabrica |   | 0 |
 | Juliana | Head de Gente e Gestão | trabalho do papel | Auditoria por amostragem (✅ concluída) | 1 |
@@ -139,7 +139,7 @@
 | Tiago | Analista de People Analytics Pleno | trabalho do papel | Indicadores de pessoas (✅ concluída) | 1 |
 | Valéria | Revisora Independente de Casos | trabalho do papel | Revisar um caso de treino feito por outro designer (✅ concluída) | 2 |
 | Vicente | Analista Sênior de Geração de Demandas | trabalho do papel na rotina demandas |   | 0 |
-| Vitor | Analista de Governança Pleno | estudo (o trabalho do papel estava bloqueado) | Consultar o conhecimento da área (✅ concluída) | 2 |
+| Vitor | Analista de Governança Pleno | estudo (trabalho do papel bloqueado: ainda não há planilha sintética tratada (Bases-Tratad | Consultar o conhecimento da área (✅ concluída) | 2 |
 | Yasmin | Planejadora de Treino | trabalho do papel | Revisar um caso de treino feito por outro designer (✅ concluída) | 2 |
 
 ### 5º andar
