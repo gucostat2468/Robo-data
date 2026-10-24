@@ -1,6 +1,6 @@
 # Empresa ao vivo
 
-**Boletim das 24/10 12:18** (horário de Brasília) · trabalhando
+**Boletim das 24/10 12:26** (horário de Brasília) · trabalhando
 
 > Atualiza a cada 5 minutos enquanto a empresa trabalha. Recarregue a página para ver o mais novo.
 
@@ -180,7 +180,7 @@
 
 ## Banco de dados
 
-Levantamento das 24/10 12:04: **152 de 186** tabelas com dados (309.997 linhas contadas uma a uma).
+Levantamento das 24/10 12:23: **152 de 186** tabelas com dados (320.823 linhas contadas uma a uma).
 
 
 | Onde | Tabelas | Com dados |
@@ -194,7 +194,7 @@ Vazias e por quê (nada é preenchido para parecer cheio):
 
 | Onde | Tabela | Situação | Causa |
 |---|---|---|---|
-| sqlite | aprendizados_replay | implementada, mas nada a chama | replay() existe, mas nenhuma rotina o chama; e ele só refaz erros REAIS guardados em Bases-Erros |
+| sqlite | aprendizados_replay | funcionalidade não acionada | o replay diário (licoes.replay_diario, 1x por dia) refaz erros da esteira guardados em Bases-Erros; sem planil |
 | sqlite | aprovacoes | funcionalidade não acionada | só etapa que ALTERA dados pede aprovação do dono; as demandas automáticas nunca alteram dados (publicar planil |
 | sqlite | arquivos | funcionalidade não acionada | anexo enviado numa conversa |
 | sqlite | boas_praticas | funcionalidade não acionada | PDCA: um erro corrigido que não volta por um período vira boa prática |
@@ -211,7 +211,7 @@ Vazias e por quê (nada é preenchido para parecer cheio):
 | sqlite | telegram_mensagens | funcionalidade não acionada | o grupo do Telegram ainda não foi ligado (precisa do token do @BotFather, que só o dono cria) |
 | sqlite | telegram_vinculos | funcionalidade não acionada | ninguém mandou /vincular com o código certo no grupo ainda (precisa dos segredos ROBO_TELEGRAM_TOKEN e ROBO_TE |
 | sqlite | voz_falas | funcionalidade não acionada | cada fala composta pela voz de um funcionário (canal, conversas) |
-| postgres.robo | memoria_aprendizados_replay | implementada, mas nada a chama | espelho de aprendizados_replay (vazia no SQLite também): replay() existe, mas nenhuma rotina o chama; e ele só |
+| postgres.robo | memoria_aprendizados_replay | funcionalidade não acionada | espelho de aprendizados_replay (vazia no SQLite também): o replay diário (licoes.replay_diario, 1x por dia) re |
 | postgres.robo | memoria_aprovacoes | funcionalidade não acionada | espelho de aprovacoes (vazia no SQLite também): só etapa que ALTERA dados pede aprovação do dono; as demandas  |
 | postgres.robo | memoria_arquivos | funcionalidade não acionada | espelho de arquivos (vazia no SQLite também): anexo enviado numa conversa |
 | postgres.robo | memoria_boas_praticas | funcionalidade não acionada | espelho de boas_praticas (vazia no SQLite também): PDCA: um erro corrigido que não volta por um período vira b |
