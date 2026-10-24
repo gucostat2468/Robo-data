@@ -91,7 +91,7 @@ def teste_quem_nunca_recebeu_vem_primeiro_e_ninguem_recebe_duas(cfg_factory, fer
     cob = demandas.cobertura(cfg)
     assert all(not a["sem_demanda"] for a in cob["andares"].values())
     assert demandas.rotina(cfg)["atribuidas"] == 0
-    assert any("menos de 24" in x["motivo"] for x in _ultimo_ciclo(cfg)["puladas"])
+    assert any("menos de 6 h" in x["motivo"] for x in _ultimo_ciclo(cfg)["puladas"])  # ritmo: a cada 6 h
 
 
 def teste_demanda_aberta_bloqueia_outra(cfg_factory, monkeypatch):

@@ -37,9 +37,11 @@ from typing import Callable
 from robo.trabalho import FINAIS, Trabalho, _agora
 
 ORIGEM = "demanda_sintetica"
-PADRAO = {"habilitada": True, "intervalo_minutos": 30, "por_ciclo": 6, "por_dia": 150, "por_pessoa_horas": 24,
+# Ritmo (pedido do dono: "todos trabalhando muito"): cada pessoa recebe trabalho do papel a cada 6 h (antes 24 h),
+# o 5º andar a cada 3 h e a equipe de AWS a cada hora. 20 por ciclo de 30 min = até 960 por dia de turno contínuo.
+PADRAO = {"habilitada": True, "intervalo_minutos": 30, "por_ciclo": 20, "por_dia": 600, "por_pessoa_horas": 6,
           # o 5º andar (TI, nuvem, segurança) recebe trabalho com mais frequência; a equipe de AWS mais que todos
-          "horas_por_andar": {"5": 6}, "horas_por_pessoa": {"head_aws": 2, "aws_senior": 2, "cloud_aws": 2},
+          "horas_por_andar": {"5": 3}, "horas_por_pessoa": {"head_aws": 1, "aws_senior": 1, "cloud_aws": 1},
           "horas_sem_atividade": 48, "horas_abandono": 6, "avaliacoes_por_ciclo": 3}
 
 # =============================================================================== a equipe de demandas (4º andar)

@@ -247,14 +247,14 @@ def teste_equipes_com_rotina_propria_nao_recebem_trabalho_de_outra_area(cfg_fact
 
 
 def teste_quinto_andar_e_aws_trabalham_mais_vezes(cfg_factory):
-    c = {**demandas.PADRAO, "por_pessoa_horas": 24}
+    c = dict(demandas.PADRAO)
     gente = organizacao.por_id()
-    assert demandas.intervalo_da_pessoa(c, gente["aws_senior"]) == 2
-    assert demandas.intervalo_da_pessoa(c, gente["head_aws"]) == 2
+    assert demandas.intervalo_da_pessoa(c, gente["aws_senior"]) == 1   # AWS: a cada hora
+    assert demandas.intervalo_da_pessoa(c, gente["head_aws"]) == 1
     quinto = next(p for p in gente.values() if p["andar"] == 5 and p["id"] not in c["horas_por_pessoa"])
-    assert demandas.intervalo_da_pessoa(c, quinto) == 6
+    assert demandas.intervalo_da_pessoa(c, quinto) == 3                # 5º andar: a cada 3 h
     outro = next(p for p in gente.values() if p["andar"] == 2)
-    assert demandas.intervalo_da_pessoa(c, outro) == 24
+    assert demandas.intervalo_da_pessoa(c, outro) == 6                 # todos: a cada 6 h (antes 24 h)
     # só aperta: um intervalo geral menor vale para todos
     assert demandas.intervalo_da_pessoa({**c, "por_pessoa_horas": 1}, gente["aws_senior"]) == 1
 
