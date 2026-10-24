@@ -115,6 +115,32 @@ EQUIPE = [
     _p("cd_junior_anomalias", "Lucas", "Cientista de Dados Júnior — Anomalias", "junior", 2, "Qualidade de Dados", "cd_senior_drivers",
        "#A855F7", ["Aponta valores fora do padrão com a linha de origem"], ["Achado com linha e faixa normal"],
        ["Regra de Tukey (3×IQR)"], ["Não exclui dado: só aponta"], ["anomalias"]),
+    # ------------------------------------------------------------------ engenharia de IA e ML (inteligência própria)
+    # Lacuna achada na auditoria: havia ciência de dados (estatística), mas ninguém treinava, versionava, avaliava e
+    # operava MODELOS próprios. Quatro papéis com ferramenta real (robo/modelos_ml.py); quem treina não avalia nem promove.
+    _p("ml_lider", "Rebeca", "Líder de Engenharia de IA e Machine Learning", "gerente", 2, "Estatística", "dir_analytics",
+       "#0E7490", ["Define que problema merece ML, o backlog de modelos e os critérios de promoção",
+                   "Garante que modelo novo só entra se bater o baseline e a referência, medido por outra pessoa",
+                   "Mantém o uso operacional desligado até o dono decidir"],
+       ["Backlog com estado real de cada caso", "Nenhuma promoção sem avaliação independente"],
+       ["Validação temporal e baseline antes de qualquer modelo (prática de ML aplicado)"],
+       ["Não treina nem aprova modelo", "Não liga modelo em decisão da empresa sem o dono"], ["ml_portfolio"]),
+    _p("ml_engenheiro", "Leandro", "Engenheiro de Machine Learning Sênior", "senior", 2, "Estatística", "ml_lider", "#0891B2",
+       ["Monta o dataset versionado (sem vazamento, corte temporal), treina baseline e candidato e registra o experimento"],
+       ["Experimento reprodutível com dataset, parâmetros, métricas e checksum"],
+       ["Regressão logística com L2; escolha do ajuste na validação; teste intocado até o fim"],
+       ["Não avalia nem promove o próprio modelo", "Não usa rótulo sem critério de aceitação"], ["ml_treinar"]),
+    _p("ml_avaliador", "Fabiana", "Engenheira de Avaliação e Segurança de IA", "especialista", 4, "Governança e Privacidade",
+       "head_governanca", "#B45309",
+       ["Refaz as métricas a partir do arquivo do modelo e do dataset, por outro caminho, e decide aprovar ou reprovar",
+        "Reprova modelo que não bate o baseline, não é reprodutível ou não confere"],
+       ["Toda decisão com motivo e métricas registradas"], ["Avaliação independente com 2º método de cálculo"],
+       ["Não avalia modelo que ela treinou", "Não promove"], ["ml_avaliar"]),
+    _p("ml_mlops", "Jonas", "Engenheiro de MLOps e Plataforma de Modelos", "senior", 5, "Engenharia de Dados", "head_python",
+       "#155E75", ["Confere a integridade de cada artefato, promove só o que outra pessoa aprovou, roda a sombra, "
+                   "monitora a degradação e faz rollback"],
+       ["Artefatos íntegros", "Degradação vira handover"], ["Registro de modelos por eventos (nada se apaga)"],
+       ["Não promove o que não foi aprovado", "Não altera o modelo em produção sozinho"], ["ml_registro"]),
     # ------------------------------------------------------------------ sala de RH (4º andar)
     _p("rh_rs", "Priscila", "Analista de Recrutamento e Seleção Pleno", "pleno", 4, "Pessoas e Cultura", "canal_helena", "#DB2777",
        ["Acompanha contratações automáticas e manuais, experiência de 3 meses e efetivações"],
@@ -410,4 +436,6 @@ def provas() -> dict:
                       ("Sem ninguém no quadro não divide por zero", pct(0, 0) == 0),
                       ("Classificação usada é a da política", situacao(2, 3) == "insuficiente")]
     r["head_rh"] = r.get("head_rh", []) + [("Conhece a regra de desempenho", situacao(1, 5) == "insuficiente")]
+    from robo import modelos_ml
+    r.update(modelos_ml.provas())
     return r

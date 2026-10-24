@@ -706,6 +706,11 @@ def f_publicar_planilha(cfg, arquivo: str | None = None, **_) -> dict:
                      [destino], evidencia=str(destino))
 
 
+def _ml(nome: str):
+    from robo import modelos_ml
+    return getattr(modelos_ml, nome)
+
+
 REGISTRO: dict[str, Ferramenta] = {f.id: f for f in [
     Ferramenta("conhecimento", "Consultar conhecimento", "Busca nos manuais .md e na base de conhecimento", "baixo", False, f_conhecimento, ["pergunta"]),
     Ferramenta("historico", "Ler histórico", "Últimas execuções do robô", "baixo", False, f_historico),
@@ -752,6 +757,14 @@ REGISTRO: dict[str, Ferramenta] = {f.id: f for f in [
     Ferramenta("laboratorio", "Laboratório", "O que a equipe treinou e errou no laboratório", "baixo", False, f_laboratorio),
     Ferramenta("raio_x", "Raio-X da empresa", "Como a empresa está agora, com números de todos os registros", "baixo", False, f_raio_x),
     Ferramenta("organizacao", "Organização", "Quem faz o quê, por andar e nível", "baixo", False, f_organizacao),
+    Ferramenta("ml_portfolio", "Programa de modelos", "Backlog de ML com o estado real de cada caso e os critérios",
+               "baixo", False, lambda cfg, **k: _ml("f_ml_portfolio")(cfg, **k)),
+    Ferramenta("ml_treinar", "Treinar modelo", "Dataset versionado, baseline e candidato medidos no teste temporal",
+               "baixo", False, lambda cfg, **k: _ml("f_ml_treinar")(cfg, **k)),
+    Ferramenta("ml_avaliar", "Avaliar modelo", "Avaliação independente do candidato (refaz métricas, confere checksum)",
+               "baixo", False, lambda cfg, **k: _ml("f_ml_avaliar")(cfg, **k)),
+    Ferramenta("ml_registro", "Registro de modelos", "Integridade, promoção do aprovado, sombra e monitoramento",
+               "baixo", False, lambda cfg, **k: _ml("f_ml_registro")(cfg, **k)),
     Ferramenta("resumo_executivo", "Resumo executivo", "Arquivo .md com os resultados das etapas", "medio", False, f_resumo_executivo),
     Ferramenta("publicar_planilha", "Publicar planilha", "Envia a planilha para o pipeline de produção", "alto", True,
                f_publicar_planilha, ["arquivo"]),

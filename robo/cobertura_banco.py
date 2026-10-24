@@ -137,6 +137,18 @@ CAUSAS: dict[str, tuple[str, str, str, str]] = {
     "instantaneos_sqlite": (NAO_ACIONADA, "cópia do SQLite inteiro gravada pelo turno da nuvem logo DEPOIS deste "
                             "levantamento (no 1º salvamento ainda não há nenhuma)", "salvamento do turno da nuvem",
                             "robo/nuvem.py"),
+    # inteligência própria (robo/modelos_ml.py)
+    "ml_datasets": (NAO_ACIONADA, "o 1º dataset nasce quando há demandas fechadas suficientes (critério do líder)",
+                    "rotina modelos ou demanda ml_treinar", "robo/modelos_ml.py"),
+    "ml_experimentos": (NAO_ACIONADA, "experimento só existe depois de um treino com dados suficientes",
+                        "rotina modelos ou demanda ml_treinar", "robo/modelos_ml.py"),
+    "ml_modelos": (NAO_ACIONADA, "modelo candidato nasce de um experimento", "treino do engenheiro de ML",
+                   "robo/modelos_ml.py"),
+    "ml_modelos_eventos": (NAO_ACIONADA, "eventos (candidato, avaliação, promoção) começam com o 1º modelo",
+                           "treino + avaliação independente", "robo/modelos_ml.py"),
+    "ml_inferencias": (NAO_ACIONADA, "a sombra só pontua depois que um modelo é aprovado por outra pessoa e promovido, e "
+                       "só demandas criadas depois do dataset dele", "modelo de referência + demanda nova",
+                       "robo/modelos_ml.py"),
     "aprendizados_replay": (NAO_ACIONADA, "o replay diário (licoes.replay_diario, 1x por dia) refaz erros da esteira "
                             "guardados em Bases-Erros; sem planilha barrada guardada, não há o que refazer",
                             "planilha barrada na esteira + rotina licoes do dia", "robo/aprendizados.py, robo/licoes.py"),

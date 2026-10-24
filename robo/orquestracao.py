@@ -35,7 +35,7 @@ FLUXOS = {
                                   "reunião semanal…)", "cron": "0 * * * *", "a_cada_min": 60, "limite_min": 120,
                      "rotinas": ["estrategia", "backup", "pdca", "licoes", "estudo", "auditoria", "reuniao",
                                  "rh_desempenho", "alcadas", "ideias", "paineis", "caixa_dono",
-                                 "jornada"]},
+                                 "jornada", "modelos"]},
     "robo_memoria": {"descricao": "Cópia incremental de toda a memória para o PostgreSQL", "cron": "*/10 * * * *",
                      "a_cada_min": 10, "limite_min": 15, "rotinas": ["memoria_pg"]},
     "robo_treino": {"descricao": "Treino contínuo de todos os funcionários", "cron": "*/5 * * * *", "a_cada_min": 5,

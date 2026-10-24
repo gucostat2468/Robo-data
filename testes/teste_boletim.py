@@ -126,3 +126,14 @@ def teste_boletim_mede_acerto_por_nivel(cfg_factory):
     assert list(n) == ["basico", "medio", "dificil"]
     assert n["basico"]["demandas"] == 2 and n["dificil"]["falhas"] == 1 and n["dificil"]["concluidas"] == 1
     assert "| dificil | 2 | 1 | 0 | 1 | 50% |" in boletim.markdown(boletim.montar(cfg))
+
+
+def teste_boletim_mostra_a_inteligencia_propria_sem_inventar(cfg_factory):
+    cfg = cfg_factory()
+    cfg.criar_pastas()
+    from robo.trabalho import Trabalho
+    Trabalho(cfg)
+    b = boletim.montar(cfg)
+    assert b["modelos"]["modelos"] == [] and b["modelos"]["referencia"] is None
+    md = boletim.markdown(b)
+    assert "## Inteligência própria" in md and "Ainda sem modelo" in md and "dono" in md

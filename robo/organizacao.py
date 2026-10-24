@@ -114,6 +114,7 @@ ENCAMINHAR = {
     "publicar_planilha": "recepcao", "consulta_sql": "dba", "dados_pessoais": "gov_pleno_lgpd",
     "ronda_ti": "coord_devops", "orquestracao": "airflow_pleno", "organizacao": "canal_helena", "reuniao_andar": "ger_operacoes", "ideias": "canal_iara", "paineis": "bi_powerbi", "fabrica": "fab_coordenador", "demandas": "dem_coordenador",
     "scorecard": "dir_operacoes", "auditoria": "head_engenharia", "drivers": "cd_senior_drivers",
+    "ml_portfolio": "ml_lider", "ml_treinar": "ml_engenheiro", "ml_avaliar": "ml_avaliador", "ml_registro": "ml_mlops",
     "segmentacao": "cd_pleno_segmentos", "anomalias": "cd_junior_anomalias", "recrutamento": "rh_rs",
     "desenvolvimento": "rh_td", "desempenho": "rh_desempenho", "people_analytics": "rh_people", "raio_x": "dir_operacoes",
     "revisao_biblioteca": "head_python", "estrategia_python": "head_python", "laboratorio": "head_engenharia",

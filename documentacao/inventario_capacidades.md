@@ -63,6 +63,8 @@ Python 3.13.16. 702 testes coletados antes deste ciclo; a suíte completa passou
 |---|---|---|---|
 | Ollama / provedores opcionais | Integrada, desligada por padrão | `robo/ia.py`: timeout, 1 nova tentativa, disjuntor (3 falhas = 10 min) | **Bloqueada**: o Ollama precisa ser instalado no notebook do dono; medir RAM antes de escolher o modelo |
 | Fila compartilhada e limite de concorrência | Ausente | chamadas diretas | criar só quando a IA for ligada (hoje ninguém a usa na nuvem) |
+| Equipe de AI Engineering (ML, MLOps, avaliação) | **Criada neste ciclo** | auditoria: não existia cargo de ML/MLOps nem biblioteca de treino; agora Rebeca, Leandro, Fabiana e Jonas (`lideranca.py`) com ferramenta, demanda e prova técnica | `teste_ferramentas_da_equipe_rodam_com_contrato` |
+| Modelo próprio treinado, avaliado e versionado | **Criado neste ciclo (sombra)** | `robo/modelos_ml.py`: dataset versionado por checksum, corte temporal, baseline, regressão logística (numpy), avaliação independente por outro caminho, promoção por eventos, rollback, sombra e monitoramento | `testes/teste_modelos_ml.py`; uso operacional desligado até o dono decidir |
 
 ## 5. Celular
 
@@ -91,7 +93,7 @@ Não foi feito de uma vez de propósito: trocar a fonte de verdade num patch só
 ## Backlog ordenado (impacto × risco)
 
 1. Conferir no boletim real a cobertura de tabelas e tratar cada "sem causa registrada".
-2. Medir demandas por nível e taxa de acerto por nível (prova de que o nível difícil é mais difícil).
+2. Níveis na prática: o boletim real mostra só básico (163) e médio (9) — ninguém chegou ao difícil (1 demanda a cada 6 h, todos começam no básico).
 3. Persistência imediata no PostgreSQL por demanda concluída + reconciliação (passo 2 acima).
 5. IA local: medir o notebook do dono (precisa dele).
 6. Backend contínuo para tempo quase real (precisa da decisão de custo do dono).

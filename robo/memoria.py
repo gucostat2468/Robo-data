@@ -500,6 +500,8 @@ ESPELHO_EXTRA = {
     "demandas_avaliacoes": "imutavel",
     "voz_falas": "imutavel", "cobertura_persistencia": "imutavel",
     "caixa_dono_eventos": "imutavel", "caixa_dono_sugestoes": "imutavel", "jornada_execucoes": "imutavel",
+    "ml_datasets": "imutavel", "ml_experimentos": "imutavel", "ml_modelos": "imutavel", "ml_modelos_eventos": "imutavel",
+    "ml_inferencias": "imutavel",
 }
 # Toda tabela do trabalho.db vai para o PostgreSQL (inclusive as criadas no futuro): a que não está acima é copiada
 # como "atualiza" (o estado mais novo substitui). "imutavel" = a cópia do banco nunca é sobrescrita.

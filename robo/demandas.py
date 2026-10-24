@@ -268,6 +268,30 @@ def _verdade_dos_drivers(cfg, arquivo: Path) -> dict | None:
         return None
 
 
+def _ml_para_treinar(cfg, pessoa):
+    """Só há o que treinar com dados suficientes e novos (treinar o mesmo dataset de novo não ensina nada)."""
+    from robo import modelos_ml as ml
+    n = len(ml._linhas_rotuladas(cfg))
+    if n < ml.CRITERIOS["min_linhas"]:
+        return f"só {n} demanda(s) fechada(s) rotulada(s); o primeiro treino precisa de {ml.CRITERIOS['min_linhas']}"
+    with ml._tb(cfg).tx() as c:
+        ultimo = c.execute("SELECT COALESCE(MAX(d.linhas),0) FROM ml_datasets d JOIN ml_experimentos e "
+                           "ON e.dataset_id=d.id").fetchone()[0] or 0
+    if ultimo and n - ultimo < ml.CRITERIOS["crescimento_para_retreino"]:
+        return (f"o dataset cresceu {n - ultimo} demanda(s) desde o último treino; retreino a partir de "
+                f"{ml.CRITERIOS['crescimento_para_retreino']}")
+    return {}, []
+
+
+def _ml_para_avaliar(cfg, pessoa):
+    """Só avalia candidato que OUTRA pessoa treinou."""
+    from robo import modelos_ml as ml
+    pend = [m for m in ml._modelos(cfg) if m["estado"] == "candidato" and m["criado_por"] != pessoa["id"]]
+    if not pend:
+        return "nenhum modelo candidato esperando avaliação independente"
+    return {}, []
+
+
 def _sql_lotes(cfg, pessoa):
     """Leitura real no PostgreSQL: os lotes sintéticos que a esteira gravou no schema treino (demanda consulta_sql).
     Antes tinha o mesmo nome do preparo do exercício de SQL e era substituída por ele: toda consulta_sql falhava."""
@@ -413,6 +437,19 @@ CATALOGO: dict[str, Modelo] = {m.ferramenta: m for m in [
     Modelo("segredos_repo", "Procurar segredos no repositório público",
            "Varrer os arquivos versionados atrás de senha, token e chave escritos.",
            "arquivos lidos e achados (sem mostrar o segredo)", BASICOS + [{"tipo": "dados", "chave": "arquivos_lidos"}]),
+    Modelo("ml_treinar", "Treinar o modelo de risco de demanda",
+           "Montar o dataset versionado (corte temporal, sem vazamento), treinar baseline e candidato e medir no teste.",
+           "experimento registrado com dataset, parâmetros, métricas e checksum",
+           BASICOS + [{"tipo": "dados", "chave": "experimento"}], _ml_para_treinar),
+    Modelo("ml_avaliar", "Avaliar de forma independente o modelo candidato",
+           "Refazer as métricas do arquivo do modelo e do dataset, por outro caminho, e aprovar ou reprovar com motivo.",
+           "decisão com motivos e métricas refeitas", BASICOS + [{"tipo": "dados", "chave": "decisao"}], _ml_para_avaliar),
+    Modelo("ml_registro", "Integridade, promoção e monitoramento dos modelos",
+           "Conferir o checksum de cada artefato, promover só o aprovado por outra pessoa e monitorar a sombra.",
+           "artefatos conferidos e eventos do registro de modelos", BASICOS),
+    Modelo("ml_portfolio", "Programa de modelos: backlog e critérios",
+           "Atualizar o backlog de ML com o estado real de cada caso e o que falta para o próximo passo.",
+           "backlog com estado real e critérios de promoção", BASICOS),
     Modelo("ronda_ti", "Ronda de saúde do sistema", "Conferir disco, pastas, dependências, segurança e logs agora.",
            "verificações executadas neste computador", BASICOS),
     Modelo("orquestracao", "SLA das rotinas", "Apontar rotinas atrasadas, com erro ou lentas pelos registros.",

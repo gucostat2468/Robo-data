@@ -102,6 +102,11 @@ def montar(cfg, agora: datetime | None = None, turno: dict | None = None) -> dic
                                                     "FROM rotinas_execucoes WHERE inicio>=? GROUP BY nome ORDER BY nome",
                                                  (desde,))]
         saida["pessoas"] = _pessoas(c, gente, hoje, cfg)
+        try:  # inteligência própria: só o que está no registro de modelos (nunca estimado)
+            from robo import modelos_ml
+            saida["modelos"] = modelos_ml.resumo(cfg)
+        except Exception as e:
+            saida["modelos"] = {"erro": type(e).__name__}
         # prova de que o nível é trabalho diferente e não só rótulo: acerto por nível em todo o histórico
         saida["niveis"] = [{"nivel": nv or "sem nível", "demandas": n, "concluidas": int(ok or 0), "parciais": int(pa or 0),
                             "falhas": int(fa or 0)}
@@ -251,6 +256,22 @@ def markdown(d: dict) -> str:
                   f"{('(' + ESTADOS.get(x['estado'], x['estado']) + ')') if x['estado'] else ''} | {x['demandas_hoje']} |"
                   for x in pessoas if x["andar"] == andar]
             l.append("")
+    m = d.get("modelos") or {}
+    if m and "erro" not in m:
+        l += ["", "## Inteligência própria (modelo de risco das demandas)", ""]
+        if not m.get("modelos"):
+            l.append(f"- Ainda sem modelo: {m['rotuladas_agora']} demandas rotuladas de {m['minimo_para_treinar']} "
+                     "necessárias para o 1º treino.")
+        else:
+            l += [f"- {x['id']}: **{x['estado']}** (treinado por {x['criado_por']})" for x in m["modelos"]]
+        av = m.get("ultima_avaliacao")
+        if av and av.get("candidato"):
+            c, bl = av["candidato"], av.get("baseline") or {}
+            l.append(f"- Última avaliação independente ({av['quem']}): {av['modelo']} "
+                     f"{'aprovado' if av['resultado'] == 'avaliado_aprovado' else 'reprovado'} — log loss {c['log_loss']:.3f} "
+                     f"contra baseline {bl.get('log_loss', 0):.3f}" + (f"; motivos: {'; '.join(av['motivos'])}" if av.get("motivos") else ""))
+        l += [f"- Referência em sombra: {m.get('referencia') or 'nenhuma'}; {m.get('inferencias_sombra', 0)} previsões em sombra",
+              f"- Uso operacional: {m.get('uso_operacional')}"]
     b = d.get("banco") or {}
     if b:
         l += ["", "## Banco de dados", "",

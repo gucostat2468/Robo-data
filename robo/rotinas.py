@@ -56,6 +56,9 @@ ROTINAS = {
                 "entra na esteira (só com a fila real vazia) e Teodoro confere o resultado contra o gabarito", 0.5),
     "paineis": ("bi_powerbi", "Estúdio de Painéis: Bárbara monta os 5 dashboards do banco real, Heitor reconcilia os "
                 "números e só então publica (cada versão registrada)", 1),
+    "modelos": ("ml_lider", "Inteligência própria: o modelo de referência pontua em sombra cada demanda nova, o MLOps "
+                "monitora, o engenheiro de ML retreina quando o dataset cresce, a avaliadora independente aprova ou "
+                "reprova e só então o MLOps promove (robo/modelos_ml.py)", 1),
     "alcadas": ("dir_operacoes", "Alçadas: com o dono fora, a liderança decide o que a matriz permite (duas pessoas; "
                 "o dono reverte em 7 dias)", 1),
 }
@@ -65,7 +68,7 @@ ROTINAS = {
 def funcao(cfg, nome: str):
     """O que cada rotina executa. Uma lista só, usada pelo laço do robô (painel/controle.py) e pelo comando
     `python -m robo rotina <nome>` (que é o que o Airflow chama). Assim os dois nunca divergem."""
-    from robo import caixa_dono, jornada
+    from robo import caixa_dono, jornada, modelos_ml
     from robo import demandas, dialogo, fabrica, telegram
     from robo import (alcadas, auditoria, backup, desenvolvimento, estrategia, ideias, laboratorio, licoes, memoria,
                       paineis, registro_total, reuniao, rh_desempenho, treino)
@@ -95,6 +98,7 @@ def funcao(cfg, nome: str):
         "telegram": lambda: telegram.rotina(cfg),
         "jornada": lambda: jornada.rotina(cfg),
         "caixa_dono": lambda: caixa_dono.rotina(cfg),
+        "modelos": lambda: modelos_ml.rotina(cfg),
     }
     if nome not in mapa:
         raise KeyError(f"rotina desconhecida: {nome} (existem: {', '.join(ROTINAS)})")
