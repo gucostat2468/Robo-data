@@ -172,3 +172,28 @@ def teste_sinal_de_parada_encerra_o_turno_salvando(tmp_path, monkeypatch):
     r = nuvem.turno(cfg, minutos=10, pausa_s=60, parar=parar)
     assert _t.monotonic() - inicio < 10   # não esperou os 10 minutos
     assert chamadas == ["salvar"] and r["voltas"] >= 1
+
+
+def teste_turno_trata_a_planilha_antes_de_distribuir_trabalho(tmp_path, monkeypatch):
+    """Cada turno começa numa máquina nova: a demanda que precisa de planilha só pode ser distribuída depois que a
+    fábrica gerou e a esteira tratou a planilha do turno (antes virava estudo por bloqueio)."""
+    import threading
+    from robo import rotinas
+    ordem = []
+    monkeypatch.setattr(nuvem, "restaurar", lambda cfg: {"origem": "teste"})
+    monkeypatch.setattr(nuvem, "garantir_leitura", lambda cfg: True)
+    monkeypatch.setattr(nuvem, "salvar", lambda cfg: {"ok": True})
+    monkeypatch.setattr(nuvem, "tamanho_mb", lambda cfg: 1.0)
+    monkeypatch.setattr(nuvem, "_esteira", lambda m: ordem.append("ESTEIRA") or 0)
+    monkeypatch.setattr(rotinas, "executar", lambda cfg, nome, f: ordem.append(nome))
+    monkeypatch.setattr(rotinas, "funcao", lambda *a, **k: None)
+    monkeypatch.setattr(rotinas, "abrir_sessao", lambda cfg: {"sessao": 1})
+    monkeypatch.setattr(rotinas, "batimento", lambda *a, **k: None)
+    cfg = nuvem.config_da_nuvem(tmp_path, "postgresql://u:p@127.0.0.1:1/x")
+    parar = threading.Event()
+    threading.Timer(0.3, parar.set).start()
+    nuvem.turno(cfg, minutos=5, pausa_s=60, parar=parar)
+    assert ordem.index("fabrica") < ordem.index("ESTEIRA") < ordem.index("demandas")
+    # e em cada volta do laço também: fábrica → esteira → demandas
+    volta = ordem[ordem.index("canal"):]
+    assert volta.index("fabrica") < volta.index("ESTEIRA") < volta.index("demandas")

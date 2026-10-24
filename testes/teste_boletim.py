@@ -54,7 +54,8 @@ def teste_publica_no_ramo_proprio_com_historico(cfg_factory, tmp_path):
     assert dados["turno"]["estado"] == "trabalhando" and len(dados["agora"]) == 1
     # a mensagem do commit carrega o mesmo boletim (é o que o app lê pelo conector)
     msg = _git("log", "-1", "--format=%B", "painel-celular", cwd=origem)
-    assert boletim.ler_mensagem(msg) == dados
+    assert boletim.ler_mensagem(msg) == {k: v for k, v in dados.items() if k != "pessoas"}  # a lista de pessoas fica só no arquivo
+    assert len(dados["pessoas"]) >= 100 and all(x["situacao"] for x in dados["pessoas"])
     assert "principal" in _git("branch", cwd=origem)  # o ramo do código não foi tocado
     # um novo turno (pasta nova) continua o mesmo ramo, sem forçar
     assert boletim.publicar(cfg, repo, tmp_path / "outro_turno", {"estado": "pausa"})

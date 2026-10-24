@@ -55,7 +55,9 @@ jobs:
       # próximo (o "concurrency" acima garante um por vez). Para pausar pelo celular: Settings → Secrets and
       # variables → Actions → aba Variables → criar ROBO_TURNO_CONTINUO com o valor 0.
       - name: Chamar o próximo turno
-        if: success() && vars.ROBO_TURNO_CONTINUO != '0'
+        # format() deixa a comparação entre textos: com a variável inexistente, null != '0' virava 0 != 0 (número) e a
+        # etapa era PULADA em todo turno (achado no log: a empresa parava ~5 h entre turnos)
+        if: success() && format('{0}', vars.ROBO_TURNO_CONTINUO) != '0'
         env:
           GH_TOKEN: ${{ github.token }}
         run: gh workflow run empresa_nuvem.yml --ref "${{ github.ref_name }}"

@@ -101,6 +101,7 @@ def montar(cfg, agora: datetime | None = None, turno: dict | None = None) -> dic
                             for r, n, e, u in _q(c, "SELECT nome, COUNT(*), SUM(status='erro'), MAX(fim) "
                                                     "FROM rotinas_execucoes WHERE inicio>=? GROUP BY nome ORDER BY nome",
                                                  (desde,))]
+        saida["pessoas"] = _pessoas(c, gente, hoje, cfg)
         tot = lambda sql: (_q(c, sql) or [(0,)])[0][0] or 0  # noqa: E731
         saida["totais"] = {"demandas": tot("SELECT COUNT(*) FROM solicitacoes WHERE origem='demanda_sintetica'"),
                            "tentativas_treino": tot("SELECT COUNT(*) FROM treino_tentativas"),
@@ -108,6 +109,53 @@ def montar(cfg, agora: datetime | None = None, turno: dict | None = None) -> dic
                            "trabalhos_com_prova": tot("SELECT COUNT(*) FROM jobs")}
     finally:
         c.close()
+    return saida
+
+
+def _pessoas(c, gente: dict, hoje: str, cfg=None) -> list[dict]:
+    """Cada funcionário: o último trabalho e se é do papel dele, ou por que não trabalhou (registro do ciclo)."""
+    from robo import demandas, organizacao
+    ultima = {}
+    for pid, titulo, modelo, estado, quando, plano in _q(
+            c, "SELECT funcionario, titulo, modelo, estado, criada_em, plano FROM solicitacoes WHERE origem='demanda_sintetica' "
+               "ORDER BY criada_em"):
+        ultima[pid] = (titulo, modelo, estado, quando, plano)
+    evento = {}
+    for pid, ev, motivo, quando in _q(c, "SELECT funcionario, evento, motivo, data_hora FROM demandas_registro ORDER BY id"):
+        evento[pid] = (ev, motivo, quando)
+    hoje_n = {pid: n for pid, n in _q(c, "SELECT funcionario, COUNT(*) FROM solicitacoes WHERE origem='demanda_sintetica' "
+                                         "AND criada_em>=? GROUP BY 1", (hoje,))}
+    saida = []
+    for pid, p in sorted(gente.items(), key=lambda x: (x[1]["andar"], x[1]["nome"])):
+        nivel = organizacao.nivel_de(pid, p)
+        item = {"nome": p["nome"], "andar": p["andar"], "cargo": p.get("papel", ""), "area": organizacao.area_de(pid) or "",
+                "demandas_hoje": hoje_n.get(pid, 0), "ultimo": "", "quando": "", "estado": "", "situacao": ""}
+        u, ev = ultima.get(pid), evento.get(pid)
+        if u:
+            titulo, modelo, estado, quando, plano = u
+            ferr = (modelo or "").split(":")[-1]
+            try:
+                tipo = json.loads(plano or "{}").get("tipo_demanda") or "trabalho"
+            except ValueError:
+                tipo = "trabalho"
+            item.update(ultimo=titulo, quando=quando, estado=estado)
+            if tipo == "treinamento":
+                item["situacao"] = "estudo (o trabalho do papel estava bloqueado)"
+            else:
+                try:
+                    papel = ferr in demandas.candidatas(cfg, {"id": pid, "andar": p["andar"]})
+                except Exception:
+                    papel = True
+                item["situacao"] = "trabalho do papel" if papel else "trabalho FORA do papel"
+        if nivel == "estagiario":
+            item["situacao"] = "estagiário: observa (regra do dono)" + (f" — {ev[1][:120]}" if ev and ev[0] == "observou" else "")
+        elif pid in organizacao.ROTINA_PROPRIA:
+            item["situacao"] = f"trabalho do papel na rotina {organizacao.ROTINA_PROPRIA[pid]}"
+        elif not u:
+            item["situacao"] = f"sem trabalho ainda ({ev[1][:120]})" if ev else "sem trabalho ainda"
+        if ev and ev[0] in ("bloqueada", "sem_trabalho") and item["situacao"].startswith("estudo"):
+            item["situacao"] += f": {ev[1][:120]}"
+        saida.append(item)
     return saida
 
 
@@ -153,6 +201,18 @@ def markdown(d: dict) -> str:
     l += ["", "## Últimas entregas", "", "| Hora | Quem | Trabalho | Resultado |", "|---|---|---|---|"]
     l += [f"| {_hora(u.get('quando'))[-5:]} | {u['funcionario']} ({u.get('andar')}º) | {u.get('trabalho', '')} | "
           f"{ESTADOS.get(u.get('estado'), u.get('estado'))} |" for u in d.get("ultimos") or []]
+    pessoas = d.get("pessoas") or []
+    if pessoas:
+        fora = [x for x in pessoas if "FORA" in x["situacao"] or x["situacao"].startswith(("sem trabalho", "estudo"))]
+        l += ["", "## Cada funcionário", "",
+              f"{len(pessoas) - len(fora)} de {len(pessoas)} no trabalho do papel, observando (estagiário) ou na rotina "
+              f"própria da equipe; {len(fora)} precisam de atenção.", ""]
+        for andar in sorted({x["andar"] for x in pessoas}):
+            l += [f"### {andar}º andar", "", "| Quem | Cargo | Situação | Último trabalho | Hoje |", "|---|---|---|---|--:|"]
+            l += [f"| {x['nome']} | {x['cargo'][:40]} | {x['situacao'][:90]} | {x['ultimo'][:60]} "
+                  f"{('(' + ESTADOS.get(x['estado'], x['estado']) + ')') if x['estado'] else ''} | {x['demandas_hoje']} |"
+                  for x in pessoas if x["andar"] == andar]
+            l.append("")
     l += ["", "---", "Números tirados dos registros da empresa (dado sintético de treino, nunca de cliente)."]
     return "\n".join(l) + "\n"
 
@@ -168,7 +228,8 @@ MARCA = "BOLETIM-JSON:"
 
 def mensagem(dados: dict) -> str:
     """Primeira linha legível; depois a marca e o JSON compacto numa linha só."""
-    return f"boletim {dados['gerado_em']}\n\n{MARCA}{json.dumps(dados, ensure_ascii=False, separators=(',', ':'), default=str)}\n"
+    leve = {k: v for k, v in dados.items() if k != "pessoas"}
+    return f"boletim {dados['gerado_em']}\n\n{MARCA}{json.dumps(leve, ensure_ascii=False, separators=(',', ':'), default=str)}\n"
 
 
 def ler_mensagem(texto: str) -> dict | None:

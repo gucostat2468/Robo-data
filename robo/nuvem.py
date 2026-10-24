@@ -39,6 +39,10 @@ RAIZ = Path(__file__).resolve().parents[1]
 MEMORIA_INICIAL = RAIZ / "nuvem" / "memoria_inicial.db.gz"
 MANTER_INSTANTANEOS = 6
 NAO_RODAM_NA_NUVEM = {"memoria_pg", "registro", "canal", "treino", "laboratorio"}  # cuidadas à parte no turno
+# Cada turno começa numa máquina NOVA, sem planilhas: estas rotinas só rodam depois que a fábrica gerou e a esteira
+# tratou a planilha do turno. Antes a 1ª distribuição de demandas vinha antes e o trabalho que precisa de planilha
+# ficava bloqueado (virava estudo "Consultar o conhecimento").
+DEPOIS_DA_ESTEIRA = ("demandas",)
 LIMITE_MB_PADRAO = 500  # plano gratuito: avisa com 80% (o Neon gratuito dá 0,5 a 1 GB por projeto)
 
 
@@ -213,12 +217,18 @@ def turno(cfg, minutos: float = 20, salvar_a_cada_min: float = 10, pausa_s: floa
     log.info("Turno na nuvem: memória restaurada de %s", origem["origem"])
     sessao = rotinas.abrir_sessao(cfg)["sessao"]
     garantir_leitura(cfg)
-    for nome in rotinas.ROTINAS:  # cada uma decide se está na hora (backup diário, reunião semanal…)
-        if nome not in NAO_RODAM_NA_NUVEM:
-            rotinas.executar(cfg, nome, rotinas.funcao(cfg, nome))
     from robo import pos_processamento
     monitor = Monitor(cfg, ao_processar=lambda r: pos_processamento.registrar(cfg, r))
-    planilhas = _esteira(monitor)
+    planilhas = 0
+    for nome in rotinas.ROTINAS:  # cada uma decide se está na hora (backup diário, reunião semanal…)
+        if nome in NAO_RODAM_NA_NUVEM or nome in DEPOIS_DA_ESTEIRA:
+            continue
+        rotinas.executar(cfg, nome, rotinas.funcao(cfg, nome))
+        if nome == "fabrica":  # a planilha do turno é tratada ANTES de distribuir trabalho que precisa dela
+            planilhas += _esteira(monitor)
+    planilhas += _esteira(monitor)
+    for nome in DEPOIS_DA_ESTEIRA:
+        rotinas.executar(cfg, nome, rotinas.funcao(cfg, nome))
     ultimo_salvo = time.monotonic()
     voltas = 0
     from robo import boletim
@@ -234,9 +244,11 @@ def turno(cfg, minutos: float = 20, salvar_a_cada_min: float = 10, pausa_s: floa
     ultimo_boletim = time.monotonic()
     while time.monotonic() < fim and not (parar is not None and parar.is_set()):
         voltas += 1
-        for nome in ("canal", "registro", "treino", "laboratorio", "fabrica", "demandas", "telegram"):
+        for nome in ("canal", "registro", "treino", "laboratorio", "fabrica"):
             rotinas.executar(cfg, nome, rotinas.funcao(cfg, nome))
         planilhas += _esteira(monitor)
+        for nome in ("demandas", "telegram"):
+            rotinas.executar(cfg, nome, rotinas.funcao(cfg, nome))
         rotinas.batimento(cfg, sessao)
         if time.monotonic() - ultimo_salvo >= salvar_a_cada_min * 60:
             salvar(cfg)
