@@ -298,3 +298,20 @@ def teste_sala_de_casos_revisa_mesmo_em_maquina_nova(cfg_factory):
     assert COMP[caso["competencia"]].designer != pessoa["id"] and caso["sha"]
     res = ferramentas.executar("revisar_caso", cfg, caso=caso)
     assert res["ok"] and res["dados"]["aprovado"], res["texto"]
+
+
+def teste_trabalho_bloqueado_vai_para_o_proximo_do_papel_e_nao_para_estudo(cfg_factory, ferramentas_rapidas, monkeypatch):
+    """Achado na nuvem: o rodízio caía no exercício de SQL (bloqueado) e a pessoa ia estudar, com 3 trabalhos livres."""
+    cfg = _cfg(cfg_factory, por_ciclo=1)
+    _base(cfg)
+    ordem = ["drivers", "calcular"]  # drivers bloqueia (a base não tem NPS/CSAT); calcular tem base
+    monkeypatch.setattr(demandas, "escolher_ferramenta",
+                        lambda cfg, p, ultima=None, usadas=None: next((f for f in ordem if f not in (usadas or [])), None))
+    r = demandas.rotina(cfg)
+    assert r["atribuidas"] == 1 and r["bloqueadas"] == 1
+    with sqlite3.connect(cfg.logs / "trabalho.db") as c:
+        modelo, plano = c.execute("SELECT modelo, plano FROM solicitacoes WHERE origem='demanda_sintetica'").fetchone()
+        eventos = [r[0] for r in c.execute("SELECT evento FROM demandas_registro WHERE evento IN ('bloqueada','atribuida',"
+                                           "'treinamento') ORDER BY id")]
+    assert modelo == "demanda:calcular" and json.loads(plano)["tipo_demanda"] == "trabalho"  # trabalho do papel, não estudo
+    assert eventos == ["bloqueada", "atribuida"]  # o bloqueio do drivers fica registrado com o motivo

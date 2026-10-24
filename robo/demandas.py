@@ -959,14 +959,28 @@ def rotina(cfg, agora: datetime | None = None) -> dict | None:
                       and h.get("tipo_demanda") == "trabalho"]
             ferr = _escolher(cfg, p, usadas[0] if usadas else None, usadas)
             nivel, motivo_nivel = nivel_para(organizacao.nivel_de(p["id"], p), hist)
-            sid, motivo = (criar_demanda(cfg, p, ferr, nivel, motivo_nivel=motivo_nivel) if ferr
-                           else (None, "nenhuma ferramenta do contrato está no catálogo de demandas"))
-            tipo = "trabalho"
-            if not sid:
+            tipo, primeira, sid, motivos_bloq = "trabalho", ferr, None, []
+            # o trabalho da vez; se estiver bloqueado, os OUTROS trabalhos do papel na ordem do rodízio, antes de mandar
+            # a pessoa estudar (antes desistia no 1º bloqueio: 20 pessoas viravam estudo só por causa do SQL)
+            tentadas: list[str] = []
+            while ferr and ferr not in tentadas and len(tentadas) < 8:
+                tentadas.append(ferr)
+                sid, motivo = criar_demanda(cfg, p, ferr, nivel, motivo_nivel=motivo_nivel)
+                if sid:
+                    if ferr != primeira:
+                        motivo_nivel = f"{motivo_nivel}; {primeira} estava bloqueado, fez {ferr} (do mesmo papel)"
+                    break
+                motivos_bloq.append(f"{ferr}: {motivo}")
                 bloqueadas.append({"funcionario": p["id"], "ferramenta": ferr, "motivo": motivo})
                 eventos.append({"funcionario": p["id"], "andar": p["andar"], "evento": "bloqueada", "ferramenta": ferr,
                                 "nivel": nivel, "motivo": motivo, "responsavel": "dem_gerador"})
-                estudo = ferr
+                ferr = _escolher(cfg, p, None, tentadas + usadas)
+            if not primeira:
+                motivos_bloq.append("nenhuma ferramenta do contrato está no catálogo de demandas")
+            motivo = "; ".join(motivos_bloq)
+            if not sid:
+                ferr = primeira
+                estudo = primeira
                 ferr, nivel, tipo = "conhecimento", "basico", "treinamento"
                 sid, motivo2 = criar_demanda(cfg, p, ferr, nivel, tipo="treinamento", estudo_de=estudo,
                                              motivo_nivel="sem demanda de trabalho adequada neste ciclo: " + motivo)
