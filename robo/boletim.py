@@ -102,6 +102,11 @@ def montar(cfg, agora: datetime | None = None, turno: dict | None = None) -> dic
                                                     "FROM rotinas_execucoes WHERE inicio>=? GROUP BY nome ORDER BY nome",
                                                  (desde,))]
         saida["pessoas"] = _pessoas(c, gente, hoje, cfg)
+        try:  # tempo MEDIDO dos últimos turnos, por natureza (robo/tempo_turno.py)
+            from robo import tempo_turno
+            saida["tempo_turnos"] = tempo_turno.ultimos(cfg, 6)
+        except Exception as e:
+            saida["tempo_turnos"] = {"erro": type(e).__name__}
         try:  # inteligência própria: só o que está no registro de modelos (nunca estimado)
             from robo import modelos_ml
             saida["modelos"] = modelos_ml.resumo(cfg)
@@ -256,6 +261,21 @@ def markdown(d: dict) -> str:
                   f"{('(' + ESTADOS.get(x['estado'], x['estado']) + ')') if x['estado'] else ''} | {x['demandas_hoje']} |"
                   for x in pessoas if x["andar"] == andar]
             l.append("")
+    tt = d.get("tempo_turnos")
+    if isinstance(tt, list) and tt:
+        u = tt[0]
+        p = u["percentual"]
+        l += ["", "## Tempo do último turno (medido)", "",
+              f"- {u['inicio'][11:16]}–{u['fim'][11:16]} ({u['segundos'] / 60:.0f} min, {u['voltas']} voltas; "
+              f"cobertura do cronômetro {100 * u['cobertura']:.0f}%)",
+              f"- **Entregas aprovadas na revisão independente: {u['entregas_aprovadas']} "
+              f"({u['entregas_por_hora']:.1f} por hora)** — o indicador principal",
+              "- " + " · ".join(f"{k} {p.get(k, 0):.0f}%" for k in ("operacional", "estudo", "revisao", "coordenacao",
+                                                                     "manutencao", "erro", "parado", "sem_medicao")),
+              f"- Bloqueios: {u['contagens'].get('bloqueios', 0)}; etapas esperando dependência: "
+              f"{u['contagens'].get('etapas_esperando_dependencia', 0)}"]
+        if len(tt) > 1:
+            l.append("- Turnos anteriores (entregas/hora): " + ", ".join(f"{x['entregas_por_hora']:.1f}" for x in tt[1:]))
     m = d.get("modelos") or {}
     if m and "erro" not in m:
         l += ["", "## Inteligência própria (modelo de risco das demandas)", ""]

@@ -230,27 +230,31 @@ def garantir_base(cfg, monitor) -> int:
 def turno(cfg, minutos: float = 20, salvar_a_cada_min: float = 10, pausa_s: float = 15, parar=None) -> dict:
     """parar: threading.Event opcional. Quando é ligado (SIGTERM do Cloud Run, Ctrl+C), o turno sai do laço e SALVA
     a memória antes de devolver (encerramento gracioso: nada do que foi feito se perde)."""
-    from robo import rotinas
+    from robo import rotinas, tempo_turno
     from robo.monitor import Monitor
     inicio = time.monotonic()
     fim = inicio + minutos * 60
-    origem = restaurar(cfg)
-    log.info("Turno na nuvem: memória restaurada de %s", origem["origem"])
-    sessao = rotinas.abrir_sessao(cfg)["sessao"]
-    garantir_leitura(cfg)
+    crono = tempo_turno.Cronometro()  # cada segundo do turno vai para uma natureza (robo/tempo_turno.py)
+    with crono.medir("inicio"):
+        origem = restaurar(cfg)
+        log.info("Turno na nuvem: memória restaurada de %s", origem["origem"])
+        sessao = rotinas.abrir_sessao(cfg)["sessao"]
+        garantir_leitura(cfg)
     from robo import pos_processamento
     monitor = Monitor(cfg, ao_processar=lambda r: pos_processamento.registrar(cfg, r))
     planilhas = 0
     for nome in rotinas.ROTINAS:  # cada uma decide se está na hora (backup diário, reunião semanal…)
         if nome in NAO_RODAM_NA_NUVEM or nome in DEPOIS_DA_ESTEIRA:
             continue
-        rotinas.executar(cfg, nome, rotinas.funcao(cfg, nome))
+        crono.rotina(cfg, nome, rotinas.executar, rotinas.funcao(cfg, nome))
         if nome == "fabrica":  # a planilha do turno é tratada ANTES de distribuir trabalho que precisa dela
-            planilhas += _esteira(monitor)
-    planilhas += _esteira(monitor)
-    planilhas += garantir_base(cfg, monitor)
+            with crono.medir("esteira"):
+                planilhas += _esteira(monitor)
+    with crono.medir("esteira"):
+        planilhas += _esteira(monitor)
+        planilhas += garantir_base(cfg, monitor)
     for nome in DEPOIS_DA_ESTEIRA:
-        rotinas.executar(cfg, nome, rotinas.funcao(cfg, nome))
+        crono.rotina(cfg, nome, rotinas.executar, rotinas.funcao(cfg, nome))
     ultimo_salvo = time.monotonic()
     voltas = 0
     from robo import boletim
@@ -267,35 +271,48 @@ def turno(cfg, minutos: float = 20, salvar_a_cada_min: float = 10, pausa_s: floa
             from robo import painel_espelho
             painel_espelho.publicar(cfg, RAIZ, Path(cfg.logs).parent / "espelho_git", forcar=final,
                                     ligado_desde=None if final else inicio_epoca)
-    _boletim("trabalhando")
+    with crono.medir("boletim"):
+        _boletim("trabalhando")
     ultimo_boletim = time.monotonic()
     while time.monotonic() < fim and not (parar is not None and parar.is_set()):
         voltas += 1
         for nome in LACO_ANTES_DA_ESTEIRA:
-            rotinas.executar(cfg, nome, rotinas.funcao(cfg, nome))
-        planilhas += _esteira(monitor)
+            crono.rotina(cfg, nome, rotinas.executar, rotinas.funcao(cfg, nome))
+        with crono.medir("esteira"):
+            planilhas += _esteira(monitor)
         for nome in LACO_DEPOIS_DA_ESTEIRA:
-            rotinas.executar(cfg, nome, rotinas.funcao(cfg, nome))
+            crono.rotina(cfg, nome, rotinas.executar, rotinas.funcao(cfg, nome))
         # as demais (diálogo a cada 20 min, ronda de TI, lições...) rodam quando vencem, não só no começo do turno
         for nome in rotinas.vencidas(cfg, excluir=FORA_DAS_VENCIDAS):
-            rotinas.executar(cfg, nome, rotinas.funcao(cfg, nome))
-        rotinas.batimento(cfg, sessao)
+            crono.rotina(cfg, nome, rotinas.executar, rotinas.funcao(cfg, nome))
+        with crono.medir("registro"):
+            rotinas.batimento(cfg, sessao)
         if time.monotonic() - ultimo_salvo >= salvar_a_cada_min * 60:
-            salvar(cfg)
+            with crono.medir("salvar"):
+                salvar(cfg)
             ultimo_salvo = time.monotonic()
         if time.monotonic() - ultimo_boletim >= 5 * 60:
-            _boletim("trabalhando")
+            with crono.medir("boletim"):
+                _boletim("trabalhando")
             ultimo_boletim = time.monotonic()
         espera = max(0.0, min(pausa_s, fim - time.monotonic()))
-        if parar is not None:
-            parar.wait(espera)
-        else:
-            time.sleep(espera)
-    planilhas += _esteira(monitor)
+        with crono.medir("pausa"):
+            if parar is not None:
+                parar.wait(espera)
+            else:
+                time.sleep(espera)
+    with crono.medir("esteira"):
+        planilhas += _esteira(monitor)
     for nome in ("fabrica", "ronda_ti", "rh_desempenho", "alcadas"):  # fecham o turno (a fábrica confere o gabarito)
         if nome in rotinas.ROTINAS:
-            rotinas.executar(cfg, nome, rotinas.funcao(cfg, nome))
-    inst = salvar(cfg)
+            crono.rotina(cfg, nome, rotinas.executar, rotinas.funcao(cfg, nome))
+    with crono.medir("salvar"):
+        inst = salvar(cfg)
+    try:
+        tempo = tempo_turno.fechar(cfg, crono, voltas)
+    except Exception as e:  # medir nunca derruba o turno; a falha fica no log
+        log.warning("Tempo do turno não registrado: %s: %s", type(e).__name__, e)
+        tempo = None
     _boletim("entre turnos: memória salva; o próximo turno começa em poucos minutos", final=True)
     mb = tamanho_mb(cfg)
     limite = float(os.environ.get("ROBO_LIMITE_MB") or LIMITE_MB_PADRAO)
@@ -308,7 +325,7 @@ def turno(cfg, minutos: float = 20, salvar_a_cada_min: float = 10, pausa_s: floa
         except Exception:
             pass
     return {"origem": origem["origem"], "minutos": round((time.monotonic() - inicio) / 60, 1), "voltas": voltas,
-            "planilhas_processadas": planilhas,
+            "planilhas_processadas": planilhas, "tempo": tempo,
             "memoria": inst, "banco_mb": mb, "limite_mb": limite, "alerta_espaco": alerta}
 
 
