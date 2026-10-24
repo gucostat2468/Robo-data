@@ -1,12 +1,12 @@
 {
  "versao": 1,
- "gerado_em": "2026-10-24T17:20:07",
+ "gerado_em": "2026-10-24T17:22:20",
  "turno": {
-  "estado": "entre turnos: memória salva; o próximo turno começa em poucos minutos",
-  "inicio": "2026-10-24T16:38:39",
-  "fim_previsto": "2026-10-24T17:18:39",
-  "voltas": 109,
-  "planilhas": 2
+  "estado": "trabalhando",
+  "inicio": "2026-10-24T17:22:20",
+  "fim_previsto": "2026-10-24T18:02:20",
+  "voltas": 0,
+  "planilhas": 1
  },
  "funcionarios": 105,
  "andares": [
@@ -154,7 +154,7 @@
   "concluidos_hoje": 5
  },
  "fabrica": {
-  "lotes_hoje": 21,
+  "lotes_hoje": 22,
   "conferidos_ok_hoje": 21
  },
  "rotinas": [
@@ -166,9 +166,9 @@
   },
   {
    "rotina": "caixa_dono",
-   "execucoes_24h": 14,
+   "execucoes_24h": 15,
    "erros_24h": 0,
-   "ultima": "2026-10-24T16:38:24"
+   "ultima": "2026-10-24T17:21:59"
   },
   {
    "rotina": "demandas",
@@ -178,9 +178,9 @@
   },
   {
    "rotina": "dialogo",
-   "execucoes_24h": 14,
+   "execucoes_24h": 15,
    "erros_24h": 0,
-   "ultima": "2026-10-24T16:38:24"
+   "ultima": "2026-10-24T17:21:59"
   },
   {
    "rotina": "fabrica",
@@ -196,9 +196,9 @@
   },
   {
    "rotina": "jornada",
-   "execucoes_24h": 14,
+   "execucoes_24h": 15,
    "erros_24h": 0,
-   "ultima": "2026-10-24T16:38:24"
+   "ultima": "2026-10-24T17:21:59"
   },
   {
    "rotina": "laboratorio",
@@ -214,21 +214,21 @@
   },
   {
    "rotina": "memoria_pg",
-   "execucoes_24h": 39,
+   "execucoes_24h": 38,
    "erros_24h": 0,
-   "ultima": "2026-10-24T17:20:04"
+   "ultima": "2026-10-24T17:15:48"
   },
   {
    "rotina": "modelos",
-   "execucoes_24h": 1,
+   "execucoes_24h": 2,
    "erros_24h": 0,
-   "ultima": "2026-10-24T15:55:46"
+   "ultima": "2026-10-24T17:22:02"
   },
   {
    "rotina": "paineis",
-   "execucoes_24h": 14,
+   "execucoes_24h": 15,
    "erros_24h": 0,
-   "ultima": "2026-10-24T16:38:26"
+   "ultima": "2026-10-24T17:22:02"
   },
   {
    "rotina": "registro",
@@ -244,9 +244,9 @@
   },
   {
    "rotina": "ronda_ti",
-   "execucoes_24h": 28,
+   "execucoes_24h": 29,
    "erros_24h": 0,
-   "ultima": "2026-10-24T17:18:01"
+   "ultima": "2026-10-24T17:21:54"
   },
   {
    "rotina": "treino",
@@ -258,16 +258,16 @@
  "totais": {
   "demandas": 241,
   "tentativas_treino": 6583,
-  "conversas": 2853,
-  "trabalhos_com_prova": 1460
+  "conversas": 2865,
+  "trabalhos_com_prova": 1467
  },
  "banco": {
-  "levantamento": "2026-10-24T17:18:16",
+  "levantamento": "2026-10-24T17:13:58",
   "postgres_conferido": true,
   "erro_postgres": null,
   "tabelas": 201,
   "com_dados": 160,
-  "linhas": 372990,
+  "linhas": 371914,
   "resumo": {
    "sqlite": {
     "tabelas": 79,
@@ -1725,11 +1725,16 @@
   "finalidade": "risco_demanda",
   "rotuladas_agora": 198,
   "minimo_para_treinar": 60,
-  "datasets": 1,
-  "maior_dataset": 177,
+  "datasets": 2,
+  "maior_dataset": 198,
   "modelos": [
    {
     "id": "risco_demanda-v1",
+    "estado": "reprovado",
+    "criado_por": "ml_engenheiro"
+   },
+   {
+    "id": "risco_demanda-v2",
     "estado": "reprovado",
     "criado_por": "ml_engenheiro"
    }
@@ -1738,26 +1743,26 @@
   "inferencias_sombra": 0,
   "uso_operacional": "desligado: o modelo só roda em sombra até o dono decidir usá-lo em alguma escolha da empresa",
   "ultima_avaliacao": {
-   "modelo": "risco_demanda-v1",
+   "modelo": "risco_demanda-v2",
    "resultado": "avaliado_reprovado",
    "quem": "ml_avaliador",
    "candidato": {
-    "n": 27,
-    "taxa_real": 0.074074,
-    "log_loss": 0.68113,
-    "brier": 0.074049,
-    "auc": 0.18
+    "n": 30,
+    "taxa_real": 0.066667,
+    "log_loss": 0.727842,
+    "brier": 0.066672,
+    "auc": 0.5
    },
    "baseline": {
-    "n": 27,
-    "taxa_real": 0.074074,
-    "log_loss": 0.2465,
-    "brier": 0.06874,
-    "auc": 0.72
+    "n": 30,
+    "taxa_real": 0.066667,
+    "log_loss": 0.299575,
+    "brier": 0.086653,
+    "auc": 0.571429
    },
    "motivos": [
-    "AUC 0.180 abaixo do mínimo 0.55",
-    "não bate o baseline (log loss 0.6811 ≥ 0.2465)"
+    "AUC 0.500 abaixo do mínimo 0.55",
+    "não bate o baseline (log loss 0.7278 ≥ 0.2996)"
    ]
   }
  },
