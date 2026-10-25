@@ -1,6 +1,6 @@
 # Empresa ao vivo
 
-**Boletim das 25/10 04:27** (horário de Brasília) · trabalhando
+**Boletim das 25/10 04:33** (horário de Brasília) · trabalhando
 
 > Atualiza a cada 5 minutos enquanto a empresa trabalha. Recarregue a página para ver o mais novo.
 
@@ -209,14 +209,14 @@
 
 ## Banco de dados
 
-Levantamento das 25/10 04:18: **163 de 201** tabelas com dados (663.839 linhas contadas uma a uma).
+Levantamento das 25/10 04:31: **164 de 201** tabelas com dados (665.692 linhas contadas uma a uma).
 
 
 | Onde | Tabelas | Com dados |
 |---|--:|--:|
 | sqlite | 79 | 63 |
 | postgres.laboratorio | 15 | 15 |
-| postgres.robo | 82 | 63 |
+| postgres.robo | 82 | 64 |
 | postgres.treino | 22 | 22 |
 | postgres.bruto | 1 | 0 |
 | postgres.tratado | 1 | 0 |
@@ -252,7 +252,6 @@ Vazias e por quê (nada é preenchido para parecer cheio):
 | postgres.robo | memoria_decisoes | funcionalidade não acionada | espelho de decisoes (vazia no SQLite também): decisão com dono e prazo sai de reunião ou de pedido do dono |
 | postgres.robo | memoria_decisoes_eventos | funcionalidade não acionada | espelho de decisoes_eventos (vazia no SQLite também): histórico de uma decisão; sem decisão, sem evento |
 | postgres.robo | memoria_mensagens | funcionalidade não acionada | espelho de mensagens (vazia no SQLite também): mensagens de uma conversa do dono |
-| postgres.robo | memoria_ml_inferencias | funcionalidade não acionada | espelho de ml_inferencias (vazia no SQLite também): a sombra só pontua depois que um modelo é aprovado por out |
 | postgres.robo | memoria_propostas_regra | funcionalidade não acionada | espelho de propostas_regra (vazia no SQLite também): nasce de planilha REAL reprovada com correção possível ou |
 | postgres.robo | memoria_regras_aprendidas | funcionalidade não acionada | espelho de regras_aprendidas (vazia no SQLite também): só existe depois que o dono aprova uma proposta de regr |
 | postgres.robo | memoria_sala_eventos | funcionalidade não acionada | espelho de sala_eventos (vazia no SQLite também): reunião ao vivo aberta pelo dono no painel |
