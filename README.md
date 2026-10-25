@@ -1,6 +1,6 @@
 # Empresa ao vivo
 
-**Boletim das 25/10 08:59** (horário de Brasília) · trabalhando
+**Boletim das 25/10 09:05** (horário de Brasília) · trabalhando
 
 > Atualiza a cada 5 minutos enquanto a empresa trabalha. Recarregue a página para ver o mais novo.
 
