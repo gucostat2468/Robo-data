@@ -1,6 +1,6 @@
 # Empresa ao vivo
 
-**Boletim das 25/10 14:00** (horário de Brasília) · entre turnos: memória salva; o próximo turno começa em poucos minutos
+**Boletim das 25/10 14:03** (horário de Brasília) · trabalhando
 
 > Atualiza a cada 5 minutos enquanto a empresa trabalha. Recarregue a página para ver o mais novo.
 
@@ -9,7 +9,7 @@
 - **329** demandas, **325** concluídas (99%), 1 parciais, 3 com falha
 - **105** de 105 funcionários já trabalharam
 - SQL: 50 exercícios, 50 conferidos com o gabarito
-- Fábrica: 34 planilhas, 34 conferidas sem erro
+- Fábrica: 35 planilhas, 34 conferidas sem erro
 
 ## Trabalhando agora
 
@@ -184,13 +184,6 @@
 | Ícaro | Sênior de AWS, Linux e Ubuntu | trabalho do papel | Exercício de SQL no PostgreSQL com os dados da fábrica — nív (✅ concluída) | 14 |
 
 
-## Tempo do último turno (medido)
-
-- 16:16–17:00 (44 min, 101 voltas; cobertura do cronômetro 100%)
-- **Entregas aprovadas na revisão independente: 9 (12.3 por hora)** — o indicador principal
-- operacional 1% · estudo 5% · revisao 1% · coordenacao 0% · manutencao 36% · erro 0% · parado 57% · sem_medicao 0%
-- Bloqueios: 4; etapas esperando dependência: 0
-
 ## Projetos entre andares (várias pessoas, uma etapa depende da outra)
 
 - Projeto NPS — TREINO_csat_ces_20261025_092348_28482: **✅ concluída** — 1. dba (concluida); 2. analise_monitoramento (concluida); 3. cd_senior_drivers (concluida); 4. gov_pleno_lgpd (concluida); 5. canal_nina (concluida)
@@ -220,12 +213,12 @@
 - risco_demanda-v19: **reprovado** (treinado por ml_engenheiro)
 - risco_demanda-v20: **reprovado** (treinado por ml_engenheiro)
 - Última avaliação independente (ml_avaliador): risco_demanda-v20 reprovado — log loss 0.072 contra baseline 0.060; motivos: AUC 0.122 abaixo do mínimo 0.55; não bate o baseline (log loss 0.0715 ≥ 0.0596)
-- Referência em sombra: risco_demanda-v12; 192 previsões em sombra
+- Referência em sombra: risco_demanda-v12; 201 previsões em sombra
 - Uso operacional: desligado: o modelo só roda em sombra até o dono decidir usá-lo em alguma escolha da empresa
 
 ## Banco de dados
 
-Levantamento das 25/10 13:58: **164 de 201** tabelas com dados (820.281 linhas contadas uma a uma).
+Levantamento das 25/10 13:54: **164 de 201** tabelas com dados (819.407 linhas contadas uma a uma).
 
 
 | Onde | Tabelas | Com dados |
