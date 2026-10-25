@@ -1,12 +1,12 @@
 {
  "versao": 1,
- "gerado_em": "2026-10-25T06:49:02",
+ "gerado_em": "2026-10-25T06:54:08",
  "turno": {
   "estado": "trabalhando",
   "inicio": "2026-10-25T06:23:04",
   "fim_previsto": "2026-10-25T07:03:04",
-  "voltas": 56,
-  "planilhas": 1
+  "voltas": 74,
+  "planilhas": 2
  },
  "funcionarios": 105,
  "andares": [
@@ -18,8 +18,8 @@
    "concluidas": 23,
    "parciais": 0,
    "falhas": 0,
-   "treino": 192,
-   "acertos": 109
+   "treino": 199,
+   "acertos": 111
   },
   {
    "andar": 2,
@@ -29,8 +29,8 @@
    "concluidas": 22,
    "parciais": 0,
    "falhas": 0,
-   "treino": 185,
-   "acertos": 166
+   "treino": 190,
+   "acertos": 167
   },
   {
    "andar": 3,
@@ -40,7 +40,7 @@
    "concluidas": 14,
    "parciais": 0,
    "falhas": 0,
-   "treino": 126,
+   "treino": 127,
    "acertos": 85
   },
   {
@@ -51,7 +51,7 @@
    "concluidas": 28,
    "parciais": 0,
    "falhas": 0,
-   "treino": 261,
+   "treino": 268,
    "acertos": 132
   },
   {
@@ -62,7 +62,7 @@
    "concluidas": 60,
    "parciais": 0,
    "falhas": 1,
-   "treino": 246,
+   "treino": 250,
    "acertos": 125
   }
  ],
@@ -154,8 +154,8 @@
   "concluidos_hoje": 26
  },
  "fabrica": {
-  "lotes_hoje": 18,
-  "conferidos_ok_hoje": 18
+  "lotes_hoje": 19,
+  "conferidos_ok_hoje": 19
  },
  "rotinas": [
   {
@@ -178,9 +178,9 @@
   },
   {
    "rotina": "fabrica",
-   "execucoes_24h": 66,
+   "execucoes_24h": 68,
    "erros_24h": 0,
-   "ultima": "2026-10-25T06:23:16"
+   "ultima": "2026-10-25T06:53:34"
   },
   {
    "rotina": "ideias",
@@ -196,9 +196,9 @@
   },
   {
    "rotina": "laboratorio",
-   "execucoes_24h": 96,
+   "execucoes_24h": 97,
    "erros_24h": 0,
-   "ultima": "2026-10-25T06:43:53"
+   "ultima": "2026-10-25T06:54:08"
   },
   {
    "rotina": "licoes",
@@ -226,9 +226,9 @@
   },
   {
    "rotina": "registro",
-   "execucoes_24h": 554,
+   "execucoes_24h": 560,
    "erros_24h": 0,
-   "ultima": "2026-10-25T06:46:15"
+   "ultima": "2026-10-25T06:53:50"
   },
   {
    "rotina": "rh_desempenho",
@@ -238,22 +238,22 @@
   },
   {
    "rotina": "ronda_ti",
-   "execucoes_24h": 62,
+   "execucoes_24h": 63,
    "erros_24h": 0,
-   "ultima": "2026-10-25T06:22:42"
+   "ultima": "2026-10-25T06:52:49"
   },
   {
    "rotina": "treino",
-   "execucoes_24h": 385,
+   "execucoes_24h": 388,
    "erros_24h": 0,
-   "ultima": "2026-10-25T06:46:00"
+   "ultima": "2026-10-25T06:53:34"
   }
  ],
  "totais": {
   "demandas": 526,
-  "tentativas_treino": 9280,
-  "conversas": 3806,
-  "trabalhos_com_prova": 3053
+  "tentativas_treino": 9304,
+  "conversas": 3818,
+  "trabalhos_com_prova": 3073
  },
  "banco": {
   "levantamento": "2026-10-25T06:46:35",
