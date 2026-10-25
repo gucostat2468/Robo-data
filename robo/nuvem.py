@@ -215,10 +215,14 @@ def garantir_base(cfg, monitor) -> int:
     trabalho das áreas de dados fica bloqueado e a pessoa vai estudar por horas (achado no boletim por funcionário).
     Se faltar, a fábrica produz um lote agora e a esteira trata antes da 1ª distribuição. Devolve as planilhas tratadas."""
     from robo import demandas, fabrica
-    if demandas.base_tratada(cfg) and demandas.base_original(cfg):
+    tem_base = demandas.base_tratada(cfg) and demandas.base_original(cfg)
+    # o projeto NPS entre andares (robo/projetos.py) precisa de uma pesquisa NPS com atributos; a fábrica sorteia a
+    # regra e no 1º turno real só saíram estoque e logística: sem esta base o projeto nunca nascia
+    tem_nps = tem_base and not isinstance(demandas._com_indicador(cfg, {}), str)
+    if tem_base and tem_nps:
         return 0
     try:
-        lote = fabrica.produzir_lote(cfg)
+        lote = fabrica.produzir_lote(cfg, regra_id="nps")
         log.info("Turno na nuvem: máquina sem planilha tratada; a fábrica produziu %s para o trabalho do turno",
                  lote.get("arquivo"))
     except Exception:
@@ -306,13 +310,14 @@ def turno(cfg, minutos: float = 20, salvar_a_cada_min: float = 10, pausa_s: floa
     for nome in ("fabrica", "ronda_ti", "rh_desempenho", "alcadas"):  # fecham o turno (a fábrica confere o gabarito)
         if nome in rotinas.ROTINAS:
             crono.rotina(cfg, nome, rotinas.executar, rotinas.funcao(cfg, nome))
-    with crono.medir("salvar"):
-        inst = salvar(cfg)
+    # o tempo é gravado ANTES do salvamento final: gravado depois, ficava só na máquina descartada (achado no 1º
+    # turno real). O salvamento final em si fica fora da medição deste turno.
     try:
         tempo = tempo_turno.fechar(cfg, crono, voltas)
     except Exception as e:  # medir nunca derruba o turno; a falha fica no log
         log.warning("Tempo do turno não registrado: %s: %s", type(e).__name__, e)
         tempo = None
+    inst = salvar(cfg)
     _boletim("entre turnos: memória salva; o próximo turno começa em poucos minutos", final=True)
     mb = tamanho_mb(cfg)
     limite = float(os.environ.get("ROBO_LIMITE_MB") or LIMITE_MB_PADRAO)

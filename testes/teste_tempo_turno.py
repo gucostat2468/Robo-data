@@ -122,3 +122,24 @@ def teste_turno_grava_o_tempo_e_o_boletim_mostra(tmp_path, monkeypatch):
     assert "dialogo" in t["por_chamada"] and "esteira" in t["por_chamada"]
     md = boletim.markdown(boletim.montar(cfg))
     assert "Tempo do último turno (medido)" in md and "indicador principal" in md
+
+
+def teste_tempo_e_gravado_antes_do_salvamento_final(tmp_path, monkeypatch):
+    """1º turno real: o tempo era gravado DEPOIS do salvamento final e ficava só na máquina descartada."""
+    import threading
+
+    from robo import nuvem
+    vistos = []
+    monkeypatch.setattr(nuvem, "restaurar", lambda cfg: {"origem": "teste"})
+    monkeypatch.setattr(nuvem, "garantir_leitura", lambda cfg: True)
+    monkeypatch.setattr(nuvem, "salvar", lambda cfg: vistos.append(len(tempo_turno.ultimos(cfg))) or {"ok": True})
+    monkeypatch.setattr(nuvem, "tamanho_mb", lambda cfg: 1.0)
+    monkeypatch.setattr(nuvem, "_esteira", lambda m: 0)
+    monkeypatch.setattr(nuvem, "garantir_base", lambda cfg, m: 0)
+    monkeypatch.setattr(rotinas, "funcao", lambda cfg, nome: (lambda: None))
+    monkeypatch.setattr(rotinas, "abrir_sessao", lambda cfg: {"sessao": 1})
+    parar = threading.Event()
+    monkeypatch.setattr(rotinas, "batimento", lambda *a, **k: parar.set())
+    cfg = nuvem.config_da_nuvem(tmp_path, "postgresql://u:p@127.0.0.1:1/x")
+    nuvem.turno(cfg, minutos=5, pausa_s=0, parar=parar)
+    assert vistos[-1] == 1  # o salvamento final já leva a linha do tempo deste turno

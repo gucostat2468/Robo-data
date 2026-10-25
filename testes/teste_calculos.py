@@ -35,7 +35,8 @@ def teste_texto_nao_vira_soma(planilha_baguncada, cfg_factory):
 def teste_canal_usa_a_calculadora(planilha_baguncada, cfg_factory):
     cfg = _cfg(planilha_baguncada, cfg_factory)
     r = responder("quantas respostas por curso?", cfg)[0]
-    assert r["intencao"] == "calculo" and "Contagem por curso" in r["texto"]
+    # a abertura da fala muda com o dia (robo/voz.py) e, quando termina em vírgula, o fato começa em minúscula
+    assert r["intencao"] == "calculo" and "contagem por curso" in r["texto"].lower()
     assert responder("como faço um procx?", cfg)[0]["intencao"] == "conhecimento"
 
 

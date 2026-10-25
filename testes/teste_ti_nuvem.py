@@ -212,3 +212,18 @@ def teste_maquina_nova_ganha_planilha_antes_da_distribuicao(cfg_factory):
     assert nuvem.garantir_base(cfg, monitor) == 1
     assert demandas.base_tratada(cfg) and demandas.base_original(cfg)
     assert nuvem.garantir_base(cfg, monitor) == 0  # já tem: não produz outra
+
+
+def teste_maquina_sem_pesquisa_nps_ganha_uma_para_o_projeto(cfg_factory):
+    """1º turno real: a fábrica só sorteou estoque e logística e o projeto NPS entre andares não nasceu."""
+    from robo import demandas, fabrica, pos_processamento
+    from robo.monitor import Monitor
+    cfg = cfg_factory(fabrica={"linhas_min": 300, "linhas_max": 400})
+    cfg.criar_pastas()
+    monitor = Monitor(cfg, ao_processar=lambda r: pos_processamento.registrar(cfg, r))
+    fabrica.produzir_lote(cfg, regra_id="estoque")
+    monitor.ciclo(forcar=True)
+    assert demandas.base_tratada(cfg) and isinstance(demandas._com_indicador(cfg, {}), str)
+    assert nuvem.garantir_base(cfg, monitor) == 1
+    assert not isinstance(demandas._com_indicador(cfg, {}), str)
+    assert nuvem.garantir_base(cfg, monitor) == 0
