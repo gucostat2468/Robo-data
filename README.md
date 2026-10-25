@@ -1,6 +1,6 @@
 # Empresa ao vivo
 
-**Boletim das 24/10 22:42** (horário de Brasília) · trabalhando
+**Boletim das 24/10 22:46** (horário de Brasília) · entre turnos: memória salva; o próximo turno começa em poucos minutos
 
 > Atualiza a cada 5 minutos enquanto a empresa trabalha. Recarregue a página para ver o mais novo.
 
@@ -184,6 +184,13 @@
 | Ícaro | Sênior de AWS, Linux e Ubuntu | trabalho do papel | Exercício de SQL no PostgreSQL com os dados da fábrica — nív (✅ concluída) | 2 |
 
 
+## Tempo do último turno (medido)
+
+- 01:04–01:46 (42 min, 103 voltas; cobertura do cronômetro 100%)
+- **Entregas aprovadas na revisão independente: 28 (39.9 por hora)** — o indicador principal
+- operacional 4% · estudo 5% · revisao 1% · coordenacao 0% · manutencao 30% · erro 0% · parado 61% · sem_medicao 0%
+- Bloqueios: 0; etapas esperando dependência: 0
+
 ## Inteligência própria (modelo de risco das demandas)
 
 - risco_demanda-v1: **reprovado** (treinado por ml_engenheiro)
@@ -200,7 +207,7 @@
 
 ## Banco de dados
 
-Levantamento das 24/10 22:40: **162 de 201** tabelas com dados (531.012 linhas contadas uma a uma).
+Levantamento das 24/10 22:44: **162 de 201** tabelas com dados (532.603 linhas contadas uma a uma).
 
 
 | Onde | Tabelas | Com dados |
