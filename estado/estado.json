@@ -1,12 +1,12 @@
 {
  "versao": 1,
- "gerado_em": "2026-10-25T00:16:57",
+ "gerado_em": "2026-10-25T00:19:34",
  "turno": {
-  "estado": "entre turnos: memória salva; o próximo turno começa em poucos minutos",
-  "inicio": "2026-10-24T23:32:59",
-  "fim_previsto": "2026-10-25T00:12:59",
-  "voltas": 87,
-  "planilhas": 2
+  "estado": "trabalhando",
+  "inicio": "2026-10-25T00:19:34",
+  "fim_previsto": "2026-10-25T00:59:34",
+  "voltas": 0,
+  "planilhas": 1
  },
  "funcionarios": 105,
  "andares": [
@@ -154,7 +154,7 @@
   "concluidos_hoje": 3
  },
  "fabrica": {
-  "lotes_hoje": 1,
+  "lotes_hoje": 2,
   "conferidos_ok_hoje": 1
  },
  "rotinas": [
@@ -166,9 +166,9 @@
   },
   {
    "rotina": "caixa_dono",
-   "execucoes_24h": 20,
+   "execucoes_24h": 21,
    "erros_24h": 0,
-   "ultima": "2026-10-24T23:31:33"
+   "ultima": "2026-10-25T00:19:11"
   },
   {
    "rotina": "demandas",
@@ -178,9 +178,9 @@
   },
   {
    "rotina": "dialogo",
-   "execucoes_24h": 17,
+   "execucoes_24h": 18,
    "erros_24h": 0,
-   "ultima": "2026-10-24T21:11:46"
+   "ultima": "2026-10-25T00:19:11"
   },
   {
    "rotina": "fabrica",
@@ -196,9 +196,9 @@
   },
   {
    "rotina": "jornada",
-   "execucoes_24h": 20,
+   "execucoes_24h": 21,
    "erros_24h": 0,
-   "ultima": "2026-10-24T23:31:33"
+   "ultima": "2026-10-25T00:19:11"
   },
   {
    "rotina": "laboratorio",
@@ -208,27 +208,27 @@
   },
   {
    "rotina": "licoes",
-   "execucoes_24h": 11,
+   "execucoes_24h": 12,
    "erros_24h": 0,
-   "ultima": "2026-10-24T22:43:14"
+   "ultima": "2026-10-25T00:19:10"
   },
   {
    "rotina": "memoria_pg",
-   "execucoes_24h": 61,
+   "execucoes_24h": 60,
    "erros_24h": 0,
-   "ultima": "2026-10-25T00:16:52"
+   "ultima": "2026-10-25T00:12:23"
   },
   {
    "rotina": "modelos",
-   "execucoes_24h": 6,
+   "execucoes_24h": 7,
    "erros_24h": 0,
-   "ultima": "2026-10-24T21:58:23"
+   "ultima": "2026-10-25T00:19:15"
   },
   {
    "rotina": "paineis",
-   "execucoes_24h": 20,
+   "execucoes_24h": 21,
    "erros_24h": 0,
-   "ultima": "2026-10-24T23:31:36"
+   "ultima": "2026-10-25T00:19:14"
   },
   {
    "rotina": "registro",
@@ -244,9 +244,9 @@
   },
   {
    "rotina": "ronda_ti",
-   "execucoes_24h": 41,
+   "execucoes_24h": 42,
    "erros_24h": 0,
-   "ultima": "2026-10-25T00:14:00"
+   "ultima": "2026-10-25T00:19:02"
   },
   {
    "rotina": "treino",
@@ -258,16 +258,16 @@
  "totais": {
   "demandas": 387,
   "tentativas_treino": 8330,
-  "conversas": 3336,
-  "trabalhos_com_prova": 2244
+  "conversas": 3340,
+  "trabalhos_com_prova": 2252
  },
  "banco": {
-  "levantamento": "2026-10-25T00:14:21",
+  "levantamento": "2026-10-25T00:09:47",
   "postgres_conferido": true,
   "erro_postgres": null,
   "tabelas": 201,
   "com_dados": 162,
-  "linhas": 494668,
+  "linhas": 493370,
   "resumo": {
    "sqlite": {
     "tabelas": 79,
@@ -1709,12 +1709,14 @@
    "situacao": "trabalho do papel"
   }
  ],
+ "projetos": [],
+ "tempo_turnos": [],
  "modelos": {
   "finalidade": "risco_demanda",
   "rotuladas_agora": 344,
   "minimo_para_treinar": 60,
-  "datasets": 6,
-  "maior_dataset": 296,
+  "datasets": 7,
+  "maior_dataset": 344,
   "modelos": [
    {
     "id": "risco_demanda-v1",
@@ -1745,27 +1747,32 @@
     "id": "risco_demanda-v6",
     "estado": "reprovado",
     "criado_por": "ml_engenheiro"
+   },
+   {
+    "id": "risco_demanda-v7",
+    "estado": "reprovado",
+    "criado_por": "ml_engenheiro"
    }
   ],
   "referencia": null,
   "inferencias_sombra": 0,
   "uso_operacional": "desligado: o modelo só roda em sombra até o dono decidir usá-lo em alguma escolha da empresa",
   "ultima_avaliacao": {
-   "modelo": "risco_demanda-v6",
+   "modelo": "risco_demanda-v7",
    "resultado": "avaliado_reprovado",
    "quem": "ml_avaliador",
    "candidato": {
-    "n": 45,
+    "n": 52,
     "taxa_real": 0.0,
-    "log_loss": 0.021705,
-    "brier": 0.002466,
+    "log_loss": 0.042285,
+    "brier": 0.009767,
     "auc": null
    },
    "baseline": {
-    "n": 45,
+    "n": 52,
     "taxa_real": 0.0,
-    "log_loss": 0.089905,
-    "brier": 0.025421,
+    "log_loss": 0.142613,
+    "brier": 0.048744,
     "auc": null
    },
    "motivos": [
