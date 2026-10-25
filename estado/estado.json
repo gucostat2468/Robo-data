@@ -1,11 +1,11 @@
 {
  "versao": 1,
- "gerado_em": "2026-10-25T09:05:14",
+ "gerado_em": "2026-10-25T09:11:39",
  "turno": {
   "estado": "trabalhando",
   "inicio": "2026-10-25T08:40:40",
   "fim_previsto": "2026-10-25T09:20:40",
-  "voltas": 72,
+  "voltas": 88,
   "planilhas": 1
  },
  "funcionarios": 105,
@@ -18,8 +18,8 @@
    "concluidas": 30,
    "parciais": 0,
    "falhas": 0,
-   "treino": 255,
-   "acertos": 134
+   "treino": 265,
+   "acertos": 140
   },
   {
    "andar": 2,
@@ -29,8 +29,8 @@
    "concluidas": 29,
    "parciais": 0,
    "falhas": 0,
-   "treino": 243,
-   "acertos": 212
+   "treino": 250,
+   "acertos": 218
   },
   {
    "andar": 3,
@@ -40,7 +40,7 @@
    "concluidas": 21,
    "parciais": 0,
    "falhas": 0,
-   "treino": 163,
+   "treino": 164,
    "acertos": 103
   },
   {
@@ -51,23 +51,79 @@
    "concluidas": 32,
    "parciais": 0,
    "falhas": 0,
-   "treino": 342,
-   "acertos": 154
+   "treino": 347,
+   "acertos": 159
   },
   {
    "andar": 5,
    "pessoas": 24,
    "trabalharam_hoje": 24,
-   "demandas": 77,
-   "concluidas": 76,
+   "demandas": 84,
+   "concluidas": 82,
    "parciais": 0,
-   "falhas": 1,
-   "treino": 321,
-   "acertos": 154
+   "falhas": 2,
+   "treino": 322,
+   "acertos": 155
   }
  ],
  "agora": [],
  "ultimos": [
+  {
+   "quando": "2026-10-25T09:10:48",
+   "funcionario": "Marina",
+   "cargo": "Arquiteta de Cloud (AWS)",
+   "andar": 5,
+   "trabalho": "Medir a saúde do PostgreSQL — nível dificil",
+   "estado": "concluida"
+  },
+  {
+   "quando": "2026-10-25T09:10:47",
+   "funcionario": "Ícaro",
+   "cargo": "Sênior de AWS, Linux e Ubuntu",
+   "andar": 5,
+   "trabalho": "Exercício de SQL no PostgreSQL com os dados da fábrica — nível dificil",
+   "estado": "concluida"
+  },
+  {
+   "quando": "2026-10-25T09:10:30",
+   "funcionario": "Heloísa",
+   "cargo": "Head de AWS, Arquitetura e Governança de Nuvem",
+   "andar": 5,
+   "trabalho": "Medir a saúde do PostgreSQL — nível profissional",
+   "estado": "concluida"
+  },
+  {
+   "quando": "2026-10-25T09:10:28",
+   "funcionario": "Nicolas",
+   "cargo": "Especialista em numpy",
+   "andar": 5,
+   "trabalho": "Ronda de saúde do sistema — nível dificil",
+   "estado": "concluida"
+  },
+  {
+   "quando": "2026-10-25T09:10:26",
+   "funcionario": "Letícia",
+   "cargo": "Desenvolvedora Júnior",
+   "andar": 5,
+   "trabalho": "Medir a saúde do PostgreSQL",
+   "estado": "concluida"
+  },
+  {
+   "quando": "2026-10-25T09:10:26",
+   "funcionario": "Diego",
+   "cargo": "Desenvolvedor Python Pleno",
+   "andar": 5,
+   "trabalho": "SLA das rotinas — nível medio",
+   "estado": "falhou"
+  },
+  {
+   "quando": "2026-10-25T09:10:26",
+   "funcionario": "Alexandre",
+   "cargo": "Diretor de Tecnologia (CTO)",
+   "andar": 5,
+   "trabalho": "Estratégia Python — nível profissional",
+   "estado": "concluida"
+  },
   {
    "quando": "2026-10-25T08:40:39",
    "funcionario": "Marcos",
@@ -91,67 +147,11 @@
    "andar": 5,
    "trabalho": "SLA das rotinas — nível medio",
    "estado": "concluida"
-  },
-  {
-   "quando": "2026-10-25T08:40:19",
-   "funcionario": "Fernanda",
-   "cargo": "Coordenadora de DevOps e Confiabilidade (SRE)",
-   "andar": 5,
-   "trabalho": "Estratégia Python — nível dificil",
-   "estado": "concluida"
-  },
-  {
-   "quando": "2026-10-25T08:40:18",
-   "funcionario": "Wagner",
-   "cargo": "Especialista Sênior em Segurança da Informação",
-   "andar": 5,
-   "trabalho": "Ronda de saúde do sistema — nível dificil",
-   "estado": "concluida"
-  },
-  {
-   "quando": "2026-10-25T08:09:36",
-   "funcionario": "Marina",
-   "cargo": "Arquiteta de Cloud (AWS)",
-   "andar": 5,
-   "trabalho": "SLA das rotinas — nível dificil",
-   "estado": "concluida"
-  },
-  {
-   "quando": "2026-10-25T08:09:35",
-   "funcionario": "André",
-   "cargo": "Head de Infraestrutura e Segurança",
-   "andar": 5,
-   "trabalho": "Auditoria por amostragem — nível profissional",
-   "estado": "concluida"
-  },
-  {
-   "quando": "2026-10-25T08:09:35",
-   "funcionario": "Rodrigo",
-   "cargo": "Analista de Infraestrutura Pleno",
-   "andar": 5,
-   "trabalho": "SLA das rotinas — nível medio",
-   "estado": "concluida"
-  },
-  {
-   "quando": "2026-10-25T08:09:35",
-   "funcionario": "Heloísa",
-   "cargo": "Head de AWS, Arquitetura e Governança de Nuvem",
-   "andar": 5,
-   "trabalho": "SLA das rotinas — nível profissional",
-   "estado": "concluida"
-  },
-  {
-   "quando": "2026-10-25T08:09:35",
-   "funcionario": "Ícaro",
-   "cargo": "Sênior de AWS, Linux e Ubuntu",
-   "andar": 5,
-   "trabalho": "Procurar segredos no repositório público — nível dificil",
-   "estado": "concluida"
   }
  ],
  "sql": {
-  "exercicios_hoje": 35,
-  "concluidos_hoje": 35
+  "exercicios_hoje": 36,
+  "concluidos_hoje": 36
  },
  "fabrica": {
   "lotes_hoje": 24,
@@ -166,9 +166,9 @@
   },
   {
    "rotina": "demandas",
-   "execucoes_24h": 44,
+   "execucoes_24h": 45,
    "erros_24h": 0,
-   "ultima": "2026-10-25T08:40:39"
+   "ultima": "2026-10-25T09:10:48"
   },
   {
    "rotina": "dialogo",
@@ -196,9 +196,9 @@
   },
   {
    "rotina": "laboratorio",
-   "execucoes_24h": 106,
+   "execucoes_24h": 107,
    "erros_24h": 0,
-   "ultima": "2026-10-25T08:54:45"
+   "ultima": "2026-10-25T09:06:51"
   },
   {
    "rotina": "licoes",
@@ -226,9 +226,9 @@
   },
   {
    "rotina": "registro",
-   "execucoes_24h": 608,
+   "execucoes_24h": 613,
    "erros_24h": 0,
-   "ultima": "2026-10-25T09:03:07"
+   "ultima": "2026-10-25T09:11:03"
   },
   {
    "rotina": "rh_desempenho",
@@ -238,22 +238,22 @@
   },
   {
    "rotina": "ronda_ti",
-   "execucoes_24h": 71,
+   "execucoes_24h": 72,
    "erros_24h": 0,
-   "ultima": "2026-10-25T08:39:50"
+   "ultima": "2026-10-25T09:09:54"
   },
   {
    "rotina": "treino",
-   "execucoes_24h": 426,
+   "execucoes_24h": 429,
    "erros_24h": 0,
-   "ultima": "2026-10-25T09:03:07"
+   "ultima": "2026-10-25T09:11:39"
   }
  ],
  "totais": {
-  "demandas": 567,
-  "tentativas_treino": 9594,
-  "conversas": 3892,
-  "trabalhos_com_prova": 3316
+  "demandas": 574,
+  "tentativas_treino": 9618,
+  "conversas": 3897,
+  "trabalhos_com_prova": 3339
  },
  "banco": {
   "levantamento": "2026-10-25T09:03:22",
@@ -731,7 +731,7 @@
    "ultimo": "",
    "quando": "",
    "estado": "",
-   "situacao": "estagiário: observa (regra do dono) — Observei Caetano (Especialista em Orquestração de Dados (Apache Airflow)) fazendo \"SLA das rotinas\" no nível dificil: te"
+   "situacao": "estagiário: observa (regra do dono) — Observei Letícia (Desenvolvedora Júnior) fazendo \"Medir a saúde do PostgreSQL\" no nível basico: terminou concluida."
   },
   {
    "nome": "Tina",
@@ -962,7 +962,7 @@
    "ultimo": "",
    "quando": "",
    "estado": "",
-   "situacao": "estagiário: observa (regra do dono) — Observei Caetano (Especialista em Orquestração de Dados (Apache Airflow)) fazendo \"SLA das rotinas\" no nível dificil: te"
+   "situacao": "estagiário: observa (regra do dono) — Observei Letícia (Desenvolvedora Júnior) fazendo \"Medir a saúde do PostgreSQL\" no nível basico: terminou concluida."
   },
   {
    "nome": "Felipe",
@@ -1204,7 +1204,7 @@
    "ultimo": "",
    "quando": "",
    "estado": "",
-   "situacao": "estagiário: observa (regra do dono) — Observei Wagner (Especialista Sênior em Segurança da Informação) fazendo \"Ronda de saúde do sistema\" no nível dificil: t"
+   "situacao": "estagiário: observa (regra do dono)"
   },
   {
    "nome": "Lorena",
@@ -1431,9 +1431,9 @@
    "andar": 5,
    "cargo": "Diretor de Tecnologia (CTO)",
    "area": "Engenharia de Dados",
-   "demandas_hoje": 3,
-   "ultimo": "Exercício de SQL no PostgreSQL com os dados da fábrica — nível profissional",
-   "quando": "2026-10-25T06:07:07",
+   "demandas_hoje": 4,
+   "ultimo": "Estratégia Python — nível profissional",
+   "quando": "2026-10-25T09:10:26",
    "estado": "concluida",
    "situacao": "trabalho do papel"
   },
@@ -1479,17 +1479,17 @@
    "ultimo": "",
    "quando": "",
    "estado": "",
-   "situacao": "estagiário: observa (regra do dono) — Observei Caetano (Especialista em Orquestração de Dados (Apache Airflow)) fazendo \"SLA das rotinas\" no nível dificil: te"
+   "situacao": "estagiário: observa (regra do dono) — Observei Letícia (Desenvolvedora Júnior) fazendo \"Medir a saúde do PostgreSQL\" no nível basico: terminou concluida."
   },
   {
    "nome": "Diego",
    "andar": 5,
    "cargo": "Desenvolvedor Python Pleno",
    "area": "Engenharia de Dados",
-   "demandas_hoje": 3,
-   "ultimo": "Ronda de saúde do sistema — nível medio",
-   "quando": "2026-10-25T06:06:48",
-   "estado": "concluida",
+   "demandas_hoje": 4,
+   "ultimo": "SLA das rotinas — nível medio",
+   "quando": "2026-10-25T09:10:26",
+   "estado": "falhou",
    "situacao": "trabalho do papel"
   },
   {
@@ -1523,7 +1523,7 @@
    "ultimo": "",
    "quando": "",
    "estado": "",
-   "situacao": "estagiário: observa (regra do dono) — Observei Caetano (Especialista em Orquestração de Dados (Apache Airflow)) fazendo \"SLA das rotinas\" no nível dificil: te"
+   "situacao": "estagiário: observa (regra do dono) — Observei Letícia (Desenvolvedora Júnior) fazendo \"Medir a saúde do PostgreSQL\" no nível basico: terminou concluida."
   },
   {
    "nome": "Gustavo",
@@ -1541,9 +1541,9 @@
    "andar": 5,
    "cargo": "Head de AWS, Arquitetura e Governança de Nuvem",
    "area": "Engenharia de Dados",
-   "demandas_hoje": 6,
-   "ultimo": "SLA das rotinas — nível profissional",
-   "quando": "2026-10-25T08:09:35",
+   "demandas_hoje": 7,
+   "ultimo": "Medir a saúde do PostgreSQL — nível profissional",
+   "quando": "2026-10-25T09:10:28",
    "estado": "concluida",
    "situacao": "trabalho do papel"
   },
@@ -1574,10 +1574,10 @@
    "andar": 5,
    "cargo": "Desenvolvedora Júnior",
    "area": "Engenharia de Dados",
-   "demandas_hoje": 3,
-   "ultimo": "SLA das rotinas",
-   "quando": "2026-10-25T06:06:48",
-   "estado": "falhou",
+   "demandas_hoje": 4,
+   "ultimo": "Medir a saúde do PostgreSQL",
+   "quando": "2026-10-25T09:10:24",
+   "estado": "concluida",
    "situacao": "trabalho do papel"
   },
   {
@@ -1585,9 +1585,9 @@
    "andar": 5,
    "cargo": "Arquiteta de Cloud (AWS)",
    "area": "Engenharia de Dados",
-   "demandas_hoje": 7,
-   "ultimo": "SLA das rotinas — nível dificil",
-   "quando": "2026-10-25T08:09:36",
+   "demandas_hoje": 8,
+   "ultimo": "Medir a saúde do PostgreSQL — nível dificil",
+   "quando": "2026-10-25T09:10:47",
    "estado": "concluida",
    "situacao": "trabalho do papel"
   },
@@ -1596,9 +1596,9 @@
    "andar": 5,
    "cargo": "Especialista em numpy",
    "area": "Estatística",
-   "demandas_hoje": 3,
-   "ultimo": "Revisão da biblioteca sob sua responsabilidade — nível dificil",
-   "quando": "2026-10-25T06:07:11",
+   "demandas_hoje": 4,
+   "ultimo": "Ronda de saúde do sistema — nível dificil",
+   "quando": "2026-10-25T09:10:26",
    "estado": "concluida",
    "situacao": "trabalho do papel"
   },
@@ -1684,9 +1684,9 @@
    "andar": 5,
    "cargo": "Sênior de AWS, Linux e Ubuntu",
    "area": "Engenharia de Dados",
-   "demandas_hoje": 7,
-   "ultimo": "Procurar segredos no repositório público — nível dificil",
-   "quando": "2026-10-25T08:09:35",
+   "demandas_hoje": 8,
+   "ultimo": "Exercício de SQL no PostgreSQL com os dados da fábrica — nível dificil",
+   "quando": "2026-10-25T09:10:45",
    "estado": "concluida",
    "situacao": "trabalho do papel"
   }
@@ -1772,7 +1772,7 @@
  "tempo_turnos": [],
  "modelos": {
   "finalidade": "risco_demanda",
-  "rotuladas_agora": 524,
+  "rotuladas_agora": 531,
   "minimo_para_treinar": 60,
   "datasets": 14,
   "maior_dataset": 510,
@@ -1877,29 +1877,29 @@
  "niveis": [
   {
    "nivel": "basico",
-   "demandas": 194,
-   "concluidas": 175,
+   "demandas": 195,
+   "concluidas": 176,
    "parciais": 0,
    "falhas": 19
   },
   {
    "nivel": "medio",
-   "demandas": 151,
+   "demandas": 152,
    "concluidas": 149,
    "parciais": 0,
-   "falhas": 2
+   "falhas": 3
   },
   {
    "nivel": "dificil",
-   "demandas": 136,
-   "concluidas": 136,
+   "demandas": 139,
+   "concluidas": 139,
    "parciais": 0,
    "falhas": 0
   },
   {
    "nivel": "profissional",
-   "demandas": 43,
-   "concluidas": 43,
+   "demandas": 45,
+   "concluidas": 45,
    "parciais": 0,
    "falhas": 0
   }
