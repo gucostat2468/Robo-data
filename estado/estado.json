@@ -1,12 +1,12 @@
 {
  "versao": 1,
- "gerado_em": "2026-10-25T06:20:47",
+ "gerado_em": "2026-10-25T06:23:04",
  "turno": {
-  "estado": "entre turnos: memória salva; o próximo turno começa em poucos minutos",
-  "inicio": "2026-10-25T05:37:43",
-  "fim_previsto": "2026-10-25T06:17:43",
-  "voltas": 99,
-  "planilhas": 2
+  "estado": "trabalhando",
+  "inicio": "2026-10-25T06:23:04",
+  "fim_previsto": "2026-10-25T07:03:04",
+  "voltas": 0,
+  "planilhas": 1
  },
  "funcionarios": 105,
  "andares": [
@@ -154,15 +154,15 @@
   "concluidos_hoje": 21
  },
  "fabrica": {
-  "lotes_hoje": 17,
+  "lotes_hoje": 18,
   "conferidos_ok_hoje": 17
  },
  "rotinas": [
   {
    "rotina": "caixa_dono",
-   "execucoes_24h": 26,
+   "execucoes_24h": 27,
    "erros_24h": 0,
-   "ultima": "2026-10-25T05:36:15"
+   "ultima": "2026-10-25T06:22:49"
   },
   {
    "rotina": "demandas",
@@ -172,13 +172,13 @@
   },
   {
    "rotina": "dialogo",
-   "execucoes_24h": 30,
+   "execucoes_24h": 31,
    "erros_24h": 0,
-   "ultima": "2026-10-25T05:36:15"
+   "ultima": "2026-10-25T06:22:49"
   },
   {
    "rotina": "fabrica",
-   "execucoes_24h": 66,
+   "execucoes_24h": 65,
    "erros_24h": 0,
    "ultima": "2026-10-25T06:07:27"
   },
@@ -190,9 +190,9 @@
   },
   {
    "rotina": "jornada",
-   "execucoes_24h": 26,
+   "execucoes_24h": 27,
    "erros_24h": 0,
-   "ultima": "2026-10-25T05:36:15"
+   "ultima": "2026-10-25T06:22:49"
   },
   {
    "rotina": "laboratorio",
@@ -202,31 +202,31 @@
   },
   {
    "rotina": "licoes",
-   "execucoes_24h": 13,
+   "execucoes_24h": 14,
    "erros_24h": 0,
-   "ultima": "2026-10-25T04:49:44"
+   "ultima": "2026-10-25T06:22:48"
   },
   {
    "rotina": "memoria_pg",
-   "execucoes_24h": 80,
+   "execucoes_24h": 79,
    "erros_24h": 0,
-   "ultima": "2026-10-25T06:20:44"
+   "ultima": "2026-10-25T06:16:35"
   },
   {
    "rotina": "modelos",
-   "execucoes_24h": 11,
+   "execucoes_24h": 12,
    "erros_24h": 0,
-   "ultima": "2026-10-25T05:36:17"
+   "ultima": "2026-10-25T06:22:51"
   },
   {
    "rotina": "paineis",
-   "execucoes_24h": 26,
+   "execucoes_24h": 27,
    "erros_24h": 0,
-   "ultima": "2026-10-25T05:36:17"
+   "ultima": "2026-10-25T06:22:51"
   },
   {
    "rotina": "registro",
-   "execucoes_24h": 548,
+   "execucoes_24h": 546,
    "erros_24h": 0,
    "ultima": "2026-10-25T06:18:05"
   },
@@ -238,13 +238,13 @@
   },
   {
    "rotina": "ronda_ti",
-   "execucoes_24h": 62,
+   "execucoes_24h": 63,
    "erros_24h": 0,
-   "ultima": "2026-10-25T06:18:05"
+   "ultima": "2026-10-25T06:22:42"
   },
   {
    "rotina": "treino",
-   "execucoes_24h": 378,
+   "execucoes_24h": 377,
    "erros_24h": 0,
    "ultima": "2026-10-25T06:12:08"
   }
@@ -252,16 +252,16 @@
  "totais": {
   "demandas": 506,
   "tentativas_treino": 9203,
-  "conversas": 3785,
-  "trabalhos_com_prova": 2981
+  "conversas": 3787,
+  "trabalhos_com_prova": 2989
  },
  "banco": {
-  "levantamento": "2026-10-25T06:18:25",
+  "levantamento": "2026-10-25T06:14:13",
   "postgres_conferido": true,
   "erro_postgres": null,
   "tabelas": 201,
   "com_dados": 162,
-  "linhas": 643371,
+  "linhas": 642199,
   "resumo": {
    "sqlite": {
     "tabelas": 79,
@@ -1743,79 +1743,13 @@
    ]
   }
  ],
- "tempo_turnos": [
-  {
-   "id": 1,
-   "inicio": "2026-10-25T05:35:59",
-   "fim": "2026-10-25T06:20:47",
-   "segundos": 2688.3,
-   "voltas": 99,
-   "por_natureza": {
-    "operacional": 76.0,
-    "estudo": 134.1,
-    "revisao": 54.6,
-    "coordenacao": 1.7,
-    "manutencao": 950.7,
-    "erro": 0.0,
-    "parado": 1470.0,
-    "sem_medicao": 1.1
-   },
-   "por_chamada": {
-    "pausa": 1470.01,
-    "salvar": 670.46,
-    "boletim": 258.5,
-    "treino": 119.76,
-    "demandas": 96.57,
-    "esteira": 30.34,
-    "laboratorio": 14.24,
-    "inicio": 10.26,
-    "ronda_ti": 4.98,
-    "registro": 3.44,
-    "paineis": 2.07,
-    "backup": 1.63,
-    "estrategia": 1.46,
-    "fabrica": 1.36,
-    "canal": 0.53,
-    "jornada": 0.51,
-    "telegram": 0.43,
-    "modelos": 0.28,
-    "dialogo": 0.08,
-    "licoes": 0.06,
-    "pdca": 0.05,
-    "auditoria": 0.04,
-    "estudo": 0.04,
-    "ideias": 0.03,
-    "reuniao": 0.02,
-    "caixa_dono": 0.02,
-    "rh_desempenho": 0.01,
-    "alcadas": 0.01
-   },
-   "contagens": {
-    "demandas_executadas": 27,
-    "bloqueios": 1,
-    "etapas_esperando_dependencia": 0
-   },
-   "entregas_aprovadas": 26,
-   "entregas_por_hora": 34.82,
-   "cobertura": 1.0,
-   "percentual": {
-    "operacional": 2.8,
-    "estudo": 5.0,
-    "revisao": 2.0,
-    "coordenacao": 0.1,
-    "manutencao": 35.4,
-    "erro": 0.0,
-    "parado": 54.7,
-    "sem_medicao": 0.0
-   }
-  }
- ],
+ "tempo_turnos": [],
  "modelos": {
   "finalidade": "risco_demanda",
   "rotuladas_agora": 463,
   "minimo_para_treinar": 60,
-  "datasets": 11,
-  "maior_dataset": 436,
+  "datasets": 12,
+  "maior_dataset": 463,
   "modelos": [
    {
     "id": "risco_demanda-v1",
@@ -1871,32 +1805,35 @@
     "id": "risco_demanda-v11",
     "estado": "reprovado",
     "criado_por": "ml_engenheiro"
+   },
+   {
+    "id": "risco_demanda-v12",
+    "estado": "referencia",
+    "criado_por": "ml_engenheiro"
    }
   ],
-  "referencia": null,
+  "referencia": "risco_demanda-v12",
   "inferencias_sombra": 0,
   "uso_operacional": "desligado: o modelo só roda em sombra até o dono decidir usá-lo em alguma escolha da empresa",
   "ultima_avaliacao": {
-   "modelo": "risco_demanda-v11",
-   "resultado": "avaliado_reprovado",
+   "modelo": "risco_demanda-v12",
+   "resultado": "avaliado_aprovado",
    "quem": "ml_avaliador",
    "candidato": {
-    "n": 66,
-    "taxa_real": 0.0,
-    "log_loss": 0.01016,
-    "brier": 0.000497,
-    "auc": null
+    "n": 70,
+    "taxa_real": 0.014286,
+    "log_loss": 0.090595,
+    "brier": 0.014517,
+    "auc": 0.768116
    },
    "baseline": {
-    "n": 66,
-    "taxa_real": 0.0,
-    "log_loss": 0.121232,
-    "brier": 0.038167,
-    "auc": null
+    "n": 70,
+    "taxa_real": 0.014286,
+    "log_loss": 0.166555,
+    "brier": 0.046902,
+    "auc": 0.724638
    },
-   "motivos": [
-    "o teste tem uma classe só: não dá para medir separação"
-   ]
+   "motivos": []
   }
  },
  "niveis": [
