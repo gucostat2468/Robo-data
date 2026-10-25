@@ -1,11 +1,11 @@
 {
  "versao": 1,
- "gerado_em": "2026-10-25T15:26:54",
+ "gerado_em": "2026-10-25T15:31:40",
  "turno": {
-  "estado": "trabalhando",
+  "estado": "entre turnos: memória salva; o próximo turno começa em poucos minutos",
   "inicio": "2026-10-25T14:50:03",
   "fim_previsto": "2026-10-25T15:30:03",
-  "voltas": 103,
+  "voltas": 108,
   "planilhas": 1
  },
  "funcionarios": 105,
@@ -18,7 +18,7 @@
    "concluidas": 48,
    "parciais": 0,
    "falhas": 0,
-   "treino": 426,
+   "treino": 428,
    "acertos": 221
   },
   {
@@ -40,7 +40,7 @@
    "concluidas": 32,
    "parciais": 0,
    "falhas": 0,
-   "treino": 271,
+   "treino": 272,
    "acertos": 158
   },
   {
@@ -51,7 +51,7 @@
    "concluidas": 53,
    "parciais": 0,
    "falhas": 0,
-   "treino": 564,
+   "treino": 568,
    "acertos": 235
   },
   {
@@ -62,7 +62,7 @@
    "concluidas": 133,
    "parciais": 0,
    "falhas": 3,
-   "treino": 535,
+   "treino": 536,
    "acertos": 227
   }
  ],
@@ -198,7 +198,7 @@
    "rotina": "laboratorio",
    "execucoes_24h": 108,
    "erros_24h": 0,
-   "ultima": "2026-10-25T15:16:30"
+   "ultima": "2026-10-25T15:28:25"
   },
   {
    "rotina": "licoes",
@@ -208,9 +208,9 @@
   },
   {
    "rotina": "memoria_pg",
-   "execucoes_24h": 95,
+   "execucoes_24h": 96,
    "erros_24h": 0,
-   "ultima": "2026-10-25T15:26:51"
+   "ultima": "2026-10-25T15:31:38"
   },
   {
    "rotina": "modelos",
@@ -226,9 +226,9 @@
   },
   {
    "rotina": "registro",
-   "execucoes_24h": 575,
+   "execucoes_24h": 574,
    "erros_24h": 0,
-   "ultima": "2026-10-25T15:23:14"
+   "ultima": "2026-10-25T15:29:33"
   },
   {
    "rotina": "rh_desempenho",
@@ -238,30 +238,30 @@
   },
   {
    "rotina": "ronda_ti",
-   "execucoes_24h": 83,
+   "execucoes_24h": 84,
    "erros_24h": 0,
-   "ultima": "2026-10-25T15:19:49"
+   "ultima": "2026-10-25T15:29:33"
   },
   {
    "rotina": "treino",
-   "execucoes_24h": 438,
+   "execucoes_24h": 437,
    "erros_24h": 0,
-   "ultima": "2026-10-25T15:22:59"
+   "ultima": "2026-10-25T15:28:23"
   }
  ],
  "totais": {
   "demandas": 693,
-  "tentativas_treino": 10471,
-  "conversas": 4024,
-  "trabalhos_com_prova": 3992
+  "tentativas_treino": 10479,
+  "conversas": 4028,
+  "trabalhos_com_prova": 4001
  },
  "banco": {
-  "levantamento": "2026-10-25T15:25:00",
+  "levantamento": "2026-10-25T15:29:48",
   "postgres_conferido": true,
   "erro_postgres": null,
   "tabelas": 201,
   "com_dados": 164,
-  "linhas": 799336,
+  "linhas": 800436,
   "resumo": {
    "sqlite": {
     "tabelas": 79,
@@ -1807,7 +1807,73 @@
    ]
   }
  ],
- "tempo_turnos": [],
+ "tempo_turnos": [
+  {
+   "id": 1,
+   "inicio": "2026-10-25T14:49:32",
+   "fim": "2026-10-25T15:31:40",
+   "segundos": 2528.9,
+   "voltas": 108,
+   "por_natureza": {
+    "operacional": 29.1,
+    "estudo": 118.3,
+    "revisao": 3.4,
+    "coordenacao": 2.2,
+    "manutencao": 763.6,
+    "erro": 0.0,
+    "parado": 1610.6,
+    "sem_medicao": 1.7
+   },
+   "por_chamada": {
+    "pausa": 1610.57,
+    "salvar": 515.16,
+    "boletim": 225.12,
+    "treino": 106.31,
+    "esteira": 13.48,
+    "demandas": 13.4,
+    "laboratorio": 11.98,
+    "registro": 7.81,
+    "inicio": 7.35,
+    "ronda_ti": 4.38,
+    "paineis": 4.08,
+    "estrategia": 2.1,
+    "backup": 1.87,
+    "fabrica": 1.15,
+    "canal": 0.67,
+    "telegram": 0.6,
+    "jornada": 0.58,
+    "modelos": 0.38,
+    "dialogo": 0.07,
+    "caixa_dono": 0.03,
+    "alcadas": 0.01,
+    "rh_desempenho": 0.01,
+    "pdca": 0.01,
+    "auditoria": 0.01,
+    "ideias": 0.01,
+    "reuniao": 0.01,
+    "licoes": 0.01,
+    "estudo": 0.01
+   },
+   "contagens": {
+    "demandas_executadas": 11,
+    "bloqueios": 0,
+    "etapas_esperando_dependencia": 0
+   },
+   "entregas_aprovadas": 11,
+   "entregas_por_hora": 15.66,
+   "cobertura": 0.999,
+   "percentual": {
+    "operacional": 1.2,
+    "estudo": 4.7,
+    "revisao": 0.1,
+    "coordenacao": 0.1,
+    "manutencao": 30.2,
+    "erro": 0.0,
+    "parado": 63.7,
+    "sem_medicao": 0.1
+   }
+  }
+ ],
  "modelos": {
   "finalidade": "risco_demanda",
   "rotuladas_agora": 650,
