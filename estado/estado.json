@@ -1,11 +1,11 @@
 {
  "versao": 1,
- "gerado_em": "2026-10-25T22:09:17",
+ "gerado_em": "2026-10-25T22:15:46",
  "turno": {
   "estado": "trabalhando",
   "inicio": "2026-10-25T21:35:50",
   "fim_previsto": "2026-10-25T22:15:50",
-  "voltas": 91,
+  "voltas": 104,
   "planilhas": 1
  },
  "funcionarios": 105,
@@ -18,8 +18,8 @@
    "concluidas": 66,
    "parciais": 0,
    "falhas": 0,
-   "treino": 600,
-   "acertos": 325
+   "treino": 605,
+   "acertos": 326
   },
   {
    "andar": 2,
@@ -29,8 +29,8 @@
    "concluidas": 63,
    "parciais": 1,
    "falhas": 0,
-   "treino": 569,
-   "acertos": 468
+   "treino": 571,
+   "acertos": 469
   },
   {
    "andar": 3,
@@ -40,7 +40,7 @@
    "concluidas": 43,
    "parciais": 0,
    "falhas": 0,
-   "treino": 379,
+   "treino": 380,
    "acertos": 212
   },
   {
@@ -51,8 +51,8 @@
    "concluidas": 74,
    "parciais": 0,
    "falhas": 0,
-   "treino": 789,
-   "acertos": 335
+   "treino": 791,
+   "acertos": 337
   },
   {
    "andar": 5,
@@ -62,8 +62,8 @@
    "concluidas": 184,
    "parciais": 0,
    "falhas": 3,
-   "treino": 751,
-   "acertos": 317
+   "treino": 753,
+   "acertos": 318
   }
  ],
  "agora": [],
@@ -196,7 +196,7 @@
   },
   {
    "rotina": "laboratorio",
-   "execucoes_24h": 107,
+   "execucoes_24h": 106,
    "erros_24h": 0,
    "ultima": "2026-10-25T22:04:25"
   },
@@ -208,9 +208,9 @@
   },
   {
    "rotina": "memoria_pg",
-   "execucoes_24h": 94,
+   "execucoes_24h": 95,
    "erros_24h": 0,
-   "ultima": "2026-10-25T22:02:21"
+   "ultima": "2026-10-25T22:15:41"
   },
   {
    "rotina": "modelos",
@@ -228,7 +228,7 @@
    "rotina": "registro",
    "execucoes_24h": 534,
    "erros_24h": 0,
-   "ultima": "2026-10-25T22:08:46"
+   "ultima": "2026-10-25T22:12:38"
   },
   {
    "rotina": "rh_desempenho",
@@ -246,22 +246,22 @@
    "rotina": "treino",
    "execucoes_24h": 439,
    "erros_24h": 0,
-   "ultima": "2026-10-25T22:08:31"
+   "ultima": "2026-10-25T22:12:37"
   }
  ],
  "totais": {
   "demandas": 812,
-  "tentativas_treino": 11358,
-  "conversas": 4168,
-  "trabalhos_com_prova": 4747
+  "tentativas_treino": 11370,
+  "conversas": 4174,
+  "trabalhos_com_prova": 4754
  },
  "banco": {
-  "levantamento": "2026-10-25T21:59:40",
+  "levantamento": "2026-10-25T22:13:01",
   "postgres_conferido": true,
   "erro_postgres": null,
   "tabelas": 201,
   "com_dados": 164,
-  "linhas": 894506,
+  "linhas": 895947,
   "resumo": {
    "sqlite": {
     "tabelas": 79,
