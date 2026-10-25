@@ -1,6 +1,6 @@
 # Empresa ao vivo
 
-**Boletim das 25/10 01:01** (horário de Brasília) · entre turnos: memória salva; o próximo turno começa em poucos minutos
+**Boletim das 25/10 01:03** (horário de Brasília) · trabalhando
 
 > Atualiza a cada 5 minutos enquanto a empresa trabalha. Recarregue a página para ver o mais novo.
 
@@ -9,7 +9,7 @@
 - **81** demandas, **81** concluídas (100%), 0 parciais, 0 com falha
 - **104** de 105 funcionários já trabalharam
 - SQL: 12 exercícios, 12 conferidos com o gabarito
-- Fábrica: 11 planilhas, 11 conferidas sem erro
+- Fábrica: 12 planilhas, 11 conferidas sem erro
 
 ## Trabalhando agora
 
@@ -184,13 +184,6 @@
 | Ícaro | Sênior de AWS, Linux e Ubuntu | trabalho do papel | Medir a saúde do PostgreSQL — nível dificil (✅ concluída) | 4 |
 
 
-## Tempo do último turno (medido)
-
-- 03:17–04:01 (44 min, 97 voltas; cobertura do cronômetro 100%)
-- **Entregas aprovadas na revisão independente: 6 (8.2 por hora)** — o indicador principal
-- operacional 2% · estudo 5% · revisao 1% · coordenacao 0% · manutencao 37% · erro 0% · parado 54% · sem_medicao 0%
-- Bloqueios: 0; etapas esperando dependência: 0
-
 ## Projetos entre andares (várias pessoas, uma etapa depende da outra)
 
 - Projeto NPS — TREINO_nps_20261025_030222_42391: **✅ concluída** — 1. banco (concluida); 2. analise_estatistica (concluida); 3. cd_senior_drivers (concluida); 4. gov_pleno_lgpd (concluida); 5. analise_relator (concluida)
@@ -206,13 +199,14 @@
 - risco_demanda-v7: **reprovado** (treinado por ml_engenheiro)
 - risco_demanda-v8: **reprovado** (treinado por ml_engenheiro)
 - risco_demanda-v9: **reprovado** (treinado por ml_engenheiro)
-- Última avaliação independente (ml_avaliador): risco_demanda-v9 reprovado — log loss 0.023 contra baseline 0.099; motivos: o teste tem uma classe só: não dá para medir separação
+- risco_demanda-v10: **reprovado** (treinado por ml_engenheiro)
+- Última avaliação independente (ml_avaliador): risco_demanda-v10 reprovado — log loss 0.019 contra baseline 0.083; motivos: o teste tem uma classe só: não dá para medir separação
 - Referência em sombra: nenhuma; 0 previsões em sombra
 - Uso operacional: desligado: o modelo só roda em sombra até o dono decidir usá-lo em alguma escolha da empresa
 
 ## Banco de dados
 
-Levantamento das 25/10 00:58: **162 de 201** tabelas com dados (585.638 linhas contadas uma a uma).
+Levantamento das 25/10 00:54: **162 de 201** tabelas com dados (584.816 linhas contadas uma a uma).
 
 
 | Onde | Tabelas | Com dados |
