@@ -1,11 +1,11 @@
 {
  "versao": 1,
- "gerado_em": "2026-10-25T19:56:59",
+ "gerado_em": "2026-10-25T20:01:19",
  "turno": {
-  "estado": "trabalhando",
+  "estado": "entre turnos: memória salva; o próximo turno começa em poucos minutos",
   "inicio": "2026-10-25T19:19:43",
   "fim_previsto": "2026-10-25T19:59:43",
-  "voltas": 103,
+  "voltas": 106,
   "planilhas": 1
  },
  "funcionarios": 105,
@@ -18,8 +18,8 @@
    "concluidas": 65,
    "parciais": 0,
    "falhas": 0,
-   "treino": 543,
-   "acertos": 289
+   "treino": 545,
+   "acertos": 291
   },
   {
    "andar": 2,
@@ -40,8 +40,8 @@
    "concluidas": 41,
    "parciais": 0,
    "falhas": 0,
-   "treino": 343,
-   "acertos": 197
+   "treino": 344,
+   "acertos": 198
   },
   {
    "andar": 4,
@@ -51,8 +51,8 @@
    "concluidas": 74,
    "parciais": 0,
    "falhas": 0,
-   "treino": 717,
-   "acertos": 310
+   "treino": 718,
+   "acertos": 311
   },
   {
    "andar": 5,
@@ -62,8 +62,8 @@
    "concluidas": 168,
    "parciais": 0,
    "falhas": 3,
-   "treino": 679,
-   "acertos": 287
+   "treino": 682,
+   "acertos": 290
   }
  ],
  "agora": [],
@@ -166,7 +166,7 @@
   },
   {
    "rotina": "demandas",
-   "execucoes_24h": 48,
+   "execucoes_24h": 47,
    "erros_24h": 0,
    "ultima": "2026-10-25T19:54:33"
   },
@@ -196,7 +196,7 @@
   },
   {
    "rotina": "laboratorio",
-   "execucoes_24h": 108,
+   "execucoes_24h": 107,
    "erros_24h": 0,
    "ultima": "2026-10-25T19:50:23"
   },
@@ -208,9 +208,9 @@
   },
   {
    "rotina": "memoria_pg",
-   "execucoes_24h": 95,
+   "execucoes_24h": 96,
    "erros_24h": 0,
-   "ultima": "2026-10-25T19:56:56"
+   "ultima": "2026-10-25T20:01:16"
   },
   {
    "rotina": "modelos",
@@ -228,7 +228,7 @@
    "rotina": "registro",
    "execucoes_24h": 535,
    "erros_24h": 0,
-   "ultima": "2026-10-25T19:54:50"
+   "ultima": "2026-10-25T19:59:10"
   },
   {
    "rotina": "rh_desempenho",
@@ -238,30 +238,30 @@
   },
   {
    "rotina": "ronda_ti",
-   "execucoes_24h": 89,
+   "execucoes_24h": 90,
    "erros_24h": 0,
-   "ultima": "2026-10-25T19:49:33"
+   "ultima": "2026-10-25T19:59:10"
   },
   {
    "rotina": "treino",
-   "execucoes_24h": 435,
+   "execucoes_24h": 434,
    "erros_24h": 0,
-   "ultima": "2026-10-25T19:54:50"
+   "ultima": "2026-10-25T19:58:30"
   }
  ],
  "totais": {
   "demandas": 790,
-  "tentativas_treino": 11069,
-  "conversas": 4101,
-  "trabalhos_com_prova": 4503
+  "tentativas_treino": 11076,
+  "conversas": 4107,
+  "trabalhos_com_prova": 4510
  },
  "banco": {
-  "levantamento": "2026-10-25T19:55:06",
+  "levantamento": "2026-10-25T19:59:25",
   "postgres_conferido": true,
   "erro_postgres": null,
   "tabelas": 201,
   "com_dados": 164,
-  "linhas": 866171,
+  "linhas": 867695,
   "resumo": {
    "sqlite": {
     "tabelas": 79,
@@ -1807,7 +1807,73 @@
    ]
   }
  ],
- "tempo_turnos": [],
+ "tempo_turnos": [
+  {
+   "id": 1,
+   "inicio": "2026-10-25T19:19:09",
+   "fim": "2026-10-25T20:01:19",
+   "segundos": 2530.1,
+   "voltas": 106,
+   "por_natureza": {
+    "operacional": 81.6,
+    "estudo": 33.7,
+    "revisao": 47.2,
+    "coordenacao": 2.3,
+    "manutencao": 780.2,
+    "erro": 0.0,
+    "parado": 1583.5,
+    "sem_medicao": 1.7
+   },
+   "por_chamada": {
+    "pausa": 1583.46,
+    "salvar": 525.54,
+    "boletim": 229.33,
+    "demandas": 108.2,
+    "treino": 20.53,
+    "esteira": 14.65,
+    "laboratorio": 13.18,
+    "registro": 8.73,
+    "inicio": 7.83,
+    "ronda_ti": 4.6,
+    "paineis": 4.29,
+    "estrategia": 2.1,
+    "backup": 2.04,
+    "fabrica": 1.18,
+    "jornada": 0.87,
+    "canal": 0.66,
+    "telegram": 0.58,
+    "modelos": 0.46,
+    "dialogo": 0.08,
+    "caixa_dono": 0.03,
+    "alcadas": 0.02,
+    "rh_desempenho": 0.01,
+    "pdca": 0.01,
+    "ideias": 0.01,
+    "auditoria": 0.01,
+    "estudo": 0.01,
+    "reuniao": 0.01,
+    "licoes": 0.01
+   },
+   "contagens": {
+    "demandas_executadas": 25,
+    "bloqueios": 0,
+    "etapas_esperando_dependencia": 0
+   },
+   "entregas_aprovadas": 25,
+   "entregas_por_hora": 35.57,
+   "cobertura": 0.999,
+   "percentual": {
+    "operacional": 3.2,
+    "estudo": 1.3,
+    "revisao": 1.9,
+    "coordenacao": 0.1,
+    "manutencao": 30.8,
+    "erro": 0.0,
+    "parado": 62.6,
+    "sem_medicao": 0.1
+   }
+  }
+ ],
  "modelos": {
   "finalidade": "risco_demanda",
   "rotuladas_agora": 747,
