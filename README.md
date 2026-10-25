@@ -1,6 +1,6 @@
 # Empresa ao vivo
 
-**Boletim das 24/10 21:58** (horário de Brasília) · trabalhando
+**Boletim das 24/10 22:02** (horário de Brasília) · entre turnos: memória salva; o próximo turno começa em poucos minutos
 
 > Atualiza a cada 5 minutos enquanto a empresa trabalha. Recarregue a página para ver o mais novo.
 
@@ -184,6 +184,13 @@
 | Ícaro | Sênior de AWS, Linux e Ubuntu | trabalho do papel | Procurar segredos no repositório público — nível dificil (✅ concluída) | 1 |
 
 
+## Tempo do último turno (medido)
+
+- 00:18–01:02 (44 min, 91 voltas; cobertura do cronômetro 100%)
+- **Entregas aprovadas na revisão independente: 20 (27.5 por hora)** — o indicador principal
+- operacional 4% · estudo 7% · revisao 1% · coordenacao 0% · manutencao 36% · erro 0% · parado 52% · sem_medicao 0%
+- Bloqueios: 3; etapas esperando dependência: 0
+
 ## Inteligência própria (modelo de risco das demandas)
 
 - risco_demanda-v1: **reprovado** (treinado por ml_engenheiro)
@@ -199,7 +206,7 @@
 
 ## Banco de dados
 
-Levantamento das 24/10 21:55: **162 de 201** tabelas com dados (514.612 linhas contadas uma a uma).
+Levantamento das 24/10 22:00: **162 de 201** tabelas com dados (515.472 linhas contadas uma a uma).
 
 
 | Onde | Tabelas | Com dados |
