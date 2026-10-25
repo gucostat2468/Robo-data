@@ -1,6 +1,6 @@
 # Empresa ao vivo
 
-**Boletim das 25/10 09:30** (horário de Brasília) · entre turnos: memória salva; o próximo turno começa em poucos minutos
+**Boletim das 25/10 09:33** (horário de Brasília) · trabalhando
 
 > Atualiza a cada 5 minutos enquanto a empresa trabalha. Recarregue a página para ver o mais novo.
 
@@ -9,7 +9,7 @@
 - **249** demandas, **246** concluídas (99%), 1 parciais, 2 com falha
 - **105** de 105 funcionários já trabalharam
 - SQL: 42 exercícios, 42 conferidos com o gabarito
-- Fábrica: 28 planilhas, 28 conferidas sem erro
+- Fábrica: 29 planilhas, 28 conferidas sem erro
 
 ## Trabalhando agora
 
@@ -184,13 +184,6 @@
 | Ícaro | Sênior de AWS, Linux e Ubuntu | trabalho do papel | Medir a saúde do PostgreSQL — nível dificil (✅ concluída) | 10 |
 
 
-## Tempo do último turno (medido)
-
-- 11:42–12:30 (48 min, 96 voltas; cobertura do cronômetro 100%)
-- **Entregas aprovadas na revisão independente: 29 (36.2 por hora)** — o indicador principal
-- operacional 2% · estudo 5% · revisao 3% · coordenacao 0% · manutencao 39% · erro 0% · parado 49% · sem_medicao 0%
-- Bloqueios: 1; etapas esperando dependência: 0
-
 ## Projetos entre andares (várias pessoas, uma etapa depende da outra)
 
 - Projeto NPS — TREINO_csat_ces_20261025_092348_28482: **✅ concluída** — 1. dba (concluida); 2. analise_monitoramento (concluida); 3. cd_senior_drivers (concluida); 4. gov_pleno_lgpd (concluida); 5. canal_nina (concluida)
@@ -215,13 +208,14 @@
 - risco_demanda-v14: **reprovado** (treinado por ml_engenheiro)
 - risco_demanda-v15: **reprovado** (treinado por ml_engenheiro)
 - risco_demanda-v16: **reprovado** (treinado por ml_engenheiro)
-- Última avaliação independente (ml_avaliador): risco_demanda-v16 reprovado — log loss 0.126 contra baseline 0.145; motivos: AUC 0.427 abaixo do mínimo 0.55
-- Referência em sombra: risco_demanda-v12; 92 previsões em sombra
+- risco_demanda-v17: **reprovado** (treinado por ml_engenheiro)
+- Última avaliação independente (ml_avaliador): risco_demanda-v17 reprovado — log loss 0.119 contra baseline 0.130; motivos: AUC 0.459 abaixo do mínimo 0.55
+- Referência em sombra: risco_demanda-v12; 121 previsões em sombra
 - Uso operacional: desligado: o modelo só roda em sombra até o dono decidir usá-lo em alguma escolha da empresa
 
 ## Banco de dados
 
-Levantamento das 25/10 09:27: **164 de 201** tabelas com dados (756.962 linhas contadas uma a uma).
+Levantamento das 25/10 09:22: **164 de 201** tabelas com dados (755.909 linhas contadas uma a uma).
 
 
 | Onde | Tabelas | Com dados |
