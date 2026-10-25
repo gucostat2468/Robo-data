@@ -1,6 +1,6 @@
 # Empresa ao vivo
 
-**Boletim das 24/10 22:46** (horário de Brasília) · entre turnos: memória salva; o próximo turno começa em poucos minutos
+**Boletim das 24/10 22:48** (horário de Brasília) · trabalhando
 
 > Atualiza a cada 5 minutos enquanto a empresa trabalha. Recarregue a página para ver o mais novo.
 
@@ -9,7 +9,7 @@
 - **57** demandas, **57** concluídas (100%), 0 parciais, 0 com falha
 - **104** de 105 funcionários já trabalharam
 - SQL: 6 exercícios, 6 conferidos com o gabarito
-- Fábrica: 5 planilhas, 5 conferidas sem erro
+- Fábrica: 6 planilhas, 5 conferidas sem erro
 
 ## Trabalhando agora
 
@@ -184,13 +184,6 @@
 | Ícaro | Sênior de AWS, Linux e Ubuntu | trabalho do papel | Exercício de SQL no PostgreSQL com os dados da fábrica — nív (✅ concluída) | 2 |
 
 
-## Tempo do último turno (medido)
-
-- 01:04–01:46 (42 min, 103 voltas; cobertura do cronômetro 100%)
-- **Entregas aprovadas na revisão independente: 28 (39.9 por hora)** — o indicador principal
-- operacional 4% · estudo 5% · revisao 1% · coordenacao 0% · manutencao 30% · erro 0% · parado 61% · sem_medicao 0%
-- Bloqueios: 0; etapas esperando dependência: 0
-
 ## Inteligência própria (modelo de risco das demandas)
 
 - risco_demanda-v1: **reprovado** (treinado por ml_engenheiro)
@@ -201,13 +194,14 @@
 - risco_demanda-v6: **reprovado** (treinado por ml_engenheiro)
 - risco_demanda-v7: **reprovado** (treinado por ml_engenheiro)
 - risco_demanda-v8: **reprovado** (treinado por ml_engenheiro)
-- Última avaliação independente (ml_avaliador): risco_demanda-v8 reprovado — log loss 0.037 contra baseline 0.149; motivos: o teste tem uma classe só: não dá para medir separação
+- risco_demanda-v9: **reprovado** (treinado por ml_engenheiro)
+- Última avaliação independente (ml_avaliador): risco_demanda-v9 reprovado — log loss 0.023 contra baseline 0.099; motivos: o teste tem uma classe só: não dá para medir separação
 - Referência em sombra: nenhuma; 0 previsões em sombra
 - Uso operacional: desligado: o modelo só roda em sombra até o dono decidir usá-lo em alguma escolha da empresa
 
 ## Banco de dados
 
-Levantamento das 24/10 22:44: **162 de 201** tabelas com dados (532.603 linhas contadas uma a uma).
+Levantamento das 24/10 22:40: **162 de 201** tabelas com dados (531.012 linhas contadas uma a uma).
 
 
 | Onde | Tabelas | Com dados |
