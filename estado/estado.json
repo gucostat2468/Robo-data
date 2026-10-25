@@ -1,11 +1,11 @@
 {
  "versao": 1,
- "gerado_em": "2026-10-25T10:35:25",
+ "gerado_em": "2026-10-25T10:41:59",
  "turno": {
   "estado": "trabalhando",
   "inicio": "2026-10-25T10:09:26",
   "fim_previsto": "2026-10-25T10:49:26",
-  "voltas": 66,
+  "voltas": 84,
   "planilhas": 1
  },
  "funcionarios": 105,
@@ -18,7 +18,7 @@
    "concluidas": 30,
    "parciais": 0,
    "falhas": 0,
-   "treino": 303,
+   "treino": 304,
    "acertos": 156
   },
   {
@@ -29,8 +29,8 @@
    "concluidas": 32,
    "parciais": 0,
    "falhas": 0,
-   "treino": 282,
-   "acertos": 244
+   "treino": 287,
+   "acertos": 249
   },
   {
    "andar": 3,
@@ -40,7 +40,7 @@
    "concluidas": 21,
    "parciais": 0,
    "falhas": 0,
-   "treino": 188,
+   "treino": 191,
    "acertos": 115
   },
   {
@@ -51,23 +51,39 @@
    "concluidas": 33,
    "parciais": 0,
    "falhas": 0,
-   "treino": 394,
+   "treino": 401,
    "acertos": 170
   },
   {
    "andar": 5,
    "pessoas": 24,
    "trabalharam_hoje": 24,
-   "demandas": 92,
-   "concluidas": 90,
+   "demandas": 94,
+   "concluidas": 92,
    "parciais": 0,
    "falhas": 2,
-   "treino": 370,
+   "treino": 378,
    "acertos": 170
   }
  ],
  "agora": [],
  "ultimos": [
+  {
+   "quando": "2026-10-25T10:40:43",
+   "funcionario": "Marina",
+   "cargo": "Arquiteta de Cloud (AWS)",
+   "andar": 5,
+   "trabalho": "Procurar segredos no repositório público — nível dificil",
+   "estado": "concluida"
+  },
+  {
+   "quando": "2026-10-25T10:40:42",
+   "funcionario": "Ícaro",
+   "cargo": "Sênior de AWS, Linux e Ubuntu",
+   "andar": 5,
+   "trabalho": "Testar se o último backup volta — nível dificil",
+   "estado": "concluida"
+  },
   {
    "quando": "2026-10-25T10:11:33",
    "funcionario": "Heloísa",
@@ -131,22 +147,6 @@
    "andar": 4,
    "trabalho": "Diagnosticar a planilha original da fábrica — nível dificil",
    "estado": "concluida"
-  },
-  {
-   "quando": "2026-10-25T09:40:40",
-   "funcionario": "Marcos",
-   "cargo": "Coordenador de Análise e Ciência de Dados",
-   "andar": 2,
-   "trabalho": "Projeto NPS — TREINO_csat_ces_20261025_092348_28482",
-   "estado": "concluida"
-  },
-  {
-   "quando": "2026-10-25T09:40:32",
-   "funcionario": "Olívia",
-   "cargo": "Especialista em openpyxl (Excel)",
-   "andar": 5,
-   "trabalho": "Ronda de saúde do sistema — nível dificil",
-   "estado": "concluida"
   }
  ],
  "sql": {
@@ -166,9 +166,9 @@
   },
   {
    "rotina": "demandas",
-   "execucoes_24h": 47,
+   "execucoes_24h": 48,
    "erros_24h": 0,
-   "ultima": "2026-10-25T10:11:33"
+   "ultima": "2026-10-25T10:40:43"
   },
   {
    "rotina": "dialogo",
@@ -196,9 +196,9 @@
   },
   {
    "rotina": "laboratorio",
-   "execucoes_24h": 113,
+   "execucoes_24h": 114,
    "erros_24h": 0,
-   "ultima": "2026-10-25T10:24:18"
+   "ultima": "2026-10-25T10:37:32"
   },
   {
    "rotina": "licoes",
@@ -226,9 +226,9 @@
   },
   {
    "rotina": "registro",
-   "execucoes_24h": 643,
+   "execucoes_24h": 649,
    "erros_24h": 0,
-   "ultima": "2026-10-25T10:24:33"
+   "ultima": "2026-10-25T10:41:59"
   },
   {
    "rotina": "rh_desempenho",
@@ -238,22 +238,22 @@
   },
   {
    "rotina": "ronda_ti",
-   "execucoes_24h": 77,
+   "execucoes_24h": 78,
    "erros_24h": 0,
-   "ultima": "2026-10-25T10:09:06"
+   "ultima": "2026-10-25T10:39:20"
   },
   {
    "rotina": "treino",
-   "execucoes_24h": 453,
+   "execucoes_24h": 456,
    "erros_24h": 0,
-   "ultima": "2026-10-25T10:30:54"
+   "ultima": "2026-10-25T10:41:44"
   }
  ],
  "totais": {
-  "demandas": 586,
-  "tentativas_treino": 9807,
-  "conversas": 3932,
-  "trabalhos_com_prova": 3473
+  "demandas": 588,
+  "tentativas_treino": 9831,
+  "conversas": 3936,
+  "trabalhos_com_prova": 3492
  },
  "banco": {
   "levantamento": "2026-10-25T10:33:00",
@@ -731,7 +731,7 @@
    "ultimo": "",
    "quando": "",
    "estado": "",
-   "situacao": "estagiário: observa (regra do dono) — Observei Jonas (Engenheiro de MLOps e Plataforma de Modelos) fazendo \"Exercício de SQL no PostgreSQL com os dados da fáb"
+   "situacao": "estagiário: observa (regra do dono) — Observei Ícaro (Sênior de AWS, Linux e Ubuntu) fazendo \"Testar se o último backup volta\" no nível dificil: terminou conc"
   },
   {
    "nome": "Tina",
@@ -863,7 +863,7 @@
    "ultimo": "",
    "quando": "",
    "estado": "",
-   "situacao": "estagiário: observa (regra do dono) — Observei Leandro (Engenheiro de Machine Learning Sênior) fazendo \"Perfil e indicadores da base sintética\" no nível dific"
+   "situacao": "estagiário: observa (regra do dono)"
   },
   {
    "nome": "Marcos",
@@ -962,7 +962,7 @@
    "ultimo": "",
    "quando": "",
    "estado": "",
-   "situacao": "estagiário: observa (regra do dono) — Observei Jonas (Engenheiro de MLOps e Plataforma de Modelos) fazendo \"Exercício de SQL no PostgreSQL com os dados da fáb"
+   "situacao": "estagiário: observa (regra do dono) — Observei Ícaro (Sênior de AWS, Linux e Ubuntu) fazendo \"Testar se o último backup volta\" no nível dificil: terminou conc"
   },
   {
    "nome": "Felipe",
@@ -1204,7 +1204,7 @@
    "ultimo": "",
    "quando": "",
    "estado": "",
-   "situacao": "estagiário: observa (regra do dono) — Observei Fabiana (Engenheira de Avaliação e Segurança de IA) fazendo \"Diagnosticar a planilha original da fábrica\" no ní"
+   "situacao": "estagiário: observa (regra do dono)"
   },
   {
    "nome": "Lorena",
@@ -1215,7 +1215,7 @@
    "ultimo": "",
    "quando": "",
    "estado": "",
-   "situacao": "estagiário: observa (regra do dono) — Observei Fabiana (Engenheira de Avaliação e Segurança de IA) fazendo \"Diagnosticar a planilha original da fábrica\" no ní"
+   "situacao": "estagiário: observa (regra do dono)"
   },
   {
    "nome": "Lívia",
@@ -1479,7 +1479,7 @@
    "ultimo": "",
    "quando": "",
    "estado": "",
-   "situacao": "estagiário: observa (regra do dono) — Observei Jonas (Engenheiro de MLOps e Plataforma de Modelos) fazendo \"Exercício de SQL no PostgreSQL com os dados da fáb"
+   "situacao": "estagiário: observa (regra do dono) — Observei Ícaro (Sênior de AWS, Linux e Ubuntu) fazendo \"Testar se o último backup volta\" no nível dificil: terminou conc"
   },
   {
    "nome": "Diego",
@@ -1523,7 +1523,7 @@
    "ultimo": "",
    "quando": "",
    "estado": "",
-   "situacao": "estagiário: observa (regra do dono) — Observei Jonas (Engenheiro de MLOps e Plataforma de Modelos) fazendo \"Exercício de SQL no PostgreSQL com os dados da fáb"
+   "situacao": "estagiário: observa (regra do dono) — Observei Ícaro (Sênior de AWS, Linux e Ubuntu) fazendo \"Testar se o último backup volta\" no nível dificil: terminou conc"
   },
   {
    "nome": "Gustavo",
@@ -1585,9 +1585,9 @@
    "andar": 5,
    "cargo": "Arquiteta de Cloud (AWS)",
    "area": "Engenharia de Dados",
-   "demandas_hoje": 8,
-   "ultimo": "Medir a saúde do PostgreSQL — nível dificil",
-   "quando": "2026-10-25T09:10:47",
+   "demandas_hoje": 9,
+   "ultimo": "Procurar segredos no repositório público — nível dificil",
+   "quando": "2026-10-25T10:40:42",
    "estado": "concluida",
    "situacao": "trabalho do papel"
   },
@@ -1684,9 +1684,9 @@
    "andar": 5,
    "cargo": "Sênior de AWS, Linux e Ubuntu",
    "area": "Engenharia de Dados",
-   "demandas_hoje": 8,
-   "ultimo": "Exercício de SQL no PostgreSQL com os dados da fábrica — nível dificil",
-   "quando": "2026-10-25T09:10:45",
+   "demandas_hoje": 9,
+   "ultimo": "Testar se o último backup volta — nível dificil",
+   "quando": "2026-10-25T10:40:42",
    "estado": "concluida",
    "situacao": "trabalho do papel"
   }
@@ -1810,7 +1810,7 @@
  "tempo_turnos": [],
  "modelos": {
   "finalidade": "risco_demanda",
-  "rotuladas_agora": 543,
+  "rotuladas_agora": 545,
   "minimo_para_treinar": 60,
   "datasets": 15,
   "maior_dataset": 531,
@@ -1935,8 +1935,8 @@
   },
   {
    "nivel": "dificil",
-   "demandas": 148,
-   "concluidas": 148,
+   "demandas": 150,
+   "concluidas": 150,
    "parciais": 0,
    "falhas": 0
   },
