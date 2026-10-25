@@ -1,11 +1,11 @@
 {
  "versao": 1,
- "gerado_em": "2026-10-25T19:07:27",
+ "gerado_em": "2026-10-25T19:13:25",
  "turno": {
   "estado": "trabalhando",
   "inicio": "2026-10-25T18:35:21",
   "fim_previsto": "2026-10-25T19:15:21",
-  "voltas": 84,
+  "voltas": 96,
   "planilhas": 1
  },
  "funcionarios": 105,
@@ -18,8 +18,8 @@
    "concluidas": 59,
    "parciais": 0,
    "falhas": 0,
-   "treino": 523,
-   "acertos": 277
+   "treino": 525,
+   "acertos": 279
   },
   {
    "andar": 2,
@@ -29,8 +29,8 @@
    "concluidas": 56,
    "parciais": 1,
    "falhas": 0,
-   "treino": 495,
-   "acertos": 415
+   "treino": 497,
+   "acertos": 417
   },
   {
    "andar": 3,
@@ -40,8 +40,8 @@
    "concluidas": 36,
    "parciais": 0,
    "falhas": 0,
-   "treino": 331,
-   "acertos": 192
+   "treino": 332,
+   "acertos": 193
   },
   {
    "andar": 4,
@@ -62,8 +62,8 @@
    "concluidas": 162,
    "parciais": 0,
    "falhas": 3,
-   "treino": 655,
-   "acertos": 277
+   "treino": 657,
+   "acertos": 279
   }
  ],
  "agora": [],
@@ -208,9 +208,9 @@
   },
   {
    "rotina": "memoria_pg",
-   "execucoes_24h": 94,
+   "execucoes_24h": 95,
    "erros_24h": 0,
-   "ultima": "2026-10-25T19:00:48"
+   "ultima": "2026-10-25T19:13:21"
   },
   {
    "rotina": "modelos",
@@ -226,7 +226,7 @@
   },
   {
    "rotina": "registro",
-   "execucoes_24h": 531,
+   "execucoes_24h": 529,
    "erros_24h": 0,
    "ultima": "2026-10-25T19:06:05"
   },
@@ -240,22 +240,22 @@
    "rotina": "treino",
    "execucoes_24h": 432,
    "erros_24h": 0,
-   "ultima": "2026-10-25T19:06:57"
+   "ultima": "2026-10-25T19:09:22"
   }
  ],
  "totais": {
   "demandas": 765,
-  "tentativas_treino": 10966,
+  "tentativas_treino": 10973,
   "conversas": 4072,
-  "trabalhos_com_prova": 4394
+  "trabalhos_com_prova": 4397
  },
  "banco": {
-  "levantamento": "2026-10-25T18:58:36",
+  "levantamento": "2026-10-25T19:11:11",
   "postgres_conferido": true,
   "erro_postgres": null,
   "tabelas": 201,
   "com_dados": 164,
-  "linhas": 851751,
+  "linhas": 853374,
   "resumo": {
    "sqlite": {
     "tabelas": 79,
