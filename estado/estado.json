@@ -1,11 +1,11 @@
 {
  "versao": 1,
- "gerado_em": "2026-10-25T15:21:10",
+ "gerado_em": "2026-10-25T15:26:54",
  "turno": {
   "estado": "trabalhando",
   "inicio": "2026-10-25T14:50:03",
   "fim_previsto": "2026-10-25T15:30:03",
-  "voltas": 90,
+  "voltas": 103,
   "planilhas": 1
  },
  "funcionarios": 105,
@@ -18,8 +18,8 @@
    "concluidas": 48,
    "parciais": 0,
    "falhas": 0,
-   "treino": 422,
-   "acertos": 219
+   "treino": 426,
+   "acertos": 221
   },
   {
    "andar": 2,
@@ -29,7 +29,7 @@
    "concluidas": 45,
    "parciais": 1,
    "falhas": 0,
-   "treino": 404,
+   "treino": 405,
    "acertos": 341
   },
   {
@@ -51,23 +51,71 @@
    "concluidas": 53,
    "parciais": 0,
    "falhas": 0,
-   "treino": 562,
+   "treino": 564,
    "acertos": 235
   },
   {
    "andar": 5,
    "pessoas": 24,
    "trabalharam_hoje": 24,
-   "demandas": 130,
-   "concluidas": 127,
+   "demandas": 136,
+   "concluidas": 133,
    "parciais": 0,
    "falhas": 3,
-   "treino": 534,
+   "treino": 535,
    "acertos": 227
   }
  ],
  "agora": [],
  "ultimos": [
+  {
+   "quando": "2026-10-25T15:22:18",
+   "funcionario": "Heloísa",
+   "cargo": "Head de AWS, Arquitetura e Governança de Nuvem",
+   "andar": 5,
+   "trabalho": "Ronda de saúde do sistema — nível profissional",
+   "estado": "concluida"
+  },
+  {
+   "quando": "2026-10-25T15:22:18",
+   "funcionario": "Ícaro",
+   "cargo": "Sênior de AWS, Linux e Ubuntu",
+   "andar": 5,
+   "trabalho": "Procurar segredos no repositório público — nível medio",
+   "estado": "concluida"
+  },
+  {
+   "quando": "2026-10-25T15:22:16",
+   "funcionario": "Nicolas",
+   "cargo": "Especialista em numpy",
+   "andar": 5,
+   "trabalho": "Medir a saúde do PostgreSQL — nível dificil",
+   "estado": "concluida"
+  },
+  {
+   "quando": "2026-10-25T15:22:14",
+   "funcionario": "Alexandre",
+   "cargo": "Diretor de Tecnologia (CTO)",
+   "andar": 5,
+   "trabalho": "Ronda de saúde do sistema — nível profissional",
+   "estado": "concluida"
+  },
+  {
+   "quando": "2026-10-25T15:22:13",
+   "funcionario": "Diego",
+   "cargo": "Desenvolvedor Python Pleno",
+   "andar": 5,
+   "trabalho": "Procurar segredos no repositório público",
+   "estado": "concluida"
+  },
+  {
+   "quando": "2026-10-25T15:22:12",
+   "funcionario": "Letícia",
+   "cargo": "Desenvolvedora Júnior",
+   "andar": 5,
+   "trabalho": "Testar se o último backup volta",
+   "estado": "concluida"
+  },
   {
    "quando": "2026-10-25T14:52:05",
    "funcionario": "Fernanda",
@@ -99,54 +147,6 @@
    "andar": 5,
    "trabalho": "Procurar segredos no repositório público — nível medio",
    "estado": "concluida"
-  },
-  {
-   "quando": "2026-10-25T14:52:01",
-   "funcionario": "Wagner",
-   "cargo": "Especialista Sênior em Segurança da Informação",
-   "andar": 5,
-   "trabalho": "Medir a saúde do PostgreSQL — nível dificil",
-   "estado": "concluida"
-  },
-  {
-   "quando": "2026-10-25T14:22:00",
-   "funcionario": "Rodrigo",
-   "cargo": "Analista de Infraestrutura Pleno",
-   "andar": 5,
-   "trabalho": "Procurar segredos no repositório público — nível medio",
-   "estado": "concluida"
-  },
-  {
-   "quando": "2026-10-25T14:21:59",
-   "funcionario": "Henrique",
-   "cargo": "Head de Engenharia Python",
-   "andar": 5,
-   "trabalho": "Revisão da biblioteca sob sua responsabilidade — nível profissional",
-   "estado": "concluida"
-  },
-  {
-   "quando": "2026-10-25T14:21:59",
-   "funcionario": "André",
-   "cargo": "Head de Infraestrutura e Segurança",
-   "andar": 5,
-   "trabalho": "Situação do andar agora — nível profissional",
-   "estado": "concluida"
-  },
-  {
-   "quando": "2026-10-25T14:21:58",
-   "funcionario": "Gabriel",
-   "cargo": "Especialista em Tabelas Dinâmicas e Dashboards",
-   "andar": 3,
-   "trabalho": "Segmentação da base sintética — nível dificil",
-   "estado": "concluida"
-  },
-  {
-   "quando": "2026-10-25T14:21:56",
-   "funcionario": "Bárbara",
-   "cargo": "Especialista Sênior em Power BI",
-   "andar": 3,
-   "trabalho": "Calcular a média de uma métrica da base sintética — nível dificil",
-   "estado": "concluida"
   }
  ],
  "sql": {
@@ -168,7 +168,7 @@
    "rotina": "demandas",
    "execucoes_24h": 47,
    "erros_24h": 0,
-   "ultima": "2026-10-25T14:52:05"
+   "ultima": "2026-10-25T15:22:19"
   },
   {
    "rotina": "dialogo",
@@ -210,7 +210,7 @@
    "rotina": "memoria_pg",
    "execucoes_24h": 95,
    "erros_24h": 0,
-   "ultima": "2026-10-25T15:14:41"
+   "ultima": "2026-10-25T15:26:51"
   },
   {
    "rotina": "modelos",
@@ -228,7 +228,7 @@
    "rotina": "registro",
    "execucoes_24h": 575,
    "erros_24h": 0,
-   "ultima": "2026-10-25T15:20:55"
+   "ultima": "2026-10-25T15:23:14"
   },
   {
    "rotina": "rh_desempenho",
@@ -244,24 +244,24 @@
   },
   {
    "rotina": "treino",
-   "execucoes_24h": 439,
+   "execucoes_24h": 438,
    "erros_24h": 0,
-   "ultima": "2026-10-25T15:20:40"
+   "ultima": "2026-10-25T15:22:59"
   }
  ],
  "totais": {
-  "demandas": 687,
-  "tentativas_treino": 10463,
-  "conversas": 4022,
-  "trabalhos_com_prova": 3979
+  "demandas": 693,
+  "tentativas_treino": 10471,
+  "conversas": 4024,
+  "trabalhos_com_prova": 3992
  },
  "banco": {
-  "levantamento": "2026-10-25T15:12:50",
+  "levantamento": "2026-10-25T15:25:00",
   "postgres_conferido": true,
   "erro_postgres": null,
   "tabelas": 201,
   "com_dados": 164,
-  "linhas": 798039,
+  "linhas": 799336,
   "resumo": {
    "sqlite": {
     "tabelas": 79,
@@ -731,7 +731,7 @@
    "ultimo": "",
    "quando": "",
    "estado": "",
-   "situacao": "estagiário: observa (regra do dono) — Observei Caetano (Especialista em Orquestração de Dados (Apache Airflow)) fazendo \"Procurar segredos no repositório públ"
+   "situacao": "estagiário: observa (regra do dono) — Observei Letícia (Desenvolvedora Júnior) fazendo \"Testar se o último backup volta\" no nível basico: terminou concluida."
   },
   {
    "nome": "Tina",
@@ -962,7 +962,7 @@
    "ultimo": "",
    "quando": "",
    "estado": "",
-   "situacao": "estagiário: observa (regra do dono) — Observei Caetano (Especialista em Orquestração de Dados (Apache Airflow)) fazendo \"Procurar segredos no repositório públ"
+   "situacao": "estagiário: observa (regra do dono) — Observei Letícia (Desenvolvedora Júnior) fazendo \"Testar se o último backup volta\" no nível basico: terminou concluida."
   },
   {
    "nome": "Felipe",
@@ -1204,7 +1204,7 @@
    "ultimo": "",
    "quando": "",
    "estado": "",
-   "situacao": "estagiário: observa (regra do dono) — Observei Wagner (Especialista Sênior em Segurança da Informação) fazendo \"Medir a saúde do PostgreSQL\" no nível dificil:"
+   "situacao": "estagiário: observa (regra do dono)"
   },
   {
    "nome": "Lorena",
@@ -1431,9 +1431,9 @@
    "andar": 5,
    "cargo": "Diretor de Tecnologia (CTO)",
    "area": "Engenharia de Dados",
-   "demandas_hoje": 5,
-   "ultimo": "Scorecard da área — nível profissional",
-   "quando": "2026-10-25T12:14:42",
+   "demandas_hoje": 6,
+   "ultimo": "Ronda de saúde do sistema — nível profissional",
+   "quando": "2026-10-25T15:22:13",
    "estado": "concluida",
    "situacao": "trabalho do papel"
   },
@@ -1479,16 +1479,16 @@
    "ultimo": "",
    "quando": "",
    "estado": "",
-   "situacao": "estagiário: observa (regra do dono) — Observei Caetano (Especialista em Orquestração de Dados (Apache Airflow)) fazendo \"Procurar segredos no repositório públ"
+   "situacao": "estagiário: observa (regra do dono) — Observei Letícia (Desenvolvedora Júnior) fazendo \"Testar se o último backup volta\" no nível basico: terminou concluida."
   },
   {
    "nome": "Diego",
    "andar": 5,
    "cargo": "Desenvolvedor Python Pleno",
    "area": "Engenharia de Dados",
-   "demandas_hoje": 5,
-   "ultimo": "Medir a saúde do PostgreSQL",
-   "quando": "2026-10-25T12:14:39",
+   "demandas_hoje": 6,
+   "ultimo": "Procurar segredos no repositório público",
+   "quando": "2026-10-25T15:22:12",
    "estado": "concluida",
    "situacao": "trabalho do papel"
   },
@@ -1523,7 +1523,7 @@
    "ultimo": "",
    "quando": "",
    "estado": "",
-   "situacao": "estagiário: observa (regra do dono) — Observei Caetano (Especialista em Orquestração de Dados (Apache Airflow)) fazendo \"Procurar segredos no repositório públ"
+   "situacao": "estagiário: observa (regra do dono) — Observei Letícia (Desenvolvedora Júnior) fazendo \"Testar se o último backup volta\" no nível basico: terminou concluida."
   },
   {
    "nome": "Gustavo",
@@ -1541,9 +1541,9 @@
    "andar": 5,
    "cargo": "Head de AWS, Arquitetura e Governança de Nuvem",
    "area": "Engenharia de Dados",
-   "demandas_hoje": 11,
-   "ultimo": "Conferir se o projeto está pronto para servidor — nível profissional",
-   "quando": "2026-10-25T13:52:03",
+   "demandas_hoje": 12,
+   "ultimo": "Ronda de saúde do sistema — nível profissional",
+   "quando": "2026-10-25T15:22:16",
    "estado": "concluida",
    "situacao": "trabalho do papel"
   },
@@ -1574,9 +1574,9 @@
    "andar": 5,
    "cargo": "Desenvolvedora Júnior",
    "area": "Engenharia de Dados",
-   "demandas_hoje": 5,
-   "ultimo": "Procurar segredos no repositório público",
-   "quando": "2026-10-25T12:14:38",
+   "demandas_hoje": 6,
+   "ultimo": "Testar se o último backup volta",
+   "quando": "2026-10-25T15:22:12",
    "estado": "concluida",
    "situacao": "trabalho do papel"
   },
@@ -1596,9 +1596,9 @@
    "andar": 5,
    "cargo": "Especialista em numpy",
    "area": "Estatística",
-   "demandas_hoje": 5,
-   "ultimo": "SLA das rotinas — nível dificil",
-   "quando": "2026-10-25T12:14:42",
+   "demandas_hoje": 6,
+   "ultimo": "Medir a saúde do PostgreSQL — nível dificil",
+   "quando": "2026-10-25T15:22:14",
    "estado": "concluida",
    "situacao": "trabalho do papel"
   },
@@ -1684,10 +1684,10 @@
    "andar": 5,
    "cargo": "Sênior de AWS, Linux e Ubuntu",
    "area": "Engenharia de Dados",
-   "demandas_hoje": 12,
-   "ultimo": "SLA das rotinas — nível dificil",
-   "quando": "2026-10-25T13:52:14",
-   "estado": "falhou",
+   "demandas_hoje": 13,
+   "ultimo": "Procurar segredos no repositório público — nível medio",
+   "quando": "2026-10-25T15:22:18",
+   "estado": "concluida",
    "situacao": "trabalho do papel"
   }
  ],
@@ -1810,7 +1810,7 @@
  "tempo_turnos": [],
  "modelos": {
   "finalidade": "risco_demanda",
-  "rotuladas_agora": 644,
+  "rotuladas_agora": 650,
   "minimo_para_treinar": 60,
   "datasets": 19,
   "maior_dataset": 632,
@@ -1940,29 +1940,29 @@
  "niveis": [
   {
    "nivel": "basico",
-   "demandas": 202,
-   "concluidas": 183,
+   "demandas": 204,
+   "concluidas": 185,
    "parciais": 0,
    "falhas": 19
   },
   {
    "nivel": "medio",
-   "demandas": 169,
-   "concluidas": 166,
+   "demandas": 170,
+   "concluidas": 167,
    "parciais": 0,
    "falhas": 3
   },
   {
    "nivel": "dificil",
-   "demandas": 201,
-   "concluidas": 200,
+   "demandas": 202,
+   "concluidas": 201,
    "parciais": 0,
    "falhas": 1
   },
   {
    "nivel": "profissional",
-   "demandas": 72,
-   "concluidas": 71,
+   "demandas": 74,
+   "concluidas": 73,
    "parciais": 1,
    "falhas": 0
   }
