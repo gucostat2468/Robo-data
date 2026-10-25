@@ -1,12 +1,12 @@
 {
  "versao": 1,
- "gerado_em": "2026-10-25T04:29:52",
+ "gerado_em": "2026-10-25T04:36:39",
  "turno": {
   "estado": "trabalhando",
   "inicio": "2026-10-25T04:03:38",
   "fim_previsto": "2026-10-25T04:43:38",
-  "voltas": 64,
-  "planilhas": 1
+  "voltas": 80,
+  "planilhas": 2
  },
  "funcionarios": 105,
  "andares": [
@@ -18,8 +18,8 @@
    "concluidas": 12,
    "parciais": 0,
    "falhas": 0,
-   "treino": 134,
-   "acertos": 78
+   "treino": 135,
+   "acertos": 79
   },
   {
    "andar": 2,
@@ -29,8 +29,8 @@
    "concluidas": 14,
    "parciais": 0,
    "falhas": 0,
-   "treino": 127,
-   "acertos": 111
+   "treino": 133,
+   "acertos": 117
   },
   {
    "andar": 3,
@@ -40,8 +40,8 @@
    "concluidas": 10,
    "parciais": 0,
    "falhas": 0,
-   "treino": 86,
-   "acertos": 67
+   "treino": 91,
+   "acertos": 72
   },
   {
    "andar": 4,
@@ -51,23 +51,31 @@
    "concluidas": 12,
    "parciais": 0,
    "falhas": 0,
-   "treino": 181,
-   "acertos": 88
+   "treino": 186,
+   "acertos": 91
   },
   {
    "andar": 5,
    "pessoas": 24,
    "trabalharam_hoje": 24,
-   "demandas": 40,
-   "concluidas": 40,
+   "demandas": 41,
+   "concluidas": 41,
    "parciais": 0,
    "falhas": 0,
-   "treino": 172,
-   "acertos": 92
+   "treino": 176,
+   "acertos": 96
   }
  ],
  "agora": [],
  "ultimos": [
+  {
+   "quando": "2026-10-25T04:36:22",
+   "funcionario": "Marina",
+   "cargo": "Arquiteta de Cloud (AWS)",
+   "andar": 5,
+   "trabalho": "Exercício de SQL no PostgreSQL com os dados da fábrica — nível dificil",
+   "estado": "concluida"
+  },
   {
    "quando": "2026-10-25T04:07:06",
    "funcionario": "Xavier",
@@ -139,23 +147,15 @@
    "andar": 5,
    "trabalho": "Exercício de SQL no PostgreSQL com os dados da fábrica — nível profissional",
    "estado": "concluida"
-  },
-  {
-   "quando": "2026-10-25T03:36:02",
-   "funcionario": "Pietro",
-   "cargo": "Especialista em psycopg (PostgreSQL)",
-   "andar": 5,
-   "trabalho": "Testar se o último backup volta — nível dificil",
-   "estado": "concluida"
   }
  ],
  "sql": {
-  "exercicios_hoje": 15,
-  "concluidos_hoje": 15
+  "exercicios_hoje": 16,
+  "concluidos_hoje": 16
  },
  "fabrica": {
-  "lotes_hoje": 12,
-  "conferidos_ok_hoje": 12
+  "lotes_hoje": 13,
+  "conferidos_ok_hoje": 13
  },
  "rotinas": [
   {
@@ -166,9 +166,9 @@
   },
   {
    "rotina": "demandas",
-   "execucoes_24h": 37,
+   "execucoes_24h": 38,
    "erros_24h": 0,
-   "ultima": "2026-10-25T04:07:06"
+   "ultima": "2026-10-25T04:36:22"
   },
   {
    "rotina": "dialogo",
@@ -178,9 +178,9 @@
   },
   {
    "rotina": "fabrica",
-   "execucoes_24h": 61,
+   "execucoes_24h": 63,
    "erros_24h": 0,
-   "ultima": "2026-10-25T04:03:51"
+   "ultima": "2026-10-25T04:34:16"
   },
   {
    "rotina": "ideias",
@@ -196,9 +196,9 @@
   },
   {
    "rotina": "laboratorio",
-   "execucoes_24h": 89,
+   "execucoes_24h": 90,
    "erros_24h": 0,
-   "ultima": "2026-10-25T04:18:43"
+   "ultima": "2026-10-25T04:32:05"
   },
   {
    "rotina": "licoes",
@@ -226,9 +226,9 @@
   },
   {
    "rotina": "registro",
-   "execucoes_24h": 521,
+   "execucoes_24h": 527,
    "erros_24h": 0,
-   "ultima": "2026-10-25T04:23:39"
+   "ultima": "2026-10-25T04:36:37"
   },
   {
    "rotina": "rh_desempenho",
@@ -238,22 +238,22 @@
   },
   {
    "rotina": "ronda_ti",
-   "execucoes_24h": 55,
+   "execucoes_24h": 56,
    "erros_24h": 0,
-   "ultima": "2026-10-25T04:03:14"
+   "ultima": "2026-10-25T04:33:22"
   },
   {
    "rotina": "treino",
-   "execucoes_24h": 361,
+   "execucoes_24h": 364,
    "erros_24h": 0,
-   "ultima": "2026-10-25T04:25:10"
+   "ultima": "2026-10-25T04:36:39"
   }
  ],
  "totais": {
-  "demandas": 466,
-  "tentativas_treino": 8970,
-  "conversas": 3705,
-  "trabalhos_com_prova": 2765
+  "demandas": 467,
+  "tentativas_treino": 8991,
+  "conversas": 3710,
+  "trabalhos_com_prova": 2788
  },
  "banco": {
   "levantamento": "2026-10-25T04:27:16",
@@ -743,7 +743,7 @@
    "ultimo": "",
    "quando": "",
    "estado": "",
-   "situacao": "estagiário: observa (regra do dono) — Observei Silas (Especialista em sqlite3 (memória da empresa)) fazendo \"Exercício de SQL no PostgreSQL com os dados da fá"
+   "situacao": "estagiário: observa (regra do dono) — Observei Marina (Arquiteta de Cloud (AWS)) fazendo \"Exercício de SQL no PostgreSQL com os dados da fábrica\" no nível dif"
   },
   {
    "nome": "Tina",
@@ -875,7 +875,7 @@
    "ultimo": "",
    "quando": "",
    "estado": "",
-   "situacao": "estagiário: observa (regra do dono) — Observei Leandro (Engenheiro de Machine Learning Sênior) fazendo \"Exercício de SQL no PostgreSQL com os dados da fábrica"
+   "situacao": "estagiário: observa (regra do dono)"
   },
   {
    "nome": "Marcos",
@@ -974,7 +974,7 @@
    "ultimo": "",
    "quando": "",
    "estado": "",
-   "situacao": "estagiário: observa (regra do dono) — Observei Silas (Especialista em sqlite3 (memória da empresa)) fazendo \"Exercício de SQL no PostgreSQL com os dados da fá"
+   "situacao": "estagiário: observa (regra do dono) — Observei Marina (Arquiteta de Cloud (AWS)) fazendo \"Exercício de SQL no PostgreSQL com os dados da fábrica\" no nível dif"
   },
   {
    "nome": "Felipe",
@@ -1216,7 +1216,7 @@
    "ultimo": "",
    "quando": "",
    "estado": "",
-   "situacao": "estagiário: observa (regra do dono) — Observei Fabiana (Engenheira de Avaliação e Segurança de IA) fazendo \"Verificar dados pessoais (LGPD) na base sintética\""
+   "situacao": "estagiário: observa (regra do dono)"
   },
   {
    "nome": "Lorena",
@@ -1227,7 +1227,7 @@
    "ultimo": "",
    "quando": "",
    "estado": "",
-   "situacao": "estagiário: observa (regra do dono) — Observei Fabiana (Engenheira de Avaliação e Segurança de IA) fazendo \"Verificar dados pessoais (LGPD) na base sintética\""
+   "situacao": "estagiário: observa (regra do dono)"
   },
   {
    "nome": "Lívia",
@@ -1491,7 +1491,7 @@
    "ultimo": "",
    "quando": "",
    "estado": "",
-   "situacao": "estagiário: observa (regra do dono) — Observei Silas (Especialista em sqlite3 (memória da empresa)) fazendo \"Exercício de SQL no PostgreSQL com os dados da fá"
+   "situacao": "estagiário: observa (regra do dono) — Observei Marina (Arquiteta de Cloud (AWS)) fazendo \"Exercício de SQL no PostgreSQL com os dados da fábrica\" no nível dif"
   },
   {
    "nome": "Diego",
@@ -1535,7 +1535,7 @@
    "ultimo": "",
    "quando": "",
    "estado": "",
-   "situacao": "estagiário: observa (regra do dono) — Observei Silas (Especialista em sqlite3 (memória da empresa)) fazendo \"Exercício de SQL no PostgreSQL com os dados da fá"
+   "situacao": "estagiário: observa (regra do dono) — Observei Marina (Arquiteta de Cloud (AWS)) fazendo \"Exercício de SQL no PostgreSQL com os dados da fábrica\" no nível dif"
   },
   {
    "nome": "Gustavo",
@@ -1597,9 +1597,9 @@
    "andar": 5,
    "cargo": "Arquiteta de Cloud (AWS)",
    "area": "Engenharia de Dados",
-   "demandas_hoje": 3,
-   "ultimo": "Testar se o último backup volta — nível dificil",
-   "quando": "2026-10-25T03:36:02",
+   "demandas_hoje": 4,
+   "ultimo": "Exercício de SQL no PostgreSQL com os dados da fábrica — nível dificil",
+   "quando": "2026-10-25T04:36:20",
    "estado": "concluida",
    "situacao": "trabalho do papel"
   },
@@ -1746,7 +1746,7 @@
  "tempo_turnos": [],
  "modelos": {
   "finalidade": "risco_demanda",
-  "rotuladas_agora": 423,
+  "rotuladas_agora": 424,
   "minimo_para_treinar": 60,
   "datasets": 10,
   "maior_dataset": 416,
@@ -1845,8 +1845,8 @@
   },
   {
    "nivel": "dificil",
-   "demandas": 85,
-   "concluidas": 85,
+   "demandas": 86,
+   "concluidas": 86,
    "parciais": 0,
    "falhas": 0
   },
