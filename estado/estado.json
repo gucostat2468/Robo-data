@@ -1,11 +1,11 @@
 {
  "versao": 1,
- "gerado_em": "2026-10-25T09:43:40",
+ "gerado_em": "2026-10-25T09:50:09",
  "turno": {
   "estado": "trabalhando",
   "inicio": "2026-10-25T09:24:04",
   "fim_previsto": "2026-10-25T10:04:04",
-  "voltas": 57,
+  "voltas": 70,
   "planilhas": 1
  },
  "funcionarios": 105,
@@ -18,8 +18,8 @@
    "concluidas": 30,
    "parciais": 0,
    "falhas": 0,
-   "treino": 276,
-   "acertos": 143
+   "treino": 279,
+   "acertos": 144
   },
   {
    "andar": 2,
@@ -29,8 +29,8 @@
    "concluidas": 30,
    "parciais": 0,
    "falhas": 0,
-   "treino": 261,
-   "acertos": 226
+   "treino": 264,
+   "acertos": 229
   },
   {
    "andar": 3,
@@ -40,8 +40,8 @@
    "concluidas": 21,
    "parciais": 0,
    "falhas": 0,
-   "treino": 175,
-   "acertos": 107
+   "treino": 176,
+   "acertos": 108
   },
   {
    "andar": 4,
@@ -51,8 +51,8 @@
    "concluidas": 32,
    "parciais": 0,
    "falhas": 0,
-   "treino": 368,
-   "acertos": 165
+   "treino": 369,
+   "acertos": 166
   },
   {
    "andar": 5,
@@ -208,9 +208,9 @@
   },
   {
    "rotina": "memoria_pg",
-   "execucoes_24h": 91,
+   "execucoes_24h": 92,
    "erros_24h": 0,
-   "ultima": "2026-10-25T09:36:58"
+   "ultima": "2026-10-25T09:50:05"
   },
   {
    "rotina": "modelos",
@@ -226,9 +226,9 @@
   },
   {
    "rotina": "registro",
-   "execucoes_24h": 628,
+   "execucoes_24h": 629,
    "erros_24h": 0,
-   "ultima": "2026-10-25T09:41:24"
+   "ultima": "2026-10-25T09:45:47"
   },
   {
    "rotina": "rh_desempenho",
@@ -244,24 +244,24 @@
   },
   {
    "rotina": "treino",
-   "execucoes_24h": 439,
+   "execucoes_24h": 440,
    "erros_24h": 0,
-   "ultima": "2026-10-25T09:43:10"
+   "ultima": "2026-10-25T09:45:31"
   }
  ],
  "totais": {
   "demandas": 578,
-  "tentativas_treino": 9696,
-  "conversas": 3919,
-  "trabalhos_com_prova": 3399
+  "tentativas_treino": 9704,
+  "conversas": 3922,
+  "trabalhos_com_prova": 3403
  },
  "banco": {
-  "levantamento": "2026-10-25T09:34:35",
+  "levantamento": "2026-10-25T09:47:36",
   "postgres_conferido": true,
   "erro_postgres": null,
   "tabelas": 201,
   "com_dados": 164,
-  "linhas": 719311,
+  "linhas": 721025,
   "resumo": {
    "sqlite": {
     "tabelas": 79,
