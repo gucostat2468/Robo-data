@@ -1,11 +1,11 @@
 {
  "versao": 1,
- "gerado_em": "2026-10-25T04:08:42",
+ "gerado_em": "2026-10-25T04:16:50",
  "turno": {
   "estado": "trabalhando",
   "inicio": "2026-10-25T04:03:38",
   "fim_previsto": "2026-10-25T04:43:38",
-  "voltas": 14,
+  "voltas": 32,
   "planilhas": 1
  },
  "funcionarios": 105,
@@ -18,8 +18,8 @@
    "concluidas": 12,
    "parciais": 0,
    "falhas": 0,
-   "treino": 131,
-   "acertos": 75
+   "treino": 133,
+   "acertos": 77
   },
   {
    "andar": 2,
@@ -29,8 +29,8 @@
    "concluidas": 14,
    "parciais": 0,
    "falhas": 0,
-   "treino": 120,
-   "acertos": 104
+   "treino": 125,
+   "acertos": 109
   },
   {
    "andar": 3,
@@ -40,8 +40,8 @@
    "concluidas": 10,
    "parciais": 0,
    "falhas": 0,
-   "treino": 80,
-   "acertos": 62
+   "treino": 83,
+   "acertos": 64
   },
   {
    "andar": 4,
@@ -51,8 +51,8 @@
    "concluidas": 12,
    "parciais": 0,
    "falhas": 0,
-   "treino": 169,
-   "acertos": 76
+   "treino": 173,
+   "acertos": 80
   },
   {
    "andar": 5,
@@ -62,8 +62,8 @@
    "concluidas": 40,
    "parciais": 0,
    "falhas": 0,
-   "treino": 154,
-   "acertos": 74
+   "treino": 155,
+   "acertos": 75
   }
  ],
  "agora": [],
@@ -208,9 +208,9 @@
   },
   {
    "rotina": "memoria_pg",
-   "execucoes_24h": 72,
+   "execucoes_24h": 73,
    "erros_24h": 0,
-   "ultima": "2026-10-25T03:56:41"
+   "ultima": "2026-10-25T04:16:46"
   },
   {
    "rotina": "modelos",
@@ -244,24 +244,24 @@
   },
   {
    "rotina": "treino",
-   "execucoes_24h": 355,
+   "execucoes_24h": 357,
    "erros_24h": 0,
-   "ultima": "2026-10-25T04:08:27"
+   "ultima": "2026-10-25T04:13:05"
   }
  ],
  "totais": {
   "demandas": 466,
-  "tentativas_treino": 8924,
+  "tentativas_treino": 8939,
   "conversas": 3683,
-  "trabalhos_com_prova": 2743
+  "trabalhos_com_prova": 2748
  },
  "banco": {
-  "levantamento": "2026-10-25T03:54:10",
+  "levantamento": "2026-10-25T04:14:11",
   "postgres_conferido": true,
   "erro_postgres": null,
   "tabelas": 201,
   "com_dados": 162,
-  "linhas": 584816,
+  "linhas": 593356,
   "resumo": {
    "sqlite": {
     "tabelas": 79,
