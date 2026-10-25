@@ -1,6 +1,6 @@
 # Empresa ao vivo
 
-**Boletim das 24/10 23:30** (horário de Brasília) · entre turnos: memória salva; o próximo turno começa em poucos minutos
+**Boletim das 24/10 23:32** (horário de Brasília) · trabalhando
 
 > Atualiza a cada 5 minutos enquanto a empresa trabalha. Recarregue a página para ver o mais novo.
 
@@ -9,7 +9,7 @@
 - **66** demandas, **66** concluídas (100%), 0 parciais, 0 com falha
 - **104** de 105 funcionários já trabalharam
 - SQL: 7 exercícios, 7 conferidos com o gabarito
-- Fábrica: 7 planilhas, 7 conferidas sem erro
+- Fábrica: 8 planilhas, 7 conferidas sem erro
 
 ## Trabalhando agora
 
@@ -184,13 +184,6 @@
 | Ícaro | Sênior de AWS, Linux e Ubuntu | trabalho do papel | Testar se o último backup volta — nível dificil (✅ concluída) | 3 |
 
 
-## Tempo do último turno (medido)
-
-- 01:48–02:30 (42 min, 105 voltas; cobertura do cronômetro 100%)
-- **Entregas aprovadas na revisão independente: 9 (12.8 por hora)** — o indicador principal
-- operacional 2% · estudo 6% · revisao 0% · coordenacao 0% · manutencao 30% · erro 0% · parado 62% · sem_medicao 0%
-- Bloqueios: 0; etapas esperando dependência: 0
-
 ## Inteligência própria (modelo de risco das demandas)
 
 - risco_demanda-v1: **reprovado** (treinado por ml_engenheiro)
@@ -208,7 +201,7 @@
 
 ## Banco de dados
 
-Levantamento das 24/10 23:28: **162 de 201** tabelas com dados (557.032 linhas contadas uma a uma).
+Levantamento das 24/10 23:23: **162 de 201** tabelas com dados (556.091 linhas contadas uma a uma).
 
 
 | Onde | Tabelas | Com dados |
