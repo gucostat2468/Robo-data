@@ -1,6 +1,6 @@
 # Empresa ao vivo
 
-**Boletim das 25/10 19:20** (horário de Brasília) · entre turnos: memória salva; o próximo turno começa em poucos minutos
+**Boletim das 25/10 19:23** (horário de Brasília) · trabalhando
 
 > Atualiza a cada 5 minutos enquanto a empresa trabalha. Recarregue a página para ver o mais novo.
 
@@ -9,7 +9,7 @@
 - **434** demandas, **430** concluídas (99%), 1 parciais, 3 com falha
 - **105** de 105 funcionários já trabalharam
 - SQL: 61 exercícios, 61 conferidos com o gabarito
-- Fábrica: 41 planilhas, 41 conferidas sem erro
+- Fábrica: 42 planilhas, 41 conferidas sem erro
 
 ## Trabalhando agora
 
@@ -184,13 +184,6 @@
 | Ícaro | Sênior de AWS, Linux e Ubuntu | trabalho do papel | Ronda de saúde do sistema — nível dificil (✅ concluída) | 17 |
 
 
-## Tempo do último turno (medido)
-
-- 21:35–22:20 (45 min, 104 voltas; cobertura do cronômetro 100%)
-- **Entregas aprovadas na revisão independente: 4 (5.3 por hora)** — o indicador principal
-- operacional 1% · estudo 1% · revisao 1% · coordenacao 0% · manutencao 40% · erro 0% · parado 57% · sem_medicao 0%
-- Bloqueios: 0; etapas esperando dependência: 0
-
 ## Projetos entre andares (várias pessoas, uma etapa depende da outra)
 
 - Projeto NPS — TREINO_nps_20261025_200320_00175: **✅ concluída** — 1. dir_dados (concluida); 2. analise_perfil (concluida); 3. head_ciencia (concluida); 4. sec_senior (concluida); 5. analise_relator (concluida)
@@ -222,13 +215,14 @@
 - risco_demanda-v21: **reprovado** (treinado por ml_engenheiro)
 - risco_demanda-v22: **reprovado** (treinado por ml_engenheiro)
 - risco_demanda-v23: **reprovado** (treinado por ml_engenheiro)
-- Última avaliação independente (ml_avaliador): risco_demanda-v23 reprovado — log loss 0.033 contra baseline 0.015; motivos: o teste tem uma classe só: não dá para medir separação; não bate o baseline (log loss 0.0325 ≥ 0.0149); não bate a referência atual risco_demanda-v12 (log loss 0.0325 ≥ 0.0009)
-- Referência em sombra: risco_demanda-v12; 302 previsões em sombra
+- risco_demanda-v24: **reprovado** (treinado por ml_engenheiro)
+- Última avaliação independente (ml_avaliador): risco_demanda-v24 reprovado — log loss 0.034 contra baseline 0.016; motivos: o teste tem uma classe só: não dá para medir separação; não bate o baseline (log loss 0.0337 ≥ 0.0163); não bate a referência atual risco_demanda-v12 (log loss 0.0337 ≥ 0.0009)
+- Referência em sombra: risco_demanda-v12; 306 previsões em sombra
 - Uso operacional: desligado: o modelo só roda em sombra até o dono decidir usá-lo em alguma escolha da empresa
 
 ## Banco de dados
 
-Levantamento das 25/10 19:17: **164 de 201** tabelas com dados (896.762 linhas contadas uma a uma).
+Levantamento das 25/10 19:13: **164 de 201** tabelas com dados (895.947 linhas contadas uma a uma).
 
 
 | Onde | Tabelas | Com dados |
