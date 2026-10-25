@@ -1,15 +1,15 @@
 # Empresa ao vivo
 
-**Boletim das 25/10 03:03** (horário de Brasília) · trabalhando
+**Boletim das 25/10 03:10** (horário de Brasília) · trabalhando
 
 > Atualiza a cada 5 minutos enquanto a empresa trabalha. Recarregue a página para ver o mais novo.
 
 ## Hoje
 
-- **120** demandas, **120** concluídas (100%), 0 parciais, 0 com falha
+- **128** demandas, **127** concluídas (99%), 0 parciais, 1 com falha
 - **105** de 105 funcionários já trabalharam
-- SQL: 20 exercícios, 20 conferidos com o gabarito
-- Fábrica: 16 planilhas, 16 conferidas sem erro
+- SQL: 21 exercícios, 21 conferidos com o gabarito
+- Fábrica: 17 planilhas, 17 conferidas sem erro
 
 ## Trabalhando agora
 
@@ -19,35 +19,35 @@
 
 | Andar | Trabalharam | Demandas | Concluídas | Parciais | Falhas |
 |---|--:|--:|--:|--:|--:|
-| 1º | 19 de 19 | 18 | 18 | 0 | 0 |
+| 1º | 19 de 19 | 19 | 19 | 0 | 0 |
 | 2º | 18 de 18 | 18 | 18 | 0 | 0 |
 | 3º | 12 de 12 | 11 | 11 | 0 | 0 |
-| 4º | 32 de 32 | 21 | 21 | 0 | 0 |
-| 5º | 24 de 24 | 52 | 52 | 0 | 0 |
+| 4º | 32 de 32 | 24 | 24 | 0 | 0 |
+| 5º | 24 de 24 | 56 | 55 | 0 | 1 |
 
 ## Últimas entregas
 
 | Hora | Quem | Trabalho | Resultado |
 |---|---|---|---|
+| 03:07 | Alexandre (5º) | Exercício de SQL no PostgreSQL com os dados da fábrica — nível profissional | ✅ concluída |
+| 03:07 | Nicolas (5º) | Revisão da biblioteca sob sua responsabilidade — nível dificil | ✅ concluída |
+| 03:06 | Diego (5º) | Ronda de saúde do sistema — nível medio | ✅ concluída |
+| 03:06 | Otávio (4º) | Revisar um caso de treino feito por outro designer — nível profissional | ✅ concluída |
+| 03:06 | Rafael (1º) | Diagnosticar a planilha original da fábrica — nível medio | ✅ concluída |
+| 03:06 | Letícia (5º) | SLA das rotinas | 🔴 falhou |
+| 03:06 | Augusto (4º) | Revisar um caso de treino feito por outro designer — nível dificil | ✅ concluída |
+| 03:06 | Valéria (4º) | Revisar um caso de treino feito por outro designer — nível dificil | ✅ concluída |
 | 02:37 | Camila (1º) | Verificar dados pessoais (LGPD) na base sintética | ✅ concluída |
 | 02:37 | Marina (5º) | Conferir se o projeto está pronto para servidor — nível dificil | ✅ concluída |
-| 02:37 | Yasmin (4º) | Revisar um caso de treino feito por outro designer — nível dificil | ✅ concluída |
-| 02:37 | Fernanda (5º) | Testar se o último backup volta — nível dificil | ✅ concluída |
-| 02:37 | Raquel (4º) | Revisar um caso de treino feito por outro designer — nível dificil | ✅ concluída |
-| 02:37 | Eduardo (1º) | Anomalias na base sintética — nível profissional | ✅ concluída |
-| 02:37 | Bianca (5º) | Ronda de saúde do sistema — nível medio | ✅ concluída |
-| 02:37 | Lívia (4º) | Revisar um caso de treino feito por outro designer — nível dificil | ✅ concluída |
-| 02:37 | Carolina (2º) | Conferir no PostgreSQL os lotes da fábrica — nível medio | ✅ concluída |
-| 02:37 | Beatriz (1º) | Anomalias na base sintética — nível profissional | ✅ concluída |
 
 ## Dificuldade (todo o histórico)
 
 | Nível | Demandas | Concluídas | Parciais | Falhas | Acerto |
 |---|--:|--:|--:|--:|--:|
-| basico | 191 | 173 | 0 | 18 | 91% |
-| medio | 136 | 134 | 0 | 2 | 99% |
-| dificil | 98 | 98 | 0 | 0 | 100% |
-| profissional | 30 | 30 | 0 | 0 | 100% |
+| basico | 192 | 173 | 0 | 19 | 90% |
+| medio | 138 | 136 | 0 | 2 | 99% |
+| dificil | 101 | 101 | 0 | 0 | 100% |
+| profissional | 32 | 32 | 0 | 0 | 100% |
 
 ## Cada funcionário
 
@@ -71,10 +71,10 @@
 | Lia | Limpeza | trabalho do papel | Anomalias na base sintética — nível medio (✅ concluída) | 1 |
 | Marcelo | Gerente de Engenharia de Dados | trabalho do papel | Anomalias na base sintética — nível dificil (✅ concluída) | 1 |
 | Otto | Auditoria (Validação) | trabalho do papel | Conferir no PostgreSQL os lotes da fábrica — nível medio (✅ concluída) | 1 |
-| Rafael | Engenheiro de Dados Pleno | trabalho do papel | Exercício de SQL no PostgreSQL com os dados da fábrica — nív (✅ concluída) | 1 |
+| Rafael | Engenheiro de Dados Pleno | trabalho do papel | Diagnosticar a planilha original da fábrica — nível medio (✅ concluída) | 2 |
 | Rita | Recepção | trabalho do papel | Exercício de SQL no PostgreSQL com os dados da fábrica — nív (✅ concluída) | 1 |
 | Saulo | Supervisor de Planilhas | trabalho do papel | Perfil e indicadores da base sintética — nível medio (✅ concluída) | 1 |
-| Théo | Estagiário de Engenharia de Dados | estagiário: observa (regra do dono) — Observei Dora (DBA PostgreSQL) fazendo "Exercício de |   | 0 |
+| Théo | Estagiário de Engenharia de Dados | estagiário: observa (regra do dono) — Observei Rafael (Engenheiro de Dados Pleno) fazendo  |   | 0 |
 | Tina | Contatos e NPS | trabalho do papel | Diagnosticar a planilha original da fábrica — nível medio (✅ concluída) | 1 |
 
 ### 2º andar
@@ -91,7 +91,7 @@
 | Larissa | Analista de Customer Insights Pleno | trabalho do papel | Segmentação da base sintética — nível medio (✅ concluída) | 1 |
 | Leandro | Engenheiro de Machine Learning Sênior | trabalho do papel | Exercício de SQL no PostgreSQL com os dados da fábrica — nív (✅ concluída) | 1 |
 | Lucas | Cientista de Dados Júnior | trabalho do papel | Calcular a média de uma métrica da base sintética (✅ concluída) | 1 |
-| Manu | Estagiária de Análise de Dados | estagiário: observa (regra do dono) — Observei Carolina (Cientista de Dados Pleno) fazendo |   | 0 |
+| Manu | Estagiária de Análise de Dados | estagiário: observa (regra do dono) |   | 0 |
 | Marcos | Coordenador de Análise e Ciência de Dado | trabalho FORA do papel | Projeto NPS — TREINO_nps_20261025_030222_42391 (✅ concluída) | 2 |
 | Natália | Head de Ciência de Dados | trabalho do papel | Segmentação da base sintética — nível dificil (✅ concluída) | 1 |
 | Patrícia | Gerente de Analytics e Customer Insights | trabalho do papel | Calcular a média de uma métrica da base sintética — nível pr (✅ concluída) | 1 |
@@ -105,7 +105,7 @@
 | Quem | Cargo | Situação | Último trabalho | Hoje |
 |---|---|---|---|--:|
 | Bárbara | Especialista Sênior em Power BI | trabalho do papel | Segmentação da base sintética — nível medio (✅ concluída) | 1 |
-| Enzo | Estagiário da Sala Excel | estagiário: observa (regra do dono) — Observei Dora (DBA PostgreSQL) fazendo "Exercício de |   | 0 |
+| Enzo | Estagiário da Sala Excel | estagiário: observa (regra do dono) — Observei Rafael (Engenheiro de Dados Pleno) fazendo  |   | 0 |
 | Felipe | Head de BI e Excel | trabalho do papel | Perfil e indicadores da base sintética — nível dificil (✅ concluída) | 1 |
 | Gabriel | Especialista em Tabelas Dinâmicas e Dash | trabalho do papel | Calcular a média de uma métrica da base sintética — nível me (✅ concluída) | 1 |
 | Heitor | Analista Pleno de BI | trabalho do papel | Perfil e indicadores da base sintética — nível medio (✅ concluída) | 1 |
@@ -121,7 +121,7 @@
 
 | Quem | Cargo | Situação | Último trabalho | Hoje |
 |---|---|---|---|--:|
-| Augusto | Designer de Casos | trabalho do papel | Revisar um caso de treino feito por outro designer — nível m (✅ concluída) | 1 |
+| Augusto | Designer de Casos | trabalho do papel | Revisar um caso de treino feito por outro designer — nível d (✅ concluída) | 2 |
 | Aurora | Coordenadora de Demandas | trabalho do papel na rotina demandas |   | 0 |
 | Bento | Avaliador Independente de Demandas | trabalho do papel na rotina demandas |   | 0 |
 | Celina | Especialista Sênior em Dados de Treino | trabalho do papel na rotina fabrica |   | 0 |
@@ -132,14 +132,14 @@
 | Isadora | Analista Pleno de Distribuição de Demand | trabalho do papel na rotina demandas |   | 0 |
 | Joana | Analista Júnior de Dados Sintéticos | trabalho do papel na rotina fabrica |   | 0 |
 | Juliana | Head de Gente e Gestão | trabalho do papel | Situação do andar agora — nível dificil (✅ concluída) | 1 |
-| Lara | Estagiária de Documentação de Dados | estagiário: observa (regra do dono) — Observei Renata (Gerente de Operações e Governança d |   | 0 |
-| Lorena | Estagiária de RH | estagiário: observa (regra do dono) — Observei Renata (Gerente de Operações e Governança d |   | 0 |
+| Lara | Estagiária de Documentação de Dados | estagiário: observa (regra do dono) — Observei Valéria (Revisora Independente de Casos) fa |   | 0 |
+| Lorena | Estagiária de RH | estagiário: observa (regra do dono) — Observei Valéria (Revisora Independente de Casos) fa |   | 0 |
 | Lívia | Designer de Casos | trabalho do papel | Revisar um caso de treino feito por outro designer — nível d (✅ concluída) | 1 |
 | Marta | Diretora de Pessoas e Cultura (CHRO) | trabalho do papel | Planos de desenvolvimento 70-20-10 — nível profissional (✅ concluída) | 1 |
 | Mauro | Analista de Desempenho Sênior | trabalho do papel | Situação das contratações — nível medio (✅ concluída) | 1 |
 | Murilo | Designer de Casos | trabalho do papel | Revisar um caso de treino feito por outro designer — nível d (✅ concluída) | 1 |
 | Nina | Assistente do canal | trabalho do papel | Perfil e indicadores da base sintética — nível medio (✅ concluída) | 1 |
-| Otávio | Head da Sala de Casos | trabalho do papel | Revisar um caso de treino feito por outro designer — nível d (✅ concluída) | 1 |
+| Otávio | Head da Sala de Casos | trabalho do papel | Revisar um caso de treino feito por outro designer — nível p (✅ concluída) | 2 |
 | Priscila | Analista de Recrutamento e Seleção Pleno | trabalho do papel | Planos de desenvolvimento 70-20-10 — nível medio (✅ concluída) | 1 |
 | Raquel | Designer de Casos | trabalho do papel | Revisar um caso de treino feito por outro designer — nível d (✅ concluída) | 1 |
 | Renan | Analista Pleno de Cobertura de Demandas | trabalho do papel na rotina demandas |   | 0 |
@@ -149,7 +149,7 @@
 | Simone | Head de Governança de Dados | trabalho do papel | Diagnosticar a planilha original da fábrica — nível dificil (✅ concluída) | 1 |
 | Teodoro | Coordenador da Fábrica de Planilhas | trabalho do papel na rotina fabrica |   | 0 |
 | Tiago | Analista de People Analytics Pleno | trabalho do papel | Situação das contratações — nível medio (✅ concluída) | 1 |
-| Valéria | Revisora Independente de Casos | trabalho do papel | Revisar um caso de treino feito por outro designer — nível m (✅ concluída) | 1 |
+| Valéria | Revisora Independente de Casos | trabalho do papel | Revisar um caso de treino feito por outro designer — nível d (✅ concluída) | 2 |
 | Vicente | Analista Sênior de Geração de Demandas | trabalho do papel na rotina demandas |   | 0 |
 | Vitor | Analista de Governança Pleno | trabalho do papel | Verificar dados pessoais (LGPD) na base sintética — nível me (✅ concluída) | 1 |
 | Yasmin | Planejadora de Treino | trabalho do papel | Revisar um caso de treino feito por outro designer — nível d (✅ concluída) | 1 |
@@ -158,22 +158,22 @@
 
 | Quem | Cargo | Situação | Último trabalho | Hoje |
 |---|---|---|---|--:|
-| Alexandre | Diretor de Tecnologia (CTO) | trabalho do papel | Testar se o último backup volta — nível profissional (✅ concluída) | 2 |
+| Alexandre | Diretor de Tecnologia (CTO) | trabalho do papel | Exercício de SQL no PostgreSQL com os dados da fábrica — nív (✅ concluída) | 3 |
 | André | Head de Infraestrutura e Segurança | trabalho do papel | Testar se o último backup volta — nível profissional (✅ concluída) | 2 |
 | Bianca | Engenheira de Dados Pleno | trabalho do papel | Ronda de saúde do sistema — nível medio (✅ concluída) | 2 |
 | Caetano | Especialista em Orquestração de Dados (A | trabalho do papel | Ronda de saúde do sistema — nível dificil (✅ concluída) | 2 |
-| Caíque | Estagiário de DevOps | estagiário: observa (regra do dono) — Observei Dora (DBA PostgreSQL) fazendo "Exercício de |   | 0 |
-| Diego | Desenvolvedor Python Pleno | trabalho do papel | Estratégia Python — nível medio (✅ concluída) | 2 |
+| Caíque | Estagiário de DevOps | estagiário: observa (regra do dono) — Observei Rafael (Engenheiro de Dados Pleno) fazendo  |   | 0 |
+| Diego | Desenvolvedor Python Pleno | trabalho do papel | Ronda de saúde do sistema — nível medio (✅ concluída) | 3 |
 | Elisa | Especialista em PyYAML (configuração) | trabalho do papel | Revisão da biblioteca sob sua responsabilidade — nível dific (✅ concluída) | 2 |
 | Fernanda | Coordenadora de DevOps e Confiabilidade  | trabalho do papel | Testar se o último backup volta — nível dificil (✅ concluída) | 2 |
-| Gael | Estagiário de Engenharia de Dados (Airfl | estagiário: observa (regra do dono) — Observei Dora (DBA PostgreSQL) fazendo "Exercício de |   | 0 |
+| Gael | Estagiário de Engenharia de Dados (Airfl | estagiário: observa (regra do dono) — Observei Rafael (Engenheiro de Dados Pleno) fazendo  |   | 0 |
 | Gustavo | Gerente de TI e Infraestrutura | trabalho do papel | Testar se o último backup volta — nível profissional (✅ concluída) | 2 |
 | Heloísa | Head de AWS, Arquitetura e Governança de | trabalho do papel | Conferir se o projeto está pronto para servidor — nível prof (✅ concluída) | 4 |
 | Henrique | Head de Engenharia Python | trabalho do papel | Procurar segredos no repositório público — nível profissiona (✅ concluída) | 2 |
 | Jonas | Engenheiro de MLOps e Plataforma de Mode | trabalho do papel | Procurar segredos no repositório público — nível dificil (✅ concluída) | 2 |
-| Letícia | Desenvolvedora Júnior | trabalho do papel | Ronda de saúde do sistema (✅ concluída) | 2 |
+| Letícia | Desenvolvedora Júnior | trabalho do papel | SLA das rotinas (🔴 falhou) | 3 |
 | Marina | Arquiteta de Cloud (AWS) | trabalho do papel | Conferir se o projeto está pronto para servidor — nível difi (✅ concluída) | 5 |
-| Nicolas | Especialista em numpy | trabalho do papel | Exercício de SQL no PostgreSQL com os dados da fábrica — nív (✅ concluída) | 2 |
+| Nicolas | Especialista em numpy | trabalho do papel | Revisão da biblioteca sob sua responsabilidade — nível dific (✅ concluída) | 3 |
 | Olívia | Especialista em openpyxl (Excel) | trabalho do papel | Exercício de SQL no PostgreSQL com os dados da fábrica — nív (✅ concluída) | 2 |
 | Pietro | Especialista em psycopg (PostgreSQL) | trabalho do papel | Testar se o último backup volta — nível dificil (✅ concluída) | 2 |
 | Rodrigo | Analista de Infraestrutura Pleno | trabalho do papel | Ronda de saúde do sistema — nível medio (✅ concluída) | 2 |
