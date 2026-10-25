@@ -1,6 +1,6 @@
 # Empresa ao vivo
 
-**Boletim das 25/10 04:13** (horário de Brasília) · trabalhando
+**Boletim das 25/10 04:21** (horário de Brasília) · trabalhando
 
 > Atualiza a cada 5 minutos enquanto a empresa trabalha. Recarregue a página para ver o mais novo.
 
@@ -209,12 +209,12 @@
 
 ## Banco de dados
 
-Levantamento das 25/10 03:59: **162 de 201** tabelas com dados (656.292 linhas contadas uma a uma).
+Levantamento das 25/10 04:18: **163 de 201** tabelas com dados (663.839 linhas contadas uma a uma).
 
 
 | Onde | Tabelas | Com dados |
 |---|--:|--:|
-| sqlite | 79 | 62 |
+| sqlite | 79 | 63 |
 | postgres.laboratorio | 15 | 15 |
 | postgres.robo | 82 | 63 |
 | postgres.treino | 22 | 22 |
@@ -235,7 +235,6 @@ Vazias e por quê (nada é preenchido para parecer cheio):
 | sqlite | decisoes | funcionalidade não acionada | decisão com dono e prazo sai de reunião ou de pedido do dono |
 | sqlite | decisoes_eventos | funcionalidade não acionada | histórico de uma decisão; sem decisão, sem evento |
 | sqlite | mensagens | funcionalidade não acionada | mensagens de uma conversa do dono |
-| sqlite | ml_inferencias | funcionalidade não acionada | a sombra só pontua depois que um modelo é aprovado por outra pessoa e promovido, e só demandas criadas depois  |
 | sqlite | propostas_regra | funcionalidade não acionada | nasce de planilha REAL reprovada com correção possível ou de correção do dono no chat |
 | sqlite | regras_aprendidas | funcionalidade não acionada | só existe depois que o dono aprova uma proposta de regra |
 | sqlite | sala_eventos | funcionalidade não acionada | reunião ao vivo aberta pelo dono no painel |
