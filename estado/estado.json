@@ -1,11 +1,11 @@
 {
  "versao": 1,
- "gerado_em": "2026-10-25T23:13:50",
+ "gerado_em": "2026-10-25T23:20:59",
  "turno": {
   "estado": "trabalhando",
   "inicio": "2026-10-25T23:08:40",
   "fim_previsto": "2026-10-25T23:48:40",
-  "voltas": 21,
+  "voltas": 40,
   "planilhas": 1
  },
  "funcionarios": 105,
@@ -29,8 +29,8 @@
    "concluidas": 64,
    "parciais": 2,
    "falhas": 0,
-   "treino": 593,
-   "acertos": 481
+   "treino": 595,
+   "acertos": 482
   },
   {
    "andar": 3,
@@ -40,8 +40,8 @@
    "concluidas": 43,
    "parciais": 0,
    "falhas": 0,
-   "treino": 396,
-   "acertos": 218
+   "treino": 398,
+   "acertos": 219
   },
   {
    "andar": 4,
@@ -51,7 +51,7 @@
    "concluidas": 75,
    "parciais": 0,
    "falhas": 0,
-   "treino": 826,
+   "treino": 828,
    "acertos": 350
   },
   {
@@ -62,8 +62,8 @@
    "concluidas": 193,
    "parciais": 0,
    "falhas": 3,
-   "treino": 788,
-   "acertos": 330
+   "treino": 791,
+   "acertos": 333
   }
  ],
  "agora": [],
@@ -208,9 +208,9 @@
   },
   {
    "rotina": "memoria_pg",
-   "execucoes_24h": 94,
+   "execucoes_24h": 95,
    "erros_24h": 0,
-   "ultima": "2026-10-25T23:01:53"
+   "ultima": "2026-10-25T23:20:56"
   },
   {
    "rotina": "modelos",
@@ -226,9 +226,9 @@
   },
   {
    "rotina": "registro",
-   "execucoes_24h": 536,
+   "execucoes_24h": 535,
    "erros_24h": 0,
-   "ultima": "2026-10-25T23:13:05"
+   "ultima": "2026-10-25T23:17:12"
   },
   {
    "rotina": "rh_desempenho",
@@ -244,24 +244,24 @@
   },
   {
    "rotina": "treino",
-   "execucoes_24h": 442,
+   "execucoes_24h": 441,
    "erros_24h": 0,
-   "ultima": "2026-10-25T23:12:50"
+   "ultima": "2026-10-25T23:16:56"
   }
  ],
  "totais": {
   "demandas": 824,
-  "tentativas_treino": 11503,
-  "conversas": 4209,
-  "trabalhos_com_prova": 4861
+  "tentativas_treino": 11512,
+  "conversas": 4212,
+  "trabalhos_com_prova": 4868
  },
  "banco": {
-  "levantamento": "2026-10-25T22:59:25",
+  "levantamento": "2026-10-25T23:19:00",
   "postgres_conferido": true,
   "erro_postgres": null,
   "tabelas": 201,
   "com_dados": 164,
-  "linhas": 908169,
+  "linhas": 913608,
   "resumo": {
    "sqlite": {
     "tabelas": 79,
