@@ -1,11 +1,11 @@
 {
  "versao": 1,
- "gerado_em": "2026-10-26T22:16:43",
+ "gerado_em": "2026-10-26T22:23:17",
  "turno": {
   "estado": "trabalhando",
   "inicio": "2026-10-26T22:04:18",
   "fim_previsto": "2026-10-26T22:44:18",
-  "voltas": 40,
+  "voltas": 60,
   "planilhas": 1
  },
  "funcionarios": 105,
@@ -18,8 +18,8 @@
    "concluidas": 66,
    "parciais": 0,
    "falhas": 0,
-   "treino": 572,
-   "acertos": 163
+   "treino": 578,
+   "acertos": 169
   },
   {
    "andar": 2,
@@ -29,8 +29,8 @@
    "concluidas": 64,
    "parciais": 0,
    "falhas": 0,
-   "treino": 540,
-   "acertos": 172
+   "treino": 541,
+   "acertos": 173
   },
   {
    "andar": 3,
@@ -40,8 +40,8 @@
    "concluidas": 43,
    "parciais": 0,
    "falhas": 0,
-   "treino": 360,
-   "acertos": 108
+   "treino": 362,
+   "acertos": 110
   },
   {
    "andar": 4,
@@ -51,23 +51,39 @@
    "concluidas": 73,
    "parciais": 0,
    "falhas": 1,
-   "treino": 742,
-   "acertos": 207
+   "treino": 746,
+   "acertos": 211
   },
   {
    "andar": 5,
    "pessoas": 24,
    "trabalharam_hoje": 24,
-   "demandas": 184,
-   "concluidas": 170,
+   "demandas": 186,
+   "concluidas": 172,
    "parciais": 0,
    "falhas": 14,
-   "treino": 702,
-   "acertos": 189
+   "treino": 712,
+   "acertos": 199
   }
  ],
  "agora": [],
  "ultimos": [
+  {
+   "quando": "2026-10-26T22:18:58",
+   "funcionario": "Ícaro",
+   "cargo": "Sênior de AWS, Linux e Ubuntu",
+   "andar": 5,
+   "trabalho": "SLA das rotinas — nível dificil",
+   "estado": "concluida"
+  },
+  {
+   "quando": "2026-10-26T22:18:57",
+   "funcionario": "Heloísa",
+   "cargo": "Head de AWS, Arquitetura e Governança de Nuvem",
+   "andar": 5,
+   "trabalho": "Medir a saúde do PostgreSQL — nível profissional",
+   "estado": "concluida"
+  },
   {
    "quando": "2026-10-26T21:48:59",
    "funcionario": "Letícia",
@@ -131,22 +147,6 @@
    "andar": 5,
    "trabalho": "Ronda de saúde do sistema — nível dificil",
    "estado": "concluida"
-  },
-  {
-   "quando": "2026-10-26T21:18:56",
-   "funcionario": "Marina",
-   "cargo": "Arquiteta de Cloud (AWS)",
-   "andar": 5,
-   "trabalho": "SLA das rotinas — nível dificil",
-   "estado": "concluida"
-  },
-  {
-   "quando": "2026-10-26T21:18:54",
-   "funcionario": "Heloísa",
-   "cargo": "Head de AWS, Arquitetura e Governança de Nuvem",
-   "andar": 5,
-   "trabalho": "SLA das rotinas — nível profissional",
-   "estado": "concluida"
   }
  ],
  "sql": {
@@ -160,15 +160,15 @@
  "rotinas": [
   {
    "rotina": "caixa_dono",
-   "execucoes_24h": 32,
+   "execucoes_24h": 31,
    "erros_24h": 0,
    "ultima": "2026-10-26T22:04:01"
   },
   {
    "rotina": "demandas",
-   "execucoes_24h": 47,
+   "execucoes_24h": 48,
    "erros_24h": 0,
-   "ultima": "2026-10-26T21:48:59"
+   "ultima": "2026-10-26T22:18:58"
   },
   {
    "rotina": "dialogo",
@@ -184,7 +184,7 @@
   },
   {
    "rotina": "fabrica",
-   "execucoes_24h": 56,
+   "execucoes_24h": 55,
    "erros_24h": 0,
    "ultima": "2026-10-26T22:04:24"
   },
@@ -196,7 +196,7 @@
   },
   {
    "rotina": "jornada",
-   "execucoes_24h": 32,
+   "execucoes_24h": 31,
    "erros_24h": 0,
    "ultima": "2026-10-26T22:04:01"
   },
@@ -204,7 +204,7 @@
    "rotina": "laboratorio",
    "execucoes_24h": 109,
    "erros_24h": 0,
-   "ultima": "2026-10-26T22:04:24"
+   "ultima": "2026-10-26T22:18:25"
   },
   {
    "rotina": "licoes",
@@ -220,21 +220,21 @@
   },
   {
    "rotina": "modelos",
-   "execucoes_24h": 32,
+   "execucoes_24h": 31,
    "erros_24h": 0,
    "ultima": "2026-10-26T22:04:08"
   },
   {
    "rotina": "paineis",
-   "execucoes_24h": 32,
+   "execucoes_24h": 31,
    "erros_24h": 0,
    "ultima": "2026-10-26T22:04:06"
   },
   {
    "rotina": "registro",
-   "execucoes_24h": 512,
+   "execucoes_24h": 513,
    "erros_24h": 0,
-   "ultima": "2026-10-26T22:04:39"
+   "ultima": "2026-10-26T22:19:13"
   },
   {
    "rotina": "reuniao",
@@ -250,22 +250,22 @@
   },
   {
    "rotina": "ronda_ti",
-   "execucoes_24h": 95,
+   "execucoes_24h": 93,
    "erros_24h": 0,
    "ultima": "2026-10-26T22:03:51"
   },
   {
    "rotina": "treino",
-   "execucoes_24h": 467,
+   "execucoes_24h": 469,
    "erros_24h": 0,
-   "ultima": "2026-10-26T22:12:35"
+   "ultima": "2026-10-26T22:22:32"
   }
  ],
  "totais": {
-  "demandas": 1285,
-  "tentativas_treino": 14529,
+  "demandas": 1287,
+  "tentativas_treino": 14552,
   "conversas": 4903,
-  "trabalhos_com_prova": 7525
+  "trabalhos_com_prova": 7540
  },
  "banco": {
   "levantamento": "2026-10-26T22:14:40",
@@ -719,7 +719,7 @@
    "ultimo": "",
    "quando": "",
    "estado": "",
-   "situacao": "estagiário: observa (regra do dono) — Observei Fernanda (Coordenadora de DevOps e Confiabilidade (SRE)) fazendo \"Situação do andar agora\" no nível dificil: te"
+   "situacao": "estagiário: observa (regra do dono) — Observei Heloísa (Head de AWS, Arquitetura e Governança de Nuvem) fazendo \"Medir a saúde do PostgreSQL\" no nível profiss"
   },
   {
    "nome": "Tina",
@@ -950,7 +950,7 @@
    "ultimo": "",
    "quando": "",
    "estado": "",
-   "situacao": "estagiário: observa (regra do dono) — Observei Fernanda (Coordenadora de DevOps e Confiabilidade (SRE)) fazendo \"Situação do andar agora\" no nível dificil: te"
+   "situacao": "estagiário: observa (regra do dono) — Observei Heloísa (Head de AWS, Arquitetura e Governança de Nuvem) fazendo \"Medir a saúde do PostgreSQL\" no nível profiss"
   },
   {
    "nome": "Felipe",
@@ -1192,7 +1192,7 @@
    "ultimo": "",
    "quando": "",
    "estado": "",
-   "situacao": "estagiário: observa (regra do dono) — Observei Wagner (Especialista Sênior em Segurança da Informação) fazendo \"Ronda de saúde do sistema\" no nível dificil: t"
+   "situacao": "estagiário: observa (regra do dono)"
   },
   {
    "nome": "Lorena",
@@ -1467,7 +1467,7 @@
    "ultimo": "",
    "quando": "",
    "estado": "",
-   "situacao": "estagiário: observa (regra do dono) — Observei Fernanda (Coordenadora de DevOps e Confiabilidade (SRE)) fazendo \"Situação do andar agora\" no nível dificil: te"
+   "situacao": "estagiário: observa (regra do dono) — Observei Heloísa (Head de AWS, Arquitetura e Governança de Nuvem) fazendo \"Medir a saúde do PostgreSQL\" no nível profiss"
   },
   {
    "nome": "Diego",
@@ -1511,7 +1511,7 @@
    "ultimo": "",
    "quando": "",
    "estado": "",
-   "situacao": "estagiário: observa (regra do dono) — Observei Fernanda (Coordenadora de DevOps e Confiabilidade (SRE)) fazendo \"Situação do andar agora\" no nível dificil: te"
+   "situacao": "estagiário: observa (regra do dono) — Observei Heloísa (Head de AWS, Arquitetura e Governança de Nuvem) fazendo \"Medir a saúde do PostgreSQL\" no nível profiss"
   },
   {
    "nome": "Gustavo",
@@ -1529,9 +1529,9 @@
    "andar": 5,
    "cargo": "Head de AWS, Arquitetura e Governança de Nuvem",
    "area": "Engenharia de Dados",
-   "demandas_hoje": 16,
-   "ultimo": "SLA das rotinas — nível profissional",
-   "quando": "2026-10-26T21:18:53",
+   "demandas_hoje": 17,
+   "ultimo": "Medir a saúde do PostgreSQL — nível profissional",
+   "quando": "2026-10-26T22:18:55",
    "estado": "concluida",
    "situacao": "trabalho do papel"
   },
@@ -1672,9 +1672,9 @@
    "andar": 5,
    "cargo": "Sênior de AWS, Linux e Ubuntu",
    "area": "Engenharia de Dados",
-   "demandas_hoje": 16,
-   "ultimo": "Ronda de saúde do sistema — nível dificil",
-   "quando": "2026-10-26T21:18:54",
+   "demandas_hoje": 17,
+   "ultimo": "SLA das rotinas — nível dificil",
+   "quando": "2026-10-26T22:18:57",
    "estado": "concluida",
    "situacao": "trabalho do papel"
   }
@@ -1798,7 +1798,7 @@
  "tempo_turnos": [],
  "modelos": {
   "finalidade": "risco_demanda",
-  "rotuladas_agora": 1242,
+  "rotuladas_agora": 1244,
   "minimo_para_treinar": 60,
   "datasets": 40,
   "maior_dataset": 1242,
@@ -2047,15 +2047,15 @@
   },
   {
    "nivel": "dificil",
-   "demandas": 513,
-   "concluidas": 502,
+   "demandas": 514,
+   "concluidas": 503,
    "parciais": 1,
    "falhas": 10
   },
   {
    "nivel": "profissional",
-   "demandas": 212,
-   "concluidas": 210,
+   "demandas": 213,
+   "concluidas": 211,
    "parciais": 1,
    "falhas": 1
   }
