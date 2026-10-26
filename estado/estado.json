@@ -1,11 +1,11 @@
 {
  "versao": 1,
- "gerado_em": "2026-10-26T07:57:30",
+ "gerado_em": "2026-10-26T08:05:36",
  "turno": {
   "estado": "trabalhando",
   "inicio": "2026-10-26T07:38:59",
   "fim_previsto": "2026-10-26T08:18:59",
-  "voltas": 53,
+  "voltas": 66,
   "planilhas": 1
  },
  "funcionarios": 105,
@@ -18,8 +18,8 @@
    "concluidas": 24,
    "parciais": 0,
    "falhas": 0,
-   "treino": 208,
-   "acertos": 71
+   "treino": 213,
+   "acertos": 73
   },
   {
    "andar": 2,
@@ -40,7 +40,7 @@
    "concluidas": 14,
    "parciais": 0,
    "falhas": 0,
-   "treino": 129,
+   "treino": 136,
    "acertos": 56
   },
   {
@@ -51,8 +51,8 @@
    "concluidas": 30,
    "parciais": 0,
    "falhas": 0,
-   "treino": 277,
-   "acertos": 91
+   "treino": 278,
+   "acertos": 92
   },
   {
    "andar": 5,
@@ -62,7 +62,7 @@
    "concluidas": 65,
    "parciais": 0,
    "falhas": 3,
-   "treino": 261,
+   "treino": 264,
    "acertos": 78
   }
  ],
@@ -216,7 +216,7 @@
    "rotina": "memoria_pg",
    "execucoes_24h": 94,
    "erros_24h": 0,
-   "ultima": "2026-10-26T07:52:13"
+   "ultima": "2026-10-26T08:05:32"
   },
   {
    "rotina": "modelos",
@@ -234,7 +234,7 @@
    "rotina": "registro",
    "execucoes_24h": 529,
    "erros_24h": 0,
-   "ultima": "2026-10-26T07:52:54"
+   "ultima": "2026-10-26T07:59:41"
   },
   {
    "rotina": "reuniao",
@@ -256,24 +256,24 @@
   },
   {
    "rotina": "treino",
-   "execucoes_24h": 452,
+   "execucoes_24h": 451,
    "erros_24h": 0,
-   "ultima": "2026-10-26T07:56:44"
+   "ultima": "2026-10-26T08:01:28"
   }
  ],
  "totais": {
   "demandas": 1012,
-  "tentativas_treino": 12687,
-  "conversas": 4687,
-  "trabalhos_com_prova": 5930
+  "tentativas_treino": 12703,
+  "conversas": 4688,
+  "trabalhos_com_prova": 5936
  },
  "banco": {
-  "levantamento": "2026-10-26T07:49:27",
+  "levantamento": "2026-10-26T08:02:51",
   "postgres_conferido": true,
   "erro_postgres": null,
   "tabelas": 201,
   "com_dados": 168,
-  "linhas": 1042552,
+  "linhas": 1044549,
   "resumo": {
    "sqlite": {
     "tabelas": 79,
