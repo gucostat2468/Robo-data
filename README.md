@@ -1,6 +1,6 @@
 # Empresa ao vivo
 
-**Boletim das 26/10 17:31** (horário de Brasília) · entre turnos: memória salva; o próximo turno começa em poucos minutos
+**Boletim das 26/10 17:34** (horário de Brasília) · trabalhando
 
 > Atualiza a cada 5 minutos enquanto a empresa trabalha. Recarregue a página para ver o mais novo.
 
@@ -9,7 +9,7 @@
 - **401** demandas, **389** concluídas (97%), 0 parciais, 12 com falha
 - **105** de 105 funcionários já trabalharam
 - SQL: 45 exercícios, 45 conferidos com o gabarito
-- Fábrica: 38 planilhas, 38 conferidas sem erro
+- Fábrica: 39 planilhas, 38 conferidas sem erro
 
 ## Trabalhando agora
 
@@ -184,13 +184,6 @@
 | Ícaro | Sênior de AWS, Linux e Ubuntu | trabalho do papel | Medir a saúde do PostgreSQL — nível dificil (✅ concluída) | 15 |
 
 
-## Tempo do último turno (medido)
-
-- 19:45–20:31 (46 min, 101 voltas; cobertura do cronômetro 100%)
-- **Entregas aprovadas na revisão independente: 22 (28.9 por hora)** — o indicador principal
-- operacional 2% · estudo 1% · revisao 2% · coordenacao 0% · manutencao 40% · erro 0% · parado 55% · sem_medicao 0%
-- Bloqueios: 0; etapas esperando dependência: 0
-
 ## Projetos entre andares (várias pessoas, uma etapa depende da outra)
 
 - Projeto NPS — TREINO_nps_20261026_094851_31114: **✅ concluída** — 1. eng_junior_espacos (concluida); 2. analise_indicadores (concluida); 3. head_ciencia (concluida); 4. sec_senior (concluida); 5. canal_nina (concluida)
@@ -237,13 +230,14 @@
 - risco_demanda-v36: **reprovado** (treinado por ml_engenheiro)
 - risco_demanda-v37: **reprovado** (treinado por ml_engenheiro)
 - risco_demanda-v38: **reprovado** (treinado por ml_engenheiro)
-- Última avaliação independente (ml_avaliador): risco_demanda-v38 reprovado — log loss 0.158 contra baseline 0.142; motivos: não bate o baseline (log loss 0.1581 ≥ 0.1415)
-- Referência em sombra: risco_demanda-v25; 726 previsões em sombra
+- risco_demanda-v39: **reprovado** (treinado por ml_engenheiro)
+- Última avaliação independente (ml_avaliador): risco_demanda-v39 reprovado — log loss 0.135 contra baseline 0.123; motivos: não bate o baseline (log loss 0.1353 ≥ 0.1226)
+- Referência em sombra: risco_demanda-v25; 749 previsões em sombra
 - Uso operacional: desligado: o modelo só roda em sombra até o dono decidir usá-lo em alguma escolha da empresa
 
 ## Banco de dados
 
-Levantamento das 26/10 17:28: **168 de 201** tabelas com dados (1.138.542 linhas contadas uma a uma).
+Levantamento das 26/10 17:23: **168 de 201** tabelas com dados (1.137.319 linhas contadas uma a uma).
 
 
 | Onde | Tabelas | Com dados |
