@@ -1,12 +1,12 @@
 {
  "versao": 1,
- "gerado_em": "2026-10-26T04:56:48",
+ "gerado_em": "2026-10-26T05:03:17",
  "turno": {
   "estado": "trabalhando",
   "inicio": "2026-10-26T04:31:15",
   "fim_previsto": "2026-10-26T05:11:15",
-  "voltas": 74,
-  "planilhas": 1
+  "voltas": 93,
+  "planilhas": 2
  },
  "funcionarios": 105,
  "andares": [
@@ -18,8 +18,8 @@
    "concluidas": 12,
    "parciais": 0,
    "falhas": 0,
-   "treino": 132,
-   "acertos": 38
+   "treino": 139,
+   "acertos": 45
   },
   {
    "andar": 2,
@@ -29,8 +29,8 @@
    "concluidas": 14,
    "parciais": 0,
    "falhas": 0,
-   "treino": 125,
-   "acertos": 40
+   "treino": 127,
+   "acertos": 42
   },
   {
    "andar": 3,
@@ -40,8 +40,8 @@
    "concluidas": 10,
    "parciais": 0,
    "falhas": 0,
-   "treino": 80,
-   "acertos": 43
+   "treino": 89,
+   "acertos": 47
   },
   {
    "andar": 4,
@@ -51,23 +51,39 @@
    "concluidas": 12,
    "parciais": 0,
    "falhas": 0,
-   "treino": 177,
-   "acertos": 57
+   "treino": 179,
+   "acertos": 58
   },
   {
    "andar": 5,
    "pessoas": 24,
    "trabalharam_hoje": 24,
-   "demandas": 41,
-   "concluidas": 38,
+   "demandas": 43,
+   "concluidas": 40,
    "parciais": 0,
    "falhas": 3,
-   "treino": 166,
+   "treino": 169,
    "acertos": 57
   }
  ],
  "agora": [],
  "ultimos": [
+  {
+   "quando": "2026-10-26T05:01:15",
+   "funcionario": "Ícaro",
+   "cargo": "Sênior de AWS, Linux e Ubuntu",
+   "andar": 5,
+   "trabalho": "Ronda de saúde do sistema — nível dificil",
+   "estado": "concluida"
+  },
+  {
+   "quando": "2026-10-26T05:01:13",
+   "funcionario": "Heloísa",
+   "cargo": "Head de AWS, Arquitetura e Governança de Nuvem",
+   "andar": 5,
+   "trabalho": "Procurar segredos no repositório público — nível profissional",
+   "estado": "concluida"
+  },
   {
    "quando": "2026-10-26T04:31:15",
    "funcionario": "Marina",
@@ -131,22 +147,6 @@
    "andar": 2,
    "trabalho": "Programa de modelos: backlog e critérios — nível profissional",
    "estado": "concluida"
-  },
-  {
-   "quando": "2026-10-26T04:31:09",
-   "funcionario": "Leandro",
-   "cargo": "Engenheiro de Machine Learning Sênior",
-   "andar": 2,
-   "trabalho": "Anomalias na base sintética — nível dificil",
-   "estado": "concluida"
-  },
-  {
-   "quando": "2026-10-26T04:31:09",
-   "funcionario": "Olívia",
-   "cargo": "Especialista em openpyxl (Excel)",
-   "andar": 5,
-   "trabalho": "Revisão da biblioteca sob sua responsabilidade — nível dificil",
-   "estado": "concluida"
   }
  ],
  "sql": {
@@ -154,8 +154,8 @@
   "concluidos_hoje": 8
  },
  "fabrica": {
-  "lotes_hoje": 12,
-  "conferidos_ok_hoje": 12
+  "lotes_hoje": 13,
+  "conferidos_ok_hoje": 13
  },
  "rotinas": [
   {
@@ -166,9 +166,9 @@
   },
   {
    "rotina": "demandas",
-   "execucoes_24h": 47,
+   "execucoes_24h": 48,
    "erros_24h": 0,
-   "ultima": "2026-10-26T04:31:15"
+   "ultima": "2026-10-26T05:01:15"
   },
   {
    "rotina": "dialogo",
@@ -184,9 +184,9 @@
   },
   {
    "rotina": "fabrica",
-   "execucoes_24h": 53,
+   "execucoes_24h": 55,
    "erros_24h": 0,
-   "ultima": "2026-10-26T04:31:22"
+   "ultima": "2026-10-26T05:01:31"
   },
   {
    "rotina": "ideias",
@@ -202,9 +202,9 @@
   },
   {
    "rotina": "laboratorio",
-   "execucoes_24h": 108,
+   "execucoes_24h": 109,
    "erros_24h": 0,
-   "ultima": "2026-10-26T04:45:44"
+   "ultima": "2026-10-26T04:58:32"
   },
   {
    "rotina": "licoes",
@@ -214,7 +214,7 @@
   },
   {
    "rotina": "memoria_pg",
-   "execucoes_24h": 95,
+   "execucoes_24h": 94,
    "erros_24h": 0,
    "ultima": "2026-10-26T04:56:45"
   },
@@ -232,9 +232,9 @@
   },
   {
    "rotina": "registro",
-   "execucoes_24h": 539,
+   "execucoes_24h": 544,
    "erros_24h": 0,
-   "ultima": "2026-10-26T04:51:20"
+   "ultima": "2026-10-26T05:03:02"
   },
   {
    "rotina": "reuniao",
@@ -250,22 +250,22 @@
   },
   {
    "rotina": "ronda_ti",
-   "execucoes_24h": 93,
+   "execucoes_24h": 94,
    "erros_24h": 0,
-   "ultima": "2026-10-26T04:30:49"
+   "ultima": "2026-10-26T05:00:51"
   },
   {
    "rotina": "treino",
-   "execucoes_24h": 447,
+   "execucoes_24h": 448,
    "erros_24h": 0,
-   "ultima": "2026-10-26T04:53:53"
+   "ultima": "2026-10-26T05:02:47"
   }
  ],
  "totais": {
-  "demandas": 943,
-  "tentativas_treino": 12293,
-  "conversas": 4596,
-  "trabalhos_com_prova": 5563
+  "demandas": 945,
+  "tentativas_treino": 12316,
+  "conversas": 4600,
+  "trabalhos_com_prova": 5586
  },
  "banco": {
   "levantamento": "2026-10-26T04:54:29",
@@ -719,7 +719,7 @@
    "ultimo": "",
    "quando": "",
    "estado": "",
-   "situacao": "estagiário: observa (regra do dono) — Observei Olívia (Especialista em openpyxl (Excel)) fazendo \"Revisão da biblioteca sob sua responsabilidade\" no nível dif"
+   "situacao": "estagiário: observa (regra do dono) — Observei Heloísa (Head de AWS, Arquitetura e Governança de Nuvem) fazendo \"Procurar segredos no repositório público\" no "
   },
   {
    "nome": "Tina",
@@ -851,7 +851,7 @@
    "ultimo": "",
    "quando": "",
    "estado": "",
-   "situacao": "estagiário: observa (regra do dono) — Observei Leandro (Engenheiro de Machine Learning Sênior) fazendo \"Anomalias na base sintética\" no nível dificil: termino"
+   "situacao": "estagiário: observa (regra do dono)"
   },
   {
    "nome": "Marcos",
@@ -950,7 +950,7 @@
    "ultimo": "",
    "quando": "",
    "estado": "",
-   "situacao": "estagiário: observa (regra do dono) — Observei Olívia (Especialista em openpyxl (Excel)) fazendo \"Revisão da biblioteca sob sua responsabilidade\" no nível dif"
+   "situacao": "estagiário: observa (regra do dono) — Observei Heloísa (Head de AWS, Arquitetura e Governança de Nuvem) fazendo \"Procurar segredos no repositório público\" no "
   },
   {
    "nome": "Felipe",
@@ -1192,7 +1192,7 @@
    "ultimo": "",
    "quando": "",
    "estado": "",
-   "situacao": "estagiário: observa (regra do dono) — Observei Fabiana (Engenheira de Avaliação e Segurança de IA) fazendo \"Verificar dados pessoais (LGPD) na base sintética\""
+   "situacao": "estagiário: observa (regra do dono)"
   },
   {
    "nome": "Lorena",
@@ -1203,7 +1203,7 @@
    "ultimo": "",
    "quando": "",
    "estado": "",
-   "situacao": "estagiário: observa (regra do dono) — Observei Fabiana (Engenheira de Avaliação e Segurança de IA) fazendo \"Verificar dados pessoais (LGPD) na base sintética\""
+   "situacao": "estagiário: observa (regra do dono)"
   },
   {
    "nome": "Lívia",
@@ -1467,7 +1467,7 @@
    "ultimo": "",
    "quando": "",
    "estado": "",
-   "situacao": "estagiário: observa (regra do dono) — Observei Olívia (Especialista em openpyxl (Excel)) fazendo \"Revisão da biblioteca sob sua responsabilidade\" no nível dif"
+   "situacao": "estagiário: observa (regra do dono) — Observei Heloísa (Head de AWS, Arquitetura e Governança de Nuvem) fazendo \"Procurar segredos no repositório público\" no "
   },
   {
    "nome": "Diego",
@@ -1511,7 +1511,7 @@
    "ultimo": "",
    "quando": "",
    "estado": "",
-   "situacao": "estagiário: observa (regra do dono) — Observei Olívia (Especialista em openpyxl (Excel)) fazendo \"Revisão da biblioteca sob sua responsabilidade\" no nível dif"
+   "situacao": "estagiário: observa (regra do dono) — Observei Heloísa (Head de AWS, Arquitetura e Governança de Nuvem) fazendo \"Procurar segredos no repositório público\" no "
   },
   {
    "nome": "Gustavo",
@@ -1529,9 +1529,9 @@
    "andar": 5,
    "cargo": "Head de AWS, Arquitetura e Governança de Nuvem",
    "area": "Engenharia de Dados",
-   "demandas_hoje": 3,
-   "ultimo": "Medir a saúde do PostgreSQL — nível profissional",
-   "quando": "2026-10-26T03:58:18",
+   "demandas_hoje": 4,
+   "ultimo": "Procurar segredos no repositório público — nível profissional",
+   "quando": "2026-10-26T05:01:12",
    "estado": "concluida",
    "situacao": "trabalho do papel"
   },
@@ -1672,9 +1672,9 @@
    "andar": 5,
    "cargo": "Sênior de AWS, Linux e Ubuntu",
    "area": "Engenharia de Dados",
-   "demandas_hoje": 3,
-   "ultimo": "Medir a saúde do PostgreSQL — nível dificil",
-   "quando": "2026-10-26T03:58:21",
+   "demandas_hoje": 4,
+   "ultimo": "Ronda de saúde do sistema — nível dificil",
+   "quando": "2026-10-26T05:01:13",
    "estado": "concluida",
    "situacao": "trabalho do papel"
   }
@@ -1798,7 +1798,7 @@
  "tempo_turnos": [],
  "modelos": {
   "finalidade": "risco_demanda",
-  "rotuladas_agora": 900,
+  "rotuladas_agora": 902,
   "minimo_para_treinar": 60,
   "datasets": 28,
   "maior_dataset": 889,
@@ -1988,15 +1988,15 @@
   },
   {
    "nivel": "dificil",
-   "demandas": 339,
-   "concluidas": 335,
+   "demandas": 340,
+   "concluidas": 336,
    "parciais": 1,
    "falhas": 3
   },
   {
    "nivel": "profissional",
-   "demandas": 132,
-   "concluidas": 131,
+   "demandas": 133,
+   "concluidas": 132,
    "parciais": 1,
    "falhas": 0
   }
