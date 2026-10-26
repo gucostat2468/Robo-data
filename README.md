@@ -1,12 +1,12 @@
 # Empresa ao vivo
 
-**Boletim das 26/10 06:36** (horário de Brasília) · trabalhando
+**Boletim das 26/10 06:41** (horário de Brasília) · trabalhando
 
 > Atualiza a cada 5 minutos enquanto a empresa trabalha. Recarregue a página para ver o mais novo.
 
 ## Hoje
 
-- **189** demandas, **186** concluídas (98%), 0 parciais, 3 com falha
+- **192** demandas, **189** concluídas (98%), 0 parciais, 3 com falha
 - **105** de 105 funcionários já trabalharam
 - SQL: 22 exercícios, 22 conferidos com o gabarito
 - Fábrica: 24 planilhas, 24 conferidas sem erro
@@ -23,12 +23,15 @@
 | 2º | 18 de 18 | 28 | 28 | 0 | 0 |
 | 3º | 12 de 12 | 21 | 21 | 0 | 0 |
 | 4º | 32 de 32 | 32 | 32 | 0 | 0 |
-| 5º | 24 de 24 | 78 | 75 | 0 | 3 |
+| 5º | 24 de 24 | 81 | 78 | 0 | 3 |
 
 ## Últimas entregas
 
 | Hora | Quem | Trabalho | Resultado |
 |---|---|---|---|
+| 06:36 | Letícia (5º) | Testar se o último backup volta | ✅ concluída |
+| 06:36 | Marina (5º) | Conferir se o projeto está pronto para servidor — nível dificil | ✅ concluída |
+| 06:36 | Fernanda (5º) | Testar se o último backup volta — nível dificil | ✅ concluída |
 | 06:06 | Ícaro (5º) | Exercício de SQL no PostgreSQL com os dados da fábrica — nível dificil | ✅ concluída |
 | 06:06 | Bianca (5º) | Procurar segredos no repositório público — nível medio | ✅ concluída |
 | 06:06 | Heloísa (5º) | Conferir se o projeto está pronto para servidor — nível profissional | ✅ concluída |
@@ -36,17 +39,14 @@
 | 06:06 | Caetano (5º) | Procurar segredos no repositório público — nível dificil | ✅ concluída |
 | 06:06 | Rodrigo (5º) | Procurar segredos no repositório público — nível medio | ✅ concluída |
 | 05:36 | André (5º) | Ronda de saúde do sistema — nível profissional | ✅ concluída |
-| 05:36 | Henrique (5º) | Procurar segredos no repositório público — nível profissional | ✅ concluída |
-| 05:36 | Gabriel (3º) | Segmentação da base sintética — nível dificil | ✅ concluída |
-| 05:36 | Natália (2º) | Conferir no PostgreSQL os lotes da fábrica — nível profissional | ✅ concluída |
 
 ## Dificuldade (todo o histórico)
 
 | Nível | Demandas | Concluídas | Parciais | Falhas | Acerto |
 |---|--:|--:|--:|--:|--:|
-| basico | 217 | 197 | 0 | 20 | 91% |
+| basico | 218 | 198 | 0 | 20 | 91% |
 | medio | 238 | 235 | 0 | 3 | 99% |
-| dificil | 388 | 384 | 1 | 3 | 99% |
+| dificil | 390 | 386 | 1 | 3 | 99% |
 | profissional | 157 | 156 | 1 | 0 | 99% |
 
 ## Cada funcionário
@@ -74,7 +74,7 @@
 | Rafael | Engenheiro de Dados Pleno | trabalho do papel | Diagnosticar a planilha original da fábrica — nível medio (✅ concluída) | 2 |
 | Rita | Recepção | trabalho do papel | Diagnosticar a planilha original da fábrica — nível dificil (✅ concluída) | 2 |
 | Saulo | Supervisor de Planilhas | trabalho do papel | Anomalias na base sintética — nível dificil (✅ concluída) | 2 |
-| Théo | Estagiário de Engenharia de Dados | estagiário: observa (regra do dono) — Observei Rodrigo (Analista de Infraestrutura Pleno)  |   | 0 |
+| Théo | Estagiário de Engenharia de Dados | estagiário: observa (regra do dono) — Observei Fernanda (Coordenadora de DevOps e Confiabi |   | 0 |
 | Tina | Contatos e NPS | trabalho do papel | Conferir no PostgreSQL os lotes da fábrica — nível medio (✅ concluída) | 2 |
 
 ### 2º andar
@@ -105,7 +105,7 @@
 | Quem | Cargo | Situação | Último trabalho | Hoje |
 |---|---|---|---|--:|
 | Bárbara | Especialista Sênior em Power BI | trabalho do papel | Conferir no PostgreSQL os lotes da fábrica — nível dificil (✅ concluída) | 2 |
-| Enzo | Estagiário da Sala Excel | estagiário: observa (regra do dono) — Observei Rodrigo (Analista de Infraestrutura Pleno)  |   | 0 |
+| Enzo | Estagiário da Sala Excel | estagiário: observa (regra do dono) — Observei Fernanda (Coordenadora de DevOps e Confiabi |   | 0 |
 | Felipe | Head de BI e Excel | trabalho do papel | Perfil e indicadores da base sintética — nível profissional (✅ concluída) | 2 |
 | Gabriel | Especialista em Tabelas Dinâmicas e Dash | trabalho do papel | Segmentação da base sintética — nível dificil (✅ concluída) | 2 |
 | Heitor | Analista Pleno de BI | trabalho do papel | Perfil e indicadores da base sintética — nível medio (✅ concluída) | 2 |
@@ -132,7 +132,7 @@
 | Isadora | Analista Pleno de Distribuição de Demand | trabalho do papel na rotina demandas |   | 0 |
 | Joana | Analista Júnior de Dados Sintéticos | trabalho do papel na rotina fabrica |   | 0 |
 | Juliana | Head de Gente e Gestão | trabalho do papel | Desempenho da semana — nível profissional (✅ concluída) | 2 |
-| Lara | Estagiária de Documentação de Dados | estagiário: observa (regra do dono) — Observei Wagner (Especialista Sênior em Segurança da |   | 0 |
+| Lara | Estagiária de Documentação de Dados | estagiário: observa (regra do dono) |   | 0 |
 | Lorena | Estagiária de RH | estagiário: observa (regra do dono) |   | 0 |
 | Lívia | Designer de Casos | trabalho do papel | Revisar um caso de treino feito por outro designer — nível d (✅ concluída) | 1 |
 | Marta | Diretora de Pessoas e Cultura (CHRO) | trabalho do papel | Situação do andar agora — nível profissional (✅ concluída) | 1 |
@@ -162,17 +162,17 @@
 | André | Head de Infraestrutura e Segurança | trabalho do papel | Ronda de saúde do sistema — nível profissional (✅ concluída) | 3 |
 | Bianca | Engenheira de Dados Pleno | trabalho do papel | Procurar segredos no repositório público — nível medio (✅ concluída) | 3 |
 | Caetano | Especialista em Orquestração de Dados (A | trabalho do papel | Procurar segredos no repositório público — nível dificil (✅ concluída) | 3 |
-| Caíque | Estagiário de DevOps | estagiário: observa (regra do dono) — Observei Rodrigo (Analista de Infraestrutura Pleno)  |   | 0 |
+| Caíque | Estagiário de DevOps | estagiário: observa (regra do dono) — Observei Fernanda (Coordenadora de DevOps e Confiabi |   | 0 |
 | Diego | Desenvolvedor Python Pleno | trabalho do papel | SLA das rotinas — nível medio (✅ concluída) | 3 |
 | Elisa | Especialista em PyYAML (configuração) | trabalho do papel | Medir a saúde do PostgreSQL — nível dificil (✅ concluída) | 3 |
-| Fernanda | Coordenadora de DevOps e Confiabilidade  | trabalho do papel | Procurar segredos no repositório público — nível medio (✅ concluída) | 3 |
-| Gael | Estagiário de Engenharia de Dados (Airfl | estagiário: observa (regra do dono) — Observei Rodrigo (Analista de Infraestrutura Pleno)  |   | 0 |
+| Fernanda | Coordenadora de DevOps e Confiabilidade  | trabalho do papel | Testar se o último backup volta — nível dificil (✅ concluída) | 4 |
+| Gael | Estagiário de Engenharia de Dados (Airfl | estagiário: observa (regra do dono) — Observei Fernanda (Coordenadora de DevOps e Confiabi |   | 0 |
 | Gustavo | Gerente de TI e Infraestrutura | trabalho do papel | Testar se o último backup volta — nível profissional (✅ concluída) | 3 |
 | Heloísa | Head de AWS, Arquitetura e Governança de | trabalho do papel | Conferir se o projeto está pronto para servidor — nível prof (✅ concluída) | 7 |
 | Henrique | Head de Engenharia Python | trabalho do papel | Procurar segredos no repositório público — nível profissiona (✅ concluída) | 3 |
 | Jonas | Engenheiro de MLOps e Plataforma de Mode | trabalho do papel | Exercício de SQL no PostgreSQL com os dados da fábrica — nív (✅ concluída) | 3 |
-| Letícia | Desenvolvedora Júnior | trabalho do papel | Procurar segredos no repositório público (✅ concluída) | 3 |
-| Marina | Arquiteta de Cloud (AWS) | trabalho do papel | Exercício de SQL no PostgreSQL com os dados da fábrica — nív (✅ concluída) | 7 |
+| Letícia | Desenvolvedora Júnior | trabalho do papel | Testar se o último backup volta (✅ concluída) | 4 |
+| Marina | Arquiteta de Cloud (AWS) | trabalho do papel | Conferir se o projeto está pronto para servidor — nível difi (✅ concluída) | 8 |
 | Nicolas | Especialista em numpy | trabalho do papel | Ronda de saúde do sistema — nível dificil (✅ concluída) | 3 |
 | Olívia | Especialista em openpyxl (Excel) | trabalho do papel | Ronda de saúde do sistema — nível dificil (✅ concluída) | 3 |
 | Pietro | Especialista em psycopg (PostgreSQL) | trabalho do papel | Exercício de SQL no PostgreSQL com os dados da fábrica — nív (✅ concluída) | 3 |
@@ -229,7 +229,7 @@
 
 ## Banco de dados
 
-Levantamento das 26/10 06:27: **168 de 201** tabelas com dados (1.056.182 linhas contadas uma a uma).
+Levantamento das 26/10 06:40: **168 de 201** tabelas com dados (1.057.483 linhas contadas uma a uma).
 
 
 | Onde | Tabelas | Com dados |
