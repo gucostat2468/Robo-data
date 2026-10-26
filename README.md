@@ -1,6 +1,6 @@
 # Empresa ao vivo
 
-**Boletim das 26/10 17:26** (horário de Brasília) · trabalhando
+**Boletim das 26/10 17:31** (horário de Brasília) · entre turnos: memória salva; o próximo turno começa em poucos minutos
 
 > Atualiza a cada 5 minutos enquanto a empresa trabalha. Recarregue a página para ver o mais novo.
 
@@ -184,6 +184,13 @@
 | Ícaro | Sênior de AWS, Linux e Ubuntu | trabalho do papel | Medir a saúde do PostgreSQL — nível dificil (✅ concluída) | 15 |
 
 
+## Tempo do último turno (medido)
+
+- 19:45–20:31 (46 min, 101 voltas; cobertura do cronômetro 100%)
+- **Entregas aprovadas na revisão independente: 22 (28.9 por hora)** — o indicador principal
+- operacional 2% · estudo 1% · revisao 2% · coordenacao 0% · manutencao 40% · erro 0% · parado 55% · sem_medicao 0%
+- Bloqueios: 0; etapas esperando dependência: 0
+
 ## Projetos entre andares (várias pessoas, uma etapa depende da outra)
 
 - Projeto NPS — TREINO_nps_20261026_094851_31114: **✅ concluída** — 1. eng_junior_espacos (concluida); 2. analise_indicadores (concluida); 3. head_ciencia (concluida); 4. sec_senior (concluida); 5. canal_nina (concluida)
@@ -236,7 +243,7 @@
 
 ## Banco de dados
 
-Levantamento das 26/10 17:23: **168 de 201** tabelas com dados (1.137.319 linhas contadas uma a uma).
+Levantamento das 26/10 17:28: **168 de 201** tabelas com dados (1.138.542 linhas contadas uma a uma).
 
 
 | Onde | Tabelas | Com dados |
