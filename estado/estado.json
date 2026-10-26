@@ -1,11 +1,11 @@
 {
  "versao": 1,
- "gerado_em": "2026-10-26T15:04:53",
+ "gerado_em": "2026-10-26T15:10:10",
  "turno": {
   "estado": "trabalhando",
   "inicio": "2026-10-26T15:04:53",
   "fim_previsto": "2026-10-26T15:44:53",
-  "voltas": 0,
+  "voltas": 15,
   "planilhas": 1
  },
  "funcionarios": 105,
@@ -18,7 +18,7 @@
    "concluidas": 48,
    "parciais": 0,
    "falhas": 0,
-   "treino": 400,
+   "treino": 403,
    "acertos": 110
   },
   {
@@ -40,7 +40,7 @@
    "concluidas": 32,
    "parciais": 0,
    "falhas": 0,
-   "treino": 252,
+   "treino": 256,
    "acertos": 74
   },
   {
@@ -51,23 +51,55 @@
    "concluidas": 52,
    "parciais": 0,
    "falhas": 1,
-   "treino": 523,
+   "treino": 526,
    "acertos": 140
   },
   {
    "andar": 5,
    "pessoas": 24,
    "trabalharam_hoje": 24,
-   "demandas": 122,
-   "concluidas": 114,
+   "demandas": 126,
+   "concluidas": 118,
    "parciais": 0,
    "falhas": 8,
-   "treino": 494,
+   "treino": 499,
    "acertos": 129
   }
  ],
  "agora": [],
  "ultimos": [
+  {
+   "quando": "2026-10-26T15:09:21",
+   "funcionario": "Rodrigo",
+   "cargo": "Analista de Infraestrutura Pleno",
+   "andar": 5,
+   "trabalho": "Exercício de SQL no PostgreSQL com os dados da fábrica — nível medio",
+   "estado": "concluida"
+  },
+  {
+   "quando": "2026-10-26T15:08:37",
+   "funcionario": "Henrique",
+   "cargo": "Head de Engenharia Python",
+   "andar": 5,
+   "trabalho": "Exercício de SQL no PostgreSQL com os dados da fábrica — nível profissional",
+   "estado": "concluida"
+  },
+  {
+   "quando": "2026-10-26T15:08:37",
+   "funcionario": "André",
+   "cargo": "Head de Infraestrutura e Segurança",
+   "andar": 5,
+   "trabalho": "SLA das rotinas — nível profissional",
+   "estado": "concluida"
+  },
+  {
+   "quando": "2026-10-26T15:07:50",
+   "funcionario": "Gustavo",
+   "cargo": "Gerente de TI e Infraestrutura",
+   "andar": 5,
+   "trabalho": "Estratégia Python — nível profissional",
+   "estado": "concluida"
+  },
   {
    "quando": "2026-10-26T14:39:34",
    "funcionario": "Gabriel",
@@ -115,47 +147,15 @@
    "andar": 3,
    "trabalho": "Segmentação da base sintética — nível profissional",
    "estado": "concluida"
-  },
-  {
-   "quando": "2026-10-26T14:38:40",
-   "funcionario": "Carla",
-   "cargo": "Coordenadora de Engenharia de Dados",
-   "andar": 1,
-   "trabalho": "Diagnosticar a planilha original da fábrica — nível dificil",
-   "estado": "concluida"
-  },
-  {
-   "quando": "2026-10-26T14:38:39",
-   "funcionario": "Larissa",
-   "cargo": "Analista de Customer Insights Pleno",
-   "andar": 2,
-   "trabalho": "Calcular a média de uma métrica da base sintética — nível medio",
-   "estado": "concluida"
-  },
-  {
-   "quando": "2026-10-26T14:38:39",
-   "funcionario": "Marina",
-   "cargo": "Arquiteta de Cloud (AWS)",
-   "andar": 5,
-   "trabalho": "Procurar segredos no repositório público — nível medio",
-   "estado": "concluida"
-  },
-  {
-   "quando": "2026-10-26T14:38:36",
-   "funcionario": "Hugo",
-   "cargo": "Analista de Excel Pleno",
-   "andar": 3,
-   "trabalho": "Calcular a média de uma métrica da base sintética — nível medio",
-   "estado": "concluida"
   }
  ],
  "sql": {
-  "exercicios_hoje": 34,
-  "concluidos_hoje": 34
+  "exercicios_hoje": 36,
+  "concluidos_hoje": 36
  },
  "fabrica": {
   "lotes_hoje": 32,
-  "conferidos_ok_hoje": 31
+  "conferidos_ok_hoje": 32
  },
  "rotinas": [
   {
@@ -166,9 +166,9 @@
   },
   {
    "rotina": "demandas",
-   "execucoes_24h": 47,
+   "execucoes_24h": 48,
    "erros_24h": 0,
-   "ultima": "2026-10-26T14:39:34"
+   "ultima": "2026-10-26T15:09:21"
   },
   {
    "rotina": "dialogo",
@@ -184,9 +184,9 @@
   },
   {
    "rotina": "fabrica",
-   "execucoes_24h": 55,
+   "execucoes_24h": 56,
    "erros_24h": 0,
-   "ultima": "2026-10-26T14:18:54"
+   "ultima": "2026-10-26T15:05:02"
   },
   {
    "rotina": "ideias",
@@ -202,9 +202,9 @@
   },
   {
    "rotina": "laboratorio",
-   "execucoes_24h": 110,
+   "execucoes_24h": 111,
    "erros_24h": 0,
-   "ultima": "2026-10-26T14:46:34"
+   "ultima": "2026-10-26T15:05:01"
   },
   {
    "rotina": "licoes",
@@ -232,9 +232,9 @@
   },
   {
    "rotina": "registro",
-   "execucoes_24h": 543,
+   "execucoes_24h": 546,
    "erros_24h": 0,
-   "ultima": "2026-10-26T14:59:28"
+   "ultima": "2026-10-26T15:09:36"
   },
   {
    "rotina": "reuniao",
@@ -258,14 +258,14 @@
    "rotina": "treino",
    "execucoes_24h": 469,
    "erros_24h": 0,
-   "ultima": "2026-10-26T14:54:43"
+   "ultima": "2026-10-26T15:09:39"
   }
  ],
  "totais": {
-  "demandas": 1155,
-  "tentativas_treino": 13661,
+  "demandas": 1159,
+  "tentativas_treino": 13676,
   "conversas": 4812,
-  "trabalhos_com_prova": 6761
+  "trabalhos_com_prova": 6780
  },
  "banco": {
   "levantamento": "2026-10-26T14:55:22",
@@ -719,7 +719,7 @@
    "ultimo": "",
    "quando": "",
    "estado": "",
-   "situacao": "estagiário: observa (regra do dono) — Observei Leo (Leitura (Extração)) fazendo \"Diagnosticar a planilha original da fábrica\" no nível dificil: terminou concl"
+   "situacao": "estagiário: observa (regra do dono) — Observei Gustavo (Gerente de TI e Infraestrutura) fazendo \"Estratégia Python\" no nível profissional: terminou concluida."
   },
   {
    "nome": "Tina",
@@ -851,7 +851,7 @@
    "ultimo": "",
    "quando": "",
    "estado": "",
-   "situacao": "estagiário: observa (regra do dono) — Observei Igor (Analista de Dados Júnior) fazendo \"Conferir no PostgreSQL os lotes da fábrica\" no nível medio: terminou c"
+   "situacao": "estagiário: observa (regra do dono)"
   },
   {
    "nome": "Marcos",
@@ -950,7 +950,7 @@
    "ultimo": "",
    "quando": "",
    "estado": "",
-   "situacao": "estagiário: observa (regra do dono) — Observei Leo (Leitura (Extração)) fazendo \"Diagnosticar a planilha original da fábrica\" no nível dificil: terminou concl"
+   "situacao": "estagiário: observa (regra do dono) — Observei Gustavo (Gerente de TI e Infraestrutura) fazendo \"Estratégia Python\" no nível profissional: terminou concluida."
   },
   {
    "nome": "Felipe",
@@ -1192,7 +1192,7 @@
    "ultimo": "",
    "quando": "",
    "estado": "",
-   "situacao": "estagiário: observa (regra do dono) — Observei Otto (Auditoria (Validação)) fazendo \"Conferir no PostgreSQL os lotes da fábrica\" no nível dificil: terminou co"
+   "situacao": "estagiário: observa (regra do dono) — Observei André (Head de Infraestrutura e Segurança) fazendo \"SLA das rotinas\" no nível profissional: terminou concluida."
   },
   {
    "nome": "Lorena",
@@ -1203,7 +1203,7 @@
    "ultimo": "",
    "quando": "",
    "estado": "",
-   "situacao": "estagiário: observa (regra do dono) — Observei Iara (Ideias e evolução da plataforma) fazendo \"Ideias para o futuro\" no nível dificil: terminou concluida."
+   "situacao": "estagiário: observa (regra do dono)"
   },
   {
    "nome": "Lívia",
@@ -1430,9 +1430,9 @@
    "andar": 5,
    "cargo": "Head de Infraestrutura e Segurança",
    "area": "Governança e Privacidade",
-   "demandas_hoje": 4,
-   "ultimo": "Situação do andar agora — nível profissional",
-   "quando": "2026-10-26T11:38:17",
+   "demandas_hoje": 5,
+   "ultimo": "SLA das rotinas — nível profissional",
+   "quando": "2026-10-26T15:08:37",
    "estado": "concluida",
    "situacao": "trabalho do papel"
   },
@@ -1467,7 +1467,7 @@
    "ultimo": "",
    "quando": "",
    "estado": "",
-   "situacao": "estagiário: observa (regra do dono) — Observei Leo (Leitura (Extração)) fazendo \"Diagnosticar a planilha original da fábrica\" no nível dificil: terminou concl"
+   "situacao": "estagiário: observa (regra do dono) — Observei Gustavo (Gerente de TI e Infraestrutura) fazendo \"Estratégia Python\" no nível profissional: terminou concluida."
   },
   {
    "nome": "Diego",
@@ -1511,16 +1511,16 @@
    "ultimo": "",
    "quando": "",
    "estado": "",
-   "situacao": "estagiário: observa (regra do dono) — Observei Leo (Leitura (Extração)) fazendo \"Diagnosticar a planilha original da fábrica\" no nível dificil: terminou concl"
+   "situacao": "estagiário: observa (regra do dono) — Observei Gustavo (Gerente de TI e Infraestrutura) fazendo \"Estratégia Python\" no nível profissional: terminou concluida."
   },
   {
    "nome": "Gustavo",
    "andar": 5,
    "cargo": "Gerente de TI e Infraestrutura",
    "area": "Engenharia de Dados",
-   "demandas_hoje": 4,
-   "ultimo": "Exercício de SQL no PostgreSQL com os dados da fábrica — nível profissional",
-   "quando": "2026-10-26T11:38:06",
+   "demandas_hoje": 5,
+   "ultimo": "Estratégia Python — nível profissional",
+   "quando": "2026-10-26T15:07:50",
    "estado": "concluida",
    "situacao": "trabalho do papel"
   },
@@ -1540,9 +1540,9 @@
    "andar": 5,
    "cargo": "Head de Engenharia Python",
    "area": "Engenharia de Dados",
-   "demandas_hoje": 4,
-   "ultimo": "Testar se o último backup volta — nível profissional",
-   "quando": "2026-10-26T11:38:16",
+   "demandas_hoje": 5,
+   "ultimo": "Exercício de SQL no PostgreSQL com os dados da fábrica — nível profissional",
+   "quando": "2026-10-26T15:08:32",
    "estado": "concluida",
    "situacao": "trabalho do papel"
   },
@@ -1617,9 +1617,9 @@
    "andar": 5,
    "cargo": "Analista de Infraestrutura Pleno",
    "area": "Engenharia de Dados",
-   "demandas_hoje": 4,
-   "ultimo": "Testar se o último backup volta — nível medio",
-   "quando": "2026-10-26T12:07:44",
+   "demandas_hoje": 5,
+   "ultimo": "Exercício de SQL no PostgreSQL com os dados da fábrica — nível medio",
+   "quando": "2026-10-26T15:09:19",
    "estado": "concluida",
    "situacao": "trabalho do papel"
   },
@@ -1798,7 +1798,7 @@
  "tempo_turnos": [],
  "modelos": {
   "finalidade": "risco_demanda",
-  "rotuladas_agora": 1112,
+  "rotuladas_agora": 1116,
   "minimo_para_treinar": 60,
   "datasets": 36,
   "maior_dataset": 1112,
@@ -2020,8 +2020,8 @@
   },
   {
    "nivel": "medio",
-   "demandas": 262,
-   "concluidas": 258,
+   "demandas": 263,
+   "concluidas": 259,
    "parciais": 0,
    "falhas": 4
   },
@@ -2034,8 +2034,8 @@
   },
   {
    "nivel": "profissional",
-   "demandas": 180,
-   "concluidas": 178,
+   "demandas": 183,
+   "concluidas": 181,
    "parciais": 1,
    "falhas": 1
   }
