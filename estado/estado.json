@@ -1,11 +1,11 @@
 {
  "versao": 1,
- "gerado_em": "2026-10-26T21:44:33",
+ "gerado_em": "2026-10-26T21:51:02",
  "turno": {
   "estado": "trabalhando",
   "inicio": "2026-10-26T21:18:15",
   "fim_previsto": "2026-10-26T21:58:15",
-  "voltas": 74,
+  "voltas": 93,
   "planilhas": 1
  },
  "funcionarios": 105,
@@ -18,8 +18,8 @@
    "concluidas": 66,
    "parciais": 0,
    "falhas": 0,
-   "treino": 560,
-   "acertos": 160
+   "treino": 564,
+   "acertos": 161
   },
   {
    "andar": 2,
@@ -29,7 +29,7 @@
    "concluidas": 64,
    "parciais": 0,
    "falhas": 0,
-   "treino": 526,
+   "treino": 530,
    "acertos": 168
   },
   {
@@ -40,7 +40,7 @@
    "concluidas": 43,
    "parciais": 0,
    "falhas": 0,
-   "treino": 353,
+   "treino": 354,
    "acertos": 103
   },
   {
@@ -51,23 +51,71 @@
    "concluidas": 73,
    "parciais": 0,
    "falhas": 1,
-   "treino": 727,
+   "treino": 732,
    "acertos": 202
   },
   {
    "andar": 5,
    "pessoas": 24,
    "trabalharam_hoje": 24,
-   "demandas": 178,
-   "concluidas": 167,
+   "demandas": 184,
+   "concluidas": 170,
    "parciais": 0,
-   "falhas": 11,
-   "treino": 694,
+   "falhas": 14,
+   "treino": 696,
    "acertos": 184
   }
  ],
  "agora": [],
  "ultimos": [
+  {
+   "quando": "2026-10-26T21:48:59",
+   "funcionario": "Letícia",
+   "cargo": "Desenvolvedora Júnior",
+   "andar": 5,
+   "trabalho": "Medir a saúde do PostgreSQL",
+   "estado": "concluida"
+  },
+  {
+   "quando": "2026-10-26T21:48:57",
+   "funcionario": "Fernanda",
+   "cargo": "Coordenadora de DevOps e Confiabilidade (SRE)",
+   "andar": 5,
+   "trabalho": "Situação do andar agora — nível dificil",
+   "estado": "concluida"
+  },
+  {
+   "quando": "2026-10-26T21:48:56",
+   "funcionario": "Wagner",
+   "cargo": "Especialista Sênior em Segurança da Informação",
+   "andar": 5,
+   "trabalho": "Ronda de saúde do sistema — nível dificil",
+   "estado": "concluida"
+  },
+  {
+   "quando": "2026-10-26T21:48:56",
+   "funcionario": "Caetano",
+   "cargo": "Especialista em Orquestração de Dados (Apache Airflow)",
+   "andar": 5,
+   "trabalho": "SLA das rotinas — nível dificil",
+   "estado": "falhou"
+  },
+  {
+   "quando": "2026-10-26T21:48:56",
+   "funcionario": "Bianca",
+   "cargo": "Engenheira de Dados Pleno",
+   "andar": 5,
+   "trabalho": "SLA das rotinas — nível medio",
+   "estado": "falhou"
+  },
+  {
+   "quando": "2026-10-26T21:48:54",
+   "funcionario": "Rodrigo",
+   "cargo": "Analista de Infraestrutura Pleno",
+   "andar": 5,
+   "trabalho": "SLA das rotinas — nível medio",
+   "estado": "falhou"
+  },
   {
    "quando": "2026-10-26T21:19:02",
    "funcionario": "Marcos",
@@ -99,54 +147,6 @@
    "andar": 5,
    "trabalho": "SLA das rotinas — nível profissional",
    "estado": "concluida"
-  },
-  {
-   "quando": "2026-10-26T21:18:53",
-   "funcionario": "Henrique",
-   "cargo": "Head de Engenharia Python",
-   "andar": 5,
-   "trabalho": "Estratégia Python — nível profissional",
-   "estado": "concluida"
-  },
-  {
-   "quando": "2026-10-26T21:18:53",
-   "funcionario": "André",
-   "cargo": "Head de Infraestrutura e Segurança",
-   "andar": 5,
-   "trabalho": "Procurar segredos no repositório público — nível profissional",
-   "estado": "concluida"
-  },
-  {
-   "quando": "2026-10-26T21:18:52",
-   "funcionario": "Gustavo",
-   "cargo": "Gerente de TI e Infraestrutura",
-   "andar": 5,
-   "trabalho": "Situação do andar agora — nível profissional",
-   "estado": "concluida"
-  },
-  {
-   "quando": "2026-10-26T20:50:44",
-   "funcionario": "Gabriel",
-   "cargo": "Especialista em Tabelas Dinâmicas e Dashboards",
-   "andar": 3,
-   "trabalho": "Perfil e indicadores da base sintética — nível dificil",
-   "estado": "concluida"
-  },
-  {
-   "quando": "2026-10-26T20:50:40",
-   "funcionario": "Natália",
-   "cargo": "Head de Ciência de Dados",
-   "andar": 2,
-   "trabalho": "Calcular a média de uma métrica da base sintética — nível profissional",
-   "estado": "concluida"
-  },
-  {
-   "quando": "2026-10-26T20:50:28",
-   "funcionario": "Bárbara",
-   "cargo": "Especialista Sênior em Power BI",
-   "andar": 3,
-   "trabalho": "Perfil e indicadores da base sintética — nível dificil",
-   "estado": "concluida"
   }
  ],
  "sql": {
@@ -166,9 +166,9 @@
   },
   {
    "rotina": "demandas",
-   "execucoes_24h": 47,
+   "execucoes_24h": 48,
    "erros_24h": 0,
-   "ultima": "2026-10-26T21:19:02"
+   "ultima": "2026-10-26T21:48:59"
   },
   {
    "rotina": "dialogo",
@@ -204,7 +204,7 @@
    "rotina": "laboratorio",
    "execucoes_24h": 109,
    "erros_24h": 0,
-   "ultima": "2026-10-26T21:33:46"
+   "ultima": "2026-10-26T21:46:20"
   },
   {
    "rotina": "licoes",
@@ -214,7 +214,7 @@
   },
   {
    "rotina": "memoria_pg",
-   "execucoes_24h": 93,
+   "execucoes_24h": 92,
    "erros_24h": 0,
    "ultima": "2026-10-26T21:44:29"
   },
@@ -232,9 +232,9 @@
   },
   {
    "rotina": "registro",
-   "execucoes_24h": 515,
+   "execucoes_24h": 519,
    "erros_24h": 0,
-   "ultima": "2026-10-26T21:41:27"
+   "ultima": "2026-10-26T21:49:14"
   },
   {
    "rotina": "reuniao",
@@ -250,22 +250,22 @@
   },
   {
    "rotina": "ronda_ti",
-   "execucoes_24h": 93,
+   "execucoes_24h": 94,
    "erros_24h": 0,
-   "ultima": "2026-10-26T21:17:59"
+   "ultima": "2026-10-26T21:48:08"
   },
   {
    "rotina": "treino",
-   "execucoes_24h": 467,
+   "execucoes_24h": 469,
    "erros_24h": 0,
-   "ultima": "2026-10-26T21:41:27"
+   "ultima": "2026-10-26T21:50:32"
   }
  ],
  "totais": {
-  "demandas": 1279,
-  "tentativas_treino": 14473,
-  "conversas": 4897,
-  "trabalhos_com_prova": 7470
+  "demandas": 1285,
+  "tentativas_treino": 14489,
+  "conversas": 4901,
+  "trabalhos_com_prova": 7492
  },
  "banco": {
   "levantamento": "2026-10-26T21:41:50",
@@ -719,7 +719,7 @@
    "ultimo": "",
    "quando": "",
    "estado": "",
-   "situacao": "estagiário: observa (regra do dono) — Observei Gustavo (Gerente de TI e Infraestrutura) fazendo \"Situação do andar agora\" no nível profissional: terminou conc"
+   "situacao": "estagiário: observa (regra do dono) — Observei Fernanda (Coordenadora de DevOps e Confiabilidade (SRE)) fazendo \"Situação do andar agora\" no nível dificil: te"
   },
   {
    "nome": "Tina",
@@ -950,7 +950,7 @@
    "ultimo": "",
    "quando": "",
    "estado": "",
-   "situacao": "estagiário: observa (regra do dono) — Observei Gustavo (Gerente de TI e Infraestrutura) fazendo \"Situação do andar agora\" no nível profissional: terminou conc"
+   "situacao": "estagiário: observa (regra do dono) — Observei Fernanda (Coordenadora de DevOps e Confiabilidade (SRE)) fazendo \"Situação do andar agora\" no nível dificil: te"
   },
   {
    "nome": "Felipe",
@@ -1192,7 +1192,7 @@
    "ultimo": "",
    "quando": "",
    "estado": "",
-   "situacao": "estagiário: observa (regra do dono) — Observei André (Head de Infraestrutura e Segurança) fazendo \"Procurar segredos no repositório público\" no nível profissi"
+   "situacao": "estagiário: observa (regra do dono) — Observei Wagner (Especialista Sênior em Segurança da Informação) fazendo \"Ronda de saúde do sistema\" no nível dificil: t"
   },
   {
    "nome": "Lorena",
@@ -1441,10 +1441,10 @@
    "andar": 5,
    "cargo": "Engenheira de Dados Pleno",
    "area": "Engenharia de Dados",
-   "demandas_hoje": 6,
-   "ultimo": "Ronda de saúde do sistema — nível medio",
-   "quando": "2026-10-26T18:48:27",
-   "estado": "concluida",
+   "demandas_hoje": 7,
+   "ultimo": "SLA das rotinas — nível medio",
+   "quando": "2026-10-26T21:48:56",
+   "estado": "falhou",
    "situacao": "trabalho do papel"
   },
   {
@@ -1452,10 +1452,10 @@
    "andar": 5,
    "cargo": "Especialista em Orquestração de Dados (Apache Airflow)",
    "area": "Engenharia de Dados",
-   "demandas_hoje": 6,
-   "ultimo": "Ronda de saúde do sistema — nível dificil",
-   "quando": "2026-10-26T18:48:24",
-   "estado": "concluida",
+   "demandas_hoje": 7,
+   "ultimo": "SLA das rotinas — nível dificil",
+   "quando": "2026-10-26T21:48:56",
+   "estado": "falhou",
    "situacao": "trabalho do papel"
   },
   {
@@ -1467,7 +1467,7 @@
    "ultimo": "",
    "quando": "",
    "estado": "",
-   "situacao": "estagiário: observa (regra do dono) — Observei Gustavo (Gerente de TI e Infraestrutura) fazendo \"Situação do andar agora\" no nível profissional: terminou conc"
+   "situacao": "estagiário: observa (regra do dono) — Observei Fernanda (Coordenadora de DevOps e Confiabilidade (SRE)) fazendo \"Situação do andar agora\" no nível dificil: te"
   },
   {
    "nome": "Diego",
@@ -1496,9 +1496,9 @@
    "andar": 5,
    "cargo": "Coordenadora de DevOps e Confiabilidade (SRE)",
    "area": "Engenharia de Dados",
-   "demandas_hoje": 7,
-   "ultimo": "Diagnosticar a planilha original da fábrica — nível dificil",
-   "quando": "2026-10-26T18:48:29",
+   "demandas_hoje": 8,
+   "ultimo": "Situação do andar agora — nível dificil",
+   "quando": "2026-10-26T21:48:56",
    "estado": "concluida",
    "situacao": "trabalho do papel"
   },
@@ -1511,7 +1511,7 @@
    "ultimo": "",
    "quando": "",
    "estado": "",
-   "situacao": "estagiário: observa (regra do dono) — Observei Gustavo (Gerente de TI e Infraestrutura) fazendo \"Situação do andar agora\" no nível profissional: terminou conc"
+   "situacao": "estagiário: observa (regra do dono) — Observei Fernanda (Coordenadora de DevOps e Confiabilidade (SRE)) fazendo \"Situação do andar agora\" no nível dificil: te"
   },
   {
    "nome": "Gustavo",
@@ -1562,10 +1562,10 @@
    "andar": 5,
    "cargo": "Desenvolvedora Júnior",
    "area": "Engenharia de Dados",
-   "demandas_hoje": 7,
-   "ultimo": "SLA das rotinas",
-   "quando": "2026-10-26T18:48:31",
-   "estado": "falhou",
+   "demandas_hoje": 8,
+   "ultimo": "Medir a saúde do PostgreSQL",
+   "quando": "2026-10-26T21:48:57",
+   "estado": "concluida",
    "situacao": "trabalho do papel"
   },
   {
@@ -1617,10 +1617,10 @@
    "andar": 5,
    "cargo": "Analista de Infraestrutura Pleno",
    "area": "Engenharia de Dados",
-   "demandas_hoje": 6,
-   "ultimo": "Ronda de saúde do sistema — nível medio",
-   "quando": "2026-10-26T18:18:53",
-   "estado": "concluida",
+   "demandas_hoje": 7,
+   "ultimo": "SLA das rotinas — nível medio",
+   "quando": "2026-10-26T21:48:54",
+   "estado": "falhou",
    "situacao": "trabalho do papel"
   },
   {
@@ -1650,9 +1650,9 @@
    "andar": 5,
    "cargo": "Especialista Sênior em Segurança da Informação",
    "area": "Governança e Privacidade",
-   "demandas_hoje": 6,
-   "ultimo": "Verificar dados pessoais (LGPD) na base sintética — nível dificil",
-   "quando": "2026-10-26T18:48:22",
+   "demandas_hoje": 7,
+   "ultimo": "Ronda de saúde do sistema — nível dificil",
+   "quando": "2026-10-26T21:48:54",
    "estado": "concluida",
    "situacao": "trabalho do papel"
   },
@@ -1798,7 +1798,7 @@
  "tempo_turnos": [],
  "modelos": {
   "finalidade": "risco_demanda",
-  "rotuladas_agora": 1236,
+  "rotuladas_agora": 1242,
   "minimo_para_treinar": 60,
   "datasets": 39,
   "maior_dataset": 1212,
@@ -2028,24 +2028,24 @@
  "niveis": [
   {
    "nivel": "basico",
-   "demandas": 226,
-   "concluidas": 205,
+   "demandas": 227,
+   "concluidas": 206,
    "parciais": 0,
    "falhas": 21
   },
   {
    "nivel": "medio",
-   "demandas": 288,
+   "demandas": 290,
    "concluidas": 284,
    "parciais": 0,
-   "falhas": 4
+   "falhas": 6
   },
   {
    "nivel": "dificil",
-   "demandas": 510,
-   "concluidas": 500,
+   "demandas": 513,
+   "concluidas": 502,
    "parciais": 1,
-   "falhas": 9
+   "falhas": 10
   },
   {
    "nivel": "profissional",
