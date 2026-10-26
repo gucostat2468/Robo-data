@@ -1,11 +1,11 @@
 {
  "versao": 1,
- "gerado_em": "2026-10-26T19:44:02",
+ "gerado_em": "2026-10-26T19:46:20",
  "turno": {
-  "estado": "entre turnos: memória salva; o próximo turno começa em poucos minutos",
-  "inicio": "2026-10-26T19:02:18",
-  "fim_previsto": "2026-10-26T19:42:18",
-  "voltas": 102,
+  "estado": "trabalhando",
+  "inicio": "2026-10-26T19:46:20",
+  "fim_previsto": "2026-10-26T20:26:20",
+  "voltas": 0,
   "planilhas": 1
  },
  "funcionarios": 105,
@@ -154,15 +154,15 @@
   "concluidos_hoje": 44
  },
  "fabrica": {
-  "lotes_hoje": 37,
+  "lotes_hoje": 38,
   "conferidos_ok_hoje": 37
  },
  "rotinas": [
   {
    "rotina": "caixa_dono",
-   "execucoes_24h": 31,
+   "execucoes_24h": 32,
    "erros_24h": 0,
-   "ultima": "2026-10-26T19:02:06"
+   "ultima": "2026-10-26T19:46:06"
   },
   {
    "rotina": "demandas",
@@ -196,9 +196,9 @@
   },
   {
    "rotina": "jornada",
-   "execucoes_24h": 31,
+   "execucoes_24h": 32,
    "erros_24h": 0,
-   "ultima": "2026-10-26T19:02:06"
+   "ultima": "2026-10-26T19:46:06"
   },
   {
    "rotina": "laboratorio",
@@ -214,25 +214,25 @@
   },
   {
    "rotina": "memoria_pg",
-   "execucoes_24h": 93,
+   "execucoes_24h": 92,
    "erros_24h": 0,
-   "ultima": "2026-10-26T19:43:59"
+   "ultima": "2026-10-26T19:39:31"
   },
   {
    "rotina": "modelos",
-   "execucoes_24h": 31,
+   "execucoes_24h": 32,
    "erros_24h": 0,
-   "ultima": "2026-10-26T19:02:12"
+   "ultima": "2026-10-26T19:46:11"
   },
   {
    "rotina": "paineis",
-   "execucoes_24h": 31,
+   "execucoes_24h": 32,
    "erros_24h": 0,
-   "ultima": "2026-10-26T19:02:11"
+   "ultima": "2026-10-26T19:46:10"
   },
   {
    "rotina": "registro",
-   "execucoes_24h": 534,
+   "execucoes_24h": 533,
    "erros_24h": 0,
    "ultima": "2026-10-26T19:41:48"
   },
@@ -250,13 +250,13 @@
   },
   {
    "rotina": "ronda_ti",
-   "execucoes_24h": 95,
+   "execucoes_24h": 96,
    "erros_24h": 0,
-   "ultima": "2026-10-26T19:41:47"
+   "ultima": "2026-10-26T19:46:01"
   },
   {
    "rotina": "treino",
-   "execucoes_24h": 466,
+   "execucoes_24h": 465,
    "erros_24h": 0,
    "ultima": "2026-10-26T19:41:15"
   }
@@ -265,15 +265,15 @@
   "demandas": 1232,
   "tentativas_treino": 14216,
   "conversas": 4874,
-  "trabalhos_com_prova": 7233
+  "trabalhos_com_prova": 7239
  },
  "banco": {
-  "levantamento": "2026-10-26T19:42:03",
+  "levantamento": "2026-10-26T19:37:36",
   "postgres_conferido": true,
   "erro_postgres": null,
   "tabelas": 201,
   "com_dados": 168,
-  "linhas": 1131778,
+  "linhas": 1130718,
   "resumo": {
    "sqlite": {
     "tabelas": 79,
@@ -1795,73 +1795,7 @@
    ]
   }
  ],
- "tempo_turnos": [
-  {
-   "id": 1,
-   "inicio": "2026-10-26T19:01:45",
-   "fim": "2026-10-26T19:44:02",
-   "segundos": 2536.3,
-   "voltas": 102,
-   "por_natureza": {
-    "operacional": 38.4,
-    "estudo": 100.0,
-    "revisao": 36.1,
-    "coordenacao": 2.3,
-    "manutencao": 830.8,
-    "erro": 0.0,
-    "parado": 1527.1,
-    "sem_medicao": 1.7
-   },
-   "por_chamada": {
-    "pausa": 1527.08,
-    "salvar": 545.64,
-    "boletim": 252.13,
-    "treino": 84.8,
-    "demandas": 61.06,
-    "registro": 13.49,
-    "laboratorio": 11.61,
-    "inicio": 9.44,
-    "esteira": 5.99,
-    "ronda_ti": 5.05,
-    "paineis": 4.9,
-    "licoes": 3.54,
-    "backup": 3.26,
-    "estrategia": 1.89,
-    "modelos": 1.55,
-    "fabrica": 0.99,
-    "canal": 0.66,
-    "telegram": 0.55,
-    "jornada": 0.53,
-    "rh_desempenho": 0.29,
-    "dialogo": 0.06,
-    "caixa_dono": 0.04,
-    "alcadas": 0.01,
-    "pdca": 0.01,
-    "ideias": 0.01,
-    "auditoria": 0.01,
-    "reuniao": 0.01,
-    "estudo": 0.01
-   },
-   "contagens": {
-    "demandas_executadas": 12,
-    "bloqueios": 3,
-    "etapas_esperando_dependencia": 0
-   },
-   "entregas_aprovadas": 12,
-   "entregas_por_hora": 17.03,
-   "cobertura": 0.999,
-   "percentual": {
-    "operacional": 1.5,
-    "estudo": 3.9,
-    "revisao": 1.4,
-    "coordenacao": 0.1,
-    "manutencao": 32.8,
-    "erro": 0.0,
-    "parado": 60.2,
-    "sem_medicao": 0.1
-   }
-  }
- ],
+ "tempo_turnos": [],
  "modelos": {
   "finalidade": "risco_demanda",
   "rotuladas_agora": 1189,
@@ -2061,7 +1995,7 @@
    }
   ],
   "referencia": "risco_demanda-v25",
-  "inferencias_sombra": 714,
+  "inferencias_sombra": 726,
   "uso_operacional": "desligado: o modelo só roda em sombra até o dono decidir usá-lo em alguma escolha da empresa",
   "ultima_avaliacao": {
    "modelo": "risco_demanda-v38",
