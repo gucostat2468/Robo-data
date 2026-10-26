@@ -1,6 +1,6 @@
 # Empresa ao vivo
 
-**Boletim das 26/10 07:20** (horário de Brasília) · trabalhando
+**Boletim das 26/10 07:26** (horário de Brasília) · trabalhando
 
 > Atualiza a cada 5 minutos enquanto a empresa trabalha. Recarregue a página para ver o mais novo.
 
@@ -229,7 +229,7 @@
 
 ## Banco de dados
 
-Levantamento das 26/10 07:11: **168 de 201** tabelas com dados (1.061.379 linhas contadas uma a uma).
+Levantamento das 26/10 07:24: **168 de 201** tabelas com dados (1.062.747 linhas contadas uma a uma).
 
 
 | Onde | Tabelas | Com dados |
