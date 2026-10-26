@@ -1,11 +1,11 @@
 {
  "versao": 1,
- "gerado_em": "2026-10-26T10:01:24",
+ "gerado_em": "2026-10-26T10:07:49",
  "turno": {
   "estado": "trabalhando",
   "inicio": "2026-10-26T09:49:03",
   "fim_previsto": "2026-10-26T10:29:03",
-  "voltas": 40,
+  "voltas": 56,
   "planilhas": 1
  },
  "funcionarios": 105,
@@ -18,15 +18,15 @@
    "concluidas": 30,
    "parciais": 0,
    "falhas": 0,
-   "treino": 265,
-   "acertos": 88
+   "treino": 269,
+   "acertos": 92
   },
   {
    "andar": 2,
    "pessoas": 18,
    "trabalharam_hoje": 18,
-   "demandas": 28,
-   "concluidas": 28,
+   "demandas": 30,
+   "concluidas": 30,
    "parciais": 0,
    "falhas": 0,
    "treino": 253,
@@ -40,8 +40,8 @@
    "concluidas": 21,
    "parciais": 0,
    "falhas": 0,
-   "treino": 164,
-   "acertos": 57
+   "treino": 172,
+   "acertos": 65
   },
   {
    "andar": 4,
@@ -51,23 +51,71 @@
    "concluidas": 32,
    "parciais": 0,
    "falhas": 0,
-   "treino": 350,
-   "acertos": 112
+   "treino": 352,
+   "acertos": 114
   },
   {
    "andar": 5,
    "pessoas": 24,
    "trabalharam_hoje": 24,
-   "demandas": 81,
-   "concluidas": 78,
+   "demandas": 85,
+   "concluidas": 82,
    "parciais": 0,
    "falhas": 3,
-   "treino": 328,
-   "acertos": 90
+   "treino": 334,
+   "acertos": 96
   }
  ],
  "agora": [],
  "ultimos": [
+  {
+   "quando": "2026-10-26T10:07:33",
+   "funcionario": "Marcos",
+   "cargo": "Coordenador de Análise e Ciência de Dados",
+   "andar": 2,
+   "trabalho": "Projeto NPS — TREINO_nps_20261026_094851_31114",
+   "estado": "concluida"
+  },
+  {
+   "quando": "2026-10-26T10:07:11",
+   "funcionario": "Heloísa",
+   "cargo": "Head de AWS, Arquitetura e Governança de Nuvem",
+   "andar": 5,
+   "trabalho": "Ronda de saúde do sistema — nível profissional",
+   "estado": "concluida"
+  },
+  {
+   "quando": "2026-10-26T10:07:09",
+   "funcionario": "Alexandre",
+   "cargo": "Diretor de Tecnologia (CTO)",
+   "andar": 5,
+   "trabalho": "Exercício de SQL no PostgreSQL com os dados da fábrica — nível profissional",
+   "estado": "concluida"
+  },
+  {
+   "quando": "2026-10-26T10:07:09",
+   "funcionario": "Nicolas",
+   "cargo": "Especialista em numpy",
+   "andar": 5,
+   "trabalho": "SLA das rotinas — nível dificil",
+   "estado": "concluida"
+  },
+  {
+   "quando": "2026-10-26T10:06:39",
+   "funcionario": "Diego",
+   "cargo": "Desenvolvedor Python Pleno",
+   "andar": 5,
+   "trabalho": "Medir a saúde do PostgreSQL — nível medio",
+   "estado": "concluida"
+  },
+  {
+   "quando": "2026-10-26T10:06:37",
+   "funcionario": "Marcos",
+   "cargo": "Coordenador de Análise e Ciência de Dados",
+   "andar": 2,
+   "trabalho": "Situação do andar agora — nível dificil",
+   "estado": "concluida"
+  },
   {
    "quando": "2026-10-26T09:36:28",
    "funcionario": "Letícia",
@@ -99,59 +147,11 @@
    "andar": 5,
    "trabalho": "Exercício de SQL no PostgreSQL com os dados da fábrica — nível dificil",
    "estado": "concluida"
-  },
-  {
-   "quando": "2026-10-26T09:06:22",
-   "funcionario": "Bianca",
-   "cargo": "Engenheira de Dados Pleno",
-   "andar": 5,
-   "trabalho": "Procurar segredos no repositório público — nível medio",
-   "estado": "concluida"
-  },
-  {
-   "quando": "2026-10-26T09:06:22",
-   "funcionario": "Heloísa",
-   "cargo": "Head de AWS, Arquitetura e Governança de Nuvem",
-   "andar": 5,
-   "trabalho": "Conferir se o projeto está pronto para servidor — nível profissional",
-   "estado": "concluida"
-  },
-  {
-   "quando": "2026-10-26T09:06:21",
-   "funcionario": "Wagner",
-   "cargo": "Especialista Sênior em Segurança da Informação",
-   "andar": 5,
-   "trabalho": "Medir a saúde do PostgreSQL — nível dificil",
-   "estado": "concluida"
-  },
-  {
-   "quando": "2026-10-26T09:06:21",
-   "funcionario": "Caetano",
-   "cargo": "Especialista em Orquestração de Dados (Apache Airflow)",
-   "andar": 5,
-   "trabalho": "Procurar segredos no repositório público — nível dificil",
-   "estado": "concluida"
-  },
-  {
-   "quando": "2026-10-26T09:06:19",
-   "funcionario": "Rodrigo",
-   "cargo": "Analista de Infraestrutura Pleno",
-   "andar": 5,
-   "trabalho": "Procurar segredos no repositório público — nível medio",
-   "estado": "concluida"
-  },
-  {
-   "quando": "2026-10-26T08:36:45",
-   "funcionario": "André",
-   "cargo": "Head de Infraestrutura e Segurança",
-   "andar": 5,
-   "trabalho": "Ronda de saúde do sistema — nível profissional",
-   "estado": "concluida"
   }
  ],
  "sql": {
-  "exercicios_hoje": 22,
-  "concluidos_hoje": 22
+  "exercicios_hoje": 23,
+  "concluidos_hoje": 23
  },
  "fabrica": {
   "lotes_hoje": 25,
@@ -166,9 +166,9 @@
   },
   {
    "rotina": "demandas",
-   "execucoes_24h": 47,
+   "execucoes_24h": 48,
    "erros_24h": 0,
-   "ultima": "2026-10-26T09:36:28"
+   "ultima": "2026-10-26T10:07:33"
   },
   {
    "rotina": "dialogo",
@@ -202,9 +202,9 @@
   },
   {
    "rotina": "laboratorio",
-   "execucoes_24h": 107,
+   "execucoes_24h": 108,
    "erros_24h": 0,
-   "ultima": "2026-10-26T09:53:44"
+   "ultima": "2026-10-26T10:03:48"
   },
   {
    "rotina": "licoes",
@@ -232,9 +232,9 @@
   },
   {
    "rotina": "registro",
-   "execucoes_24h": 524,
+   "execucoes_24h": 528,
    "erros_24h": 0,
-   "ultima": "2026-10-26T09:57:35"
+   "ultima": "2026-10-26T10:07:48"
   },
   {
    "rotina": "reuniao",
@@ -250,22 +250,22 @@
   },
   {
    "rotina": "ronda_ti",
-   "execucoes_24h": 95,
+   "execucoes_24h": 94,
    "erros_24h": 0,
    "ultima": "2026-10-26T09:48:35"
   },
   {
    "rotina": "treino",
-   "execucoes_24h": 456,
+   "execucoes_24h": 459,
    "erros_24h": 0,
-   "ultima": "2026-10-26T09:57:20"
+   "ultima": "2026-10-26T10:07:49"
   }
  ],
  "totais": {
-  "demandas": 1046,
-  "tentativas_treino": 12973,
-  "conversas": 4721,
-  "trabalhos_com_prova": 6175
+  "demandas": 1052,
+  "tentativas_treino": 12993,
+  "conversas": 4723,
+  "trabalhos_com_prova": 6196
  },
  "banco": {
   "levantamento": "2026-10-26T09:59:24",
@@ -719,7 +719,7 @@
    "ultimo": "",
    "quando": "",
    "estado": "",
-   "situacao": "estagiário: observa (regra do dono) — Observei Fernanda (Coordenadora de DevOps e Confiabilidade (SRE)) fazendo \"Testar se o último backup volta\" no nível dif"
+   "situacao": "estagiário: observa (regra do dono) — Observei Diego (Desenvolvedor Python Pleno) fazendo \"Medir a saúde do PostgreSQL\" no nível medio: terminou concluida."
   },
   {
    "nome": "Tina",
@@ -851,16 +851,16 @@
    "ultimo": "",
    "quando": "",
    "estado": "",
-   "situacao": "estagiário: observa (regra do dono)"
+   "situacao": "estagiário: observa (regra do dono) — Observei Marcos (Coordenador de Análise e Ciência de Dados) fazendo \"Situação do andar agora\" no nível dificil: terminou"
   },
   {
    "nome": "Marcos",
    "andar": 2,
    "cargo": "Coordenador de Análise e Ciência de Dados",
    "area": "Análise de Dados",
-   "demandas_hoje": 2,
-   "ultimo": "Projeto NPS — TREINO_nps_20261026_034221_41046",
-   "quando": "2026-10-26T03:58:24",
+   "demandas_hoje": 4,
+   "ultimo": "Projeto NPS — TREINO_nps_20261026_094851_31114",
+   "quando": "2026-10-26T10:07:12",
    "estado": "concluida",
    "situacao": "trabalho FORA do papel"
   },
@@ -950,7 +950,7 @@
    "ultimo": "",
    "quando": "",
    "estado": "",
-   "situacao": "estagiário: observa (regra do dono) — Observei Fernanda (Coordenadora de DevOps e Confiabilidade (SRE)) fazendo \"Testar se o último backup volta\" no nível dif"
+   "situacao": "estagiário: observa (regra do dono) — Observei Diego (Desenvolvedor Python Pleno) fazendo \"Medir a saúde do PostgreSQL\" no nível medio: terminou concluida."
   },
   {
    "nome": "Felipe",
@@ -1419,9 +1419,9 @@
    "andar": 5,
    "cargo": "Diretor de Tecnologia (CTO)",
    "area": "Engenharia de Dados",
-   "demandas_hoje": 3,
-   "ultimo": "Testar se o último backup volta — nível profissional",
-   "quando": "2026-10-26T07:03:20",
+   "demandas_hoje": 4,
+   "ultimo": "Exercício de SQL no PostgreSQL com os dados da fábrica — nível profissional",
+   "quando": "2026-10-26T10:07:06",
    "estado": "concluida",
    "situacao": "trabalho do papel"
   },
@@ -1467,16 +1467,16 @@
    "ultimo": "",
    "quando": "",
    "estado": "",
-   "situacao": "estagiário: observa (regra do dono) — Observei Fernanda (Coordenadora de DevOps e Confiabilidade (SRE)) fazendo \"Testar se o último backup volta\" no nível dif"
+   "situacao": "estagiário: observa (regra do dono) — Observei Diego (Desenvolvedor Python Pleno) fazendo \"Medir a saúde do PostgreSQL\" no nível medio: terminou concluida."
   },
   {
    "nome": "Diego",
    "andar": 5,
    "cargo": "Desenvolvedor Python Pleno",
    "area": "Engenharia de Dados",
-   "demandas_hoje": 3,
-   "ultimo": "SLA das rotinas — nível medio",
-   "quando": "2026-10-26T07:03:01",
+   "demandas_hoje": 4,
+   "ultimo": "Medir a saúde do PostgreSQL — nível medio",
+   "quando": "2026-10-26T10:06:37",
    "estado": "concluida",
    "situacao": "trabalho do papel"
   },
@@ -1511,7 +1511,7 @@
    "ultimo": "",
    "quando": "",
    "estado": "",
-   "situacao": "estagiário: observa (regra do dono) — Observei Fernanda (Coordenadora de DevOps e Confiabilidade (SRE)) fazendo \"Testar se o último backup volta\" no nível dif"
+   "situacao": "estagiário: observa (regra do dono) — Observei Diego (Desenvolvedor Python Pleno) fazendo \"Medir a saúde do PostgreSQL\" no nível medio: terminou concluida."
   },
   {
    "nome": "Gustavo",
@@ -1529,9 +1529,9 @@
    "andar": 5,
    "cargo": "Head de AWS, Arquitetura e Governança de Nuvem",
    "area": "Engenharia de Dados",
-   "demandas_hoje": 7,
-   "ultimo": "Conferir se o projeto está pronto para servidor — nível profissional",
-   "quando": "2026-10-26T09:06:22",
+   "demandas_hoje": 8,
+   "ultimo": "Ronda de saúde do sistema — nível profissional",
+   "quando": "2026-10-26T10:07:09",
    "estado": "concluida",
    "situacao": "trabalho do papel"
   },
@@ -1584,9 +1584,9 @@
    "andar": 5,
    "cargo": "Especialista em numpy",
    "area": "Estatística",
-   "demandas_hoje": 3,
-   "ultimo": "Ronda de saúde do sistema — nível dificil",
-   "quando": "2026-10-26T07:03:35",
+   "demandas_hoje": 4,
+   "ultimo": "SLA das rotinas — nível dificil",
+   "quando": "2026-10-26T10:07:09",
    "estado": "concluida",
    "situacao": "trabalho do papel"
   },
@@ -1681,6 +1681,44 @@
  ],
  "projetos": [
   {
+   "id": "TAR-20261026-caf751",
+   "titulo": "Projeto NPS — TREINO_nps_20261026_094851_31114",
+   "estado": "concluida",
+   "criada_em": "2026-10-26T10:07:12",
+   "etapas": [
+    {
+     "ordem": 1,
+     "titulo": "Diagnóstico da planilha original (o que barraria a produção)",
+     "funcionario": "eng_junior_espacos",
+     "estado": "concluida"
+    },
+    {
+     "ordem": 2,
+     "titulo": "Perfil e indicadores (NPS com margem de erro)",
+     "funcionario": "analise_indicadores",
+     "estado": "concluida"
+    },
+    {
+     "ordem": 3,
+     "titulo": "Drivers do NPS (o que mais pesa na nota)",
+     "funcionario": "head_ciencia",
+     "estado": "concluida"
+    },
+    {
+     "ordem": 4,
+     "titulo": "Dados pessoais na base (LGPD)",
+     "funcionario": "sec_senior",
+     "estado": "concluida"
+    },
+    {
+     "ordem": 5,
+     "titulo": "Resumo executivo do projeto (.md)",
+     "funcionario": "canal_nina",
+     "estado": "concluida"
+    }
+   ]
+  },
+  {
    "id": "TAR-20261026-16054a",
    "titulo": "Projeto NPS — TREINO_nps_20261026_034221_41046",
    "estado": "concluida",
@@ -1755,50 +1793,12 @@
      "estado": "concluida"
     }
    ]
-  },
-  {
-   "id": "TAR-20261025-a214e6",
-   "titulo": "Projeto NPS — TREINO_csat_ces_20261025_092348_28482",
-   "estado": "concluida",
-   "criada_em": "2026-10-25T09:40:32",
-   "etapas": [
-    {
-     "ordem": 1,
-     "titulo": "Diagnóstico da planilha original (o que barraria a produção)",
-     "funcionario": "dba",
-     "estado": "concluida"
-    },
-    {
-     "ordem": 2,
-     "titulo": "Perfil e indicadores (NPS com margem de erro)",
-     "funcionario": "analise_monitoramento",
-     "estado": "concluida"
-    },
-    {
-     "ordem": 3,
-     "titulo": "Drivers do NPS (o que mais pesa na nota)",
-     "funcionario": "cd_senior_drivers",
-     "estado": "concluida"
-    },
-    {
-     "ordem": 4,
-     "titulo": "Dados pessoais na base (LGPD)",
-     "funcionario": "gov_pleno_lgpd",
-     "estado": "concluida"
-    },
-    {
-     "ordem": 5,
-     "titulo": "Resumo executivo do projeto (.md)",
-     "funcionario": "canal_nina",
-     "estado": "concluida"
-    }
-   ]
   }
  ],
  "tempo_turnos": [],
  "modelos": {
   "finalidade": "risco_demanda",
-  "rotuladas_agora": 1003,
+  "rotuladas_agora": 1009,
   "minimo_para_treinar": 60,
   "datasets": 31,
   "maior_dataset": 986,
@@ -1995,22 +1995,22 @@
   },
   {
    "nivel": "medio",
-   "demandas": 238,
-   "concluidas": 235,
+   "demandas": 239,
+   "concluidas": 236,
    "parciais": 0,
    "falhas": 3
   },
   {
    "nivel": "dificil",
-   "demandas": 390,
-   "concluidas": 386,
+   "demandas": 392,
+   "concluidas": 388,
    "parciais": 1,
    "falhas": 3
   },
   {
    "nivel": "profissional",
-   "demandas": 157,
-   "concluidas": 156,
+   "demandas": 160,
+   "concluidas": 159,
    "parciais": 1,
    "falhas": 0
   }
