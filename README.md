@@ -1,6 +1,6 @@
 # Empresa ao vivo
 
-**Boletim das 26/10 06:46** (horário de Brasília) · entre turnos: memória salva; o próximo turno começa em poucos minutos
+**Boletim das 26/10 06:49** (horário de Brasília) · trabalhando
 
 > Atualiza a cada 5 minutos enquanto a empresa trabalha. Recarregue a página para ver o mais novo.
 
@@ -9,7 +9,7 @@
 - **192** demandas, **189** concluídas (98%), 0 parciais, 3 com falha
 - **105** de 105 funcionários já trabalharam
 - SQL: 22 exercícios, 22 conferidos com o gabarito
-- Fábrica: 24 planilhas, 24 conferidas sem erro
+- Fábrica: 25 planilhas, 24 conferidas sem erro
 
 ## Trabalhando agora
 
@@ -184,13 +184,6 @@
 | Ícaro | Sênior de AWS, Linux e Ubuntu | trabalho do papel | Exercício de SQL no PostgreSQL com os dados da fábrica — nív (✅ concluída) | 7 |
 
 
-## Tempo do último turno (medido)
-
-- 09:04–09:46 (42 min, 110 voltas; cobertura do cronômetro 100%)
-- **Entregas aprovadas na revisão independente: 9 (12.8 por hora)** — o indicador principal
-- operacional 1% · estudo 1% · revisao 1% · coordenacao 0% · manutencao 32% · erro 0% · parado 65% · sem_medicao 0%
-- Bloqueios: 0; etapas esperando dependência: 0
-
 ## Projetos entre andares (várias pessoas, uma etapa depende da outra)
 
 - Projeto NPS — TREINO_nps_20261026_034221_41046: **✅ concluída** — 1. eng_junior_auditoria (concluida); 2. analise_estatistica (concluida); 3. cd_senior_drivers (concluida); 4. gov_pleno_lgpd (concluida); 5. canal_iara (concluida)
@@ -231,12 +224,12 @@
 - risco_demanda-v30: **reprovado** (treinado por ml_engenheiro)
 - risco_demanda-v31: **reprovado** (treinado por ml_engenheiro)
 - Última avaliação independente (ml_avaliador): risco_demanda-v31 reprovado — log loss 0.032 contra baseline 0.028; motivos: não bate o baseline (log loss 0.0324 ≥ 0.0279)
-- Referência em sombra: risco_demanda-v25; 531 previsões em sombra
+- Referência em sombra: risco_demanda-v25; 540 previsões em sombra
 - Uso operacional: desligado: o modelo só roda em sombra até o dono decidir usá-lo em alguma escolha da empresa
 
 ## Banco de dados
 
-Levantamento das 26/10 06:44: **168 de 201** tabelas com dados (1.058.538 linhas contadas uma a uma).
+Levantamento das 26/10 06:40: **168 de 201** tabelas com dados (1.057.483 linhas contadas uma a uma).
 
 
 | Onde | Tabelas | Com dados |
