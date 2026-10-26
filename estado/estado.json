@@ -1,11 +1,11 @@
 {
  "versao": 1,
- "gerado_em": "2026-10-26T01:09:50",
+ "gerado_em": "2026-10-26T01:16:20",
  "turno": {
   "estado": "trabalhando",
   "inicio": "2026-10-26T00:36:38",
   "fim_previsto": "2026-10-26T01:16:38",
-  "voltas": 85,
+  "voltas": 98,
   "planilhas": 2
  },
  "funcionarios": 105,
@@ -18,7 +18,7 @@
    "concluidas": 4,
    "parciais": 0,
    "falhas": 0,
-   "treino": 43,
+   "treino": 46,
    "acertos": 20
   },
   {
@@ -29,8 +29,8 @@
    "concluidas": 3,
    "parciais": 0,
    "falhas": 0,
-   "treino": 40,
-   "acertos": 22
+   "treino": 43,
+   "acertos": 23
   },
   {
    "andar": 3,
@@ -51,7 +51,7 @@
    "concluidas": 6,
    "parciais": 0,
    "falhas": 0,
-   "treino": 57,
+   "treino": 64,
    "acertos": 35
   },
   {
@@ -62,7 +62,7 @@
    "concluidas": 4,
    "parciais": 0,
    "falhas": 2,
-   "treino": 51,
+   "treino": 54,
    "acertos": 31
   }
  ],
@@ -210,7 +210,7 @@
    "rotina": "memoria_pg",
    "execucoes_24h": 95,
    "erros_24h": 0,
-   "ultima": "2026-10-26T01:02:56"
+   "ultima": "2026-10-26T01:16:16"
   },
   {
    "rotina": "modelos",
@@ -226,9 +226,9 @@
   },
   {
    "rotina": "registro",
-   "execucoes_24h": 559,
+   "execucoes_24h": 557,
    "erros_24h": 0,
-   "ultima": "2026-10-26T01:09:19"
+   "ultima": "2026-10-26T01:13:09"
   },
   {
    "rotina": "reuniao",
@@ -252,22 +252,22 @@
    "rotina": "treino",
    "execucoes_24h": 451,
    "erros_24h": 0,
-   "ultima": "2026-10-26T01:09:04"
+   "ultima": "2026-10-26T01:13:09"
   }
  ],
  "totais": {
   "demandas": 875,
-  "tentativas_treino": 11833,
-  "conversas": 4337,
-  "trabalhos_com_prova": 5132
+  "tentativas_treino": 11849,
+  "conversas": 4340,
+  "trabalhos_com_prova": 5138
  },
  "banco": {
-  "levantamento": "2026-10-26T01:00:16",
+  "levantamento": "2026-10-26T01:13:33",
   "postgres_conferido": true,
   "erro_postgres": null,
   "tabelas": 201,
   "com_dados": 168,
-  "linhas": 953091,
+  "linhas": 962517,
   "resumo": {
    "sqlite": {
     "tabelas": 79,
