@@ -1,11 +1,11 @@
 {
  "versao": 1,
- "gerado_em": "2026-10-26T18:41:33",
+ "gerado_em": "2026-10-26T18:48:31",
  "turno": {
   "estado": "trabalhando",
   "inicio": "2026-10-26T18:14:50",
   "fim_previsto": "2026-10-26T18:54:50",
-  "voltas": 69,
+  "voltas": 87,
   "planilhas": 1
  },
  "funcionarios": 105,
@@ -14,12 +14,12 @@
    "andar": 1,
    "pessoas": 19,
    "trabalharam_hoje": 19,
-   "demandas": 54,
-   "concluidas": 54,
+   "demandas": 55,
+   "concluidas": 55,
    "parciais": 0,
    "falhas": 0,
-   "treino": 483,
-   "acertos": 132
+   "treino": 488,
+   "acertos": 133
   },
   {
    "andar": 2,
@@ -29,8 +29,8 @@
    "concluidas": 53,
    "parciais": 0,
    "falhas": 0,
-   "treino": 453,
-   "acertos": 130
+   "treino": 459,
+   "acertos": 136
   },
   {
    "andar": 3,
@@ -40,112 +40,112 @@
    "concluidas": 33,
    "parciais": 0,
    "falhas": 0,
-   "treino": 305,
+   "treino": 306,
    "acertos": 93
   },
   {
    "andar": 4,
    "pessoas": 32,
    "trabalharam_hoje": 32,
-   "demandas": 63,
-   "concluidas": 62,
+   "demandas": 66,
+   "concluidas": 65,
    "parciais": 0,
    "falhas": 1,
-   "treino": 627,
-   "acertos": 171
+   "treino": 635,
+   "acertos": 175
   },
   {
    "andar": 5,
    "pessoas": 24,
    "trabalharam_hoje": 24,
-   "demandas": 153,
-   "concluidas": 144,
+   "demandas": 159,
+   "concluidas": 149,
    "parciais": 0,
-   "falhas": 9,
-   "treino": 600,
+   "falhas": 10,
+   "treino": 601,
    "acertos": 163
   }
  ],
  "agora": [],
  "ultimos": [
   {
-   "quando": "2026-10-26T18:18:59",
-   "funcionario": "Ícaro",
-   "cargo": "Sênior de AWS, Linux e Ubuntu",
+   "quando": "2026-10-26T18:48:31",
+   "funcionario": "Fernanda",
+   "cargo": "Coordenadora de DevOps e Confiabilidade (SRE)",
    "andar": 5,
-   "trabalho": "Testar se o último backup volta — nível dificil",
+   "trabalho": "Diagnosticar a planilha original da fábrica — nível dificil",
    "estado": "concluida"
   },
   {
-   "quando": "2026-10-26T18:18:58",
-   "funcionario": "Camila",
-   "cargo": "Analista de Dados Júnior",
-   "andar": 1,
-   "trabalho": "Verificar dados pessoais (LGPD) na base sintética",
-   "estado": "concluida"
-  },
-  {
-   "quando": "2026-10-26T18:18:58",
-   "funcionario": "Heloísa",
-   "cargo": "Head de AWS, Arquitetura e Governança de Nuvem",
+   "quando": "2026-10-26T18:48:31",
+   "funcionario": "Letícia",
+   "cargo": "Desenvolvedora Júnior",
    "andar": 5,
-   "trabalho": "Conferir se o projeto está pronto para servidor — nível profissional",
+   "trabalho": "SLA das rotinas",
+   "estado": "falhou"
+  },
+  {
+   "quando": "2026-10-26T18:48:31",
+   "funcionario": "Marina",
+   "cargo": "Arquiteta de Cloud (AWS)",
+   "andar": 5,
+   "trabalho": "Conferir se o projeto está pronto para servidor — nível dificil",
    "estado": "concluida"
   },
   {
-   "quando": "2026-10-26T18:18:58",
-   "funcionario": "Yasmin",
-   "cargo": "Planejadora de Treino",
-   "andar": 4,
-   "trabalho": "Revisar um caso de treino feito por outro designer — nível dificil",
-   "estado": "concluida"
-  },
-  {
-   "quando": "2026-10-26T18:18:56",
-   "funcionario": "Rodrigo",
-   "cargo": "Analista de Infraestrutura Pleno",
+   "quando": "2026-10-26T18:48:29",
+   "funcionario": "Bianca",
+   "cargo": "Engenheira de Dados Pleno",
    "andar": 5,
    "trabalho": "Ronda de saúde do sistema — nível medio",
    "estado": "concluida"
   },
   {
-   "quando": "2026-10-26T18:18:56",
-   "funcionario": "Raquel",
-   "cargo": "Designer de Casos",
-   "andar": 4,
-   "trabalho": "Revisar um caso de treino feito por outro designer — nível dificil",
-   "estado": "concluida"
-  },
-  {
-   "quando": "2026-10-26T18:18:53",
-   "funcionario": "Eduardo",
-   "cargo": "Head de Engenharia de Dados",
-   "andar": 1,
-   "trabalho": "Anomalias na base sintética — nível profissional",
-   "estado": "concluida"
-  },
-  {
-   "quando": "2026-10-26T18:18:50",
-   "funcionario": "André",
-   "cargo": "Head de Infraestrutura e Segurança",
+   "quando": "2026-10-26T18:48:27",
+   "funcionario": "Caetano",
+   "cargo": "Especialista em Orquestração de Dados (Apache Airflow)",
    "andar": 5,
-   "trabalho": "Medir a saúde do PostgreSQL — nível profissional",
+   "trabalho": "Ronda de saúde do sistema — nível dificil",
    "estado": "concluida"
   },
   {
-   "quando": "2026-10-26T18:18:50",
-   "funcionario": "Lívia",
+   "quando": "2026-10-26T18:48:27",
+   "funcionario": "Otávio",
+   "cargo": "Head da Sala de Casos",
+   "andar": 4,
+   "trabalho": "Revisar um caso de treino feito por outro designer — nível profissional",
+   "estado": "concluida"
+  },
+  {
+   "quando": "2026-10-26T18:48:24",
+   "funcionario": "Wagner",
+   "cargo": "Especialista Sênior em Segurança da Informação",
+   "andar": 5,
+   "trabalho": "Verificar dados pessoais (LGPD) na base sintética — nível dificil",
+   "estado": "concluida"
+  },
+  {
+   "quando": "2026-10-26T18:48:24",
+   "funcionario": "Augusto",
    "cargo": "Designer de Casos",
    "andar": 4,
    "trabalho": "Revisar um caso de treino feito por outro designer — nível dificil",
    "estado": "concluida"
   },
   {
-   "quando": "2026-10-26T18:18:47",
-   "funcionario": "Beatriz",
-   "cargo": "Diretora de Dados e Engenharia (CDO)",
+   "quando": "2026-10-26T18:48:22",
+   "funcionario": "Rafael",
+   "cargo": "Engenheiro de Dados Pleno",
    "andar": 1,
-   "trabalho": "Anomalias na base sintética — nível profissional",
+   "trabalho": "Anomalias na base sintética — nível medio",
+   "estado": "concluida"
+  },
+  {
+   "quando": "2026-10-26T18:48:21",
+   "funcionario": "Valéria",
+   "cargo": "Revisora Independente de Casos",
+   "andar": 4,
+   "trabalho": "Revisar um caso de treino feito por outro designer — nível dificil",
    "estado": "concluida"
   }
  ],
@@ -166,9 +166,9 @@
   },
   {
    "rotina": "demandas",
-   "execucoes_24h": 47,
+   "execucoes_24h": 48,
    "erros_24h": 0,
-   "ultima": "2026-10-26T18:18:59"
+   "ultima": "2026-10-26T18:48:31"
   },
   {
    "rotina": "dialogo",
@@ -204,7 +204,7 @@
    "rotina": "laboratorio",
    "execucoes_24h": 110,
    "erros_24h": 0,
-   "ultima": "2026-10-26T18:30:14"
+   "ultima": "2026-10-26T18:43:34"
   },
   {
    "rotina": "licoes",
@@ -214,7 +214,7 @@
   },
   {
    "rotina": "memoria_pg",
-   "execucoes_24h": 93,
+   "execucoes_24h": 92,
    "erros_24h": 0,
    "ultima": "2026-10-26T18:41:29"
   },
@@ -232,9 +232,9 @@
   },
   {
    "rotina": "registro",
-   "execucoes_24h": 538,
+   "execucoes_24h": 540,
    "erros_24h": 0,
-   "ultima": "2026-10-26T18:36:49"
+   "ultima": "2026-10-26T18:44:53"
   },
   {
    "rotina": "reuniao",
@@ -250,22 +250,22 @@
   },
   {
    "rotina": "ronda_ti",
-   "execucoes_24h": 93,
+   "execucoes_24h": 94,
    "erros_24h": 0,
-   "ultima": "2026-10-26T18:14:31"
+   "ultima": "2026-10-26T18:44:37"
   },
   {
    "rotina": "treino",
-   "execucoes_24h": 467,
+   "execucoes_24h": 468,
    "erros_24h": 0,
-   "ultima": "2026-10-26T18:36:33"
+   "ultima": "2026-10-26T18:48:05"
   }
  ],
  "totais": {
-  "demandas": 1210,
-  "tentativas_treino": 14081,
-  "conversas": 4859,
-  "trabalhos_com_prova": 7118
+  "demandas": 1220,
+  "tentativas_treino": 14102,
+  "conversas": 4860,
+  "trabalhos_com_prova": 7142
  },
  "banco": {
   "levantamento": "2026-10-26T18:38:44",
@@ -682,9 +682,9 @@
    "andar": 1,
    "cargo": "Engenheiro de Dados Pleno",
    "area": "Engenharia de Dados",
-   "demandas_hoje": 3,
-   "ultimo": "Conferir no PostgreSQL os lotes da fábrica — nível medio",
-   "quando": "2026-10-26T12:37:20",
+   "demandas_hoje": 4,
+   "ultimo": "Anomalias na base sintética — nível medio",
+   "quando": "2026-10-26T18:48:21",
    "estado": "concluida",
    "situacao": "trabalho do papel"
   },
@@ -719,7 +719,7 @@
    "ultimo": "",
    "quando": "",
    "estado": "",
-   "situacao": "estagiário: observa (regra do dono) — Observei Dora (DBA PostgreSQL) fazendo \"Diagnosticar a planilha original da fábrica\" no nível dificil: terminou concluid"
+   "situacao": "estagiário: observa (regra do dono) — Observei Rafael (Engenheiro de Dados Pleno) fazendo \"Anomalias na base sintética\" no nível medio: terminou concluida."
   },
   {
    "nome": "Tina",
@@ -851,7 +851,7 @@
    "ultimo": "",
    "quando": "",
    "estado": "",
-   "situacao": "estagiário: observa (regra do dono) — Observei Carolina (Cientista de Dados Pleno) fazendo \"Segmentação da base sintética\" no nível medio: terminou concluida."
+   "situacao": "estagiário: observa (regra do dono)"
   },
   {
    "nome": "Marcos",
@@ -950,7 +950,7 @@
    "ultimo": "",
    "quando": "",
    "estado": "",
-   "situacao": "estagiário: observa (regra do dono) — Observei Dora (DBA PostgreSQL) fazendo \"Diagnosticar a planilha original da fábrica\" no nível dificil: terminou concluid"
+   "situacao": "estagiário: observa (regra do dono) — Observei Rafael (Engenheiro de Dados Pleno) fazendo \"Anomalias na base sintética\" no nível medio: terminou concluida."
   },
   {
    "nome": "Felipe",
@@ -1067,9 +1067,9 @@
    "andar": 4,
    "cargo": "Designer de Casos",
    "area": "Treinamento e Avaliação",
-   "demandas_hoje": 3,
+   "demandas_hoje": 4,
    "ultimo": "Revisar um caso de treino feito por outro designer — nível dificil",
-   "quando": "2026-10-26T12:37:22",
+   "quando": "2026-10-26T18:48:24",
    "estado": "concluida",
    "situacao": "trabalho do papel"
   },
@@ -1192,7 +1192,7 @@
    "ultimo": "",
    "quando": "",
    "estado": "",
-   "situacao": "estagiário: observa (regra do dono) — Observei Renata (Gerente de Operações e Governança de Dados) fazendo \"Verificar dados pessoais (LGPD) na base sintética\""
+   "situacao": "estagiário: observa (regra do dono) — Observei Wagner (Especialista Sênior em Segurança da Informação) fazendo \"Verificar dados pessoais (LGPD) na base sintét"
   },
   {
    "nome": "Lorena",
@@ -1203,7 +1203,7 @@
    "ultimo": "",
    "quando": "",
    "estado": "",
-   "situacao": "estagiário: observa (regra do dono) — Observei Renata (Gerente de Operações e Governança de Dados) fazendo \"Verificar dados pessoais (LGPD) na base sintética\""
+   "situacao": "estagiário: observa (regra do dono) — Observei Valéria (Revisora Independente de Casos) fazendo \"Revisar um caso de treino feito por outro designer\" no nível "
   },
   {
    "nome": "Lívia",
@@ -1265,9 +1265,9 @@
    "andar": 4,
    "cargo": "Head da Sala de Casos",
    "area": "Treinamento e Avaliação",
-   "demandas_hoje": 3,
+   "demandas_hoje": 4,
    "ultimo": "Revisar um caso de treino feito por outro designer — nível profissional",
-   "quando": "2026-10-26T12:37:52",
+   "quando": "2026-10-26T18:48:27",
    "estado": "concluida",
    "situacao": "trabalho do papel"
   },
@@ -1375,9 +1375,9 @@
    "andar": 4,
    "cargo": "Revisora Independente de Casos",
    "area": "Treinamento e Avaliação",
-   "demandas_hoje": 3,
+   "demandas_hoje": 4,
    "ultimo": "Revisar um caso de treino feito por outro designer — nível dificil",
-   "quando": "2026-10-26T12:37:19",
+   "quando": "2026-10-26T18:48:21",
    "estado": "concluida",
    "situacao": "trabalho do papel"
   },
@@ -1441,9 +1441,9 @@
    "andar": 5,
    "cargo": "Engenheira de Dados Pleno",
    "area": "Engenharia de Dados",
-   "demandas_hoje": 5,
-   "ultimo": "Exercício de SQL no PostgreSQL com os dados da fábrica — nível medio",
-   "quando": "2026-10-26T15:39:25",
+   "demandas_hoje": 6,
+   "ultimo": "Ronda de saúde do sistema — nível medio",
+   "quando": "2026-10-26T18:48:27",
    "estado": "concluida",
    "situacao": "trabalho do papel"
   },
@@ -1452,9 +1452,9 @@
    "andar": 5,
    "cargo": "Especialista em Orquestração de Dados (Apache Airflow)",
    "area": "Engenharia de Dados",
-   "demandas_hoje": 5,
-   "ultimo": "Exercício de SQL no PostgreSQL com os dados da fábrica — nível dificil",
-   "quando": "2026-10-26T15:38:40",
+   "demandas_hoje": 6,
+   "ultimo": "Ronda de saúde do sistema — nível dificil",
+   "quando": "2026-10-26T18:48:24",
    "estado": "concluida",
    "situacao": "trabalho do papel"
   },
@@ -1467,7 +1467,7 @@
    "ultimo": "",
    "quando": "",
    "estado": "",
-   "situacao": "estagiário: observa (regra do dono) — Observei Dora (DBA PostgreSQL) fazendo \"Diagnosticar a planilha original da fábrica\" no nível dificil: terminou concluid"
+   "situacao": "estagiário: observa (regra do dono) — Observei Rafael (Engenheiro de Dados Pleno) fazendo \"Anomalias na base sintética\" no nível medio: terminou concluida."
   },
   {
    "nome": "Diego",
@@ -1496,9 +1496,9 @@
    "andar": 5,
    "cargo": "Coordenadora de DevOps e Confiabilidade (SRE)",
    "area": "Engenharia de Dados",
-   "demandas_hoje": 6,
-   "ultimo": "Exercício de SQL no PostgreSQL com os dados da fábrica — nível dificil",
-   "quando": "2026-10-26T15:40:09",
+   "demandas_hoje": 7,
+   "ultimo": "Diagnosticar a planilha original da fábrica — nível dificil",
+   "quando": "2026-10-26T18:48:29",
    "estado": "concluida",
    "situacao": "trabalho do papel"
   },
@@ -1511,7 +1511,7 @@
    "ultimo": "",
    "quando": "",
    "estado": "",
-   "situacao": "estagiário: observa (regra do dono) — Observei Dora (DBA PostgreSQL) fazendo \"Diagnosticar a planilha original da fábrica\" no nível dificil: terminou concluid"
+   "situacao": "estagiário: observa (regra do dono) — Observei Rafael (Engenheiro de Dados Pleno) fazendo \"Anomalias na base sintética\" no nível medio: terminou concluida."
   },
   {
    "nome": "Gustavo",
@@ -1562,10 +1562,10 @@
    "andar": 5,
    "cargo": "Desenvolvedora Júnior",
    "area": "Engenharia de Dados",
-   "demandas_hoje": 6,
-   "ultimo": "Ronda de saúde do sistema",
-   "quando": "2026-10-26T15:40:11",
-   "estado": "concluida",
+   "demandas_hoje": 7,
+   "ultimo": "SLA das rotinas",
+   "quando": "2026-10-26T18:48:31",
+   "estado": "falhou",
    "situacao": "trabalho do papel"
   },
   {
@@ -1573,9 +1573,9 @@
    "andar": 5,
    "cargo": "Arquiteta de Cloud (AWS)",
    "area": "Engenharia de Dados",
-   "demandas_hoje": 14,
-   "ultimo": "Exercício de SQL no PostgreSQL com os dados da fábrica — nível dificil",
-   "quando": "2026-10-26T17:14:36",
+   "demandas_hoje": 15,
+   "ultimo": "Conferir se o projeto está pronto para servidor — nível dificil",
+   "quando": "2026-10-26T18:48:31",
    "estado": "concluida",
    "situacao": "trabalho do papel"
   },
@@ -1650,9 +1650,9 @@
    "andar": 5,
    "cargo": "Especialista Sênior em Segurança da Informação",
    "area": "Governança e Privacidade",
-   "demandas_hoje": 5,
-   "ultimo": "Testar se o último backup volta — nível dificil",
-   "quando": "2026-10-26T15:37:56",
+   "demandas_hoje": 6,
+   "ultimo": "Verificar dados pessoais (LGPD) na base sintética — nível dificil",
+   "quando": "2026-10-26T18:48:22",
    "estado": "concluida",
    "situacao": "trabalho do papel"
   },
@@ -1798,7 +1798,7 @@
  "tempo_turnos": [],
  "modelos": {
   "finalidade": "risco_demanda",
-  "rotuladas_agora": 1167,
+  "rotuladas_agora": 1177,
   "minimo_para_treinar": 60,
   "datasets": 37,
   "maior_dataset": 1141,
@@ -2018,29 +2018,29 @@
  "niveis": [
   {
    "nivel": "basico",
-   "demandas": 224,
+   "demandas": 225,
    "concluidas": 204,
    "parciais": 0,
-   "falhas": 20
+   "falhas": 21
   },
   {
    "nivel": "medio",
-   "demandas": 273,
-   "concluidas": 269,
+   "demandas": 275,
+   "concluidas": 271,
    "parciais": 0,
    "falhas": 4
   },
   {
    "nivel": "dificil",
-   "demandas": 471,
-   "concluidas": 462,
+   "demandas": 477,
+   "concluidas": 468,
    "parciais": 1,
    "falhas": 8
   },
   {
    "nivel": "profissional",
-   "demandas": 199,
-   "concluidas": 197,
+   "demandas": 200,
+   "concluidas": 198,
    "parciais": 1,
    "falhas": 1
   }
