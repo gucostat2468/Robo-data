@@ -1,13 +1,13 @@
 # Empresa ao vivo
 
-**Boletim das 25/10 21:11** (horário de Brasília) · trabalhando
+**Boletim das 25/10 21:17** (horário de Brasília) · trabalhando
 
 > Atualiza a cada 5 minutos enquanto a empresa trabalha. Recarregue a página para ver o mais novo.
 
 ## Hoje
 
 - **0** demandas, **0** concluídas, 0 parciais, 0 com falha
-- **49** de 105 funcionários já trabalharam
+- **64** de 105 funcionários já trabalharam
 - SQL: 0 exercícios, 0 conferidos com o gabarito
 - Fábrica: 0 planilhas, 0 conferidas sem erro
 
@@ -19,11 +19,11 @@
 
 | Andar | Trabalharam | Demandas | Concluídas | Parciais | Falhas |
 |---|--:|--:|--:|--:|--:|
-| 1º | 10 de 19 | 0 | 0 | 0 | 0 |
-| 2º | 9 de 18 | 0 | 0 | 0 | 0 |
-| 3º | 5 de 12 | 0 | 0 | 0 | 0 |
-| 4º | 17 de 32 | 0 | 0 | 0 | 0 |
-| 5º | 8 de 24 | 0 | 0 | 0 | 0 |
+| 1º | 13 de 19 | 0 | 0 | 0 | 0 |
+| 2º | 14 de 18 | 0 | 0 | 0 | 0 |
+| 3º | 6 de 12 | 0 | 0 | 0 | 0 |
+| 4º | 19 de 32 | 0 | 0 | 0 | 0 |
+| 5º | 12 de 24 | 0 | 0 | 0 | 0 |
 
 ## Últimas entregas
 
@@ -223,14 +223,14 @@
 
 ## Banco de dados
 
-Levantamento das 25/10 21:03: **166 de 201** tabelas com dados (924.257 linhas contadas uma a uma).
+Levantamento das 25/10 21:15: **168 de 201** tabelas com dados (926.875 linhas contadas uma a uma).
 
 
 | Onde | Tabelas | Com dados |
 |---|--:|--:|
 | sqlite | 79 | 65 |
 | postgres.laboratorio | 15 | 15 |
-| postgres.robo | 82 | 64 |
+| postgres.robo | 82 | 66 |
 | postgres.treino | 22 | 22 |
 | postgres.bruto | 1 | 0 |
 | postgres.tratado | 1 | 0 |
@@ -261,8 +261,6 @@ Vazias e por quê (nada é preenchido para parecer cheio):
 | postgres.robo | memoria_boas_praticas | funcionalidade não acionada | espelho de boas_praticas (vazia no SQLite também): PDCA: um erro corrigido que não volta por um período vira b |
 | postgres.robo | memoria_caixa_dono_eventos | funcionalidade não acionada | espelho de caixa_dono_eventos (vazia no SQLite também): decisão do dono sobre um item da caixa |
 | postgres.robo | memoria_conversas | funcionalidade não acionada | espelho de conversas (vazia no SQLite também): conversa do dono com um funcionário pela ficha ou chat; a nuvem |
-| postgres.robo | memoria_decisoes | funcionalidade não acionada | espelho de decisoes (vazia no SQLite também): decisão com dono e prazo sai de reunião ou de pedido do dono |
-| postgres.robo | memoria_decisoes_eventos | funcionalidade não acionada | espelho de decisoes_eventos (vazia no SQLite também): histórico de uma decisão; sem decisão, sem evento |
 | postgres.robo | memoria_mensagens | funcionalidade não acionada | espelho de mensagens (vazia no SQLite também): mensagens de uma conversa do dono |
 | postgres.robo | memoria_propostas_regra | funcionalidade não acionada | espelho de propostas_regra (vazia no SQLite também): nasce de planilha REAL reprovada com correção possível ou |
 | postgres.robo | memoria_regras_aprendidas | funcionalidade não acionada | espelho de regras_aprendidas (vazia no SQLite também): só existe depois que o dono aprova uma proposta de regr |

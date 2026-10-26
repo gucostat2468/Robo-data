@@ -1,11 +1,11 @@
 {
  "versao": 1,
- "gerado_em": "2026-10-26T00:11:33",
+ "gerado_em": "2026-10-26T00:17:22",
  "turno": {
   "estado": "trabalhando",
   "inicio": "2026-10-25T23:52:39",
   "fim_previsto": "2026-10-26T00:32:39",
-  "voltas": 58,
+  "voltas": 71,
   "planilhas": 1
  },
  "funcionarios": 105,
@@ -13,57 +13,57 @@
   {
    "andar": 1,
    "pessoas": 19,
-   "trabalharam_hoje": 10,
+   "trabalharam_hoje": 13,
    "demandas": 0,
    "concluidas": 0,
    "parciais": 0,
    "falhas": 0,
-   "treino": 10,
-   "acertos": 8
+   "treino": 13,
+   "acertos": 10
   },
   {
    "andar": 2,
    "pessoas": 18,
-   "trabalharam_hoje": 9,
+   "trabalharam_hoje": 14,
    "demandas": 0,
    "concluidas": 0,
    "parciais": 0,
    "falhas": 0,
-   "treino": 9,
-   "acertos": 8
+   "treino": 14,
+   "acertos": 12
   },
   {
    "andar": 3,
    "pessoas": 12,
-   "trabalharam_hoje": 5,
+   "trabalharam_hoje": 6,
    "demandas": 0,
    "concluidas": 0,
    "parciais": 0,
    "falhas": 0,
-   "treino": 5,
-   "acertos": 5
+   "treino": 6,
+   "acertos": 6
   },
   {
    "andar": 4,
    "pessoas": 32,
-   "trabalharam_hoje": 17,
+   "trabalharam_hoje": 19,
    "demandas": 0,
    "concluidas": 0,
    "parciais": 0,
    "falhas": 0,
-   "treino": 17,
-   "acertos": 17
+   "treino": 19,
+   "acertos": 19
   },
   {
    "andar": 5,
    "pessoas": 24,
-   "trabalharam_hoje": 8,
+   "trabalharam_hoje": 12,
    "demandas": 0,
    "concluidas": 0,
    "parciais": 0,
    "falhas": 0,
-   "treino": 8,
-   "acertos": 8
+   "treino": 12,
+   "acertos": 10
   }
  ],
  "agora": [],
@@ -172,9 +172,9 @@
   },
   {
    "rotina": "dialogo",
-   "execucoes_24h": 19,
+   "execucoes_24h": 20,
    "erros_24h": 0,
-   "ultima": "2026-10-25T22:42:50"
+   "ultima": "2026-10-26T00:12:20"
   },
   {
    "rotina": "fabrica",
@@ -208,9 +208,9 @@
   },
   {
    "rotina": "memoria_pg",
-   "execucoes_24h": 94,
+   "execucoes_24h": 95,
    "erros_24h": 0,
-   "ultima": "2026-10-26T00:05:03"
+   "ultima": "2026-10-26T00:17:19"
   },
   {
    "rotina": "modelos",
@@ -226,9 +226,9 @@
   },
   {
    "rotina": "registro",
-   "execucoes_24h": 547,
+   "execucoes_24h": 549,
    "erros_24h": 0,
-   "ultima": "2026-10-26T00:11:03"
+   "ultima": "2026-10-26T00:15:09"
   },
   {
    "rotina": "reuniao",
@@ -244,30 +244,30 @@
   },
   {
    "rotina": "ronda_ti",
-   "execucoes_24h": 95,
+   "execucoes_24h": 94,
    "erros_24h": 0,
    "ultima": "2026-10-25T23:52:15"
   },
   {
    "rotina": "treino",
-   "execucoes_24h": 447,
+   "execucoes_24h": 449,
    "erros_24h": 0,
-   "ultima": "2026-10-26T00:10:48"
+   "ultima": "2026-10-26T00:15:09"
   }
  ],
  "totais": {
   "demandas": 854,
-  "tentativas_treino": 11662,
-  "conversas": 4260,
-  "trabalhos_com_prova": 4994
+  "tentativas_treino": 11677,
+  "conversas": 4267,
+  "trabalhos_com_prova": 5003
  },
  "banco": {
-  "levantamento": "2026-10-26T00:03:07",
+  "levantamento": "2026-10-26T00:15:26",
   "postgres_conferido": true,
   "erro_postgres": null,
   "tabelas": 201,
-  "com_dados": 166,
-  "linhas": 924257,
+  "com_dados": 168,
+  "linhas": 926875,
   "resumo": {
    "sqlite": {
     "tabelas": 79,
@@ -283,9 +283,9 @@
    },
    "postgres.robo": {
     "tabelas": 82,
-    "com_dados": 64,
+    "com_dados": 66,
     "vazias": {
-     "vazia: funcionalidade não acionada": 18
+     "vazia: funcionalidade não acionada": 16
     }
    },
    "postgres.treino": {
@@ -441,18 +441,6 @@
     "tabela": "memoria_conversas",
     "situacao": "funcionalidade não acionada",
     "causa": "espelho de conversas (vazia no SQLite também): conversa do dono com um funcionário pela ficha ou chat; a nuvem não tem painel"
-   },
-   {
-    "onde": "postgres.robo",
-    "tabela": "memoria_decisoes",
-    "situacao": "funcionalidade não acionada",
-    "causa": "espelho de decisoes (vazia no SQLite também): decisão com dono e prazo sai de reunião ou de pedido do dono"
-   },
-   {
-    "onde": "postgres.robo",
-    "tabela": "memoria_decisoes_eventos",
-    "situacao": "funcionalidade não acionada",
-    "causa": "espelho de decisoes_eventos (vazia no SQLite também): histórico de uma decisão; sem decisão, sem evento"
    },
    {
     "onde": "postgres.robo",
