@@ -1,11 +1,11 @@
 {
  "versao": 1,
- "gerado_em": "2026-10-26T23:46:42",
+ "gerado_em": "2026-10-26T23:53:44",
  "turno": {
   "estado": "trabalhando",
   "inicio": "2026-10-26T23:33:00",
   "fim_previsto": "2026-10-27T00:13:00",
-  "voltas": 40,
+  "voltas": 56,
   "planilhas": 1
  },
  "funcionarios": 105,
@@ -14,60 +14,116 @@
    "andar": 1,
    "pessoas": 19,
    "trabalharam_hoje": 19,
-   "demandas": 66,
-   "concluidas": 66,
+   "demandas": 67,
+   "concluidas": 67,
    "parciais": 0,
    "falhas": 0,
-   "treino": 611,
+   "treino": 617,
    "acertos": 182
   },
   {
    "andar": 2,
    "pessoas": 18,
    "trabalharam_hoje": 18,
-   "demandas": 66,
-   "concluidas": 66,
+   "demandas": 67,
+   "concluidas": 67,
    "parciais": 0,
    "falhas": 0,
-   "treino": 576,
+   "treino": 577,
    "acertos": 186
   },
   {
    "andar": 3,
    "pessoas": 12,
    "trabalharam_hoje": 12,
-   "demandas": 43,
-   "concluidas": 43,
+   "demandas": 44,
+   "concluidas": 44,
    "parciais": 0,
    "falhas": 0,
-   "treino": 385,
+   "treino": 389,
    "acertos": 118
   },
   {
    "andar": 4,
    "pessoas": 32,
    "trabalharam_hoje": 32,
-   "demandas": 75,
-   "concluidas": 74,
+   "demandas": 78,
+   "concluidas": 77,
    "parciais": 0,
    "falhas": 1,
-   "treino": 793,
+   "treino": 799,
    "acertos": 234
   },
   {
    "andar": 5,
    "pessoas": 24,
    "trabalharam_hoje": 24,
-   "demandas": 199,
-   "concluidas": 185,
+   "demandas": 200,
+   "concluidas": 186,
    "parciais": 0,
    "falhas": 14,
-   "treino": 755,
+   "treino": 761,
    "acertos": 224
   }
  ],
  "agora": [],
  "ultimos": [
+  {
+   "quando": "2026-10-26T23:50:24",
+   "funcionario": "Cláudia",
+   "cargo": "Diretora de Operações e Governança",
+   "andar": 4,
+   "trabalho": "Scorecard da área — nível profissional",
+   "estado": "concluida"
+  },
+  {
+   "quando": "2026-10-26T23:50:24",
+   "funcionario": "Marta",
+   "cargo": "Diretora de Pessoas e Cultura (CHRO)",
+   "andar": 4,
+   "trabalho": "Situação das contratações — nível profissional",
+   "estado": "concluida"
+  },
+  {
+   "quando": "2026-10-26T23:50:23",
+   "funcionario": "Ricardo",
+   "cargo": "Gerente da Sala Excel",
+   "andar": 3,
+   "trabalho": "Situação do andar agora — nível profissional",
+   "estado": "concluida"
+  },
+  {
+   "quando": "2026-10-26T23:50:23",
+   "funcionario": "Marina",
+   "cargo": "Arquiteta de Cloud (AWS)",
+   "andar": 5,
+   "trabalho": "Procurar segredos no repositório público — nível dificil",
+   "estado": "concluida"
+  },
+  {
+   "quando": "2026-10-26T23:50:22",
+   "funcionario": "Rogério",
+   "cargo": "Diretor de Analytics, Ciência de Dados e BI",
+   "andar": 2,
+   "trabalho": "Exercício de SQL no PostgreSQL com os dados da fábrica — nível profissional",
+   "estado": "concluida"
+  },
+  {
+   "quando": "2026-10-26T23:49:28",
+   "funcionario": "Beto",
+   "cargo": "Banco de dados (ELT)",
+   "andar": 1,
+   "trabalho": "Anomalias na base sintética — nível dificil",
+   "estado": "concluida"
+  },
+  {
+   "quando": "2026-10-26T23:49:26",
+   "funcionario": "Helena",
+   "cargo": "RH e desenvolvimento da equipe",
+   "andar": 4,
+   "trabalho": "Diagnosticar a planilha original da fábrica — nível dificil",
+   "estado": "concluida"
+  },
   {
    "quando": "2026-10-26T23:21:36",
    "funcionario": "Ícaro",
@@ -91,67 +147,11 @@
    "andar": 5,
    "trabalho": "Procurar segredos no repositório público — nível profissional",
    "estado": "concluida"
-  },
-  {
-   "quando": "2026-10-26T23:21:34",
-   "funcionario": "Xavier",
-   "cargo": "Especialista em xlrd (.xls antigo)",
-   "andar": 5,
-   "trabalho": "Exercício de SQL no PostgreSQL com os dados da fábrica — nível dificil",
-   "estado": "concluida"
-  },
-  {
-   "quando": "2026-10-26T23:21:01",
-   "funcionario": "Silas",
-   "cargo": "Especialista em sqlite3 (memória da empresa)",
-   "andar": 5,
-   "trabalho": "Exercício de SQL no PostgreSQL com os dados da fábrica — nível dificil",
-   "estado": "concluida"
-  },
-  {
-   "quando": "2026-10-26T23:20:27",
-   "funcionario": "Pietro",
-   "cargo": "Especialista em psycopg (PostgreSQL)",
-   "andar": 5,
-   "trabalho": "Medir a saúde do PostgreSQL — nível medio",
-   "estado": "concluida"
-  },
-  {
-   "quando": "2026-10-26T23:20:25",
-   "funcionario": "Sofia",
-   "cargo": "Especialista em pandas",
-   "andar": 5,
-   "trabalho": "Medir a saúde do PostgreSQL — nível dificil",
-   "estado": "concluida"
-  },
-  {
-   "quando": "2026-10-26T23:20:25",
-   "funcionario": "Jonas",
-   "cargo": "Engenheiro de MLOps e Plataforma de Modelos",
-   "andar": 5,
-   "trabalho": "Procurar segredos no repositório público — nível medio",
-   "estado": "concluida"
-  },
-  {
-   "quando": "2026-10-26T23:20:22",
-   "funcionario": "Olívia",
-   "cargo": "Especialista em openpyxl (Excel)",
-   "andar": 5,
-   "trabalho": "Exercício de SQL no PostgreSQL com os dados da fábrica — nível dificil",
-   "estado": "concluida"
-  },
-  {
-   "quando": "2026-10-26T23:19:49",
-   "funcionario": "Nicolas",
-   "cargo": "Especialista em numpy",
-   "andar": 5,
-   "trabalho": "Exercício de SQL no PostgreSQL com os dados da fábrica — nível dificil",
-   "estado": "concluida"
   }
  ],
  "sql": {
-  "exercicios_hoje": 51,
-  "concluidos_hoje": 51
+  "exercicios_hoje": 52,
+  "concluidos_hoje": 52
  },
  "fabrica": {
   "lotes_hoje": 43,
@@ -160,15 +160,15 @@
  "rotinas": [
   {
    "rotina": "caixa_dono",
-   "execucoes_24h": 32,
+   "execucoes_24h": 31,
    "erros_24h": 0,
    "ultima": "2026-10-26T23:32:45"
   },
   {
    "rotina": "demandas",
-   "execucoes_24h": 47,
+   "execucoes_24h": 48,
    "erros_24h": 0,
-   "ultima": "2026-10-26T23:21:36"
+   "ultima": "2026-10-26T23:50:24"
   },
   {
    "rotina": "dialogo",
@@ -184,7 +184,7 @@
   },
   {
    "rotina": "fabrica",
-   "execucoes_24h": 56,
+   "execucoes_24h": 55,
    "erros_24h": 0,
    "ultima": "2026-10-26T23:33:06"
   },
@@ -196,7 +196,7 @@
   },
   {
    "rotina": "jornada",
-   "execucoes_24h": 32,
+   "execucoes_24h": 31,
    "erros_24h": 0,
    "ultima": "2026-10-26T23:32:45"
   },
@@ -204,7 +204,7 @@
    "rotina": "laboratorio",
    "execucoes_24h": 111,
    "erros_24h": 0,
-   "ultima": "2026-10-26T23:35:59"
+   "ultima": "2026-10-26T23:48:54"
   },
   {
    "rotina": "licoes",
@@ -220,27 +220,21 @@
   },
   {
    "rotina": "modelos",
-   "execucoes_24h": 32,
+   "execucoes_24h": 31,
    "erros_24h": 0,
    "ultima": "2026-10-26T23:32:52"
   },
   {
    "rotina": "paineis",
-   "execucoes_24h": 32,
+   "execucoes_24h": 31,
    "erros_24h": 0,
    "ultima": "2026-10-26T23:32:51"
   },
   {
    "rotina": "registro",
-   "execucoes_24h": 511,
+   "execucoes_24h": 509,
    "erros_24h": 0,
-   "ultima": "2026-10-26T23:39:51"
-  },
-  {
-   "rotina": "reuniao",
-   "execucoes_24h": 1,
-   "erros_24h": 0,
-   "ultima": "2026-10-25T23:52:20"
+   "ultima": "2026-10-26T23:50:40"
   },
   {
    "rotina": "rh_desempenho",
@@ -250,22 +244,22 @@
   },
   {
    "rotina": "ronda_ti",
-   "execucoes_24h": 95,
+   "execucoes_24h": 93,
    "erros_24h": 0,
    "ultima": "2026-10-26T23:32:34"
   },
   {
    "rotina": "treino",
-   "execucoes_24h": 471,
+   "execucoes_24h": 472,
    "erros_24h": 0,
-   "ultima": "2026-10-26T23:41:38"
+   "ultima": "2026-10-26T23:52:58"
   }
  ],
  "totais": {
-  "demandas": 1303,
-  "tentativas_treino": 14733,
+  "demandas": 1310,
+  "tentativas_treino": 14756,
   "conversas": 4930,
-  "trabalhos_com_prova": 7697
+  "trabalhos_com_prova": 7717
  },
  "banco": {
   "levantamento": "2026-10-26T23:43:36",
@@ -550,9 +544,9 @@
    "andar": 1,
    "cargo": "Banco de dados (ELT)",
    "area": "Engenharia de Dados",
-   "demandas_hoje": 3,
-   "ultimo": "Diagnosticar a planilha original da fábrica — nível dificil",
-   "quando": "2026-10-26T17:48:23",
+   "demandas_hoje": 4,
+   "ultimo": "Anomalias na base sintética — nível dificil",
+   "quando": "2026-10-26T23:49:26",
    "estado": "concluida",
    "situacao": "trabalho do papel"
   },
@@ -719,7 +713,7 @@
    "ultimo": "",
    "quando": "",
    "estado": "",
-   "situacao": "estagiário: observa (regra do dono) — Observei Olívia (Especialista em openpyxl (Excel)) fazendo \"Exercício de SQL no PostgreSQL com os dados da fábrica\" no n"
+   "situacao": "estagiário: observa (regra do dono) — Observei Beto (Banco de dados (ELT)) fazendo \"Anomalias na base sintética\" no nível dificil: terminou concluida."
   },
   {
    "nome": "Tina",
@@ -851,7 +845,7 @@
    "ultimo": "",
    "quando": "",
    "estado": "",
-   "situacao": "estagiário: observa (regra do dono)"
+   "situacao": "estagiário: observa (regra do dono) — Observei Rogério (Diretor de Analytics, Ciência de Dados e BI) fazendo \"Exercício de SQL no PostgreSQL com os dados da f"
   },
   {
    "nome": "Marcos",
@@ -902,9 +896,9 @@
    "andar": 2,
    "cargo": "Diretor de Analytics, Ciência de Dados e BI",
    "area": "Customer Insights e Pesquisa",
-   "demandas_hoje": 3,
-   "ultimo": "Segmentação da base sintética — nível profissional",
-   "quando": "2026-10-26T17:48:26",
+   "demandas_hoje": 4,
+   "ultimo": "Exercício de SQL no PostgreSQL com os dados da fábrica — nível profissional",
+   "quando": "2026-10-26T23:50:18",
    "estado": "concluida",
    "situacao": "trabalho do papel"
   },
@@ -950,7 +944,7 @@
    "ultimo": "",
    "quando": "",
    "estado": "",
-   "situacao": "estagiário: observa (regra do dono) — Observei Olívia (Especialista em openpyxl (Excel)) fazendo \"Exercício de SQL no PostgreSQL com os dados da fábrica\" no n"
+   "situacao": "estagiário: observa (regra do dono) — Observei Beto (Banco de dados (ELT)) fazendo \"Anomalias na base sintética\" no nível dificil: terminou concluida."
   },
   {
    "nome": "Felipe",
@@ -1034,9 +1028,9 @@
    "andar": 3,
    "cargo": "Gerente da Sala Excel",
    "area": "Storytelling e Negócio",
-   "demandas_hoje": 3,
-   "ultimo": "Diagnosticar a planilha original da fábrica — nível profissional",
-   "quando": "2026-10-26T17:48:36",
+   "demandas_hoje": 4,
+   "ultimo": "Situação do andar agora — nível profissional",
+   "quando": "2026-10-26T23:50:22",
    "estado": "concluida",
    "situacao": "trabalho do papel"
   },
@@ -1111,9 +1105,9 @@
    "andar": 4,
    "cargo": "Diretora de Operações e Governança",
    "area": "Governança e Privacidade",
-   "demandas_hoje": 3,
-   "ultimo": "Raio-X da empresa — nível profissional",
-   "quando": "2026-10-26T17:48:43",
+   "demandas_hoje": 4,
+   "ultimo": "Scorecard da área — nível profissional",
+   "quando": "2026-10-26T23:50:24",
    "estado": "concluida",
    "situacao": "trabalho do papel"
   },
@@ -1133,9 +1127,9 @@
    "andar": 4,
    "cargo": "RH e desenvolvimento da equipe",
    "area": "Governança e Privacidade",
-   "demandas_hoje": 3,
-   "ultimo": "Verificar dados pessoais (LGPD) na base sintética — nível dificil",
-   "quando": "2026-10-26T17:48:18",
+   "demandas_hoje": 4,
+   "ultimo": "Diagnosticar a planilha original da fábrica — nível dificil",
+   "quando": "2026-10-26T23:49:25",
    "estado": "concluida",
    "situacao": "trabalho do papel"
   },
@@ -1192,7 +1186,7 @@
    "ultimo": "",
    "quando": "",
    "estado": "",
-   "situacao": "estagiário: observa (regra do dono) — Observei Elisa (Especialista em PyYAML (configuração)) fazendo \"SLA das rotinas\" no nível dificil: terminou concluida."
+   "situacao": "estagiário: observa (regra do dono) — Observei Helena (RH e desenvolvimento da equipe) fazendo \"Diagnosticar a planilha original da fábrica\" no nível dificil:"
   },
   {
    "nome": "Lorena",
@@ -1203,7 +1197,7 @@
    "ultimo": "",
    "quando": "",
    "estado": "",
-   "situacao": "estagiário: observa (regra do dono)"
+   "situacao": "estagiário: observa (regra do dono) — Observei Marta (Diretora de Pessoas e Cultura (CHRO)) fazendo \"Situação das contratações\" no nível profissional: termino"
   },
   {
    "nome": "Lívia",
@@ -1221,9 +1215,9 @@
    "andar": 4,
    "cargo": "Diretora de Pessoas e Cultura (CHRO)",
    "area": "Pessoas e Cultura",
-   "demandas_hoje": 3,
-   "ultimo": "Planos de desenvolvimento 70-20-10 — nível profissional",
-   "quando": "2026-10-26T17:48:43",
+   "demandas_hoje": 4,
+   "ultimo": "Situação das contratações — nível profissional",
+   "quando": "2026-10-26T23:50:24",
    "estado": "concluida",
    "situacao": "trabalho do papel"
   },
@@ -1467,7 +1461,7 @@
    "ultimo": "",
    "quando": "",
    "estado": "",
-   "situacao": "estagiário: observa (regra do dono) — Observei Olívia (Especialista em openpyxl (Excel)) fazendo \"Exercício de SQL no PostgreSQL com os dados da fábrica\" no n"
+   "situacao": "estagiário: observa (regra do dono) — Observei Beto (Banco de dados (ELT)) fazendo \"Anomalias na base sintética\" no nível dificil: terminou concluida."
   },
   {
    "nome": "Diego",
@@ -1511,7 +1505,7 @@
    "ultimo": "",
    "quando": "",
    "estado": "",
-   "situacao": "estagiário: observa (regra do dono) — Observei Olívia (Especialista em openpyxl (Excel)) fazendo \"Exercício de SQL no PostgreSQL com os dados da fábrica\" no n"
+   "situacao": "estagiário: observa (regra do dono) — Observei Beto (Banco de dados (ELT)) fazendo \"Anomalias na base sintética\" no nível dificil: terminou concluida."
   },
   {
    "nome": "Gustavo",
@@ -1573,9 +1567,9 @@
    "andar": 5,
    "cargo": "Arquiteta de Cloud (AWS)",
    "area": "Engenharia de Dados",
-   "demandas_hoje": 18,
-   "ultimo": "Medir a saúde do PostgreSQL — nível dificil",
-   "quando": "2026-10-26T22:49:14",
+   "demandas_hoje": 19,
+   "ultimo": "Procurar segredos no repositório público — nível dificil",
+   "quando": "2026-10-26T23:50:23",
    "estado": "concluida",
    "situacao": "trabalho do papel"
   },
@@ -1798,7 +1792,7 @@
  "tempo_turnos": [],
  "modelos": {
   "finalidade": "risco_demanda",
-  "rotuladas_agora": 1260,
+  "rotuladas_agora": 1267,
   "minimo_para_treinar": 60,
   "datasets": 40,
   "maior_dataset": 1242,
@@ -2047,15 +2041,15 @@
   },
   {
    "nivel": "dificil",
-   "demandas": 524,
-   "concluidas": 513,
+   "demandas": 527,
+   "concluidas": 516,
    "parciais": 1,
    "falhas": 10
   },
   {
    "nivel": "profissional",
-   "demandas": 216,
-   "concluidas": 214,
+   "demandas": 220,
+   "concluidas": 218,
    "parciais": 1,
    "falhas": 1
   }
