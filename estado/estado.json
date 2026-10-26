@@ -1,8 +1,8 @@
 {
  "versao": 1,
- "gerado_em": "2026-10-26T11:57:04",
+ "gerado_em": "2026-10-26T12:01:53",
  "turno": {
-  "estado": "trabalhando",
+  "estado": "entre turnos: memória salva; o próximo turno começa em poucos minutos",
   "inicio": "2026-10-26T11:17:08",
   "fim_previsto": "2026-10-26T11:57:08",
   "voltas": 100,
@@ -196,7 +196,7 @@
   },
   {
    "rotina": "laboratorio",
-   "execucoes_24h": 110,
+   "execucoes_24h": 109,
    "erros_24h": 0,
    "ultima": "2026-10-26T11:45:55"
   },
@@ -208,9 +208,9 @@
   },
   {
    "rotina": "memoria_pg",
-   "execucoes_24h": 94,
+   "execucoes_24h": 95,
    "erros_24h": 0,
-   "ultima": "2026-10-26T11:57:00"
+   "ultima": "2026-10-26T12:01:49"
   },
   {
    "rotina": "modelos",
@@ -226,9 +226,9 @@
   },
   {
    "rotina": "registro",
-   "execucoes_24h": 534,
+   "execucoes_24h": 533,
    "erros_24h": 0,
-   "ultima": "2026-10-26T11:50:17"
+   "ultima": "2026-10-26T11:58:50"
   },
   {
    "rotina": "reuniao",
@@ -244,13 +244,13 @@
   },
   {
    "rotina": "ronda_ti",
-   "execucoes_24h": 94,
+   "execucoes_24h": 95,
    "erros_24h": 0,
-   "ultima": "2026-10-26T11:46:43"
+   "ultima": "2026-10-26T11:58:49"
   },
   {
    "rotina": "treino",
-   "execucoes_24h": 465,
+   "execucoes_24h": 464,
    "erros_24h": 0,
    "ultima": "2026-10-26T11:52:07"
   }
@@ -259,15 +259,15 @@
   "demandas": 1076,
   "tentativas_treino": 13235,
   "conversas": 4758,
-  "trabalhos_com_prova": 6387
+  "trabalhos_com_prova": 6390
  },
  "banco": {
-  "levantamento": "2026-10-26T11:54:18",
+  "levantamento": "2026-10-26T11:59:11",
   "postgres_conferido": true,
   "erro_postgres": null,
   "tabelas": 201,
   "com_dados": 168,
-  "linhas": 1074444,
+  "linhas": 1075156,
   "resumo": {
    "sqlite": {
     "tabelas": 79,
@@ -1789,7 +1789,73 @@
    ]
   }
  ],
- "tempo_turnos": [],
+ "tempo_turnos": [
+  {
+   "id": 1,
+   "inicio": "2026-10-26T11:16:28",
+   "fim": "2026-10-26T12:01:53",
+   "segundos": 2724.4,
+   "voltas": 100,
+   "por_natureza": {
+    "operacional": 47.4,
+    "estudo": 35.4,
+    "revisao": 44.0,
+    "coordenacao": 2.3,
+    "manutencao": 1108.8,
+    "erro": 0.0,
+    "parado": 1485.0,
+    "sem_medicao": 1.6
+   },
+   "por_chamada": {
+    "pausa": 1485.01,
+    "salvar": 757.43,
+    "boletim": 316.49,
+    "demandas": 74.95,
+    "treino": 18.36,
+    "laboratorio": 12.29,
+    "registro": 12.23,
+    "inicio": 11.83,
+    "esteira": 9.36,
+    "ronda_ti": 6.16,
+    "paineis": 5.17,
+    "licoes": 4.73,
+    "backup": 2.71,
+    "estrategia": 2.12,
+    "fabrica": 1.11,
+    "modelos": 0.78,
+    "jornada": 0.68,
+    "canal": 0.65,
+    "telegram": 0.57,
+    "dialogo": 0.06,
+    "caixa_dono": 0.03,
+    "alcadas": 0.02,
+    "rh_desempenho": 0.01,
+    "pdca": 0.01,
+    "auditoria": 0.01,
+    "ideias": 0.01,
+    "reuniao": 0.01,
+    "estudo": 0.01
+   },
+   "contagens": {
+    "demandas_executadas": 12,
+    "bloqueios": 1,
+    "etapas_esperando_dependencia": 0
+   },
+   "entregas_aprovadas": 10,
+   "entregas_por_hora": 13.21,
+   "cobertura": 0.999,
+   "percentual": {
+    "operacional": 1.7,
+    "estudo": 1.3,
+    "revisao": 1.6,
+    "coordenacao": 0.1,
+    "manutencao": 40.7,
+    "erro": 0.0,
+    "parado": 54.5,
+    "sem_medicao": 0.1
+   }
+  }
+ ],
  "modelos": {
   "finalidade": "risco_demanda",
   "rotuladas_agora": 1033,
