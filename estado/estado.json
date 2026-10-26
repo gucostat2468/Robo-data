@@ -1,11 +1,11 @@
 {
  "versao": 1,
- "gerado_em": "2026-10-26T02:40:27",
+ "gerado_em": "2026-10-26T02:46:39",
  "turno": {
   "estado": "trabalhando",
   "inicio": "2026-10-26T02:07:54",
   "fim_previsto": "2026-10-26T02:47:54",
-  "voltas": 91,
+  "voltas": 104,
   "planilhas": 2
  },
  "funcionarios": 105,
@@ -18,7 +18,7 @@
    "concluidas": 12,
    "parciais": 0,
    "falhas": 0,
-   "treino": 84,
+   "treino": 88,
    "acertos": 25
   },
   {
@@ -29,8 +29,8 @@
    "concluidas": 11,
    "parciais": 0,
    "falhas": 0,
-   "treino": 78,
-   "acertos": 28
+   "treino": 80,
+   "acertos": 29
   },
   {
    "andar": 3,
@@ -51,7 +51,7 @@
    "concluidas": 11,
    "parciais": 0,
    "falhas": 0,
-   "treino": 109,
+   "treino": 116,
    "acertos": 44
   },
   {
@@ -62,7 +62,7 @@
    "concluidas": 17,
    "parciais": 0,
    "falhas": 2,
-   "treino": 99,
+   "treino": 102,
    "acertos": 40
   }
  ],
@@ -210,7 +210,7 @@
    "rotina": "memoria_pg",
    "execucoes_24h": 95,
    "erros_24h": 0,
-   "ultima": "2026-10-26T02:33:42"
+   "ultima": "2026-10-26T02:46:36"
   },
   {
    "rotina": "modelos",
@@ -226,9 +226,9 @@
   },
   {
    "rotina": "registro",
-   "execucoes_24h": 548,
+   "execucoes_24h": 549,
    "erros_24h": 0,
-   "ultima": "2026-10-26T02:39:57"
+   "ultima": "2026-10-26T02:42:00"
   },
   {
    "rotina": "reuniao",
@@ -250,24 +250,24 @@
   },
   {
    "rotina": "treino",
-   "execucoes_24h": 448,
+   "execucoes_24h": 449,
    "erros_24h": 0,
-   "ultima": "2026-10-26T02:39:41"
+   "ultima": "2026-10-26T02:43:47"
   }
  ],
  "totais": {
   "demandas": 917,
-  "tentativas_treino": 12036,
-  "conversas": 4457,
-  "trabalhos_com_prova": 5332
+  "tentativas_treino": 12052,
+  "conversas": 4463,
+  "trabalhos_com_prova": 5338
  },
  "banco": {
-  "levantamento": "2026-10-26T02:31:17",
+  "levantamento": "2026-10-26T02:44:09",
   "postgres_conferido": true,
   "erro_postgres": null,
   "tabelas": 201,
   "com_dados": 168,
-  "linhas": 994722,
+  "linhas": 1004087,
   "resumo": {
    "sqlite": {
     "tabelas": 79,
