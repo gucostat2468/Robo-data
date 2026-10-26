@@ -1,6 +1,6 @@
 # Empresa ao vivo
 
-**Boletim das 26/10 02:58** (horário de Brasília) · entre turnos: memória salva; o próximo turno começa em poucos minutos
+**Boletim das 26/10 03:00** (horário de Brasília) · trabalhando
 
 > Atualiza a cada 5 minutos enquanto a empresa trabalha. Recarregue a página para ver o mais novo.
 
@@ -9,7 +9,7 @@
 - **101** demandas, **98** concluídas (97%), 0 parciais, 3 com falha
 - **104** de 105 funcionários já trabalharam
 - SQL: 9 exercícios, 9 conferidos com o gabarito
-- Fábrica: 15 planilhas, 15 conferidas sem erro
+- Fábrica: 16 planilhas, 15 conferidas sem erro
 
 ## Trabalhando agora
 
@@ -184,13 +184,6 @@
 | Ícaro | Sênior de AWS, Linux e Ubuntu | trabalho do papel | Ronda de saúde do sistema — nível dificil (✅ concluída) | 4 |
 
 
-## Tempo do último turno (medido)
-
-- 05:15–05:58 (43 min, 101 voltas; cobertura do cronômetro 100%)
-- **Entregas aprovadas na revisão independente: 10 (14.0 por hora)** — o indicador principal
-- operacional 1% · estudo 1% · revisao 1% · coordenacao 0% · manutencao 38% · erro 0% · parado 58% · sem_medicao 0%
-- Bloqueios: 1; etapas esperando dependência: 0
-
 ## Projetos entre andares (várias pessoas, uma etapa depende da outra)
 
 - Projeto NPS — TREINO_nps_20261026_034221_41046: **✅ concluída** — 1. eng_junior_auditoria (concluida); 2. analise_estatistica (concluida); 3. cd_senior_drivers (concluida); 4. gov_pleno_lgpd (concluida); 5. canal_iara (concluida)
@@ -227,13 +220,14 @@
 - risco_demanda-v26: **reprovado** (treinado por ml_engenheiro)
 - risco_demanda-v27: **reprovado** (treinado por ml_engenheiro)
 - risco_demanda-v28: **reprovado** (treinado por ml_engenheiro)
-- Última avaliação independente (ml_avaliador): risco_demanda-v28 reprovado — log loss 0.156 contra baseline 0.132; motivos: não bate o baseline (log loss 0.1564 ≥ 0.1321); não bate a referência atual risco_demanda-v25 (log loss 0.1564 ≥ 0.1558)
-- Referência em sombra: risco_demanda-v25; 439 previsões em sombra
+- risco_demanda-v29: **reprovado** (treinado por ml_engenheiro)
+- Última avaliação independente (ml_avaliador): risco_demanda-v29 reprovado — log loss 0.100 contra baseline 0.063; motivos: não bate o baseline (log loss 0.0998 ≥ 0.0633)
+- Referência em sombra: risco_demanda-v25; 449 previsões em sombra
 - Uso operacional: desligado: o modelo só roda em sombra até o dono decidir usá-lo em alguma escolha da empresa
 
 ## Banco de dados
 
-Levantamento das 26/10 02:55: **168 de 201** tabelas com dados (1.028.468 linhas contadas uma a uma).
+Levantamento das 26/10 02:52: **168 de 201** tabelas com dados (1.027.532 linhas contadas uma a uma).
 
 
 | Onde | Tabelas | Com dados |
