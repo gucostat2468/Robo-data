@@ -1,11 +1,11 @@
 {
  "versao": 1,
- "gerado_em": "2026-10-27T10:44:04",
+ "gerado_em": "2026-10-27T10:50:41",
  "turno": {
   "estado": "trabalhando",
   "inicio": "2026-10-27T10:31:30",
   "fim_previsto": "2026-10-27T11:11:30",
-  "voltas": 40,
+  "voltas": 54,
   "planilhas": 1
  },
  "funcionarios": 105,
@@ -18,19 +18,19 @@
    "concluidas": 35,
    "parciais": 0,
    "falhas": 0,
-   "treino": 254,
-   "acertos": 89
+   "treino": 258,
+   "acertos": 90
   },
   {
    "andar": 2,
    "pessoas": 18,
    "trabalharam_hoje": 18,
-   "demandas": 31,
-   "concluidas": 31,
+   "demandas": 32,
+   "concluidas": 32,
    "parciais": 0,
    "falhas": 0,
-   "treino": 244,
-   "acertos": 84
+   "treino": 247,
+   "acertos": 85
   },
   {
    "andar": 3,
@@ -40,7 +40,7 @@
    "concluidas": 21,
    "parciais": 0,
    "falhas": 0,
-   "treino": 158,
+   "treino": 162,
    "acertos": 68
   },
   {
@@ -51,23 +51,55 @@
    "concluidas": 38,
    "parciais": 0,
    "falhas": 0,
-   "treino": 333,
-   "acertos": 124
+   "treino": 334,
+   "acertos": 125
   },
   {
    "andar": 5,
    "pessoas": 24,
    "trabalharam_hoje": 24,
-   "demandas": 90,
-   "concluidas": 86,
+   "demandas": 93,
+   "concluidas": 89,
    "parciais": 0,
    "falhas": 4,
-   "treino": 311,
-   "acertos": 115
+   "treino": 316,
+   "acertos": 119
   }
  ],
  "agora": [],
  "ultimos": [
+  {
+   "quando": "2026-10-27T10:47:19",
+   "funcionario": "Marina",
+   "cargo": "Arquiteta de Cloud (AWS)",
+   "andar": 5,
+   "trabalho": "Exercício de SQL no PostgreSQL com os dados da fábrica — nível dificil",
+   "estado": "concluida"
+  },
+  {
+   "quando": "2026-10-27T10:46:39",
+   "funcionario": "Ícaro",
+   "cargo": "Sênior de AWS, Linux e Ubuntu",
+   "andar": 5,
+   "trabalho": "Medir a saúde do PostgreSQL — nível dificil",
+   "estado": "concluida"
+  },
+  {
+   "quando": "2026-10-27T10:46:37",
+   "funcionario": "Heloísa",
+   "cargo": "Head de AWS, Arquitetura e Governança de Nuvem",
+   "andar": 5,
+   "trabalho": "Exercício de SQL no PostgreSQL com os dados da fábrica — nível profissional",
+   "estado": "concluida"
+  },
+  {
+   "quando": "2026-10-27T10:45:56",
+   "funcionario": "Marcos",
+   "cargo": "Coordenador de Análise e Ciência de Dados",
+   "andar": 2,
+   "trabalho": "Calcular a média de uma métrica da base sintética — nível dificil",
+   "estado": "concluida"
+  },
   {
    "quando": "2026-10-27T10:17:40",
    "funcionario": "Letícia",
@@ -115,43 +147,11 @@
    "andar": 5,
    "trabalho": "Testar se o último backup volta — nível dificil",
    "estado": "concluida"
-  },
-  {
-   "quando": "2026-10-27T09:45:04",
-   "funcionario": "André",
-   "cargo": "Head de Infraestrutura e Segurança",
-   "andar": 5,
-   "trabalho": "Situação do andar agora — nível profissional",
-   "estado": "concluida"
-  },
-  {
-   "quando": "2026-10-27T09:45:03",
-   "funcionario": "Henrique",
-   "cargo": "Head de Engenharia Python",
-   "andar": 5,
-   "trabalho": "Medir a saúde do PostgreSQL — nível profissional",
-   "estado": "concluida"
-  },
-  {
-   "quando": "2026-10-27T09:45:01",
-   "funcionario": "Gustavo",
-   "cargo": "Gerente de TI e Infraestrutura",
-   "andar": 5,
-   "trabalho": "Procurar segredos no repositório público — nível profissional",
-   "estado": "concluida"
-  },
-  {
-   "quando": "2026-10-27T09:18:00",
-   "funcionario": "Gabriel",
-   "cargo": "Especialista em Tabelas Dinâmicas e Dashboards",
-   "andar": 3,
-   "trabalho": "Calcular a média de uma métrica da base sintética — nível dificil",
-   "estado": "concluida"
   }
  ],
  "sql": {
-  "exercicios_hoje": 30,
-  "concluidos_hoje": 30
+  "exercicios_hoje": 32,
+  "concluidos_hoje": 32
  },
  "fabrica": {
   "lotes_hoje": 26,
@@ -166,9 +166,9 @@
   },
   {
    "rotina": "demandas",
-   "execucoes_24h": 46,
+   "execucoes_24h": 47,
    "erros_24h": 0,
-   "ultima": "2026-10-27T10:17:40"
+   "ultima": "2026-10-27T10:47:19"
   },
   {
    "rotina": "dialogo",
@@ -196,7 +196,7 @@
   },
   {
    "rotina": "laboratorio",
-   "execucoes_24h": 109,
+   "execucoes_24h": 108,
    "erros_24h": 0,
    "ultima": "2026-10-27T10:41:40"
   },
@@ -226,9 +226,9 @@
   },
   {
    "rotina": "registro",
-   "execucoes_24h": 463,
+   "execucoes_24h": 464,
    "erros_24h": 0,
-   "ultima": "2026-10-27T10:41:41"
+   "ultima": "2026-10-27T10:48:06"
   },
   {
    "rotina": "rh_desempenho",
@@ -244,16 +244,16 @@
   },
   {
    "rotina": "treino",
-   "execucoes_24h": 465,
+   "execucoes_24h": 466,
    "erros_24h": 0,
-   "ultima": "2026-10-27T10:39:50"
+   "ultima": "2026-10-27T10:49:55"
   }
  ],
  "totais": {
-  "demandas": 1525,
-  "tentativas_treino": 16063,
-  "conversas": 5315,
-  "trabalhos_com_prova": 8958
+  "demandas": 1529,
+  "tentativas_treino": 16080,
+  "conversas": 5317,
+  "trabalhos_com_prova": 8973
  },
  "banco": {
   "levantamento": "2026-10-27T10:41:58",
@@ -707,7 +707,7 @@
    "ultimo": "",
    "quando": "",
    "estado": "",
-   "situacao": "estagiário: observa (regra do dono) — Observei Rodrigo (Analista de Infraestrutura Pleno) fazendo \"Exercício de SQL no PostgreSQL com os dados da fábrica\" no "
+   "situacao": "estagiário: observa (regra do dono) — Observei Heloísa (Head de AWS, Arquitetura e Governança de Nuvem) fazendo \"Exercício de SQL no PostgreSQL com os dados d"
   },
   {
    "nome": "Tina",
@@ -839,18 +839,18 @@
    "ultimo": "",
    "quando": "",
    "estado": "",
-   "situacao": "estagiário: observa (regra do dono)"
+   "situacao": "estagiário: observa (regra do dono) — Observei Marcos (Coordenador de Análise e Ciência de Dados) fazendo \"Calcular a média de uma métrica da base sintética\" "
   },
   {
    "nome": "Marcos",
    "andar": 2,
    "cargo": "Coordenador de Análise e Ciência de Dados",
    "area": "Análise de Dados",
-   "demandas_hoje": 2,
-   "ultimo": "Projeto NPS — TREINO_nps_20261027_041610_70053",
-   "quando": "2026-10-27T04:30:22",
+   "demandas_hoje": 3,
+   "ultimo": "Calcular a média de uma métrica da base sintética — nível dificil",
+   "quando": "2026-10-27T10:45:44",
    "estado": "concluida",
-   "situacao": "trabalho FORA do papel"
+   "situacao": "trabalho do papel"
   },
   {
    "nome": "Natália",
@@ -938,7 +938,7 @@
    "ultimo": "",
    "quando": "",
    "estado": "",
-   "situacao": "estagiário: observa (regra do dono) — Observei Rodrigo (Analista de Infraestrutura Pleno) fazendo \"Exercício de SQL no PostgreSQL com os dados da fábrica\" no "
+   "situacao": "estagiário: observa (regra do dono) — Observei Heloísa (Head de AWS, Arquitetura e Governança de Nuvem) fazendo \"Exercício de SQL no PostgreSQL com os dados d"
   },
   {
    "nome": "Felipe",
@@ -1180,7 +1180,7 @@
    "ultimo": "",
    "quando": "",
    "estado": "",
-   "situacao": "estagiário: observa (regra do dono) — Observei Wagner (Especialista Sênior em Segurança da Informação) fazendo \"Testar se o último backup volta\" no nível difi"
+   "situacao": "estagiário: observa (regra do dono)"
   },
   {
    "nome": "Lorena",
@@ -1455,7 +1455,7 @@
    "ultimo": "",
    "quando": "",
    "estado": "",
-   "situacao": "estagiário: observa (regra do dono) — Observei Rodrigo (Analista de Infraestrutura Pleno) fazendo \"Exercício de SQL no PostgreSQL com os dados da fábrica\" no "
+   "situacao": "estagiário: observa (regra do dono) — Observei Heloísa (Head de AWS, Arquitetura e Governança de Nuvem) fazendo \"Exercício de SQL no PostgreSQL com os dados d"
   },
   {
    "nome": "Diego",
@@ -1499,7 +1499,7 @@
    "ultimo": "",
    "quando": "",
    "estado": "",
-   "situacao": "estagiário: observa (regra do dono) — Observei Rodrigo (Analista de Infraestrutura Pleno) fazendo \"Exercício de SQL no PostgreSQL com os dados da fábrica\" no "
+   "situacao": "estagiário: observa (regra do dono) — Observei Heloísa (Head de AWS, Arquitetura e Governança de Nuvem) fazendo \"Exercício de SQL no PostgreSQL com os dados d"
   },
   {
    "nome": "Gustavo",
@@ -1517,9 +1517,9 @@
    "andar": 5,
    "cargo": "Head de AWS, Arquitetura e Governança de Nuvem",
    "area": "Engenharia de Dados",
-   "demandas_hoje": 8,
-   "ultimo": "Testar se o último backup volta — nível profissional",
-   "quando": "2026-10-27T09:15:36",
+   "demandas_hoje": 9,
+   "ultimo": "Exercício de SQL no PostgreSQL com os dados da fábrica — nível profissional",
+   "quando": "2026-10-27T10:46:34",
    "estado": "concluida",
    "situacao": "trabalho do papel"
   },
@@ -1561,9 +1561,9 @@
    "andar": 5,
    "cargo": "Arquiteta de Cloud (AWS)",
    "area": "Engenharia de Dados",
-   "demandas_hoje": 8,
-   "ultimo": "Testar se o último backup volta — nível dificil",
-   "quando": "2026-10-27T09:16:46",
+   "demandas_hoje": 9,
+   "ultimo": "Exercício de SQL no PostgreSQL com os dados da fábrica — nível dificil",
+   "quando": "2026-10-27T10:47:17",
    "estado": "concluida",
    "situacao": "trabalho do papel"
   },
@@ -1660,9 +1660,9 @@
    "andar": 5,
    "cargo": "Sênior de AWS, Linux e Ubuntu",
    "area": "Engenharia de Dados",
-   "demandas_hoje": 8,
-   "ultimo": "Testar se o último backup volta — nível dificil",
-   "quando": "2026-10-27T09:15:48",
+   "demandas_hoje": 9,
+   "ultimo": "Medir a saúde do PostgreSQL — nível dificil",
+   "quando": "2026-10-27T10:46:37",
    "estado": "concluida",
    "situacao": "trabalho do papel"
   }
@@ -1786,7 +1786,7 @@
  "tempo_turnos": [],
  "modelos": {
   "finalidade": "risco_demanda",
-  "rotuladas_agora": 1482,
+  "rotuladas_agora": 1486,
   "minimo_para_treinar": 60,
   "datasets": 48,
   "maior_dataset": 1473,
@@ -2073,15 +2073,15 @@
   },
   {
    "nivel": "dificil",
-   "demandas": 635,
-   "concluidas": 621,
+   "demandas": 638,
+   "concluidas": 624,
    "parciais": 1,
    "falhas": 13
   },
   {
    "nivel": "profissional",
-   "demandas": 267,
-   "concluidas": 264,
+   "demandas": 268,
+   "concluidas": 265,
    "parciais": 1,
    "falhas": 2
   }
