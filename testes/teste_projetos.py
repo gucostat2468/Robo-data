@@ -41,7 +41,7 @@ def teste_plano_com_pessoas_diferentes_mesma_base_e_dependencias(cfg_factory):
 
 def teste_projeto_executa_revisa_e_conta_como_entrega(cfg_factory):
     cfg = _base(cfg_factory)
-    r = projetos.ciclo(cfg)
+    r = projetos.ciclo(cfg, intervalo_horas=1, por_ciclo=1)
     assert r["projeto"], r
     s = Trabalho(cfg).solicitacao(r["projeto"])
     assert r["estado"] in ("concluida", "concluida_parcialmente", "falhou")
@@ -49,7 +49,7 @@ def teste_projeto_executa_revisa_e_conta_como_entrega(cfg_factory):
     assert s["revisor"] not in {e["funcionario"] for e in s["etapas"]}
     assert s["plano"]["tipo_demanda"] == "projeto"
     assert projetos.resumo(cfg)[0]["id"] == r["projeto"]
-    assert projetos.ciclo(cfg) is None  # dentro do intervalo: não cria outro
+    assert projetos.ciclo(cfg, intervalo_horas=1, por_ciclo=1) is None  # com intervalo (freio): espera
 
 
 def teste_etapa_que_depende_de_falha_fica_bloqueada(cfg_factory, monkeypatch):
@@ -82,3 +82,18 @@ def teste_ciclo_de_demandas_cria_o_projeto(cfg_factory):
     cfg.dados["demandas"] = {"intervalo_minutos": 0, "por_ciclo": 2, "por_dia": 500}
     r = demandas.rotina(cfg)
     assert r["projeto"] and r["projeto"]["projeto"]
+
+
+def teste_ciclo_faz_dois_tipos_sem_repetir_pessoa(cfg_factory):
+    """Pedido do dono: mais trabalho, sem espera entre projetos. Um ciclo faz NPS e segmentação, e ninguém está em
+    dois projetos ao mesmo tempo."""
+    cfg = _base(cfg_factory)
+    r = projetos.ciclo(cfg, intervalo_horas=0, por_ciclo=2)
+    assert {p["tipo"] for p in r["projetos"]} == {"nps", "segmentacao"}, r
+    t = Trabalho(cfg)
+    pessoas = [e["funcionario"] for p in r["projetos"] for e in t.solicitacao(p["projeto"])["etapas"]]
+    assert len(pessoas) == len(set(pessoas))
+    seg = next(p for p in r["projetos"] if p["tipo"] == "segmentacao")
+    ferrs = [e["ferramenta"] for e in t.solicitacao(seg["projeto"])["etapas"]]
+    assert "segmentacao" in ferrs and "anomalias" in ferrs and ferrs[-1] == "resumo_executivo"
+    assert projetos.ciclo(cfg, intervalo_horas=0, por_ciclo=2)["projetos"]  # sem espera: o próximo ciclo já faz mais

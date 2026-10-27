@@ -37,14 +37,20 @@ from typing import Callable
 from robo.trabalho import FINAIS, Trabalho, _agora
 
 ORIGEM = "demanda_sintetica"
-# Ritmo (pedido do dono: "todos trabalhando muito"): cada pessoa recebe trabalho do papel a cada 6 h (antes 24 h),
-# o 5º andar a cada 3 h e a equipe de AWS a cada hora. 20 por ciclo de 30 min = até 960 por dia de turno contínuo.
-PADRAO = {"habilitada": True, "intervalo_minutos": 30, "por_ciclo": 20, "por_dia": 600, "por_pessoa_horas": 6,
-          # o 5º andar (TI, nuvem, segurança) recebe trabalho com mais frequência; a equipe de AWS mais que todos
-          "horas_por_andar": {"5": 3}, "horas_por_pessoa": {"head_aws": 1, "aws_senior": 1, "cloud_aws": 1},
+# Ritmo (pedido do dono: "sem limitação na criação do trabalho, eficiente de verdade"). Medido no turno real de
+# 27/10: com ciclos de 30 min, 20 por ciclo e 6 h por pessoa, 63% do turno ficava PARADO e só 4% era operacional.
+# Agora o ciclo roda a cada 5 min, sem teto por ciclo nem por dia; o que limita é a pessoa estar livre (uma demanda
+# aberta por vez, 1 h entre demandas do papel; 5º andar 30 min; AWS 15 min) e o tempo do turno. O freio de espaço
+# (FREIO) volta ao ritmo antigo quando o banco grátis passa de 80% (nuvem.freio_de_espaco).
+PADRAO = {"habilitada": True, "intervalo_minutos": 5, "por_ciclo": 1000, "por_dia": 1000000, "por_pessoa_horas": 1,
+          "horas_por_andar": {"5": 0.5}, "horas_por_pessoa": {"head_aws": 0.25, "aws_senior": 0.25, "cloud_aws": 0.25},
           "horas_sem_atividade": 48, "horas_abandono": 6, "avaliacoes_por_ciclo": 3,
-          # projeto entre andares (robo/projetos.py): no máximo um a cada N horas; 0 desliga
-          "projetos_intervalo_horas": 1}
+          # projetos entre andares (robo/projetos.py): quantos por ciclo (rodízio NPS/segmentação) e espera entre
+          # eles em horas (0 = sem espera); projetos_por_ciclo 0 desliga
+          "projetos_por_ciclo": 2, "projetos_intervalo_horas": 0}
+FREIO = {"intervalo_minutos": 30, "por_ciclo": 20, "por_dia": 600, "por_pessoa_horas": 6, "horas_por_andar": {"5": 3},
+         "horas_por_pessoa": {"head_aws": 1, "aws_senior": 1, "cloud_aws": 1}, "projetos_por_ciclo": 1,
+         "projetos_intervalo_horas": 1}
 
 # =============================================================================== a equipe de demandas (4º andar)
 # Cinco funções complementares. A Sala de Casos (head_casos) planeja os CASOS DE TREINO com gabarito; esta equipe
@@ -1094,11 +1100,11 @@ def rotina(cfg, agora: datetime | None = None) -> dict | None:
             finais[sid] = _executar_com_job(cfg, sid, p["id"], ferr)  # executa já: nuvem e notebook veem no ciclo
         # ---- projeto entre andares: várias pessoas, uma etapa depende da outra, revisão independente
         projeto = None
-        if float(c["projetos_intervalo_horas"]) > 0:
+        if int(c["projetos_por_ciclo"]) > 0:
             jobs.etapa(cfg, jid, "projeto", "dem_gerador")
             try:
                 from robo import projetos
-                projeto = projetos.ciclo(cfg, agora, float(c["projetos_intervalo_horas"]))
+                projeto = projetos.ciclo(cfg, agora, float(c["projetos_intervalo_horas"]), int(c["projetos_por_ciclo"]))
             except Exception as e:  # o ciclo das demandas continua; o motivo fica no registro do ciclo
                 projeto = {"projeto": None, "motivo": f"{type(e).__name__}: {e}"}
         # ---- estagiários: observam um colega da área num trabalho concluído deste ciclo e registram o que viram

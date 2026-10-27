@@ -253,16 +253,20 @@ def teste_equipes_com_rotina_propria_nao_recebem_trabalho_de_outra_area(cfg_fact
 
 
 def teste_quinto_andar_e_aws_trabalham_mais_vezes(cfg_factory):
+    """Ritmo sem teto (pedido do dono, 27/10): cada pessoa a cada 1 h, 5º andar a cada 30 min, AWS a cada 15 min."""
     c = dict(demandas.PADRAO)
     gente = organizacao.por_id()
-    assert demandas.intervalo_da_pessoa(c, gente["aws_senior"]) == 1   # AWS: a cada hora
-    assert demandas.intervalo_da_pessoa(c, gente["head_aws"]) == 1
+    assert demandas.intervalo_da_pessoa(c, gente["aws_senior"]) == 0.25
+    assert demandas.intervalo_da_pessoa(c, gente["head_aws"]) == 0.25
     quinto = next(p for p in gente.values() if p["andar"] == 5 and p["id"] not in c["horas_por_pessoa"])
-    assert demandas.intervalo_da_pessoa(c, quinto) == 3                # 5º andar: a cada 3 h
+    assert demandas.intervalo_da_pessoa(c, quinto) == 0.5
     outro = next(p for p in gente.values() if p["andar"] == 2)
-    assert demandas.intervalo_da_pessoa(c, outro) == 6                 # todos: a cada 6 h (antes 24 h)
+    assert demandas.intervalo_da_pessoa(c, outro) == 1
     # só aperta: um intervalo geral menor vale para todos
-    assert demandas.intervalo_da_pessoa({**c, "por_pessoa_horas": 1}, gente["aws_senior"]) == 1
+    assert demandas.intervalo_da_pessoa({**c, "por_pessoa_horas": 0.1}, gente["aws_senior"]) == 0.1
+    # o freio de espaço volta ao ritmo antigo
+    f = {**c, **demandas.FREIO}
+    assert demandas.intervalo_da_pessoa(f, outro) == 6 and demandas.intervalo_da_pessoa(f, gente["aws_senior"]) == 1
 
 
 def teste_sql_profissional_tem_conferencia_cruzada_de_sql_por_colega(cfg_factory, monkeypatch):

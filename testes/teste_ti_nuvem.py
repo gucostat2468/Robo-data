@@ -158,7 +158,7 @@ def teste_sinal_de_parada_encerra_o_turno_salvando(tmp_path, monkeypatch):
     chamadas = []
     monkeypatch.setattr(nuvem, "restaurar", lambda cfg: {"origem": "teste"})
     monkeypatch.setattr(nuvem, "garantir_leitura", lambda cfg: True)
-    monkeypatch.setattr(nuvem, "salvar", lambda cfg: chamadas.append("salvar") or {"ok": True})
+    monkeypatch.setattr(nuvem, "salvar", lambda cfg, **k: chamadas.append("salvar") or {"ok": True})
     monkeypatch.setattr(nuvem, "tamanho_mb", lambda cfg: 1.0)
     monkeypatch.setattr(nuvem, "_esteira", lambda m: 0)
     monkeypatch.setattr(nuvem, "garantir_base", lambda cfg, m: 0)  # a fábrica real demoraria mais que o relógio abaixo
@@ -183,7 +183,7 @@ def teste_turno_trata_a_planilha_antes_de_distribuir_trabalho(tmp_path, monkeypa
     ordem = []
     monkeypatch.setattr(nuvem, "restaurar", lambda cfg: {"origem": "teste"})
     monkeypatch.setattr(nuvem, "garantir_leitura", lambda cfg: True)
-    monkeypatch.setattr(nuvem, "salvar", lambda cfg: {"ok": True})
+    monkeypatch.setattr(nuvem, "salvar", lambda cfg, **k: {"ok": True})
     monkeypatch.setattr(nuvem, "tamanho_mb", lambda cfg: 1.0)
     monkeypatch.setattr(nuvem, "_esteira", lambda m: ordem.append("ESTEIRA") or 0)
     monkeypatch.setattr(rotinas, "executar", lambda cfg, nome, f: ordem.append(nome))
@@ -227,3 +227,35 @@ def teste_maquina_sem_pesquisa_nps_ganha_uma_para_o_projeto(cfg_factory):
     assert nuvem.garantir_base(cfg, monitor) == 1
     assert not isinstance(demandas._com_indicador(cfg, {}), str)
     assert nuvem.garantir_base(cfg, monitor) == 0
+
+
+def teste_freio_de_espaco_volta_ao_ritmo_antigo(cfg_factory):
+    """Trabalho sem teto enche o banco grátis mais rápido: com 80% do limite, as demandas voltam ao ritmo antigo."""
+    from robo import demandas
+    cfg = cfg_factory()
+    assert nuvem.freio_de_espaco(cfg, mb=100, limite=500) is False
+    assert demandas._c(cfg)["por_pessoa_horas"] == demandas.PADRAO["por_pessoa_horas"]
+    assert nuvem.freio_de_espaco(cfg, mb=420, limite=500) is True
+    c = demandas._c(cfg)
+    assert c["por_pessoa_horas"] == 6 and c["intervalo_minutos"] == 30 and c["projetos_por_ciclo"] == 1
+
+
+def teste_salvar_faz_a_cobertura_so_de_hora_em_hora_e_no_fim(cfg_factory, monkeypatch):
+    """No turno real, salvar custava 25% do turno; a cobertura (COUNT exato de ~200 tabelas) era refeita a cada 10 min."""
+    from robo import cobertura_banco, memoria, registro_total
+    feitos = []
+    monkeypatch.setattr(nuvem, "_cobertura", {"t": None})
+    monkeypatch.setattr(registro_total, "capturar", lambda cfg: None)
+    monkeypatch.setattr(cobertura_banco, "levantar", lambda cfg: feitos.append("cobertura") or {})
+    monkeypatch.setattr(cobertura_banco, "salvar_relatorio", lambda cfg, r: None)
+    monkeypatch.setattr(nuvem, "salvar_instantaneo", lambda cfg: {"linhas": 1})
+    monkeypatch.setattr(memoria, "sincronizar_postgres", lambda cfg: None)
+    monkeypatch.setattr(nuvem, "garantir_leitura", lambda cfg: True)
+    cfg = cfg_factory()
+    cfg.criar_pastas()
+    r = nuvem.salvar(cfg)
+    assert feitos == ["cobertura"] and set(r["tempos"]) >= {"registro", "cobertura", "instantaneo", "memoria_pg"}
+    nuvem.salvar(cfg)
+    assert feitos == ["cobertura"]  # 10 min depois: não refaz
+    nuvem.salvar(cfg, completo=True)
+    assert feitos == ["cobertura", "cobertura"]  # salvamento final: refaz

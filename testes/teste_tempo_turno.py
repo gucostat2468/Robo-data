@@ -106,7 +106,7 @@ def teste_turno_grava_o_tempo_e_o_boletim_mostra(tmp_path, monkeypatch):
     from robo import boletim, nuvem
     monkeypatch.setattr(nuvem, "restaurar", lambda cfg: {"origem": "teste"})
     monkeypatch.setattr(nuvem, "garantir_leitura", lambda cfg: True)
-    monkeypatch.setattr(nuvem, "salvar", lambda cfg: {"ok": True})
+    monkeypatch.setattr(nuvem, "salvar", lambda cfg, **k: {"ok": True})
     monkeypatch.setattr(nuvem, "tamanho_mb", lambda cfg: 1.0)
     monkeypatch.setattr(nuvem, "_esteira", lambda m: 0)
     monkeypatch.setattr(nuvem, "garantir_base", lambda cfg, m: 0)
@@ -132,7 +132,7 @@ def teste_tempo_e_gravado_antes_do_salvamento_final(tmp_path, monkeypatch):
     vistos = []
     monkeypatch.setattr(nuvem, "restaurar", lambda cfg: {"origem": "teste"})
     monkeypatch.setattr(nuvem, "garantir_leitura", lambda cfg: True)
-    monkeypatch.setattr(nuvem, "salvar", lambda cfg: vistos.append(len(tempo_turno.ultimos(cfg))) or {"ok": True})
+    monkeypatch.setattr(nuvem, "salvar", lambda cfg, **k: vistos.append(len(tempo_turno.ultimos(cfg))) or {"ok": True})
     monkeypatch.setattr(nuvem, "tamanho_mb", lambda cfg: 1.0)
     monkeypatch.setattr(nuvem, "_esteira", lambda m: 0)
     monkeypatch.setattr(nuvem, "garantir_base", lambda cfg, m: 0)

@@ -69,7 +69,7 @@ def teste_turno_chama_a_rotina_vencida_dentro_do_laco(tmp_path, monkeypatch):
     monkeypatch.setattr(rotinas, "funcao", lambda cfg, nome: (lambda: None))
     monkeypatch.setattr(nuvem, "restaurar", lambda cfg: {"origem": "teste"})
     monkeypatch.setattr(nuvem, "garantir_leitura", lambda cfg: True)
-    monkeypatch.setattr(nuvem, "salvar", lambda cfg: {"ok": True})
+    monkeypatch.setattr(nuvem, "salvar", lambda cfg, **k: {"ok": True})
     monkeypatch.setattr(nuvem, "tamanho_mb", lambda cfg: 1.0)
     monkeypatch.setattr(nuvem, "_esteira", lambda m: ordem.append("ESTEIRA") or 0)
     monkeypatch.setattr(nuvem, "garantir_base", lambda cfg, m: 0)

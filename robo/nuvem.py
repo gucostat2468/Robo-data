@@ -187,18 +187,37 @@ def tamanho_mb(cfg) -> float:
 
 
 # =============================================================================== o turno
-def salvar(cfg) -> dict:
-    """Registro total → instantâneo → cópia incremental (essa ordem nunca deixa número repetido para trás)."""
+COBERTURA_A_CADA_S = 60 * 60
+_cobertura = {"t": None}
+
+
+def salvar(cfg, completo: bool = False) -> dict:
+    """Registro total → instantâneo → cópia incremental (essa ordem nunca deixa número repetido para trás).
+    O levantamento de cobertura (COUNT exato de ~200 tabelas no SQLite e no PostgreSQL) é o que menos muda: roda no
+    1º salvamento, a cada hora e no salvamento final (completo=True), não a cada 10 min. Cada parte é cronometrada
+    (em "tempos") para o próximo corte de custo ser decidido por medida: no turno real, salvar custou 25% do turno."""
     from robo import cobertura_banco, memoria, registro_total, rotinas
-    rotinas.executar(cfg, "registro", lambda: registro_total.capturar(cfg))
-    try:  # quais tabelas têm dados e por que as vazias estão vazias (vai junto no instantâneo e no espelho)
-        cobertura_banco.salvar_relatorio(cfg, cobertura_banco.levantar(cfg))
-    except Exception:
-        log.exception("Turno na nuvem: levantamento de cobertura falhou")
-    inst = salvar_instantaneo(cfg)
-    rotinas.executar(cfg, "memoria_pg", lambda: memoria.sincronizar_postgres(cfg))
-    garantir_leitura(cfg)  # tabelas novas também ficam legíveis no celular
-    return inst
+    tempos = {}
+
+    def parte(nome, f):
+        t = time.perf_counter()
+        try:
+            return f()
+        finally:
+            tempos[nome] = round(time.perf_counter() - t, 2)
+    parte("registro", lambda: rotinas.executar(cfg, "registro", lambda: registro_total.capturar(cfg)))
+    agora = time.monotonic()
+    if completo or _cobertura["t"] is None or agora - _cobertura["t"] >= COBERTURA_A_CADA_S:
+        try:  # quais tabelas têm dados e por que as vazias estão vazias (vai junto no instantâneo e no espelho)
+            parte("cobertura", lambda: cobertura_banco.salvar_relatorio(cfg, cobertura_banco.levantar(cfg)))
+            _cobertura["t"] = agora
+        except Exception:
+            log.exception("Turno na nuvem: levantamento de cobertura falhou")
+    inst = parte("instantaneo", lambda: salvar_instantaneo(cfg))
+    parte("memoria_pg", lambda: rotinas.executar(cfg, "memoria_pg", lambda: memoria.sincronizar_postgres(cfg)))
+    parte("leitura", lambda: garantir_leitura(cfg))  # tabelas novas também ficam legíveis no celular
+    log.info("Salvamento: %s", ", ".join(f"{k} {v:.1f}s" for k, v in tempos.items()))
+    return {**inst, "tempos": tempos}
 
 
 def _esteira(monitor) -> int:
@@ -208,6 +227,22 @@ def _esteira(monitor) -> int:
     except Exception:
         log.exception("Turno na nuvem: a esteira falhou nesta volta")
         return 0
+
+
+def freio_de_espaco(cfg, mb: float | None = None, limite: float | None = None) -> bool:
+    """Trabalho sem teto enche o banco grátis mais rápido. Com 80% ou mais do limite, as demandas voltam ao ritmo
+    antigo (demandas.FREIO) neste turno e o canal avisa; nada é apagado. Devolve se o freio foi puxado."""
+    from robo import demandas
+    try:
+        mb = tamanho_mb(cfg) if mb is None else mb
+    except Exception:
+        return False  # sem medir não freia: o alerta do fim do turno continua valendo
+    limite = float(limite or os.environ.get("ROBO_LIMITE_MB") or LIMITE_MB_PADRAO)
+    if mb < 0.8 * limite:
+        return False
+    cfg.dados["demandas"] = {**(cfg.dados.get("demandas") or {}), **demandas.FREIO}
+    log.warning("Freio de espaço: banco com %s MB de %.0f MB; demandas no ritmo antigo neste turno", mb, limite)
+    return True
 
 
 def garantir_base(cfg, monitor) -> int:
@@ -242,6 +277,7 @@ def turno(cfg, minutos: float = 20, salvar_a_cada_min: float = 10, pausa_s: floa
     with crono.medir("inicio"):
         origem = restaurar(cfg)
         log.info("Turno na nuvem: memória restaurada de %s", origem["origem"])
+        freio_de_espaco(cfg)
         sessao = rotinas.abrir_sessao(cfg)["sessao"]
         garantir_leitura(cfg)
     from robo import pos_processamento
@@ -317,7 +353,7 @@ def turno(cfg, minutos: float = 20, salvar_a_cada_min: float = 10, pausa_s: floa
     except Exception as e:  # medir nunca derruba o turno; a falha fica no log
         log.warning("Tempo do turno não registrado: %s: %s", type(e).__name__, e)
         tempo = None
-    inst = salvar(cfg)
+    inst = salvar(cfg, completo=True)
     _boletim("entre turnos: memória salva; o próximo turno começa em poucos minutos", final=True)
     mb = tamanho_mb(cfg)
     limite = float(os.environ.get("ROBO_LIMITE_MB") or LIMITE_MB_PADRAO)
