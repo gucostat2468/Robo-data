@@ -64,7 +64,9 @@ POR_ID = {p["id"]: p for p in EQUIPE_FABRICA}
 GESTORES = {"fab_coordenador": "head_casos", "fab_gerador": "fab_coordenador", "fab_conferente": "fab_coordenador",
             "fab_revisor": "fab_coordenador"}
 
-PADRAO = {"habilitada": True, "intervalo_minutos": 30, "teto_por_dia": 24, "linhas_min": 2000, "linhas_max": 20000,
+# Ritmo: um lote a cada 15 min, até 96 por dia (antes 30 min e 24: o teto batia no meio do dia e, com a cadeia de turnos
+# 24 h, a fábrica parava; sobrava só a NPS do início do turno). Cada lote segue o rodízio das 15 regras.
+PADRAO = {"habilitada": True, "intervalo_minutos": 15, "teto_por_dia": 96, "linhas_min": 2000, "linhas_max": 20000,
           "fila_vazia_minutos": 10, "prefixo": "TREINO_", "subpasta": "sintetico", "regras_extra": None}
 
 ESQUEMA = """

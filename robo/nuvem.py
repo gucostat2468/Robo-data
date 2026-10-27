@@ -246,24 +246,29 @@ def freio_de_espaco(cfg, mb: float | None = None, limite: float | None = None) -
 
 
 def garantir_base(cfg, monitor) -> int:
-    """Máquina nova não tem planilha nenhuma, e a fábrica só produz de 30 em 30 min. Sem planilha tratada, quase todo
-    trabalho das áreas de dados fica bloqueado e a pessoa vai estudar por horas (achado no boletim por funcionário).
-    Se faltar, a fábrica produz um lote agora e a esteira trata antes da 1ª distribuição. Devolve as planilhas tratadas."""
+    """Máquina nova não tem planilha nenhuma. Sem planilha tratada, quase todo trabalho das áreas de dados fica
+    bloqueado. No início do turno a fábrica produz o que falta e a esteira trata antes da 1ª distribuição:
+      - uma pesquisa NPS com atributos, se não houver (o projeto NPS entre andares precisa dela);
+      - um lote do RODÍZIO de regras (churn, RFM, estoque, folha, vendas...), produzido por último para ser a base
+        mais recente que as demandas usam. Antes só saía NPS: 14 das 15 últimas planilhas eram NPS (27/10) e todo
+        trabalho de base virava análise de NPS.
+    Devolve as planilhas tratadas."""
     from robo import demandas, fabrica
     tem_base = demandas.base_tratada(cfg) and demandas.base_original(cfg)
-    # o projeto NPS entre andares (robo/projetos.py) precisa de uma pesquisa NPS com atributos; a fábrica sorteia a
-    # regra e no 1º turno real só saíram estoque e logística: sem esta base o projeto nunca nascia
     tem_nps = tem_base and not isinstance(demandas._com_indicador(cfg, {}), str)
-    if tem_base and tem_nps:
+    pedir = ([] if tem_nps else ["nps"]) + ([] if tem_base and tem_nps else [None])  # None = próxima do rodízio
+    if not pedir:
         return 0
-    try:
-        lote = fabrica.produzir_lote(cfg, regra_id="nps")
-        log.info("Turno na nuvem: máquina sem planilha tratada; a fábrica produziu %s para o trabalho do turno",
-                 lote.get("arquivo"))
-    except Exception:
-        log.exception("Turno na nuvem: não consegui produzir a planilha do início do turno")
-        return 0
-    return _esteira(monitor)
+    for regra in pedir:
+        try:
+            lote = fabrica.produzir_lote(cfg, regra_id=regra)
+            log.info("Turno na nuvem: a fábrica produziu %s (%s) para o trabalho do turno", lote.get("arquivo"),
+                     regra or "rodízio")
+        except Exception:
+            log.exception("Turno na nuvem: não consegui produzir a planilha do início do turno (%s)", regra or "rodízio")
+            continue
+        _esteira(monitor)
+    return len(pedir)
 
 
 def turno(cfg, minutos: float = 20, salvar_a_cada_min: float = 10, pausa_s: float = 15, parar=None) -> dict:

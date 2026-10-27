@@ -209,8 +209,9 @@ def teste_maquina_nova_ganha_planilha_antes_da_distribuicao(cfg_factory):
     cfg.criar_pastas()
     assert not demandas.base_tratada(cfg)
     monitor = Monitor(cfg, ao_processar=lambda r: pos_processamento.registrar(cfg, r))
-    assert nuvem.garantir_base(cfg, monitor) == 1
+    assert nuvem.garantir_base(cfg, monitor) == 2  # a NPS do projeto e um lote do rodízio
     assert demandas.base_tratada(cfg) and demandas.base_original(cfg)
+    assert "TREINO_nps" not in demandas.base_tratada(cfg).name  # a base mais recente das demandas não é a NPS
     assert nuvem.garantir_base(cfg, monitor) == 0  # já tem: não produz outra
 
 
@@ -224,8 +225,9 @@ def teste_maquina_sem_pesquisa_nps_ganha_uma_para_o_projeto(cfg_factory):
     fabrica.produzir_lote(cfg, regra_id="estoque")
     monitor.ciclo(forcar=True)
     assert demandas.base_tratada(cfg) and isinstance(demandas._com_indicador(cfg, {}), str)
-    assert nuvem.garantir_base(cfg, monitor) == 1
+    assert nuvem.garantir_base(cfg, monitor) == 2  # NPS para o projeto + rodízio por último (base das demandas)
     assert not isinstance(demandas._com_indicador(cfg, {}), str)
+    assert "TREINO_nps" not in demandas.base_tratada(cfg).name
     assert nuvem.garantir_base(cfg, monitor) == 0
 
 
