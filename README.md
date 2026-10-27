@@ -1,6 +1,6 @@
 # Empresa ao vivo
 
-**Boletim das 27/10 10:27** (horário de Brasília) · trabalhando
+**Boletim das 27/10 10:31** (horário de Brasília) · entre turnos: memória salva; o próximo turno começa em poucos minutos
 
 > Atualiza a cada 5 minutos enquanto a empresa trabalha. Recarregue a página para ver o mais novo.
 
@@ -184,6 +184,13 @@
 | Ícaro | Sênior de AWS, Linux e Ubuntu | trabalho do papel | SLA das rotinas — nível dificil (🔴 falhou) | 11 |
 
 
+## Tempo do último turno (medido)
+
+- 12:48–13:29 (41 min, 105 voltas; cobertura do cronômetro 100%)
+- **Entregas aprovadas na revisão independente: 29 (42.5 por hora)** — o indicador principal
+- operacional 4% · estudo 1% · revisao 2% · coordenacao 0% · manutencao 30% · erro 0% · parado 63% · sem_medicao 0%
+- Bloqueios: 0; etapas esperando dependência: 0
+
 ## Projetos entre andares (várias pessoas, uma etapa depende da outra)
 
 - Projeto NPS — TREINO_nps_20261027_124828_08344: **✅ concluída** — 1. leitura (concluida); 2. analise_monitoramento (concluida); 3. cd_senior_drivers (concluida); 4. gov_pleno_lgpd (concluida); 5. canal_iara (concluida)
@@ -247,12 +254,12 @@
 
 ## Banco de dados
 
-Levantamento das 27/10 10:25: **168 de 201** tabelas com dados (1.269.314 linhas contadas uma a uma).
+Levantamento das 27/10 10:29: **169 de 202** tabelas com dados (1.270.621 linhas contadas uma a uma).
 
 
 | Onde | Tabelas | Com dados |
 |---|--:|--:|
-| sqlite | 79 | 65 |
+| sqlite | 80 | 66 |
 | postgres.laboratorio | 15 | 15 |
 | postgres.robo | 82 | 66 |
 | postgres.treino | 22 | 22 |
