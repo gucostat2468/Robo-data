@@ -1,11 +1,11 @@
 {
  "versao": 1,
- "gerado_em": "2026-10-27T18:55:09",
+ "gerado_em": "2026-10-27T19:01:32",
  "turno": {
   "estado": "trabalhando",
   "inicio": "2026-10-27T18:22:21",
   "fim_previsto": "2026-10-27T19:02:21",
-  "voltas": 82,
+  "voltas": 95,
   "planilhas": 1
  },
  "funcionarios": 105,
@@ -18,7 +18,7 @@
    "concluidas": 54,
    "parciais": 0,
    "falhas": 0,
-   "treino": 454,
+   "treino": 456,
    "acertos": 149
   },
   {
@@ -29,7 +29,7 @@
    "concluidas": 58,
    "parciais": 0,
    "falhas": 0,
-   "treino": 430,
+   "treino": 431,
    "acertos": 150
   },
   {
@@ -51,7 +51,7 @@
    "concluidas": 63,
    "parciais": 0,
    "falhas": 0,
-   "treino": 589,
+   "treino": 590,
    "acertos": 208
   },
   {
@@ -62,7 +62,7 @@
    "concluidas": 155,
    "parciais": 0,
    "falhas": 7,
-   "treino": 558,
+   "treino": 562,
    "acertos": 203
   }
  ],
@@ -208,9 +208,9 @@
   },
   {
    "rotina": "memoria_pg",
-   "execucoes_24h": 91,
+   "execucoes_24h": 92,
    "erros_24h": 0,
-   "ultima": "2026-10-27T18:48:22"
+   "ultima": "2026-10-27T19:01:29"
   },
   {
    "rotina": "modelos",
@@ -226,7 +226,7 @@
   },
   {
    "rotina": "registro",
-   "execucoes_24h": 471,
+   "execucoes_24h": 470,
    "erros_24h": 0,
    "ultima": "2026-10-27T18:53:03"
   },
@@ -238,30 +238,30 @@
   },
   {
    "rotina": "ronda_ti",
-   "execucoes_24h": 93,
+   "execucoes_24h": 92,
    "erros_24h": 0,
    "ultima": "2026-10-27T18:51:58"
   },
   {
    "rotina": "treino",
-   "execucoes_24h": 466,
+   "execucoes_24h": 467,
    "erros_24h": 0,
-   "ultima": "2026-10-27T18:54:54"
+   "ultima": "2026-10-27T18:56:59"
   }
  ],
  "totais": {
   "demandas": 1680,
-  "tentativas_treino": 17079,
+  "tentativas_treino": 17087,
   "conversas": 5441,
-  "trabalhos_com_prova": 9852
+  "trabalhos_com_prova": 9855
  },
  "banco": {
-  "levantamento": "2026-10-27T18:45:49",
+  "levantamento": "2026-10-27T18:58:54",
   "postgres_conferido": true,
   "erro_postgres": null,
   "tabelas": 203,
   "com_dados": 170,
-  "linhas": 1308428,
+  "linhas": 1310037,
   "resumo": {
    "sqlite": {
     "tabelas": 80,
