@@ -1,11 +1,11 @@
 {
  "versao": 1,
- "gerado_em": "2026-10-27T19:41:33",
+ "gerado_em": "2026-10-27T19:48:55",
  "turno": {
   "estado": "trabalhando",
   "inicio": "2026-10-27T19:11:17",
   "fim_previsto": "2026-10-27T19:51:17",
-  "voltas": 84,
+  "voltas": 98,
   "planilhas": 1
  },
  "funcionarios": 105,
@@ -51,7 +51,7 @@
    "concluidas": 72,
    "parciais": 0,
    "falhas": 0,
-   "treino": 614,
+   "treino": 615,
    "acertos": 216
   },
   {
@@ -62,7 +62,7 @@
    "concluidas": 164,
    "parciais": 0,
    "falhas": 9,
-   "treino": 582,
+   "treino": 589,
    "acertos": 206
   }
  ],
@@ -160,13 +160,13 @@
  "rotinas": [
   {
    "rotina": "caixa_dono",
-   "execucoes_24h": 31,
+   "execucoes_24h": 30,
    "erros_24h": 0,
    "ultima": "2026-10-27T19:08:33"
   },
   {
    "rotina": "demandas",
-   "execucoes_24h": 47,
+   "execucoes_24h": 46,
    "erros_24h": 0,
    "ultima": "2026-10-27T19:40:00"
   },
@@ -178,7 +178,7 @@
   },
   {
    "rotina": "fabrica",
-   "execucoes_24h": 55,
+   "execucoes_24h": 54,
    "erros_24h": 0,
    "ultima": "2026-10-27T19:11:26"
   },
@@ -190,7 +190,7 @@
   },
   {
    "rotina": "jornada",
-   "execucoes_24h": 31,
+   "execucoes_24h": 30,
    "erros_24h": 0,
    "ultima": "2026-10-27T19:08:33"
   },
@@ -208,37 +208,31 @@
   },
   {
    "rotina": "memoria_pg",
-   "execucoes_24h": 91,
+   "execucoes_24h": 92,
    "erros_24h": 0,
-   "ultima": "2026-10-27T19:36:23"
+   "ultima": "2026-10-27T19:48:52"
   },
   {
    "rotina": "modelos",
-   "execucoes_24h": 31,
+   "execucoes_24h": 30,
    "erros_24h": 0,
    "ultima": "2026-10-27T19:08:42"
   },
   {
    "rotina": "paineis",
-   "execucoes_24h": 31,
+   "execucoes_24h": 30,
    "erros_24h": 0,
    "ultima": "2026-10-27T19:08:40"
   },
   {
    "rotina": "registro",
-   "execucoes_24h": 471,
+   "execucoes_24h": 470,
    "erros_24h": 0,
-   "ultima": "2026-10-27T19:41:17"
-  },
-  {
-   "rotina": "rh_desempenho",
-   "execucoes_24h": 1,
-   "erros_24h": 0,
-   "ultima": "2026-10-26T19:41:48"
+   "ultima": "2026-10-27T19:45:36"
   },
   {
    "rotina": "ronda_ti",
-   "execucoes_24h": 93,
+   "execucoes_24h": 91,
    "erros_24h": 0,
    "ultima": "2026-10-27T19:38:35"
   },
@@ -246,22 +240,22 @@
    "rotina": "treino",
    "execucoes_24h": 465,
    "erros_24h": 0,
-   "ultima": "2026-10-27T19:41:02"
+   "ultima": "2026-10-27T19:45:21"
   }
  ],
  "totais": {
   "demandas": 1710,
-  "tentativas_treino": 17178,
-  "conversas": 5451,
-  "trabalhos_com_prova": 9948
+  "tentativas_treino": 17186,
+  "conversas": 5453,
+  "trabalhos_com_prova": 9955
  },
  "banco": {
-  "levantamento": "2026-10-27T19:34:22",
+  "levantamento": "2026-10-27T19:46:52",
   "postgres_conferido": true,
   "erro_postgres": null,
   "tabelas": 203,
   "com_dados": 170,
-  "linhas": 1314614,
+  "linhas": 1316238,
   "resumo": {
    "sqlite": {
     "tabelas": 80,
