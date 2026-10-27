@@ -1,6 +1,6 @@
 # Empresa ao vivo
 
-**Boletim das 27/10 10:39** (horário de Brasília) · trabalhando
+**Boletim das 27/10 10:46** (horário de Brasília) · trabalhando
 
 > Atualiza a cada 5 minutos enquanto a empresa trabalha. Recarregue a página para ver o mais novo.
 
@@ -255,14 +255,14 @@
 
 ## Banco de dados
 
-Levantamento das 27/10 10:25: **168 de 201** tabelas com dados (1.269.314 linhas contadas uma a uma).
+Levantamento das 27/10 10:44: **170 de 203** tabelas com dados (1.271.771 linhas contadas uma a uma).
 
 
 | Onde | Tabelas | Com dados |
 |---|--:|--:|
-| sqlite | 79 | 65 |
+| sqlite | 80 | 66 |
 | postgres.laboratorio | 15 | 15 |
-| postgres.robo | 82 | 66 |
+| postgres.robo | 83 | 67 |
 | postgres.treino | 22 | 22 |
 | postgres.bruto | 1 | 0 |
 | postgres.tratado | 1 | 0 |
