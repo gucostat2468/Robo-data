@@ -1,6 +1,6 @@
 # Empresa ao vivo
 
-**Boletim das 27/10 08:57** (horário de Brasília) · entre turnos: memória salva; o próximo turno começa em poucos minutos
+**Boletim das 27/10 09:00** (horário de Brasília) · trabalhando
 
 > Atualiza a cada 5 minutos enquanto a empresa trabalha. Recarregue a página para ver o mais novo.
 
@@ -9,7 +9,7 @@
 - **233** demandas, **229** concluídas (98%), 0 parciais, 4 com falha
 - **105** de 105 funcionários já trabalharam
 - SQL: 32 exercícios, 32 conferidos com o gabarito
-- Fábrica: 27 planilhas, 27 conferidas sem erro
+- Fábrica: 28 planilhas, 27 conferidas sem erro
 
 ## Trabalhando agora
 
@@ -184,13 +184,6 @@
 | Ícaro | Sênior de AWS, Linux e Ubuntu | trabalho do papel | Medir a saúde do PostgreSQL — nível dificil (✅ concluída) | 9 |
 
 
-## Tempo do último turno (medido)
-
-- 11:14–11:57 (43 min, 104 voltas; cobertura do cronômetro 100%)
-- **Entregas aprovadas na revisão independente: 14 (19.5 por hora)** — o indicador principal
-- operacional 2% · estudo 1% · revisao 0% · coordenacao 0% · manutencao 37% · erro 0% · parado 60% · sem_medicao 0%
-- Bloqueios: 2; etapas esperando dependência: 0
-
 ## Projetos entre andares (várias pessoas, uma etapa depende da outra)
 
 - Projeto NPS — TREINO_nps_20261027_111518_18215: **✅ concluída** — 1. ger_engenharia (concluida); 2. analise_estatistica (concluida); 3. cd_senior_drivers (concluida); 4. gov_pleno_lgpd (concluida); 5. canal_nina (concluida)
@@ -247,13 +240,14 @@
 - risco_demanda-v46: **reprovado** (treinado por ml_engenheiro)
 - risco_demanda-v47: **reprovado** (treinado por ml_engenheiro)
 - risco_demanda-v48: **referencia** (treinado por ml_engenheiro)
-- Última avaliação independente (ml_avaliador): risco_demanda-v48 aprovado — log loss 0.050 contra baseline 0.052
-- Referência em sombra: risco_demanda-v48; 1023 previsões em sombra
+- risco_demanda-v49: **reprovado** (treinado por ml_engenheiro)
+- Última avaliação independente (ml_avaliador): risco_demanda-v49 reprovado — log loss 0.055 contra baseline 0.050; motivos: não bate o baseline (log loss 0.0552 ≥ 0.0496); não bate a referência atual risco_demanda-v48 (log loss 0.0552 ≥ 0.0505)
+- Referência em sombra: risco_demanda-v48; 1037 previsões em sombra
 - Uso operacional: desligado: o modelo só roda em sombra até o dono decidir usá-lo em alguma escolha da empresa
 
 ## Banco de dados
 
-Levantamento das 27/10 08:55: **168 de 201** tabelas com dados (1.258.596 linhas contadas uma a uma).
+Levantamento das 27/10 08:51: **168 de 201** tabelas com dados (1.257.460 linhas contadas uma a uma).
 
 
 | Onde | Tabelas | Com dados |
