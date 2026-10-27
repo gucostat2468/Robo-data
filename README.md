@@ -1,6 +1,6 @@
 # Empresa ao vivo
 
-**Boletim das 27/10 04:14** (horário de Brasília) · trabalhando
+**Boletim das 27/10 04:18** (horário de Brasília) · entre turnos: memória salva; o próximo turno começa em poucos minutos
 
 > Atualiza a cada 5 minutos enquanto a empresa trabalha. Recarregue a página para ver o mais novo.
 
@@ -184,6 +184,13 @@
 | Ícaro | Sênior de AWS, Linux e Ubuntu | trabalho do papel | Procurar segredos no repositório público — nível medio (✅ concluída) | 6 |
 
 
+## Tempo do último turno (medido)
+
+- 06:35–07:18 (42 min, 104 voltas; cobertura do cronômetro 100%)
+- **Entregas aprovadas na revisão independente: 30 (42.4 por hora)** — o indicador principal
+- operacional 2% · estudo 2% · revisao 3% · coordenacao 0% · manutencao 33% · erro 0% · parado 61% · sem_medicao 0%
+- Bloqueios: 1; etapas esperando dependência: 0
+
 ## Projetos entre andares (várias pessoas, uma etapa depende da outra)
 
 - Projeto NPS — TREINO_nps_20261027_041610_70053: **✅ concluída** — 1. eng_pleno_tipos (concluida); 2. analise_perfil (concluida); 3. head_ciencia (concluida); 4. sec_senior (concluida); 5. canal_iara (concluida)
@@ -243,7 +250,7 @@
 
 ## Banco de dados
 
-Levantamento das 27/10 04:12: **168 de 201** tabelas com dados (1.223.460 linhas contadas uma a uma).
+Levantamento das 27/10 04:16: **168 de 201** tabelas com dados (1.224.740 linhas contadas uma a uma).
 
 
 | Onde | Tabelas | Com dados |
