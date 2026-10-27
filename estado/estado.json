@@ -1,11 +1,11 @@
 {
  "versao": 1,
- "gerado_em": "2026-10-27T11:47:51",
+ "gerado_em": "2026-10-27T11:53:51",
  "turno": {
   "estado": "trabalhando",
   "inicio": "2026-10-27T11:15:25",
   "fim_previsto": "2026-10-27T11:55:25",
-  "voltas": 91,
+  "voltas": 104,
   "planilhas": 1
  },
  "funcionarios": 105,
@@ -18,7 +18,7 @@
    "concluidas": 35,
    "parciais": 0,
    "falhas": 0,
-   "treino": 287,
+   "treino": 288,
    "acertos": 99
   },
   {
@@ -29,8 +29,8 @@
    "concluidas": 35,
    "parciais": 0,
    "falhas": 0,
-   "treino": 271,
-   "acertos": 95
+   "treino": 275,
+   "acertos": 98
   },
   {
    "andar": 3,
@@ -40,8 +40,8 @@
    "concluidas": 21,
    "parciais": 0,
    "falhas": 0,
-   "treino": 178,
-   "acertos": 76
+   "treino": 181,
+   "acertos": 78
   },
   {
    "andar": 4,
@@ -51,8 +51,8 @@
    "concluidas": 39,
    "parciais": 0,
    "falhas": 0,
-   "treino": 371,
-   "acertos": 146
+   "treino": 377,
+   "acertos": 149
   },
   {
    "andar": 5,
@@ -62,7 +62,7 @@
    "concluidas": 99,
    "parciais": 0,
    "falhas": 4,
-   "treino": 354,
+   "treino": 355,
    "acertos": 138
   }
  ],
@@ -208,9 +208,9 @@
   },
   {
    "rotina": "memoria_pg",
-   "execucoes_24h": 91,
+   "execucoes_24h": 92,
    "erros_24h": 0,
-   "ultima": "2026-10-27T11:41:08"
+   "ultima": "2026-10-27T11:53:47"
   },
   {
    "rotina": "modelos",
@@ -226,9 +226,9 @@
   },
   {
    "rotina": "registro",
-   "execucoes_24h": 470,
+   "execucoes_24h": 471,
    "erros_24h": 0,
-   "ultima": "2026-10-27T11:47:20"
+   "ultima": "2026-10-27T11:51:13"
   },
   {
    "rotina": "rh_desempenho",
@@ -244,24 +244,24 @@
   },
   {
    "rotina": "treino",
-   "execucoes_24h": 467,
+   "execucoes_24h": 466,
    "erros_24h": 0,
-   "ultima": "2026-10-27T11:47:05"
+   "ultima": "2026-10-27T11:51:12"
   }
  ],
  "totais": {
   "demandas": 1543,
-  "tentativas_treino": 16224,
-  "conversas": 5332,
-  "trabalhos_com_prova": 9087
+  "tentativas_treino": 16239,
+  "conversas": 5336,
+  "trabalhos_com_prova": 9094
  },
  "banco": {
-  "levantamento": "2026-10-27T11:38:46",
+  "levantamento": "2026-10-27T11:51:30",
   "postgres_conferido": true,
   "erro_postgres": null,
   "tabelas": 201,
   "com_dados": 168,
-  "linhas": 1256005,
+  "linhas": 1257460,
   "resumo": {
    "sqlite": {
     "tabelas": 79,
