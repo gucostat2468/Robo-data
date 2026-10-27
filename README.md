@@ -1,13 +1,13 @@
 # Empresa ao vivo
 
-**Boletim das 26/10 21:37** (horário de Brasília) · trabalhando
+**Boletim das 26/10 21:42** (horário de Brasília) · trabalhando
 
 > Atualiza a cada 5 minutos enquanto a empresa trabalha. Recarregue a página para ver o mais novo.
 
 ## Hoje
 
 - **19** demandas, **19** concluídas (100%), 0 parciais, 0 com falha
-- **100** de 105 funcionários já trabalharam
+- **104** de 105 funcionários já trabalharam
 - SQL: 3 exercícios, 3 conferidos com o gabarito
 - Fábrica: 2 planilhas, 2 conferidas sem erro
 
@@ -21,9 +21,9 @@
 |---|--:|--:|--:|--:|--:|
 | 1º | 19 de 19 | 5 | 5 | 0 | 0 |
 | 2º | 18 de 18 | 3 | 3 | 0 | 0 |
-| 3º | 11 de 12 | 0 | 0 | 0 | 0 |
+| 3º | 12 de 12 | 0 | 0 | 0 | 0 |
 | 4º | 31 de 32 | 6 | 6 | 0 | 0 |
-| 5º | 21 de 24 | 5 | 5 | 0 | 0 |
+| 5º | 24 de 24 | 5 | 5 | 0 | 0 |
 
 ## Últimas entregas
 
