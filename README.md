@@ -1,6 +1,6 @@
 # Empresa ao vivo
 
-**Boletim das 27/10 07:28** (horário de Brasília) · entre turnos: memória salva; o próximo turno começa em poucos minutos
+**Boletim das 27/10 07:31** (horário de Brasília) · trabalhando
 
 > Atualiza a cada 5 minutos enquanto a empresa trabalha. Recarregue a página para ver o mais novo.
 
@@ -9,7 +9,7 @@
 - **215** demandas, **211** concluídas (98%), 0 parciais, 4 com falha
 - **105** de 105 funcionários já trabalharam
 - SQL: 30 exercícios, 30 conferidos com o gabarito
-- Fábrica: 25 planilhas, 25 conferidas sem erro
+- Fábrica: 26 planilhas, 25 conferidas sem erro
 
 ## Trabalhando agora
 
@@ -184,13 +184,6 @@
 | Ícaro | Sênior de AWS, Linux e Ubuntu | trabalho do papel | Testar se o último backup volta — nível dificil (✅ concluída) | 8 |
 
 
-## Tempo do último turno (medido)
-
-- 09:44–10:28 (44 min, 96 voltas; cobertura do cronômetro 100%)
-- **Entregas aprovadas na revisão independente: 9 (12.2 por hora)** — o indicador principal
-- operacional 1% · estudo 1% · revisao 6% · coordenacao 0% · manutencao 39% · erro 0% · parado 54% · sem_medicao 0%
-- Bloqueios: 0; etapas esperando dependência: 0
-
 ## Projetos entre andares (várias pessoas, uma etapa depende da outra)
 
 - Projeto NPS — TREINO_nps_20261027_041610_70053: **✅ concluída** — 1. eng_pleno_tipos (concluida); 2. analise_perfil (concluida); 3. head_ciencia (concluida); 4. sec_senior (concluida); 5. canal_iara (concluida)
@@ -248,12 +241,12 @@
 - risco_demanda-v47: **reprovado** (treinado por ml_engenheiro)
 - risco_demanda-v48: **referencia** (treinado por ml_engenheiro)
 - Última avaliação independente (ml_avaliador): risco_demanda-v48 aprovado — log loss 0.050 contra baseline 0.052
-- Referência em sombra: risco_demanda-v48; 1010 previsões em sombra
+- Referência em sombra: risco_demanda-v48; 1019 previsões em sombra
 - Uso operacional: desligado: o modelo só roda em sombra até o dono decidir usá-lo em alguma escolha da empresa
 
 ## Banco de dados
 
-Levantamento das 27/10 07:26: **168 de 201** tabelas com dados (1.247.854 linhas contadas uma a uma).
+Levantamento das 27/10 07:21: **168 de 201** tabelas com dados (1.246.940 linhas contadas uma a uma).
 
 
 | Onde | Tabelas | Com dados |
