@@ -1,11 +1,11 @@
 {
  "versao": 1,
- "gerado_em": "2026-10-27T21:23:11",
+ "gerado_em": "2026-10-27T21:25:45",
  "turno": {
-  "estado": "entre turnos: memória salva; o próximo turno começa em poucos minutos",
-  "inicio": "2026-10-27T20:41:20",
-  "fim_previsto": "2026-10-27T21:21:20",
-  "voltas": 95,
+  "estado": "trabalhando",
+  "inicio": "2026-10-27T21:25:45",
+  "fim_previsto": "2026-10-27T22:05:45",
+  "voltas": 0,
   "planilhas": 1
  },
  "funcionarios": 105,
@@ -154,15 +154,15 @@
   "concluidos_hoje": 47
  },
  "fabrica": {
-  "lotes_hoje": 39,
+  "lotes_hoje": 40,
   "conferidos_ok_hoje": 39
  },
  "rotinas": [
   {
    "rotina": "caixa_dono",
-   "execucoes_24h": 30,
+   "execucoes_24h": 31,
    "erros_24h": 0,
-   "ultima": "2026-10-27T20:40:14"
+   "ultima": "2026-10-27T21:25:29"
   },
   {
    "rotina": "demandas",
@@ -190,43 +190,43 @@
   },
   {
    "rotina": "jornada",
-   "execucoes_24h": 30,
+   "execucoes_24h": 31,
    "erros_24h": 0,
-   "ultima": "2026-10-27T20:40:14"
+   "ultima": "2026-10-27T21:25:29"
   },
   {
    "rotina": "laboratorio",
-   "execucoes_24h": 111,
+   "execucoes_24h": 110,
    "erros_24h": 0,
    "ultima": "2026-10-27T21:14:28"
   },
   {
    "rotina": "licoes",
-   "execucoes_24h": 15,
+   "execucoes_24h": 16,
    "erros_24h": 0,
-   "ultima": "2026-10-27T19:53:36"
+   "ultima": "2026-10-27T21:25:28"
   },
   {
    "rotina": "memoria_pg",
-   "execucoes_24h": 93,
+   "execucoes_24h": 92,
    "erros_24h": 0,
-   "ultima": "2026-10-27T21:23:08"
+   "ultima": "2026-10-27T21:18:48"
   },
   {
    "rotina": "modelos",
-   "execucoes_24h": 30,
+   "execucoes_24h": 31,
    "erros_24h": 0,
-   "ultima": "2026-10-27T20:40:23"
+   "ultima": "2026-10-27T21:25:36"
   },
   {
    "rotina": "paineis",
-   "execucoes_24h": 30,
+   "execucoes_24h": 31,
    "erros_24h": 0,
-   "ultima": "2026-10-27T20:40:21"
+   "ultima": "2026-10-27T21:25:34"
   },
   {
    "rotina": "registro",
-   "execucoes_24h": 474,
+   "execucoes_24h": 472,
    "erros_24h": 0,
    "ultima": "2026-10-27T21:20:51"
   },
@@ -238,13 +238,13 @@
   },
   {
    "rotina": "ronda_ti",
-   "execucoes_24h": 92,
+   "execucoes_24h": 93,
    "erros_24h": 0,
-   "ultima": "2026-10-27T21:20:51"
+   "ultima": "2026-10-27T21:25:18"
   },
   {
    "rotina": "treino",
-   "execucoes_24h": 460,
+   "execucoes_24h": 459,
    "erros_24h": 0,
    "ultima": "2026-10-27T21:19:07"
   }
@@ -253,15 +253,15 @@
   "demandas": 1747,
   "tentativas_treino": 17381,
   "conversas": 5477,
-  "trabalhos_com_prova": 10134
+  "trabalhos_com_prova": 10141
  },
  "banco": {
-  "levantamento": "2026-10-27T21:21:06",
+  "levantamento": "2026-10-27T21:16:47",
   "postgres_conferido": true,
   "erro_postgres": null,
   "tabelas": 203,
   "com_dados": 170,
-  "linhas": 1329188,
+  "linhas": 1327812,
   "resumo": {
    "sqlite": {
     "tabelas": 80,
@@ -2179,8 +2179,8 @@
   "finalidade": "risco_demanda",
   "rotuladas_agora": 1704,
   "minimo_para_treinar": 60,
-  "datasets": 54,
-  "maior_dataset": 1667,
+  "datasets": 55,
+  "maior_dataset": 1704,
   "modelos": [
    {
     "id": "risco_demanda-v1",
@@ -2451,32 +2451,37 @@
     "id": "risco_demanda-v54",
     "estado": "reprovado",
     "criado_por": "ml_engenheiro"
+   },
+   {
+    "id": "risco_demanda-v55",
+    "estado": "reprovado",
+    "criado_por": "ml_engenheiro"
    }
   ],
   "referencia": "risco_demanda-v48",
-  "inferencias_sombra": 1216,
+  "inferencias_sombra": 1241,
   "uso_operacional": "desligado: o modelo só roda em sombra até o dono decidir usá-lo em alguma escolha da empresa",
   "ultima_avaliacao": {
-   "modelo": "risco_demanda-v54",
+   "modelo": "risco_demanda-v55",
    "resultado": "avaliado_reprovado",
    "quem": "ml_avaliador",
    "candidato": {
-    "n": 251,
-    "taxa_real": 0.01992,
-    "log_loss": 0.066251,
-    "brier": 0.014977,
-    "auc": 0.971545
+    "n": 256,
+    "taxa_real": 0.019531,
+    "log_loss": 0.06706,
+    "brier": 0.015005,
+    "auc": 0.968924
    },
    "baseline": {
-    "n": 251,
-    "taxa_real": 0.01992,
-    "log_loss": 0.048876,
-    "brier": 0.015246,
-    "auc": 0.984553
+    "n": 256,
+    "taxa_real": 0.019531,
+    "log_loss": 0.043073,
+    "brier": 0.013134,
+    "auc": 0.988845
    },
    "motivos": [
-    "não bate o baseline (log loss 0.0663 ≥ 0.0489)",
-    "não bate a referência atual risco_demanda-v48 (log loss 0.0663 ≥ 0.0631)"
+    "não bate o baseline (log loss 0.0671 ≥ 0.0431)",
+    "não bate a referência atual risco_demanda-v48 (log loss 0.0671 ≥ 0.0635)"
    ]
   }
  },
