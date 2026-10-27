@@ -1,15 +1,15 @@
 # Empresa ao vivo
 
-**Boletim das 27/10 12:51** (horário de Brasília) · entre turnos: memória salva; o próximo turno começa em poucos minutos
+**Boletim das 27/10 12:55** (horário de Brasília) · trabalhando
 
 > Atualiza a cada 5 minutos enquanto a empresa trabalha. Recarregue a página para ver o mais novo.
 
 ## Hoje
 
-- **330** demandas, **323** concluídas (98%), 0 parciais, 7 com falha
+- **334** demandas, **327** concluídas (98%), 0 parciais, 7 com falha
 - **105** de 105 funcionários já trabalharam
-- SQL: 36 exercícios, 36 conferidos com o gabarito
-- Fábrica: 32 planilhas, 32 conferidas sem erro
+- SQL: 37 exercícios, 37 conferidos com o gabarito
+- Fábrica: 33 planilhas, 32 conferidas sem erro
 
 ## Trabalhando agora
 
@@ -20,25 +20,25 @@
 | Andar | Trabalharam | Demandas | Concluídas | Parciais | Falhas |
 |---|--:|--:|--:|--:|--:|
 | 1º | 19 de 19 | 53 | 53 | 0 | 0 |
-| 2º | 18 de 18 | 52 | 52 | 0 | 0 |
+| 2º | 18 de 18 | 53 | 53 | 0 | 0 |
 | 3º | 12 de 12 | 32 | 32 | 0 | 0 |
 | 4º | 32 de 32 | 59 | 59 | 0 | 0 |
-| 5º | 24 de 24 | 134 | 127 | 0 | 7 |
+| 5º | 24 de 24 | 137 | 130 | 0 | 7 |
 
 ## Últimas entregas
 
 | Hora | Quem | Trabalho | Resultado |
 |---|---|---|---|
+| 12:55 | Marcos (2º) | Projeto NPS — TREINO_nps_20261027_155344_24573 | ✅ concluída |
+| 12:55 | André (5º) | Medir a saúde do PostgreSQL — nível profissional | ✅ concluída |
+| 12:54 | Henrique (5º) | Testar se o último backup volta — nível profissional | ✅ concluída |
+| 12:54 | Gustavo (5º) | Exercício de SQL no PostgreSQL com os dados da fábrica — nível profissional | ✅ concluída |
 | 12:24 | Gabriel (3º) | Perfil e indicadores da base sintética — nível dificil | ✅ concluída |
 | 12:24 | Natália (2º) | Drivers do indicador na base sintética — nível profissional | ✅ concluída |
 | 12:24 | Bárbara (3º) | Calcular a média de uma métrica da base sintética — nível dificil | ✅ concluída |
 | 12:24 | Marcelo (1º) | Anomalias na base sintética — nível profissional | ✅ concluída |
 | 12:24 | Bia (2º) | Calcular a média de uma métrica da base sintética — nível dificil | ✅ concluída |
 | 12:24 | Felipe (3º) | Perfil e indicadores da base sintética — nível profissional | ✅ concluída |
-| 12:24 | Carla (1º) | Calcular a média de uma métrica da base sintética — nível dificil | ✅ concluída |
-| 12:23 | Marina (5º) | Medir a saúde do PostgreSQL — nível dificil | ✅ concluída |
-| 12:23 | Larissa (2º) | Drivers do indicador na base sintética — nível medio | ✅ concluída |
-| 12:23 | Hugo (3º) | Calcular a média de uma métrica da base sintética — nível medio | ✅ concluída |
 
 ## Dificuldade (todo o histórico)
 
@@ -47,7 +47,7 @@
 | basico | 243 | 221 | 0 | 22 | 91% |
 | medio | 362 | 356 | 0 | 6 | 98% |
 | dificil | 696 | 680 | 1 | 15 | 98% |
-| profissional | 296 | 293 | 1 | 2 | 99% |
+| profissional | 300 | 297 | 1 | 2 | 99% |
 
 ## Cada funcionário
 
@@ -74,7 +74,7 @@
 | Rafael | Engenheiro de Dados Pleno | trabalho do papel | Conferir no PostgreSQL os lotes da fábrica — nível medio (✅ concluída) | 3 |
 | Rita | Recepção | trabalho do papel | Conferir no PostgreSQL os lotes da fábrica — nível dificil (✅ concluída) | 3 |
 | Saulo | Supervisor de Planilhas | trabalho do papel | Diagnosticar a planilha original da fábrica — nível dificil (✅ concluída) | 3 |
-| Théo | Estagiário de Engenharia de Dados | estagiário: observa (regra do dono) — Observei Leo (Leitura (Extração)) fazendo "Diagnosti |   | 0 |
+| Théo | Estagiário de Engenharia de Dados | estagiário: observa (regra do dono) — Observei Gustavo (Gerente de TI e Infraestrutura) fa |   | 0 |
 | Tina | Contatos e NPS | trabalho do papel | Diagnosticar a planilha original da fábrica — nível medio (✅ concluída) | 3 |
 
 ### 2º andar
@@ -91,8 +91,8 @@
 | Larissa | Analista de Customer Insights Pleno | trabalho do papel | Drivers do indicador na base sintética — nível medio (✅ concluída) | 3 |
 | Leandro | Engenheiro de Machine Learning Sênior | trabalho do papel | Calcular a média de uma métrica da base sintética — nível di (✅ concluída) | 2 |
 | Lucas | Cientista de Dados Júnior | trabalho do papel | Diagnosticar a planilha original da fábrica — nível medio (✅ concluída) | 3 |
-| Manu | Estagiária de Análise de Dados | estagiário: observa (regra do dono) — Observei Igor (Analista de Dados Júnior) fazendo "Ca |   | 0 |
-| Marcos | Coordenador de Análise e Ciência de Dado | trabalho FORA do papel | Projeto NPS — TREINO_nps_20261027_141857_37240 (✅ concluída) | 7 |
+| Manu | Estagiária de Análise de Dados | estagiário: observa (regra do dono) |   | 0 |
+| Marcos | Coordenador de Análise e Ciência de Dado | trabalho FORA do papel | Projeto NPS — TREINO_nps_20261027_155344_24573 (✅ concluída) | 8 |
 | Natália | Head de Ciência de Dados | trabalho do papel | Drivers do indicador na base sintética — nível profissional (✅ concluída) | 3 |
 | Patrícia | Gerente de Analytics e Customer Insights | trabalho do papel | Drivers do indicador na base sintética — nível profissional (✅ concluída) | 3 |
 | Rebeca | Líder de Engenharia de IA e Machine Lear | trabalho do papel | Perfil e indicadores da base sintética — nível profissional (✅ concluída) | 2 |
@@ -105,7 +105,7 @@
 | Quem | Cargo | Situação | Último trabalho | Hoje |
 |---|---|---|---|--:|
 | Bárbara | Especialista Sênior em Power BI | trabalho do papel | Calcular a média de uma métrica da base sintética — nível di (✅ concluída) | 3 |
-| Enzo | Estagiário da Sala Excel | estagiário: observa (regra do dono) — Observei Leo (Leitura (Extração)) fazendo "Diagnosti |   | 0 |
+| Enzo | Estagiário da Sala Excel | estagiário: observa (regra do dono) — Observei Gustavo (Gerente de TI e Infraestrutura) fa |   | 0 |
 | Felipe | Head de BI e Excel | trabalho do papel | Perfil e indicadores da base sintética — nível profissional (✅ concluída) | 3 |
 | Gabriel | Especialista em Tabelas Dinâmicas e Dash | trabalho do papel | Perfil e indicadores da base sintética — nível dificil (✅ concluída) | 3 |
 | Heitor | Analista Pleno de BI | trabalho do papel | Perfil e indicadores da base sintética — nível medio (✅ concluída) | 3 |
@@ -132,8 +132,8 @@
 | Isadora | Analista Pleno de Distribuição de Demand | trabalho do papel na rotina demandas |   | 0 |
 | Joana | Analista Júnior de Dados Sintéticos | trabalho do papel na rotina fabrica |   | 0 |
 | Juliana | Head de Gente e Gestão | trabalho do papel | Indicadores de pessoas — nível profissional (✅ concluída) | 3 |
-| Lara | Estagiária de Documentação de Dados | estagiário: observa (regra do dono) — Observei Otto (Auditoria (Validação)) fazendo "Verif |   | 0 |
-| Lorena | Estagiária de RH | estagiário: observa (regra do dono) — Observei Iara (Ideias e evolução da plataforma) faze |   | 0 |
+| Lara | Estagiária de Documentação de Dados | estagiário: observa (regra do dono) — Observei André (Head de Infraestrutura e Segurança)  |   | 0 |
+| Lorena | Estagiária de RH | estagiário: observa (regra do dono) |   | 0 |
 | Lívia | Designer de Casos | trabalho do papel | Revisar um caso de treino feito por outro designer — nível d (✅ concluída) | 3 |
 | Marta | Diretora de Pessoas e Cultura (CHRO) | trabalho do papel | Scorecard da área — nível profissional (✅ concluída) | 2 |
 | Mauro | Analista de Desempenho Sênior | trabalho do papel | Indicadores de pessoas — nível dificil (✅ concluída) | 3 |
@@ -159,17 +159,17 @@
 | Quem | Cargo | Situação | Último trabalho | Hoje |
 |---|---|---|---|--:|
 | Alexandre | Diretor de Tecnologia (CTO) | trabalho do papel | Exercício de SQL no PostgreSQL com os dados da fábrica — nív (✅ concluída) | 5 |
-| André | Head de Infraestrutura e Segurança | trabalho do papel | SLA das rotinas — nível profissional (✅ concluída) | 5 |
+| André | Head de Infraestrutura e Segurança | trabalho do papel | Medir a saúde do PostgreSQL — nível profissional (✅ concluída) | 6 |
 | Bianca | Engenheira de Dados Pleno | trabalho do papel | Ronda de saúde do sistema — nível medio (✅ concluída) | 5 |
 | Caetano | Especialista em Orquestração de Dados (A | trabalho do papel | Ronda de saúde do sistema — nível dificil (✅ concluída) | 5 |
-| Caíque | Estagiário de DevOps | estagiário: observa (regra do dono) — Observei Leo (Leitura (Extração)) fazendo "Diagnosti |   | 0 |
+| Caíque | Estagiário de DevOps | estagiário: observa (regra do dono) — Observei Gustavo (Gerente de TI e Infraestrutura) fa |   | 0 |
 | Diego | Desenvolvedor Python Pleno | trabalho do papel | Testar se o último backup volta — nível medio (✅ concluída) | 5 |
 | Elisa | Especialista em PyYAML (configuração) | trabalho do papel | Ronda de saúde do sistema — nível dificil (✅ concluída) | 5 |
 | Fernanda | Coordenadora de DevOps e Confiabilidade  | trabalho do papel | Testar se o último backup volta — nível dificil (✅ concluída) | 5 |
-| Gael | Estagiário de Engenharia de Dados (Airfl | estagiário: observa (regra do dono) — Observei Leo (Leitura (Extração)) fazendo "Diagnosti |   | 0 |
-| Gustavo | Gerente de TI e Infraestrutura | trabalho do papel | Testar se o último backup volta — nível profissional (✅ concluída) | 5 |
+| Gael | Estagiário de Engenharia de Dados (Airfl | estagiário: observa (regra do dono) — Observei Gustavo (Gerente de TI e Infraestrutura) fa |   | 0 |
+| Gustavo | Gerente de TI e Infraestrutura | trabalho do papel | Exercício de SQL no PostgreSQL com os dados da fábrica — nív (✅ concluída) | 6 |
 | Heloísa | Head de AWS, Arquitetura e Governança de | trabalho do papel | Medir a saúde do PostgreSQL — nível profissional (✅ concluída) | 13 |
-| Henrique | Head de Engenharia Python | trabalho do papel | Procurar segredos no repositório público — nível profissiona (✅ concluída) | 5 |
+| Henrique | Head de Engenharia Python | trabalho do papel | Testar se o último backup volta — nível profissional (✅ concluída) | 6 |
 | Jonas | Engenheiro de MLOps e Plataforma de Mode | trabalho do papel | SLA das rotinas — nível dificil (🔴 falhou) | 5 |
 | Letícia | Desenvolvedora Júnior | trabalho do papel | SLA das rotinas (🔴 falhou) | 5 |
 | Marina | Arquiteta de Cloud (AWS) | trabalho do papel | Medir a saúde do PostgreSQL — nível dificil (✅ concluída) | 13 |
@@ -194,9 +194,9 @@
 
 ## Projetos entre andares (várias pessoas, uma etapa depende da outra)
 
+- Projeto NPS — TREINO_nps_20261027_155344_24573: **✅ concluída** — 1. modelagem (concluida); 2. analise_estatistica (concluida); 3. cd_senior_drivers (concluida); 4. gov_pleno_lgpd (concluida); 5. analise_relator (concluida)
 - Projeto NPS — TREINO_nps_20261027_141857_37240: **✅ concluída** — 1. limpeza (concluida); 2. analise_perfil (concluida); 3. head_ciencia (concluida); 4. sec_senior (concluida); 5. canal_nina (concluida)
 - Projeto NPS — TREINO_nps_20261027_124828_08344: **✅ concluída** — 1. leitura (concluida); 2. analise_monitoramento (concluida); 3. cd_senior_drivers (concluida); 4. gov_pleno_lgpd (concluida); 5. canal_iara (concluida)
-- Projeto NPS — TREINO_csat_ces_20261027_120027_27127: **✅ concluída** — 1. head_engenharia (concluida); 2. analise_indicadores (concluida); 3. head_ciencia (concluida); 4. sec_senior (concluida); 5. analise_relator (concluida)
 
 ## Inteligência própria (modelo de risco das demandas)
 
@@ -251,13 +251,14 @@
 - risco_demanda-v49: **reprovado** (treinado por ml_engenheiro)
 - risco_demanda-v50: **reprovado** (treinado por ml_engenheiro)
 - risco_demanda-v51: **reprovado** (treinado por ml_engenheiro)
-- Última avaliação independente (ml_avaliador): risco_demanda-v51 reprovado — log loss 0.078 contra baseline 0.067; motivos: não bate o baseline (log loss 0.0782 ≥ 0.0667); não bate a referência atual risco_demanda-v48 (log loss 0.0782 ≥ 0.0716)
-- Referência em sombra: risco_demanda-v48; 1114 previsões em sombra
+- risco_demanda-v52: **reprovado** (treinado por ml_engenheiro)
+- Última avaliação independente (ml_avaliador): risco_demanda-v52 reprovado — log loss 0.078 contra baseline 0.067; motivos: não bate o baseline (log loss 0.0780 ≥ 0.0671); não bate a referência atual risco_demanda-v48 (log loss 0.0780 ≥ 0.0719)
+- Referência em sombra: risco_demanda-v48; 1134 previsões em sombra
 - Uso operacional: desligado: o modelo só roda em sombra até o dono decidir usá-lo em alguma escolha da empresa
 
 ## Banco de dados
 
-Levantamento das 27/10 12:48: **170 de 203** tabelas com dados (1.289.101 linhas contadas uma a uma).
+Levantamento das 27/10 12:43: **170 de 203** tabelas com dados (1.288.310 linhas contadas uma a uma).
 
 
 | Onde | Tabelas | Com dados |
