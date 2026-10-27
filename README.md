@@ -1,6 +1,6 @@
 # Empresa ao vivo
 
-**Boletim das 27/10 10:31** (horário de Brasília) · entre turnos: memória salva; o próximo turno começa em poucos minutos
+**Boletim das 27/10 10:33** (horário de Brasília) · trabalhando
 
 > Atualiza a cada 5 minutos enquanto a empresa trabalha. Recarregue a página para ver o mais novo.
 
@@ -9,7 +9,7 @@
 - **274** demandas, **268** concluídas (98%), 0 parciais, 6 com falha
 - **105** de 105 funcionários já trabalharam
 - SQL: 33 exercícios, 33 conferidos com o gabarito
-- Fábrica: 29 planilhas, 29 conferidas sem erro
+- Fábrica: 30 planilhas, 29 conferidas sem erro
 
 ## Trabalhando agora
 
@@ -248,18 +248,19 @@
 - risco_demanda-v47: **reprovado** (treinado por ml_engenheiro)
 - risco_demanda-v48: **referencia** (treinado por ml_engenheiro)
 - risco_demanda-v49: **reprovado** (treinado por ml_engenheiro)
-- Última avaliação independente (ml_avaliador): risco_demanda-v49 reprovado — log loss 0.055 contra baseline 0.050; motivos: não bate o baseline (log loss 0.0552 ≥ 0.0496); não bate a referência atual risco_demanda-v48 (log loss 0.0552 ≥ 0.0505)
-- Referência em sombra: risco_demanda-v48; 1047 previsões em sombra
+- risco_demanda-v50: **reprovado** (treinado por ml_engenheiro)
+- Última avaliação independente (ml_avaliador): risco_demanda-v50 reprovado — log loss 0.060 contra baseline 0.061; motivos: não bate a referência atual risco_demanda-v48 (log loss 0.0604 ≥ 0.0590)
+- Referência em sombra: risco_demanda-v48; 1078 previsões em sombra
 - Uso operacional: desligado: o modelo só roda em sombra até o dono decidir usá-lo em alguma escolha da empresa
 
 ## Banco de dados
 
-Levantamento das 27/10 10:29: **169 de 202** tabelas com dados (1.270.621 linhas contadas uma a uma).
+Levantamento das 27/10 10:25: **168 de 201** tabelas com dados (1.269.314 linhas contadas uma a uma).
 
 
 | Onde | Tabelas | Com dados |
 |---|--:|--:|
-| sqlite | 80 | 66 |
+| sqlite | 79 | 65 |
 | postgres.laboratorio | 15 | 15 |
 | postgres.robo | 82 | 66 |
 | postgres.treino | 22 | 22 |
