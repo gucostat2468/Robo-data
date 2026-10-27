@@ -1,6 +1,6 @@
 # Empresa ao vivo
 
-**Boletim das 27/10 16:51** (horário de Brasília) · entre turnos: memória salva; o próximo turno começa em poucos minutos
+**Boletim das 27/10 16:53** (horário de Brasília) · trabalhando
 
 > Atualiza a cada 5 minutos enquanto a empresa trabalha. Recarregue a página para ver o mais novo.
 
@@ -9,7 +9,7 @@
 - **400** demandas, **391** concluídas (98%), 0 parciais, 9 com falha
 - **105** de 105 funcionários já trabalharam
 - SQL: 43 exercícios, 43 conferidos com o gabarito
-- Fábrica: 37 planilhas, 37 conferidas sem erro
+- Fábrica: 38 planilhas, 37 conferidas sem erro
 
 ## Trabalhando agora
 
@@ -253,13 +253,14 @@
 - risco_demanda-v51: **reprovado** (treinado por ml_engenheiro)
 - risco_demanda-v52: **reprovado** (treinado por ml_engenheiro)
 - risco_demanda-v53: **reprovado** (treinado por ml_engenheiro)
-- Última avaliação independente (ml_avaliador): risco_demanda-v53 reprovado — log loss 0.062 contra baseline 0.040; motivos: não bate o baseline (log loss 0.0622 ≥ 0.0400); não bate a referência atual risco_demanda-v48 (log loss 0.0622 ≥ 0.0526)
-- Referência em sombra: risco_demanda-v48; 1174 previsões em sombra
+- risco_demanda-v54: **reprovado** (treinado por ml_engenheiro)
+- Última avaliação independente (ml_avaliador): risco_demanda-v54 reprovado — log loss 0.066 contra baseline 0.049; motivos: não bate o baseline (log loss 0.0663 ≥ 0.0489); não bate a referência atual risco_demanda-v48 (log loss 0.0663 ≥ 0.0631)
+- Referência em sombra: risco_demanda-v48; 1204 previsões em sombra
 - Uso operacional: desligado: o modelo só roda em sombra até o dono decidir usá-lo em alguma escolha da empresa
 
 ## Banco de dados
 
-Levantamento das 27/10 16:49: **170 de 203** tabelas com dados (1.317.559 linhas contadas uma a uma).
+Levantamento das 27/10 16:46: **170 de 203** tabelas com dados (1.316.238 linhas contadas uma a uma).
 
 
 | Onde | Tabelas | Com dados |
