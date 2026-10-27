@@ -1,11 +1,11 @@
 {
  "versao": 1,
- "gerado_em": "2026-10-27T00:07:20",
+ "gerado_em": "2026-10-27T00:13:59",
  "turno": {
   "estado": "trabalhando",
   "inicio": "2026-10-26T23:33:00",
   "fim_previsto": "2026-10-27T00:13:00",
-  "voltas": 87,
+  "voltas": 99,
   "planilhas": 2
  },
  "funcionarios": 105,
@@ -46,23 +46,23 @@
   {
    "andar": 4,
    "pessoas": 32,
-   "trabalharam_hoje": 7,
+   "trabalharam_hoje": 10,
    "demandas": 0,
    "concluidas": 0,
    "parciais": 0,
    "falhas": 0,
-   "treino": 7,
-   "acertos": 0
+   "treino": 10,
+   "acertos": 3
   },
   {
    "andar": 5,
    "pessoas": 24,
-   "trabalharam_hoje": 5,
+   "trabalharam_hoje": 6,
    "demandas": 0,
    "concluidas": 0,
    "parciais": 0,
    "falhas": 0,
-   "treino": 5,
+   "treino": 6,
    "acertos": 0
   }
  ],
@@ -172,7 +172,7 @@
   },
   {
    "rotina": "dialogo",
-   "execucoes_24h": 16,
+   "execucoes_24h": 15,
    "erros_24h": 0,
    "ultima": "2026-10-26T06:00:24"
   },
@@ -214,9 +214,9 @@
   },
   {
    "rotina": "memoria_pg",
-   "execucoes_24h": 92,
+   "execucoes_24h": 93,
    "erros_24h": 0,
-   "ultima": "2026-10-27T00:00:16"
+   "ultima": "2026-10-27T00:13:54"
   },
   {
    "rotina": "modelos",
@@ -232,7 +232,7 @@
   },
   {
    "rotina": "registro",
-   "execucoes_24h": 506,
+   "execucoes_24h": 501,
    "erros_24h": 0,
    "ultima": "2026-10-27T00:06:49"
   },
@@ -250,24 +250,24 @@
   },
   {
    "rotina": "treino",
-   "execucoes_24h": 471,
+   "execucoes_24h": 469,
    "erros_24h": 0,
-   "ultima": "2026-10-27T00:06:34"
+   "ultima": "2026-10-27T00:08:41"
   }
  ],
  "totais": {
   "demandas": 1310,
-  "tentativas_treino": 14792,
+  "tentativas_treino": 14796,
   "conversas": 4938,
-  "trabalhos_com_prova": 7739
+  "trabalhos_com_prova": 7742
  },
  "banco": {
-  "levantamento": "2026-10-26T23:57:16",
+  "levantamento": "2026-10-27T00:10:54",
   "postgres_conferido": true,
   "erro_postgres": null,
   "tabelas": 201,
   "com_dados": 168,
-  "linhas": 1165209,
+  "linhas": 1166764,
   "resumo": {
    "sqlite": {
     "tabelas": 79,
