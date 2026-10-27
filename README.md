@@ -1,6 +1,6 @@
 # Empresa ao vivo
 
-**Boletim das 27/10 15:14** (horário de Brasília) · trabalhando
+**Boletim das 27/10 15:19** (horário de Brasília) · entre turnos: memória salva; o próximo turno começa em poucos minutos
 
 > Atualiza a cada 5 minutos enquanto a empresa trabalha. Recarregue a página para ver o mais novo.
 
@@ -186,11 +186,11 @@
 
 ## Tempo do último turno (medido)
 
-- 16:43–17:26 (43 min, 103 voltas; cobertura do cronômetro 100%)
-- **Entregas aprovadas na revisão independente: 1 (1.4 por hora)** — o indicador principal
-- operacional 1% · estudo 2% · revisao 0% · coordenacao 0% · manutencao 38% · erro 0% · parado 59% · sem_medicao 0%
-- Bloqueios: 0; etapas esperando dependência: 0
-- Turnos anteriores (entregas/hora): 17.6, 28.6, 33.7, 16.2, 42.5
+- 17:31–18:16 (44 min, 101 voltas; cobertura do cronômetro 100%)
+- **Entregas aprovadas na revisão independente: 17 (22.9 por hora)** — o indicador principal
+- operacional 3% · estudo 1% · revisao 2% · coordenacao 0% · manutencao 37% · erro 0% · parado 56% · sem_medicao 0%
+- Bloqueios: 2; etapas esperando dependência: 0
+- Turnos anteriores (entregas/hora): 1.4, 17.6, 28.6, 33.7, 16.2
 
 ## Projetos entre andares (várias pessoas, uma etapa depende da outra)
 
@@ -258,7 +258,7 @@
 
 ## Banco de dados
 
-Levantamento das 27/10 15:11: **170 de 203** tabelas com dados (1.304.302 linhas contadas uma a uma).
+Levantamento das 27/10 15:16: **170 de 203** tabelas com dados (1.305.399 linhas contadas uma a uma).
 
 
 | Onde | Tabelas | Com dados |
