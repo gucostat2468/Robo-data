@@ -1,11 +1,11 @@
 {
  "versao": 1,
- "gerado_em": "2026-10-27T15:26:52",
+ "gerado_em": "2026-10-27T15:33:18",
  "turno": {
   "estado": "trabalhando",
   "inicio": "2026-10-27T15:06:57",
   "fim_previsto": "2026-10-27T15:46:57",
-  "voltas": 49,
+  "voltas": 62,
   "planilhas": 1
  },
  "funcionarios": 105,
@@ -18,7 +18,7 @@
    "concluidas": 53,
    "parciais": 0,
    "falhas": 0,
-   "treino": 376,
+   "treino": 379,
    "acertos": 131
   },
   {
@@ -29,7 +29,7 @@
    "concluidas": 52,
    "parciais": 0,
    "falhas": 0,
-   "treino": 357,
+   "treino": 359,
    "acertos": 132
   },
   {
@@ -51,7 +51,7 @@
    "concluidas": 59,
    "parciais": 0,
    "falhas": 0,
-   "treino": 487,
+   "treino": 493,
    "acertos": 191
   },
   {
@@ -62,7 +62,7 @@
    "concluidas": 127,
    "parciais": 0,
    "falhas": 7,
-   "treino": 464,
+   "treino": 466,
    "acertos": 176
   }
  ],
@@ -196,9 +196,9 @@
   },
   {
    "rotina": "laboratorio",
-   "execucoes_24h": 108,
+   "execucoes_24h": 109,
    "erros_24h": 0,
-   "ultima": "2026-10-27T15:17:10"
+   "ultima": "2026-10-27T15:27:13"
   },
   {
    "rotina": "licoes",
@@ -210,7 +210,7 @@
    "rotina": "memoria_pg",
    "execucoes_24h": 91,
    "erros_24h": 0,
-   "ultima": "2026-10-27T15:20:04"
+   "ultima": "2026-10-27T15:33:14"
   },
   {
    "rotina": "modelos",
@@ -226,9 +226,9 @@
   },
   {
    "rotina": "registro",
-   "execucoes_24h": 465,
+   "execucoes_24h": 467,
    "erros_24h": 0,
-   "ultima": "2026-10-27T15:25:03"
+   "ultima": "2026-10-27T15:29:32"
   },
   {
    "rotina": "rh_desempenho",
@@ -246,22 +246,22 @@
    "rotina": "treino",
    "execucoes_24h": 465,
    "erros_24h": 0,
-   "ultima": "2026-10-27T15:25:05"
+   "ultima": "2026-10-27T15:29:16"
   }
  ],
  "totais": {
   "demandas": 1640,
-  "tentativas_treino": 16684,
-  "conversas": 5390,
-  "trabalhos_com_prova": 9512
+  "tentativas_treino": 16697,
+  "conversas": 5391,
+  "trabalhos_com_prova": 9521
  },
  "banco": {
-  "levantamento": "2026-10-27T15:17:33",
+  "levantamento": "2026-10-27T15:30:38",
   "postgres_conferido": true,
   "erro_postgres": null,
   "tabelas": 203,
   "com_dados": 170,
-  "linhas": 1284191,
+  "linhas": 1286484,
   "resumo": {
    "sqlite": {
     "tabelas": 80,
