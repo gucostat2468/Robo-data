@@ -35,10 +35,29 @@ jobs:
           cache-dependency-path: requisitos.txt
       - name: Instalar dependências
         run: python -m pip install -r requisitos.txt
+      # Memória fora do banco: o turno anterior deixou a memória (criptografada) como artefato. Se o banco grátis
+      # estiver fora (cota estourada em 27/10), o turno trabalha a partir dela. Falhar aqui não impede o turno.
+      - name: Baixar a memória do turno anterior (arquivo criptografado)
+        continue-on-error: true
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          mkdir -p "$RUNNER_TEMP/memoria_entrada"
+          RUN=$(gh api "repos/${{ github.repository }}/actions/artifacts?name=memoria&per_page=20" \
+                --jq '[.artifacts[] | select(.expired == false)][0].workflow_run.id // empty')
+          if [ -n "$RUN" ]; then
+            gh run download "$RUN" -n memoria -D "$RUNNER_TEMP/memoria_entrada" && echo "memória do turno $RUN baixada"
+          else
+            echo "nenhuma memória em arquivo ainda (normal no 1º turno)"
+          fi
       - name: Turno de trabalho (restaura, trabalha, salva a cada 10 min)
         env:
           ROBO_PG_URL: ${{ secrets.ROBO_PG_URL }}
           ROBO_PG_SENHA_LEITURA: ${{ secrets.ROBO_PG_SENHA_LEITURA }}
+          # memória em arquivo (criptografada): chave própria opcional; sem ela, derivada de ROBO_PG_URL
+          ROBO_MEMORIA_CHAVE: ${{ secrets.ROBO_MEMORIA_CHAVE }}
+          ROBO_MEMORIA_ENTRADA: ${{ runner.temp }}/memoria_entrada
+          ROBO_MEMORIA_SAIDA: ${{ runner.temp }}/memoria_saida
           # grupo do Telegram (opcional): sem estes três segredos, o turno simplesmente não fala no grupo
           ROBO_TELEGRAM_TOKEN: ${{ secrets.ROBO_TELEGRAM_TOKEN }}
           ROBO_TELEGRAM_CHAT: ${{ secrets.ROBO_TELEGRAM_CHAT }}
@@ -51,6 +70,15 @@ jobs:
           MIN="${{ github.event.inputs.minutos }}"
           [ -z "$MIN" ] && [ "${{ github.event_name }}" = "push" ] && MIN="$(grep -Eo '^[0-9]+' nuvem/ligar | head -1)"
           python -m robo turno --minutos "${MIN:-40}" --pasta "$RUNNER_TEMP/empresa"
+      # Sobe a memória deste turno (mesmo se o turno falhar no meio: o que foi salvo até ali não se perde)
+      - name: Guardar a memória deste turno (arquivo criptografado)
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: memoria
+          path: ${{ runner.temp }}/memoria_saida/
+          retention-days: 7
+          if-no-files-found: ignore
       # Empresa contínua: o GitHub costuma atrasar o horário marcado em horas. Ao terminar BEM, o turno chama o
       # próximo (o "concurrency" acima garante um por vez). Para pausar pelo celular: Settings → Secrets and
       # variables → Actions → aba Variables → criar ROBO_TURNO_CONTINUO com o valor 0.

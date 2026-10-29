@@ -256,7 +256,8 @@ def teste_salvar_faz_a_cobertura_so_de_hora_em_hora_e_no_fim(cfg_factory, monkey
     cfg = cfg_factory()
     cfg.criar_pastas()
     r = nuvem.salvar(cfg)
-    assert feitos == ["cobertura"] and set(r["tempos"]) >= {"registro", "cobertura", "instantaneo", "memoria_pg"}
+    assert feitos == ["cobertura"] and set(r["tempos"]) >= {"registro", "cobertura", "instantaneo"}
+    assert "memoria_pg" not in r["tempos"]  # banco desligado: a cópia para o PostgreSQL espera ele voltar
     nuvem.salvar(cfg)
     assert feitos == ["cobertura"]  # 10 min depois: não refaz
     nuvem.salvar(cfg, completo=True)

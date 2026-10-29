@@ -112,48 +112,167 @@ def _sha_descompactado(dados_gz: bytes) -> str:
     return hashlib.sha256(gzip.decompress(dados_gz)).hexdigest()
 
 
+# --------------------------------------------------------------------- memória fora do banco (arquivo do GitHub Actions)
+# 27/10: o Neon grátis estourou a cota e bloqueou as conexões; sem banco o turno nem começava e a empresa parou.
+# Agora cada salvamento também grava a memória num ARQUIVO criptografado que o GitHub Actions guarda como artefato
+# (grátis no repositório público). O turno seguinte baixa esse arquivo e usa a cópia MAIS NOVA entre ele e o banco.
+# Sem banco, o turno trabalha só com o SQLite e o arquivo; quando o banco volta, a cópia incremental o alcança.
+# O repositório é público, então o arquivo é criptografado (AES-256, openssl) com ROBO_MEMORIA_CHAVE ou, sem ela, com
+# uma chave derivada do segredo ROBO_PG_URL. Sem chave nenhuma, o arquivo não é gravado (nunca vai em claro).
+ARQ_MEMORIA, ARQ_META = "memoria.db.gz.enc", "memoria.json"
+_sem_banco: dict = {"motivo": None}
+
+
+def _chave() -> str | None:
+    chave = os.environ.get("ROBO_MEMORIA_CHAVE") or ""
+    if not chave and os.environ.get("ROBO_PG_URL"):
+        chave = hashlib.sha256(("robo-memoria|" + os.environ["ROBO_PG_URL"]).encode()).hexdigest()
+    return chave or None
+
+
+def _openssl(dados: bytes, chave: str, abrir: bool) -> bytes:
+    import subprocess
+    r = subprocess.run(["openssl", "enc", "-aes-256-cbc", "-pbkdf2", "-iter", "200000", "-salt",
+                        *(["-d"] if abrir else []), "-pass", "env:ROBO_CHAVE_ARQUIVO"],
+                       input=dados, capture_output=True, timeout=300, env={**os.environ, "ROBO_CHAVE_ARQUIVO": chave})
+    if r.returncode != 0:
+        raise RuntimeError(f"openssl falhou: {r.stderr.decode(errors='replace').strip()[:160]}")
+    return r.stdout
+
+
+def guardar_arquivo(dados_gz: bytes, sha256: str, linhas: int) -> Path | None:
+    """Grava a memória criptografada em ROBO_MEMORIA_SAIDA (o workflow sobe como artefato). None = não configurado."""
+    pasta, chave = os.environ.get("ROBO_MEMORIA_SAIDA"), _chave()
+    if not pasta or not chave:
+        return None
+    destino = Path(pasta)
+    destino.mkdir(parents=True, exist_ok=True)
+    tmp = destino / (ARQ_MEMORIA + ".parcial")
+    tmp.write_bytes(_openssl(dados_gz, chave, abrir=False))
+    tmp.replace(destino / ARQ_MEMORIA)  # troca atômica: nunca fica um arquivo pela metade
+    from datetime import timezone
+    (destino / ARQ_META).write_text(json.dumps({"gerado_em": datetime.now(timezone.utc).isoformat(timespec="seconds"),
+                                                "sha256": sha256, "linhas": linhas}), encoding="utf-8")
+    return destino / ARQ_MEMORIA
+
+
+def ler_arquivo() -> dict | None:
+    """A memória do turno anterior baixada pelo workflow (ROBO_MEMORIA_ENTRADA), conferida pelo SHA-256."""
+    pasta, chave = os.environ.get("ROBO_MEMORIA_ENTRADA"), _chave()
+    if not pasta or not chave:
+        return None
+    arq, meta = Path(pasta) / ARQ_MEMORIA, Path(pasta) / ARQ_META
+    if not arq.exists() or not meta.exists():
+        return None
+    try:
+        m = json.loads(meta.read_text(encoding="utf-8"))
+        dados = _openssl(arq.read_bytes(), chave, abrir=True)
+        if _sha_descompactado(dados) != m["sha256"]:
+            raise RuntimeError("SHA-256 não confere")
+    except Exception as e:  # chave trocada, arquivo corrompido: não usa (e diz por quê)
+        log.warning("Memória do arquivo do GitHub ignorada: %s: %s", type(e).__name__, str(e)[:200])
+        return None
+    return {"gerado_em": datetime.fromisoformat(m["gerado_em"]), "sha256": m["sha256"], "dados": dados}
+
+
+def _erros_de_banco() -> tuple:
+    from robo.banco import ErroBancoIndisponivel
+    try:
+        import psycopg
+        return (ErroBancoIndisponivel, psycopg.OperationalError)
+    except ImportError:
+        return (ErroBancoIndisponivel,)
+
+
+def banco_ligado(cfg) -> bool:
+    return bool((cfg.banco or {}).get("habilitado"))
+
+
+def desligar_banco(cfg, motivo: str) -> None:
+    """O resto do turno segue só com o SQLite e o arquivo: rotinas que precisam do banco ficam bloqueadas com motivo."""
+    if banco_ligado(cfg):
+        log.warning("Turno SEM banco a partir de agora: %s", motivo[:300])
+    cfg.banco["habilitado"] = False
+    _sem_banco["motivo"] = motivo[:300]
+
+
 def restaurar(cfg) -> dict:
-    """Traz a memória para a máquina do turno. Ordem: último instantâneo do banco; senão, a memória inicial do projeto;
-    senão, começa vazia (e diz isso). Sempre confere o SHA-256 antes de usar."""
+    """Traz a memória para a máquina do turno: a cópia MAIS NOVA entre o último instantâneo do banco e o arquivo do
+    GitHub; sem as duas, a memória inicial do projeto; senão começa vazia (e diz isso). Banco fora do ar não impede
+    o turno: ele segue sem banco. Sempre confere o SHA-256 antes de usar."""
     destino = Path(cfg.logs) / "trabalho.db"
     if destino.exists():
         return {"origem": "local", "arquivo": str(destino)}
-    with _conectar(cfg) as conn:
-        conn.execute(ESQUEMA_PG)
-        r = conn.execute("SELECT id, sha256, conteudo FROM robo.instantaneos_sqlite ORDER BY id DESC LIMIT 1").fetchone()
+    candidatos = []
+    if banco_ligado(cfg):
+        try:
+            with _conectar(cfg) as conn:
+                conn.execute(ESQUEMA_PG)
+                r = conn.execute("SELECT id, sha256, conteudo, data_hora FROM robo.instantaneos_sqlite "
+                                 "ORDER BY id DESC LIMIT 1").fetchone()
+            if r:
+                candidatos.append({"origem": f"instantaneo {r[0]}", "sha256": r[1], "dados": bytes(r[2]),
+                                   "gerado_em": r[3]})
+        except _erros_de_banco() as e:
+            desligar_banco(cfg, f"{type(e).__name__}: {e}")
+    arq = ler_arquivo()
+    if arq:
+        candidatos.append({**arq, "origem": "arquivo do GitHub"})
     from robo import registro_total
-    if r:
-        dados = bytes(r[2])
-        if _sha_descompactado(dados) != r[1]:
-            raise RuntimeError(f"o instantâneo {r[0]} do banco não confere com o próprio SHA-256: não vou usar memória corrompida")
-        destino.write_bytes(gzip.decompress(dados))
-        saida = {"origem": f"instantaneo {r[0]}", "sha256": r[1]}
+    if candidatos:
+        c = max(candidatos, key=lambda x: x["gerado_em"])
+        if _sha_descompactado(c["dados"]) != c["sha256"]:
+            raise RuntimeError(f"a memória de {c['origem']} não confere com o próprio SHA-256: não vou usar memória corrompida")
+        destino.write_bytes(gzip.decompress(c["dados"]))
+        saida = {"origem": c["origem"], "sha256": c["sha256"], "gerado_em": str(c["gerado_em"])}
+    elif _sem_banco["motivo"]:
+        # o banco está configurado mas fora do ar e não há arquivo: a memória mais nova está presa no banco. Começar
+        # da memória inicial criaria uma 2ª história com os mesmos números de registro, e a cópia para o banco, quando
+        # ele voltar, misturaria as duas. Melhor parar (e dizer por quê) do que arriscar perder registro.
+        raise RuntimeError("banco fora do ar e nenhuma memória em arquivo ainda: a memória mais nova está no banco; "
+                           f"o turno não começa de uma memória antiga ({_sem_banco['motivo'][:160]})")
     elif MEMORIA_INICIAL.exists():
         from robo import backup
         r = backup.restaurar_sqlite(cfg, MEMORIA_INICIAL)
         saida = {"origem": "memoria_inicial", "sha256": r["sha256"], "linhas": r["linhas"]}
     else:
-        return {"origem": "vazia"}
+        return {"origem": "vazia", "banco": banco_ligado(cfg)}
     saida["arquivos"] = registro_total.restaurar_arquivos(cfg)  # canal, estado da TI, âncora, equipe… de volta
+    saida["banco"] = banco_ligado(cfg)
+    if not saida["banco"]:
+        saida["sem_banco"] = _sem_banco["motivo"]
     return saida
 
 
 def salvar_instantaneo(cfg) -> dict:
+    """A cópia conferida do SQLite vai para o arquivo do GitHub (sempre) e para o banco (quando ligado)."""
     from robo import backup
     b = backup.backup_sqlite(cfg)  # cópia online conferida (integrity_check) e compactada
     if not b.get("ok"):
         raise RuntimeError(f"não consegui copiar a memória: {b.get('motivo')}")
     arq = backup.pasta_sqlite(cfg) / b["arquivo"]
     dados = arq.read_bytes()
-    with _conectar(cfg) as conn:
-        conn.execute(ESQUEMA_PG)
-        conn.execute("INSERT INTO robo.instantaneos_sqlite (sha256, tamanho, linhas, tabelas, conteudo) VALUES (%s,%s,%s,%s,%s)",
-                     (b["sha256"], len(dados), b["linhas"], b["tabelas"], dados))
-        # só os instantâneos (cópias do arquivo) giram; a memória de verdade fica nas tabelas robo.memoria_*, que nunca
-        # perdem linha
-        conn.execute("DELETE FROM robo.instantaneos_sqlite WHERE id NOT IN (SELECT id FROM robo.instantaneos_sqlite "
-                     "ORDER BY id DESC LIMIT %s)", (MANTER_INSTANTANEOS,))
-    return {"linhas": b["linhas"], "tabelas": b["tabelas"], "tamanho_kb": round(len(dados) / 1024)}
+    saida = {"linhas": b["linhas"], "tabelas": b["tabelas"], "tamanho_kb": round(len(dados) / 1024)}
+    try:
+        saida["arquivo_github"] = bool(guardar_arquivo(dados, b["sha256"], b["linhas"]))
+    except Exception as e:
+        log.warning("Memória não gravada no arquivo do GitHub: %s: %s", type(e).__name__, str(e)[:200])
+        saida["arquivo_github"] = False
+    if not banco_ligado(cfg):
+        return {**saida, "banco": False}
+    try:
+        with _conectar(cfg) as conn:
+            conn.execute(ESQUEMA_PG)
+            conn.execute("INSERT INTO robo.instantaneos_sqlite (sha256, tamanho, linhas, tabelas, conteudo) "
+                         "VALUES (%s,%s,%s,%s,%s)", (b["sha256"], len(dados), b["linhas"], b["tabelas"], dados))
+            # só os instantâneos (cópias do arquivo) giram; a memória de verdade fica nas tabelas robo.memoria_*,
+            # que nunca perdem linha
+            conn.execute("DELETE FROM robo.instantaneos_sqlite WHERE id NOT IN (SELECT id FROM robo.instantaneos_sqlite "
+                         "ORDER BY id DESC LIMIT %s)", (MANTER_INSTANTANEOS,))
+    except _erros_de_banco() as e:
+        desligar_banco(cfg, f"{type(e).__name__}: {e}")
+        return {**saida, "banco": False}
+    return {**saida, "banco": True}
 
 
 def garantir_leitura(cfg) -> bool:
@@ -214,8 +333,12 @@ def salvar(cfg, completo: bool = False) -> dict:
         except Exception:
             log.exception("Turno na nuvem: levantamento de cobertura falhou")
     inst = parte("instantaneo", lambda: salvar_instantaneo(cfg))
-    parte("memoria_pg", lambda: rotinas.executar(cfg, "memoria_pg", lambda: memoria.sincronizar_postgres(cfg)))
-    parte("leitura", lambda: garantir_leitura(cfg))  # tabelas novas também ficam legíveis no celular
+    if banco_ligado(cfg):
+        parte("memoria_pg", lambda: rotinas.executar(cfg, "memoria_pg", lambda: memoria.sincronizar_postgres(cfg)))
+        try:
+            parte("leitura", lambda: garantir_leitura(cfg))  # tabelas novas também ficam legíveis no celular
+        except _erros_de_banco() as e:
+            desligar_banco(cfg, f"{type(e).__name__}: {e}")
     log.info("Salvamento: %s", ", ".join(f"{k} {v:.1f}s" for k, v in tempos.items()))
     return {**inst, "tempos": tempos}
 
@@ -282,9 +405,14 @@ def turno(cfg, minutos: float = 20, salvar_a_cada_min: float = 10, pausa_s: floa
     with crono.medir("inicio"):
         origem = restaurar(cfg)
         log.info("Turno na nuvem: memória restaurada de %s", origem["origem"])
-        freio_de_espaco(cfg)
+        if banco_ligado(cfg):
+            freio_de_espaco(cfg)
         sessao = rotinas.abrir_sessao(cfg)["sessao"]
-        garantir_leitura(cfg)
+        if banco_ligado(cfg):
+            try:
+                garantir_leitura(cfg)
+            except _erros_de_banco() as e:
+                desligar_banco(cfg, f"{type(e).__name__}: {e}")
     from robo import pos_processamento
     monitor = Monitor(cfg, ao_processar=lambda r: pos_processamento.registrar(cfg, r))
     planilhas = 0
@@ -308,6 +436,8 @@ def turno(cfg, minutos: float = 20, salvar_a_cada_min: float = 10, pausa_s: floa
     previsto = (datetime.now() + timedelta(minutes=minutos)).isoformat(timespec="seconds")
 
     def _boletim(estado: str, final: bool = False) -> None:  # o celular acompanha o turno, só no GitHub Actions
+        if not banco_ligado(cfg):  # o dono vê no celular que o banco está fora e onde a memória está
+            estado += " · SEM BANCO (memória guardada no arquivo do GitHub; o banco é alcançado quando voltar)"
         if boletim.ligado():
             boletim.publicar(cfg, RAIZ, Path(cfg.logs).parent / "boletim_git",
                              {"estado": estado, "inicio": inicio_txt, "fim_previsto": previsto, "voltas": voltas,
@@ -360,9 +490,14 @@ def turno(cfg, minutos: float = 20, salvar_a_cada_min: float = 10, pausa_s: floa
         tempo = None
     inst = salvar(cfg, completo=True)
     _boletim("entre turnos: memória salva; o próximo turno começa em poucos minutos", final=True)
-    mb = tamanho_mb(cfg)
+    mb = None
+    if banco_ligado(cfg):
+        try:
+            mb = tamanho_mb(cfg)
+        except _erros_de_banco() as e:
+            desligar_banco(cfg, f"{type(e).__name__}: {e}")
     limite = float(os.environ.get("ROBO_LIMITE_MB") or LIMITE_MB_PADRAO)
-    alerta = mb >= 0.8 * limite
+    alerta = mb is not None and mb >= 0.8 * limite
     if alerta:
         try:
             from robo.canal import Canal
@@ -372,7 +507,8 @@ def turno(cfg, minutos: float = 20, salvar_a_cada_min: float = 10, pausa_s: floa
             pass
     return {"origem": origem["origem"], "minutos": round((time.monotonic() - inicio) / 60, 1), "voltas": voltas,
             "planilhas_processadas": planilhas, "tempo": tempo,
-            "memoria": inst, "banco_mb": mb, "limite_mb": limite, "alerta_espaco": alerta}
+            "memoria": inst, "banco_mb": mb, "limite_mb": limite, "alerta_espaco": alerta,
+            "banco": banco_ligado(cfg), "sem_banco": None if banco_ligado(cfg) else _sem_banco["motivo"]}
 
 
 def resumo_do_turno(cfg) -> dict:
