@@ -301,6 +301,12 @@ def principal(argv: list[str] | None = None) -> int:
     sp.add_argument("arquivo")
     sd = sub.add_parser("diagnosticar", help="analisa um arquivo sem gravar nem mover")
     sd.add_argument("arquivo")
+    sen = sub.add_parser("entregar", help="PRODUTO: transforma uma planilha (pesquisa NPS/CSAT/CES ou entregas) num pacote "
+                                          "para o gestor: base tratada, indicadores.xlsx e relatorio.html com "
+                                          "recomendações. Roda só no seu computador; a base não sai dele")
+    sen.add_argument("arquivo")
+    sen.add_argument("--destino", help="pasta onde criar a entrega (padrão: a pasta do arquivo)")
+    sen.add_argument("--segmentos", help="colunas de segmento separadas por vírgula (padrão: o robô escolhe)")
     sub.add_parser("status", help="mostra pastas, fila e histórico")
     sub.add_parser("manutencao", help="remove arquivos antigos conforme a retenção")
     sdm = sub.add_parser("demo", help="abre a empresa de demonstração (pasta separada, planilhas de 6 áreas)")
@@ -632,6 +638,19 @@ def principal(argv: list[str] | None = None) -> int:
         r = processar_arquivo(args.arquivo, cfg, gravar=False)
         _imprimir_resultado(r)
         return 1 if r.relatorio.tem_erros else 0
+    if args.comando == "entregar":
+        from robo import entrega
+        r = entrega.entregar(cfg, args.arquivo, args.destino,
+                             [x.strip() for x in args.segmentos.split(",")] if args.segmentos else None)
+        print(f"Entrega {'pronta' if r['ok'] else 'com problemas'}: {r['pasta']}")
+        for a in r["arquivos"]:
+            print(f"  • {a}")
+        print("Recomendações:")
+        for x in r["recomendacoes"]:
+            print(f"  - {x.replace('**', '')}")
+        for e in r["erros"]:
+            print(f"  ! {e}")
+        return 0 if r["ok"] else 1
     if args.comando == "processar":
         cfg.criar_pastas()
         r = processar_arquivo(args.arquivo, cfg)

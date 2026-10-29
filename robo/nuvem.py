@@ -71,20 +71,24 @@ def url_do_ambiente(amb: dict | None = None) -> str:
                          user=amb["DB_USER"], password=amb.get("DB_PASS") or "", dbname=amb["DB_NAME"])
 
 
+def banco_de_url(url: str, senha_leitura: str = "") -> dict:
+    from psycopg.conninfo import conninfo_to_dict
+    c = conninfo_to_dict(url)
+    host = c.get("host", "localhost")
+    local = host in ("localhost", "127.0.0.1") or host.startswith("/")  # Unix socket (Cloud SQL) não usa SSL
+    return {"habilitado": True, "host": host, "porta": int(c.get("port") or 5432),
+            "banco": c.get("dbname", "neondb"), "usuario": c.get("user", "postgres"), "senha": c.get("password", ""),
+            "sslmode": c.get("sslmode") or ("" if local else "require"),
+            "usuario_leitura": "robo_leitura", "senha_leitura": senha_leitura, "tempo_limite_conexao": 20}
+
+
 def config_da_nuvem(pasta: Path, url: str, senha_leitura: str = ""):
     """Config montada só da memória (nada de senha em arquivo). As pastas ficam na máquina temporária do turno."""
-    from psycopg.conninfo import conninfo_to_dict
     from robo.config import carregar_config
-    c = conninfo_to_dict(url)
     pasta = Path(pasta)
     for sub in ("entrada", "logs", "agentes", "habilidades"):
         (pasta / sub).mkdir(parents=True, exist_ok=True)
-    host = c.get("host", "localhost")
-    local = host in ("localhost", "127.0.0.1") or host.startswith("/")  # Unix socket (Cloud SQL) não usa SSL
-    banco = {"habilitado": True, "host": host, "porta": int(c.get("port") or 5432),
-             "banco": c.get("dbname", "neondb"), "usuario": c.get("user", "postgres"), "senha": c.get("password", ""),
-             "sslmode": c.get("sslmode") or ("" if local else "require"),
-             "usuario_leitura": "robo_leitura", "senha_leitura": senha_leitura, "tempo_limite_conexao": 20}
+    banco = banco_de_url(url, senha_leitura)
     return carregar_config(pasta / "config_nuvem_inexistente.yaml", sobrescrever={
         "pastas": {k: str(pasta / k) for k in ("entrada", "logs", "agentes", "habilidades")},
         "banco": banco, "rotinas": {"agendador": "robo"}, "backup": {"copia_extra": "", "postgres": False},
@@ -175,6 +179,41 @@ def ler_arquivo() -> dict | None:
     return {"gerado_em": datetime.fromisoformat(m["gerado_em"]), "sha256": m["sha256"], "dados": dados}
 
 
+# --------------------------------------------------------------------- dois bancos: trabalho (local) × memória (Neon)
+# O Neon grátis cobra HORAS DE COMPUTAÇÃO: cada conexão o acorda e ele só dorme depois de 5 min parado. Com trabalho a
+# cada 5 min (exercícios de SQL, lotes da fábrica no banco, saúde do PostgreSQL) ele nunca dormia e a cota estourou
+# (27/10). Com ROBO_PG_TRABALHO_URL (um PostgreSQL descartável da própria máquina do GitHub, grátis), todo o trabalho
+# do turno usa esse banco local, e o Neon só é tocado para guardar e trazer a MEMÓRIA (início, salvamentos e fim).
+_NEON: dict = {"banco": None}
+
+
+def separar_bancos(cfg, url_trabalho: str | None) -> bool:
+    """cfg.banco passa a ser o banco de trabalho; o do Neon fica guardado para a memória. Devolve se separou."""
+    _NEON["banco"] = None
+    if not url_trabalho:
+        return False
+    _NEON["banco"] = dict(cfg.banco)
+    cfg.dados["banco"] = banco_de_url(url_trabalho, (cfg.banco or {}).get("senha_leitura", ""))
+    return True
+
+
+class _Neon:
+    """Dentro do bloco, cfg.banco é o do Neon (só para memória). Sem separação, não troca nada."""
+
+    def __init__(self, cfg):
+        self.cfg = cfg
+
+    def __enter__(self):
+        if _NEON["banco"] is not None:
+            self.trabalho, self.cfg.dados["banco"] = self.cfg.banco, _NEON["banco"]
+        return self.cfg
+
+    def __exit__(self, *a):
+        if _NEON["banco"] is not None:
+            _NEON["banco"], self.cfg.dados["banco"] = self.cfg.banco, self.trabalho
+        return False
+
+
 def _erros_de_banco() -> tuple:
     from robo.banco import ErroBancoIndisponivel
     try:
@@ -185,14 +224,16 @@ def _erros_de_banco() -> tuple:
 
 
 def banco_ligado(cfg) -> bool:
-    return bool((cfg.banco or {}).get("habilitado"))
+    """O banco da MEMÓRIA (o Neon) está disponível neste turno?"""
+    b = _NEON["banco"] if _NEON["banco"] is not None else cfg.banco
+    return bool((b or {}).get("habilitado"))
 
 
 def desligar_banco(cfg, motivo: str) -> None:
     """O resto do turno segue só com o SQLite e o arquivo: rotinas que precisam do banco ficam bloqueadas com motivo."""
     if banco_ligado(cfg):
-        log.warning("Turno SEM banco a partir de agora: %s", motivo[:300])
-    cfg.banco["habilitado"] = False
+        log.warning("Turno SEM o banco da memória a partir de agora: %s", motivo[:300])
+    (_NEON["banco"] if _NEON["banco"] is not None else cfg.banco)["habilitado"] = False
     _sem_banco["motivo"] = motivo[:300]
 
 
@@ -206,7 +247,7 @@ def restaurar(cfg) -> dict:
     candidatos = []
     if banco_ligado(cfg):
         try:
-            with _conectar(cfg) as conn:
+            with _Neon(cfg), _conectar(cfg) as conn:
                 conn.execute(ESQUEMA_PG)
                 r = conn.execute("SELECT id, sha256, conteudo, data_hora FROM robo.instantaneos_sqlite "
                                  "ORDER BY id DESC LIMIT 1").fetchone()
@@ -261,7 +302,7 @@ def salvar_instantaneo(cfg) -> dict:
     if not banco_ligado(cfg):
         return {**saida, "banco": False}
     try:
-        with _conectar(cfg) as conn:
+        with _Neon(cfg), _conectar(cfg) as conn:
             conn.execute(ESQUEMA_PG)
             conn.execute("INSERT INTO robo.instantaneos_sqlite (sha256, tamanho, linhas, tabelas, conteudo) "
                          "VALUES (%s,%s,%s,%s,%s)", (b["sha256"], len(dados), b["linhas"], b["tabelas"], dados))
@@ -334,11 +375,12 @@ def salvar(cfg, completo: bool = False) -> dict:
             log.exception("Turno na nuvem: levantamento de cobertura falhou")
     inst = parte("instantaneo", lambda: salvar_instantaneo(cfg))
     if banco_ligado(cfg):
-        parte("memoria_pg", lambda: rotinas.executar(cfg, "memoria_pg", lambda: memoria.sincronizar_postgres(cfg)))
-        try:
-            parte("leitura", lambda: garantir_leitura(cfg))  # tabelas novas também ficam legíveis no celular
-        except _erros_de_banco() as e:
-            desligar_banco(cfg, f"{type(e).__name__}: {e}")
+        with _Neon(cfg):
+            parte("memoria_pg", lambda: rotinas.executar(cfg, "memoria_pg", lambda: memoria.sincronizar_postgres(cfg)))
+            try:
+                parte("leitura", lambda: garantir_leitura(cfg))  # tabelas novas também ficam legíveis no celular
+            except _erros_de_banco() as e:
+                desligar_banco(cfg, f"{type(e).__name__}: {e}")
     log.info("Salvamento: %s", ", ".join(f"{k} {v:.1f}s" for k, v in tempos.items()))
     return {**inst, "tempos": tempos}
 
@@ -402,17 +444,27 @@ def turno(cfg, minutos: float = 20, salvar_a_cada_min: float = 10, pausa_s: floa
     inicio = time.monotonic()
     fim = inicio + minutos * 60
     crono = tempo_turno.Cronometro()  # cada segundo do turno vai para uma natureza (robo/tempo_turno.py)
+    if separar_bancos(cfg, os.environ.get("ROBO_PG_TRABALHO_URL")):
+        # o Neon só para a memória: salvar de 30 em 30 min (o arquivo do GitHub cobre o resto) o deixa dormir
+        salvar_a_cada_min = max(salvar_a_cada_min, 30)
     with crono.medir("inicio"):
         origem = restaurar(cfg)
         log.info("Turno na nuvem: memória restaurada de %s", origem["origem"])
         if banco_ligado(cfg):
-            freio_de_espaco(cfg)
+            with _Neon(cfg):
+                freio_de_espaco(cfg)
         sessao = rotinas.abrir_sessao(cfg)["sessao"]
         if banco_ligado(cfg):
             try:
-                garantir_leitura(cfg)
+                with _Neon(cfg):
+                    garantir_leitura(cfg)
             except _erros_de_banco() as e:
                 desligar_banco(cfg, f"{type(e).__name__}: {e}")
+        if _NEON["banco"] is not None:  # o banco de trabalho também precisa do leitor (exercícios de SQL)
+            try:
+                garantir_leitura(cfg)
+            except _erros_de_banco() as e:
+                log.warning("Banco de trabalho local indisponível: %s", e)
     from robo import pos_processamento
     monitor = Monitor(cfg, ao_processar=lambda r: pos_processamento.registrar(cfg, r))
     planilhas = 0
@@ -493,7 +545,8 @@ def turno(cfg, minutos: float = 20, salvar_a_cada_min: float = 10, pausa_s: floa
     mb = None
     if banco_ligado(cfg):
         try:
-            mb = tamanho_mb(cfg)
+            with _Neon(cfg):
+                mb = tamanho_mb(cfg)
         except _erros_de_banco() as e:
             desligar_banco(cfg, f"{type(e).__name__}: {e}")
     limite = float(os.environ.get("ROBO_LIMITE_MB") or LIMITE_MB_PADRAO)

@@ -105,6 +105,7 @@ def montar(cfg, agora: datetime | None = None, turno: dict | None = None) -> dic
         try:  # projetos entre andares (robo/projetos.py): quem fez cada etapa e como terminou
             from robo import projetos
             saida["projetos"] = projetos.resumo(cfg, 3)
+            saida["entregas"] = projetos.entregas(cfg, 1)
         except Exception as e:
             saida["projetos"] = {"erro": type(e).__name__}
         try:  # tempo MEDIDO dos últimos turnos, por natureza (robo/tempo_turno.py)
@@ -287,6 +288,12 @@ def markdown(d: dict) -> str:
         for x in pj:
             l.append(f"- {x['titulo']}: **{ESTADOS.get(x['estado'], x['estado'])}** — "
                      + "; ".join(f"{e['ordem']}. {e['funcionario']} ({e['estado']})" for e in x["etapas"]))
+    en = d.get("entregas")
+    if isinstance(en, list) and en:
+        e = en[0]
+        l += ["", f"## Última entrega da empresa ({e['base']}, {_hora(e['data_hora'])})", "",
+              "Pacote gerado pelo produto (`python -m robo entregar`) a partir de um projeto aprovado:", ""]
+        l += [f"{i}. {x}" for i, x in enumerate(e["recomendacoes"][:4], 1)]
     m = d.get("modelos") or {}
     if m and "erro" not in m:
         l += ["", "## Inteligência própria (modelo de risco das demandas)", ""]

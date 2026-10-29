@@ -138,3 +138,31 @@ def teste_banco_fora_e_sem_arquivo_nao_comeca_de_memoria_antiga(pastas, tmp_path
     with pytest.raises(RuntimeError, match="não começa de uma memória antiga"):
         nuvem.restaurar(cfg)
     assert not (cfg.logs / "trabalho.db").exists()
+
+
+def teste_trabalho_no_banco_local_e_neon_so_para_a_memoria(pastas, tmp_path, monkeypatch):
+    """Com ROBO_PG_TRABALHO_URL, o turno trabalha no banco local; o Neon (aqui fora do ar) só guardaria a memória."""
+    import os
+    url_local = os.environ.get("ROBO_TESTE_PG")
+    if not url_local:
+        pytest.skip("precisa de um PostgreSQL de teste (ROBO_TESTE_PG)")
+    ent, sai = pastas
+    dados, sha = _db_gz(tmp_path, "anterior")
+    nuvem.guardar_arquivo(dados, sha, 1)
+    sai.rename(ent)
+    from psycopg.conninfo import make_conninfo
+    monkeypatch.setenv("ROBO_PG_TRABALHO_URL", make_conninfo(url_local))
+    monkeypatch.setattr(nuvem, "_esteira", lambda m: 0)
+    monkeypatch.setattr(nuvem, "garantir_base", lambda cfg, m: 0)
+    vistos = []
+
+    def funcao(cfg, nome):
+        return lambda: vistos.append((nome, cfg.banco["porta"], cfg.banco["habilitado"])) and None
+    monkeypatch.setattr(rotinas, "funcao", funcao)
+    parar = threading.Event()
+    monkeypatch.setattr(rotinas, "batimento", lambda *a, **k: parar.set())
+    cfg = nuvem.config_da_nuvem(tmp_path / "turno", URL_FORA)
+    r = nuvem.turno(cfg, minutos=5, pausa_s=0, parar=parar)
+    assert r["origem"] == "arquivo do GitHub" and r["banco"] is False  # memória: Neon fora, veio do arquivo
+    assert vistos and all(porta != 1 and ligado for _, porta, ligado in vistos)  # trabalho: banco local, ligado
+    assert nuvem._NEON["banco"]["porta"] == 1 and nuvem._NEON["banco"]["habilitado"] is False

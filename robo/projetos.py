@@ -163,11 +163,57 @@ def ciclo(cfg, agora: datetime | None = None, intervalo_horas: float = INTERVALO
         if not sid:
             motivos.append(motivo)
             continue
-        feitos_agora.append({"projeto": sid, "tipo": tipo,
-                             "estado": demandas._executar_com_job(cfg, sid, DONO_DO_PROJETO, f"projeto_{tipo}")})
+        estado = demandas._executar_com_job(cfg, sid, DONO_DO_PROJETO, f"projeto_{tipo}")
+        feito = {"projeto": sid, "tipo": tipo, "estado": estado}
+        if estado == "concluida":  # aprovado na revisão: vira o pacote de entrega do produto (robo/entrega.py)
+            feito["entrega"] = registrar_entrega(cfg, sid)
+        feitos_agora.append(feito)
     # compatível com quem lê um projeto só (o primeiro) e com o detalhe do ciclo
     primeiro = feitos_agora[0] if feitos_agora else {"projeto": None}
     return {**primeiro, "projetos": feitos_agora, "motivo": "; ".join(motivos)}
+
+
+ESQUEMA_ENTREGAS = """CREATE TABLE IF NOT EXISTS entregas (
+  id INTEGER PRIMARY KEY AUTOINCREMENT, data_hora TEXT NOT NULL, projeto TEXT, base TEXT, pasta TEXT,
+  ok INTEGER, recomendacoes TEXT, arquivos TEXT);
+CREATE TRIGGER IF NOT EXISTS entregas_nao_muda BEFORE UPDATE ON entregas
+BEGIN SELECT RAISE(ABORT, 'registro permanente: entrega não pode ser alterada'); END;"""
+
+
+def registrar_entrega(cfg, sid: str) -> dict | None:
+    """O projeto aprovado gera o mesmo pacote que o dono gera com `python -m robo entregar` (base tratada,
+    indicadores.xlsx e relatorio.html) a partir da base do projeto, e o registro fica no banco (permanente).
+    Nunca derruba o ciclo: falha vira motivo no retorno."""
+    from robo import entrega
+    from robo.trabalho import Trabalho, _agora, proteger
+    tb = Trabalho(cfg)
+    s = tb.solicitacao(sid) or {}
+    base = (s.get("plano") or {}).get("base")
+    if not base or not Path(base).exists():
+        return None
+    try:
+        r = entrega.entregar(cfg, base, Path(cfg.logs) / "entregas")
+    except Exception as e:
+        import logging
+        logging.getLogger("robo").exception("Entrega do projeto %s falhou", sid)
+        return {"ok": False, "motivo": f"{type(e).__name__}: {e}"}
+    with tb.tx() as c:
+        c.executescript(ESQUEMA_ENTREGAS)
+        proteger(c)
+        c.execute("INSERT INTO entregas (data_hora, projeto, base, pasta, ok, recomendacoes, arquivos) VALUES "
+                  "(?,?,?,?,?,?,?)", (_agora(), sid, Path(base).name, r["pasta"], int(r["ok"]),
+                                      json.dumps(r["recomendacoes"], ensure_ascii=False), json.dumps(r["arquivos"])))
+    return {"ok": r["ok"], "pasta": r["pasta"], "recomendacoes": r["recomendacoes"]}
+
+
+def entregas(cfg, limite: int = 5) -> list[dict]:
+    from robo.trabalho import Trabalho
+    try:
+        with Trabalho(cfg).tx() as c:
+            linhas = c.execute("SELECT * FROM entregas ORDER BY id DESC LIMIT ?", (limite,)).fetchall()
+    except Exception:
+        return []
+    return [{**dict(x), "recomendacoes": json.loads(x["recomendacoes"] or "[]")} for x in linhas]
 
 
 def resumo(cfg, limite: int = 10) -> list[dict]:

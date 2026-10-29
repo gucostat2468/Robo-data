@@ -146,6 +146,8 @@ CAUSAS: dict[str, tuple[str, str, str, str]] = {
                    "robo/modelos_ml.py"),
     "ml_modelos_eventos": (NAO_ACIONADA, "eventos (candidato, avaliação, promoção) começam com o 1º modelo",
                            "treino + avaliação independente", "robo/modelos_ml.py"),
+    "entregas": (NAO_ACIONADA, "nasce quando um projeto entre andares é aprovado na revisão (pacote de entrega)",
+                 "projeto aprovado", "robo/projetos.py"),
     "tempo_turnos": (NAO_ACIONADA, "uma linha por turno da nuvem, gravada no fim do turno (no computador do dono não "
                      "há turno)", "fim de nuvem.turno", "robo/tempo_turno.py"),
     "ml_inferencias": (NAO_ACIONADA, "a sombra só pontua depois que um modelo é aprovado por outra pessoa e promovido, e "

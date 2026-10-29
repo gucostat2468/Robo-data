@@ -26,6 +26,16 @@ jobs:
   turno:
     runs-on: ubuntu-latest
     timeout-minutes: 60
+    # Banco de TRABALHO descartável (grátis, só existe dentro desta máquina): exercícios de SQL, lotes da fábrica e
+    # saúde do PostgreSQL usam ele. O Neon fica só para a memória e pode dormir (a cota de horas estourou em 27/10).
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_HOST_AUTH_METHOD: trust
+        ports: ["5432:5432"]
+        options: >-
+          --health-cmd "pg_isready -U postgres" --health-interval 5s --health-timeout 5s --health-retries 20
     steps:
       - uses: actions/checkout@v5
       - uses: actions/setup-python@v6
@@ -56,6 +66,7 @@ jobs:
           ROBO_PG_SENHA_LEITURA: ${{ secrets.ROBO_PG_SENHA_LEITURA }}
           # memória em arquivo (criptografada): chave própria opcional; sem ela, derivada de ROBO_PG_URL
           ROBO_MEMORIA_CHAVE: ${{ secrets.ROBO_MEMORIA_CHAVE }}
+          ROBO_PG_TRABALHO_URL: "postgresql://postgres@127.0.0.1:5432/postgres"
           ROBO_MEMORIA_ENTRADA: ${{ runner.temp }}/memoria_entrada
           ROBO_MEMORIA_SAIDA: ${{ runner.temp }}/memoria_saida
           # grupo do Telegram (opcional): sem estes três segredos, o turno simplesmente não fala no grupo

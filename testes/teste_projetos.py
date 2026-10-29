@@ -8,6 +8,8 @@ O que precisa ser verdade:
   - no máximo um projeto por intervalo; sem base com NPS e atributos, não nasce (motivo registrado).
 """
 
+import pytest
+
 from robo import demandas, organizacao, orquestrador, projetos
 from robo.trabalho import Trabalho
 
@@ -97,3 +99,21 @@ def teste_ciclo_faz_dois_tipos_sem_repetir_pessoa(cfg_factory):
     ferrs = [e["ferramenta"] for e in t.solicitacao(seg["projeto"])["etapas"]]
     assert "segmentacao" in ferrs and "anomalias" in ferrs and ferrs[-1] == "resumo_executivo"
     assert projetos.ciclo(cfg, intervalo_horas=0, por_ciclo=2)["projetos"]  # sem espera: o próximo ciclo já faz mais
+
+
+def teste_projeto_aprovado_vira_pacote_de_entrega(cfg_factory):
+    """A empresa usa o produto: projeto aprovado gera base tratada, indicadores e relatório, e o registro fica."""
+    import sqlite3
+    cfg = _base(cfg_factory)
+    r = projetos.ciclo(cfg, intervalo_horas=0, por_ciclo=1)
+    p = r["projetos"][0]
+    if p["estado"] != "concluida":
+        pytest.skip(f"projeto não aprovado neste sorteio: {p['estado']}")
+    e = p["entrega"]
+    assert e["ok"] and e["recomendacoes"]
+    from pathlib import Path
+    assert (Path(e["pasta"]) / "relatorio.html").exists()
+    assert projetos.entregas(cfg)[0]["projeto"] == p["projeto"]
+    with sqlite3.connect(cfg.logs / "trabalho.db") as c:
+        with pytest.raises(sqlite3.DatabaseError):
+            c.execute("DELETE FROM entregas")
