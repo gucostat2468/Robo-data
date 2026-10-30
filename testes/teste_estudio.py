@@ -98,3 +98,27 @@ def teste_formato_errado_explica(no_ar):
     with pytest.raises(urllib.error.HTTPError) as e:
         _post_arquivo(url, "foto.png", b"\x89PNG")
     assert e.value.code == 400 and "Formato" in json.loads(e.value.read())["erro"]
+
+
+def teste_tudo_fica_salvo_com_certificado_e_historico_do_sql(no_ar, tmp_path):
+    """Cada envio vira uma pasta permanente: original, base tratada, indicadores, relatório, manifesto (certificado
+    com SHA-256) e o histórico das consultas SQL."""
+    import hashlib
+    url, _ = no_ar
+    dados = _planilha(tmp_path)
+    j = _post_arquivo(url, "pesquisa.xlsx", dados)
+    pasta = Path(j["pasta"])
+    assert pasta.parent == tmp_path / "estudio"
+    assert {"original_pesquisa.xlsx", "base_tratada.xlsx", "indicadores.xlsx", "relatorio.html",
+            "manifesto.json"} <= {p.name for p in pasta.iterdir()}
+    man = json.loads((pasta / "manifesto.json").read_text(encoding="utf-8"))
+    assert man["todas_ok"] and man["original"]["sha256"] == hashlib.sha256(dados).hexdigest()
+    assert any("NPS" in c["conferencia"] and c["ok"] for c in man["conferencias"])
+    assert man["arquivos"]["relatorio.html"]["sha256"] == hashlib.sha256((pasta / "relatorio.html").read_bytes()).hexdigest()
+    _sql(url, j["id"], "SELECT COUNT(*) FROM dados")
+    _sql(url, j["id"], "DELETE FROM dados")
+    hist = (pasta / "consultas_sql.sql").read_text(encoding="utf-8")
+    assert "SELECT COUNT(*) FROM dados" in hist and "1 linha(s)" in hist and "ERRO" in hist
+    with urllib.request.urlopen(url + "/api/estado", timeout=10) as r:
+        est = json.loads(r.read())
+    assert est["entregas"][0]["id"] == j["id"] and est["entregas"][0]["conferido"] is True

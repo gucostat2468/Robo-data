@@ -270,6 +270,97 @@ def recomendacoes(a, prio: list[dict], logi: dict | None, rel, visao: dict | Non
     return rec
 
 
+# =============================================================================== confiabilidade
+def pasta_entregas(cfg=None) -> Path:
+    """Onde cada entrega fica guardada no computador: ROBO_PASTA_ENTREGAS, ou estudio.pasta no config.yaml, ou
+    Documentos/Robo de Planilhas/Entregas (a pasta Documentos do Windows se chama 'Documents' por dentro)."""
+    import os
+    escolhida = os.environ.get("ROBO_PASTA_ENTREGAS") or ((getattr(cfg, "dados", {}) or {}).get("estudio") or {}).get("pasta")
+    return Path(escolhida) if escolhida else Path.home() / "Documents" / "Robo de Planilhas" / "Entregas"
+
+
+def _sha(caminho: Path) -> str:
+    import hashlib
+    h = hashlib.sha256()
+    with open(caminho, "rb") as f:
+        for bloco in iter(lambda: f.read(1 << 20), b""):
+            h.update(bloco)
+    return h.hexdigest()
+
+
+def certificar(t, rel, a, pasta: Path) -> list[dict]:
+    """Conferências automáticas, cada uma feita por um caminho INDEPENDENTE do cálculo do relatório:
+      1. linhas: entrada − removidas registradas = saída (nenhuma linha some sem explicação);
+      2. somas das colunas numéricas: pandas × SQL (SQLite) — dois motores, o mesmo número;
+      3. indicador de pesquisa: o NPS/CSAT do relatório refeito em SQL direto na base tratada;
+      4. arquivos: a base tratada gravada é relida e tem as mesmas linhas.
+    Devolve [{conferencia, ok, detalhe}]."""
+    import sqlite3
+    itens = []
+    if not t.analisaveis:
+        return [{"conferencia": "Leitura da planilha", "ok": False, "detalhe": "a planilha não pôde ser lida"}]
+    nome, df = max(t.analisaveis.items(), key=lambda kv: len(kv[1]))
+    removidas = sum(int(o.quantidade or 0) for o in rel.ocorrencias if "removid" in o.mensagem.lower() and o.quantidade)
+    entrada, saida = int(t.linhas_entrada or 0), sum(len(x) for x in t.analisaveis.values())
+    itens.append({"conferencia": "Linhas: entrada − removidas = saída", "ok": entrada - removidas == saida,
+                  "detalhe": f"{entrada} − {removidas} = {entrada - removidas} · saída {saida}"})
+    conn = sqlite3.connect(":memory:")
+    try:
+        base = df.copy()
+        base.columns = [f"c{i}" for i in range(len(base.columns))]
+        for col in base.columns:  # datas/objetos viram texto (o SQLite não tem esses tipos)
+            if not pd.api.types.is_numeric_dtype(base[col]):
+                base[col] = base[col].astype(str)
+        base.to_sql("t", conn, index=False)
+        nomes = dict(zip(base.columns, df.columns))
+        numericas = [c for c in base.columns if pd.api.types.is_numeric_dtype(base[c]) and not str(nomes[c]).startswith("_")]
+        divergentes, conferidas = [], 0
+        for c in numericas[:10]:
+            s_pd = float(pd.to_numeric(df[nomes[c]], errors="coerce").sum())
+            s_sql = conn.execute(f"SELECT TOTAL({c}) FROM t").fetchone()[0] or 0.0
+            conferidas += 1
+            if abs(s_pd - s_sql) > 1e-6 * max(1.0, abs(s_pd)):
+                divergentes.append(f"{nomes[c]}: {s_pd} × {s_sql}")
+        if conferidas:
+            itens.append({"conferencia": f"Somas de {conferidas} coluna(s) numérica(s): pandas × SQL",
+                          "ok": not divergentes, "detalhe": "; ".join(divergentes) or "todas iguais"})
+        if a is not None and not a.indicadores.empty:
+            inv = {v: k for k, v in nomes.items()}
+            for _, r in a.indicadores[(a.indicadores["segmento"] == "Total")].iterrows():
+                if r["indicador"] != "NPS" or r["coluna"] not in inv:
+                    continue
+                c = inv[r["coluna"]]
+                p, d, n = conn.execute(f"SELECT SUM({c} >= 9), SUM({c} <= 6), COUNT({c}) FROM t WHERE {c} BETWEEN 0 AND 10 "
+                                       f"AND {c} = CAST({c} AS INTEGER)").fetchone()
+                nps_sql = 100.0 * (p - d) / n if n else float("nan")
+                itens.append({"conferencia": "NPS do relatório refeito em SQL", "ok": abs(nps_sql - float(r["valor"])) < 0.051,
+                              "detalhe": f"relatório {_n(r['valor'])} · SQL {_n(nps_sql)} (n={n})"})
+    finally:
+        conn.close()
+    arq = pasta / "base_tratada.xlsx"
+    if arq.exists():
+        relida = sum(len(x) for x in pd.read_excel(arq, sheet_name=None).values())
+        gravada = sum(len(x) for x in t.tabelas.values())
+        itens.append({"conferencia": "Base tratada gravada e relida", "ok": relida == gravada,
+                      "detalhe": f"{gravada} linhas gravadas · {relida} relidas"})
+    return itens
+
+
+def gravar_manifesto(pasta: Path, original: Path | None, conferencias: list[dict], extra: dict) -> Path:
+    """manifesto.json: o que entrou, o que saiu (com SHA-256 para provar que nada mudou depois), as conferências e
+    quando. Fica junto da entrega, para sempre."""
+    import json
+    arquivos = {p.name: {"sha256": _sha(p), "bytes": p.stat().st_size} for p in sorted(pasta.iterdir())
+                if p.is_file() and p.name != "manifesto.json"}
+    dados = {"gerado_em": datetime.now().isoformat(timespec="seconds"),
+             "original": {"nome": original.name, "sha256": _sha(original)} if original and original.exists() else None,
+             "arquivos": arquivos, "conferencias": conferencias,
+             "todas_ok": all(c["ok"] for c in conferencias) if conferencias else False, **extra}
+    destino = pasta / "manifesto.json"
+    destino.write_text(json.dumps(dados, ensure_ascii=False, indent=2, default=str), encoding="utf-8")
+    return destino
+
+
 # =============================================================================== HTML
 COR = {"primaria": "#1F4E79", "texto": "#1A1A1A", "suave": "#5F6B7A", "linha": "#E3E7ED", "bom": "#2E7D32",
        "ruim": "#C62828", "neutro": "#8A97A8", "fundo": "#F6F8FB"}
@@ -358,6 +449,17 @@ def montar_html(info: dict) -> str:
     cards.append(_card("Registros analisados", f"{info['linhas']:,}".replace(",", "."),
                        f"{len(rel.erros)} erro(s) · {len(rel.avisos)} aviso(s) na limpeza"))
 
+    conf = info.get("conferencias") or []
+    if conf:
+        ok = sum(1 for c in conf if c["ok"])
+        secoes.append(f"<h2>Certificado de conferência: {ok} de {len(conf)} "
+                      f"{'✅ todas batem' if ok == len(conf) else '⚠️ veja abaixo'}</h2><table><tr><th>Conferência</th>"
+                      "<th>Resultado</th><th>Detalhe</th></tr>" +
+                      "".join(f"<tr><td>{_e(c['conferencia'])}</td><td class='{'pos' if c['ok'] else 'neg'}'>"
+                              f"{'OK' if c['ok'] else 'NÃO BATE'}</td><td>{_e(c['detalhe'])}</td></tr>" for c in conf) +
+                      "</table><p class='nota'>Cada conferência refaz a conta por outro caminho (SQL × pandas, releitura "
+                      "do arquivo). A impressão digital (SHA-256) do original e de cada arquivo está em manifesto.json."
+                      "</p>")
     secoes.append("<h2>Recomendações</h2><ol>" + "".join(f"<li>{_md(x)}</li>" for x in info["recomendacoes"]) +
                   "</ol><p class='nota'>Geradas por regra a partir dos números desta base. Valide com o contexto do "
                   "negócio antes de decidir.</p>")
@@ -498,6 +600,9 @@ def entregar(cfg, arquivo, destino=None, segmentos: list[str] | None = None) -> 
     base = caminho.stem
     pasta = Path(destino or caminho.parent) / f"Entrega_{base}_{datetime.now():%Y%m%d_%H%M%S}"
     pasta.mkdir(parents=True, exist_ok=True)
+    if caminho.exists():  # cópia do original junto da entrega (o arquivo de origem nunca é alterado)
+        import shutil
+        shutil.copy2(caminho, pasta / f"original_{caminho.name}")
     arquivos = []
     a = drv = logi = None
     visao: dict = {}
@@ -542,10 +647,19 @@ def entregar(cfg, arquivo, destino=None, segmentos: list[str] | None = None) -> 
         _gravar_xlsx(planilhas, pasta / "indicadores.xlsx")
         arquivos.append("indicadores.xlsx")
     rec = recomendacoes(a, prio, logi, rel, visao)
+    try:
+        conferencias = certificar(t, rel, a, pasta)
+    except Exception as e:  # conferir nunca impede a entrega, mas a falha aparece no certificado
+        log.exception("Entrega: certificado falhou")
+        conferencias = [{"conferencia": "Certificado", "ok": False, "detalhe": f"{type(e).__name__}: {e}"}]
     info = {"analise": a, "relatorio": rel, "logistica": logi, "prioridades": prio, "visao": visao,
+            "conferencias": conferencias,
             "drivers": drv if drv and drv.get("ok") else None, "recomendacoes": rec, "base": base,
             "arquivo": caminho.name, "linhas": linhas, "gerado_em": datetime.now()}
     (pasta / "relatorio.html").write_text(montar_html(info), encoding="utf-8")
     arquivos.append("relatorio.html")
+    gravar_manifesto(pasta, caminho, conferencias, {"linhas": linhas, "recomendacoes": rec,
+                                                     "erros": [o.mensagem for o in rel.erros]})
+    arquivos.append("manifesto.json")
     return {"ok": bool(t.analisaveis), "pasta": str(pasta), "arquivos": arquivos, "recomendacoes": rec,
-            "erros": [o.mensagem for o in rel.erros], "linhas": linhas}
+            "erros": [o.mensagem for o in rel.erros], "linhas": linhas, "conferencias": conferencias}

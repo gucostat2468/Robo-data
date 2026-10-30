@@ -46,6 +46,30 @@ Sem pastas, sem comandos longos, sem o painel 3D.
    Com o PostgreSQL do robô configurado, a lista **Consultar** também oferece o banco (sempre só leitura).
 6. Para fechar: feche a janela preta (ou **Ctrl+C** nela).
 
+**Onde fica tudo:** cada envio vira uma pasta em `Documentos\Robo de Planilhas\Entregas\Entrega_<arquivo>_<data>`
+(o link **abrir a pasta** abre no Explorador). Dentro dela:
+
+| Arquivo | O que é |
+|---|---|
+| `original_<arquivo>` | cópia exata do que você enviou (o seu arquivo nunca é alterado) |
+| `base_tratada.xlsx` | a base limpa e padronizada |
+| `indicadores.xlsx` | todos os números conferíveis |
+| `relatorio.html` | o relatório completo |
+| `manifesto.json` | o **certificado**: as conferências e a impressão digital (SHA-256) de cada arquivo |
+| `consultas_sql.sql` | cada consulta SQL que você rodou, com data, hora e resultado |
+
+As entregas aparecem em **Entregas salvas** na própria tela: clique para abrir de novo (relatório e SQL).
+Para mudar a pasta: variável de ambiente `ROBO_PASTA_ENTREGAS` ou `estudio: {pasta: ...}` no `config.yaml`.
+
+**Certificado de conferência** (no topo do relatório e no `manifesto.json`), cada conta refeita por outro caminho:
+1. linhas: entrada − removidas (totais, duplicatas, rodapé) = saída;
+2. soma de cada coluna numérica: pandas × SQL;
+3. NPS do relatório refeito em SQL direto na base tratada;
+4. base tratada gravada e relida com o mesmo número de linhas.
+
+**Atalho na Área de Trabalho:** rode uma vez `python -m robo estudio --atalho`. Depois é só dar dois cliques em
+**Robô de Planilhas - Estúdio**.
+
 **Validação:** a contagem de linhas no topo ("Pronto: N linhas") deve bater com a planilha original menos as linhas de
 total/duplicadas que a seção "Limpeza e padronização feitas" do relatório lista.
 

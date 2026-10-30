@@ -306,6 +306,7 @@ def principal(argv: list[str] | None = None) -> int:
                                          "Só neste computador")
     sest.add_argument("--porta", type=int, default=8765)
     sest.add_argument("--sem-navegador", action="store_true", help="não abre o navegador sozinho")
+    sest.add_argument("--atalho", action="store_true", help="cria o atalho do Estúdio na Área de Trabalho (Windows)")
     sen = sub.add_parser("entregar", help="PRODUTO: transforma uma planilha (pesquisa NPS/CSAT/CES ou entregas) num pacote "
                                           "para o gestor: base tratada, indicadores.xlsx e relatorio.html com "
                                           "recomendações. Roda só no seu computador; a base não sai dele")
@@ -643,6 +644,14 @@ def principal(argv: list[str] | None = None) -> int:
         r = processar_arquivo(args.arquivo, cfg, gravar=False)
         _imprimir_resultado(r)
         return 1 if r.relatorio.tem_erros else 0
+    if args.comando == "estudio" and args.atalho:
+        from robo.painel import sistema
+        try:
+            print("Atalho 'Robô de Planilhas - Estúdio' criado: " + " e ".join(sistema.criar_atalho_estudio()))
+            return 0
+        except Exception as e:
+            print(f"Não foi possível: {e}")
+            return 1
     if args.comando == "estudio":
         from robo import estudio
         estudio.abrir(cfg, args.porta, navegador=not args.sem_navegador)

@@ -40,13 +40,39 @@ LIMITE_LINHAS = 500
 
 
 class Estudio:
-    """O estado do estúdio: as entregas feitas nesta sessão e o banco SQLite de cada uma."""
+    """O estado do estúdio. Cada entrega fica numa pasta própria, para sempre, em entrega.pasta_entregas()
+    (Documentos/Robo de Planilhas/Entregas): original, base tratada, indicadores, relatório, certificado de conferência
+    (manifesto.json) e o histórico das consultas SQL feitas sobre ela."""
 
     def __init__(self, cfg, pasta: Path | None = None):
+        from robo import entrega
         self.cfg = cfg
-        self.pasta = Path(pasta or tempfile.mkdtemp(prefix="robo_estudio_"))
-        self.entregas: dict[str, dict] = {}
+        self.pasta = Path(pasta) if pasta else entrega.pasta_entregas(cfg)
+        self.pasta.mkdir(parents=True, exist_ok=True)
+        self._sqlite: dict[str, sqlite3.Connection] = {}
         self._trava = threading.Lock()
+
+    # ------------------------------------------------------------------ entregas guardadas
+    def _pasta_da(self, eid: str) -> Path | None:
+        """Só pastas de entrega que estão DENTRO da pasta de entregas (nada de ../)."""
+        if not re.fullmatch(r"Entrega_[\w.\-]+", eid or ""):
+            return None
+        p = self.pasta / eid
+        return p if p.is_dir() and p.parent.resolve() == self.pasta.resolve() else None
+
+    def historico(self, limite: int = 30) -> list[dict]:
+        saida = []
+        for p in sorted((x for x in self.pasta.glob("Entrega_*") if x.is_dir()), key=lambda x: x.stat().st_mtime,
+                        reverse=True)[:limite]:
+            man = {}
+            try:
+                man = json.loads((p / "manifesto.json").read_text(encoding="utf-8"))
+            except (OSError, ValueError):
+                pass
+            saida.append({"id": p.name, "arquivo": (man.get("original") or {}).get("nome") or p.name,
+                          "quando": time.strftime("%d/%m %H:%M", time.localtime(p.stat().st_mtime)),
+                          "conferido": man.get("todas_ok"), "linhas": man.get("linhas")})
+        return saida
 
     # ------------------------------------------------------------------ tratar
     def tratar(self, nome: str, dados: bytes, segmentos: list[str] | None = None) -> dict:
@@ -54,65 +80,96 @@ class Estudio:
         nome = Path(nome or "planilha.xlsx").name
         if Path(nome).suffix.lower() not in EXTENSOES:
             raise ValueError(f"Formato não suportado: envie {', '.join(sorted(EXTENSOES))}")
-        eid = uuid.uuid4().hex[:10]
-        entrada = self.pasta / eid / nome
-        entrada.parent.mkdir(parents=True)
-        entrada.write_bytes(dados)
-        r = entrega.entregar(self.cfg, entrada, entrada.parent, segmentos)
-        pasta = Path(r["pasta"])
-        tabelas = {}
-        if (pasta / "base_tratada.xlsx").exists():
-            for aba, df in pd.read_excel(pasta / "base_tratada.xlsx", sheet_name=None).items():
-                tabelas[_nome_tabela(aba)] = df
-        with self._trava:
-            self.entregas[eid] = {"id": eid, "arquivo": nome, "pasta": pasta, "tabelas": tabelas, "sqlite": None,
-                                  "quando": time.strftime("%d/%m %H:%M")}
+        with tempfile.TemporaryDirectory(prefix="robo_estudio_") as tmp:
+            entrada = Path(tmp) / nome
+            entrada.write_bytes(dados)
+            r = entrega.entregar(self.cfg, entrada, self.pasta, segmentos)  # copia o original para a entrega
+        eid = Path(r["pasta"]).name
         return {"id": eid, "ok": r["ok"], "arquivo": nome, "recomendacoes": r["recomendacoes"], "erros": r["erros"],
-                "linhas": r["linhas"], "arquivos": r["arquivos"], "tabelas": self.esquema(eid)}
+                "linhas": r["linhas"], "arquivos": r["arquivos"], "tabelas": self.esquema(eid), "pasta": r["pasta"],
+                "conferencias": r.get("conferencias") or []}
+
+    def _tabelas(self, eid: str) -> dict[str, pd.DataFrame]:
+        p = self._pasta_da(eid)
+        if not p or not (p / "base_tratada.xlsx").exists():
+            return {}
+        return {_nome_tabela(aba): df for aba, df in pd.read_excel(p / "base_tratada.xlsx", sheet_name=None).items()}
 
     def esquema(self, eid: str) -> list[dict]:
-        e = self.entregas.get(eid) or {}
         return [{"tabela": t, "linhas": len(df), "colunas": [str(c) for c in df.columns]}
-                for t, df in (e.get("tabelas") or {}).items()]
+                for t, df in self._tabelas(eid).items()]
 
     # ------------------------------------------------------------------ SQL
-    def _sqlite(self, eid: str) -> sqlite3.Connection:
-        e = self.entregas.get(eid)
-        if not e:
-            raise ValueError("Envie uma planilha primeiro (aba Tratar planilha).")
-        if e["sqlite"] is None:
-            conn = sqlite3.connect(":memory:", check_same_thread=False)
-            for t, df in e["tabelas"].items():
-                df.to_sql(t, conn, index=False)
-            conn.execute("PRAGMA query_only = ON")  # depois de carregar: dali em diante, só leitura
-            e["sqlite"] = conn
-        return e["sqlite"]
+    def _conexao(self, eid: str) -> sqlite3.Connection:
+        with self._trava:
+            if eid not in self._sqlite:
+                tabelas = self._tabelas(eid)
+                if not tabelas:
+                    raise ValueError("Envie uma planilha primeiro (aba Tratar planilha) ou escolha uma entrega.")
+                conn = sqlite3.connect(":memory:", check_same_thread=False)
+                for t, df in tabelas.items():
+                    df.to_sql(t, conn, index=False)
+                conn.execute("PRAGMA query_only = ON")  # depois de carregar: dali em diante, só leitura
+                self._sqlite[eid] = conn
+            return self._sqlite[eid]
+
+    def _registrar_sql(self, eid: str | None, texto: str, resultado: str) -> None:
+        """Toda consulta fica registrada na pasta da entrega (consultas_sql.sql): o que foi perguntado e o que veio."""
+        p = self._pasta_da(eid or "")
+        if not p:
+            return
+        with open(p / "consultas_sql.sql", "a", encoding="utf-8") as f:
+            f.write(f"-- {time.strftime('%d/%m/%Y %H:%M:%S')} · {resultado}\n{texto.strip()}\n;\n\n")
 
     def sql(self, texto: str, eid: str | None = None, fonte: str = "planilha") -> dict:
         from robo import consultas
-        consultas.validar_leitura(texto)  # um comando só, SELECT/WITH, nada que altere (mesma regra do painel)
-        inicio = time.perf_counter()
-        if fonte == "postgres":
-            if not (self.cfg.banco or {}).get("habilitado"):
-                raise ValueError("O PostgreSQL não está configurado neste computador (python -m robo preparar-pc).")
-            from robo.banco import Banco
-            r = consultas.executar_texto(Banco(self.cfg.banco, self.cfg.base), texto, LIMITE_LINHAS)
-            return {**r, "linhas": [[_json(v) for v in l] for l in r["linhas"]]}
-        conn = self._sqlite(eid)
-        with self._trava:
-            cur = conn.execute(texto)
-            colunas = [d[0] for d in cur.description] if cur.description else []
-            linhas = cur.fetchmany(LIMITE_LINHAS + 1)
-        return {"colunas": colunas, "linhas": [[_json(v) for v in l] for l in linhas[:LIMITE_LINHAS]],
-                "truncado": len(linhas) > LIMITE_LINHAS, "duracao": round(time.perf_counter() - inicio, 3)}
+        try:
+            consultas.validar_leitura(texto)  # um comando só, SELECT/WITH, nada que altere (mesma regra do painel)
+            inicio = time.perf_counter()
+            if fonte == "postgres":
+                if not (self.cfg.banco or {}).get("habilitado"):
+                    raise ValueError("O PostgreSQL não está configurado neste computador (python -m robo preparar-pc).")
+                from robo.banco import Banco
+                r = consultas.executar_texto(Banco(self.cfg.banco, self.cfg.base), texto, LIMITE_LINHAS)
+                r = {**r, "linhas": [[_json(v) for v in l] for l in r["linhas"]]}
+            else:
+                conn = self._conexao(eid)
+                with self._trava:
+                    cur = conn.execute(texto)
+                    colunas = [d[0] for d in cur.description] if cur.description else []
+                    linhas = cur.fetchmany(LIMITE_LINHAS + 1)
+                r = {"colunas": colunas, "linhas": [[_json(v) for v in l] for l in linhas[:LIMITE_LINHAS]],
+                     "truncado": len(linhas) > LIMITE_LINHAS, "duracao": round(time.perf_counter() - inicio, 3)}
+        except (ValueError, sqlite3.Error) as e:
+            self._registrar_sql(eid, texto, f"ERRO: {e}")
+            raise
+        self._registrar_sql(eid, texto, f"{len(r['linhas'])} linha(s) · fonte {fonte}")
+        return r
 
     def arquivo(self, eid: str, nome: str) -> Path | None:
-        """Só os arquivos da própria entrega (nada de ../ para sair da pasta)."""
-        e = self.entregas.get(eid)
-        if not e or nome not in {"relatorio.html", "indicadores.xlsx", "base_tratada.xlsx"}:
+        """Só os arquivos da própria entrega, pelo nome exato."""
+        p = self._pasta_da(eid)
+        if not p or nome not in {"relatorio.html", "indicadores.xlsx", "base_tratada.xlsx", "manifesto.json",
+                                 "consultas_sql.sql"}:
             return None
-        p = e["pasta"] / nome
-        return p if p.exists() else None
+        f = p / nome
+        return f if f.exists() else None
+
+    def abrir_pasta(self, eid: str | None = None) -> str:
+        """Abre a pasta da entrega (ou a de entregas) no Explorador de Arquivos deste computador."""
+        import os
+        import subprocess
+        import sys
+        alvo = self._pasta_da(eid or "") or self.pasta
+        try:
+            if sys.platform.startswith("win"):
+                os.startfile(str(alvo))  # noqa: S606 (só abre a pasta, local)
+            else:
+                subprocess.Popen(["open" if sys.platform == "darwin" else "xdg-open", str(alvo)],
+                                 stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+        except OSError:
+            pass
+        return str(alvo)
 
 
 def _nome_tabela(aba: str) -> str:
@@ -149,21 +206,21 @@ def _handler(est: Estudio):
             caminho = urlparse(self.path).path
             if caminho in ("/", "/index.html"):
                 return self._resp(200, PAGINA.encode(), "text/html; charset=utf-8")
-            m = re.fullmatch(r"/entrega/([0-9a-f]{10})/([a-z_]+\.(?:html|xlsx))", caminho)
+            m = re.fullmatch(r"/entrega/([^/]+)/([a-z_]+\.(?:html|xlsx|json|sql))", caminho)
             if m:
                 p = est.arquivo(m.group(1), unquote(m.group(2)))
                 if not p:
                     return self._json(404, {"erro": "arquivo não encontrado"})
-                tipo = "text/html; charset=utf-8" if p.suffix == ".html" else \
-                    "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
-                extra = {} if p.suffix == ".html" else {"Content-Disposition": f'attachment; filename="{p.name}"'}
+                tipo = {".html": "text/html; charset=utf-8", ".json": "application/json; charset=utf-8",
+                        ".sql": "text/plain; charset=utf-8"}.get(p.suffix,
+                                                                "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
+                extra = {"Content-Disposition": f'attachment; filename="{p.name}"'} if p.suffix == ".xlsx" else {}
                 return self._resp(200, p.read_bytes(), tipo, extra)
             if caminho == "/api/estado":
                 return self._json(200, {"postgres": bool((est.cfg.banco or {}).get("habilitado")),
-                                        "entregas": [{"id": e["id"], "arquivo": e["arquivo"], "quando": e["quando"]}
-                                                     for e in est.entregas.values()]})
+                                        "pasta": str(est.pasta), "entregas": est.historico()})
             if caminho.startswith("/api/esquema/"):
-                return self._json(200, {"tabelas": est.esquema(caminho.rsplit("/", 1)[-1])})
+                return self._json(200, {"tabelas": est.esquema(unquote(caminho.rsplit("/", 1)[-1]))})
             return self._json(404, {"erro": "não encontrado"})
 
         def do_POST(self):
@@ -187,6 +244,9 @@ def _handler(est: Estudio):
                     if not arquivo or not arquivo[1]:
                         return self._json(400, {"erro": "nenhum arquivo enviado"})
                     return self._json(200, est.tratar(arquivo[0], arquivo[1], segmentos))
+                if caminho == "/api/abrir":
+                    p = json.loads(corpo or b"{}")
+                    return self._json(200, {"pasta": est.abrir_pasta(p.get("id"))})
                 if caminho == "/api/sql":
                     p = json.loads(corpo or b"{}")
                     return self._json(200, est.sql(p.get("sql", ""), p.get("id"), p.get("fonte", "planilha")))
@@ -240,11 +300,17 @@ button.acao:disabled{opacity:.5} .linha{display:flex;gap:12px;flex-wrap:wrap;ali
 table{border-collapse:collapse;width:100%;font-size:13px;background:#fff} th,td{border-bottom:1px solid var(--l);padding:6px 8px;text-align:left}
 th{background:var(--f);position:sticky;top:0} .resultado{max-height:60vh;overflow:auto;border:1px solid var(--l);border-radius:8px}
 .erro{color:var(--r)} .ok{color:var(--b)} .nota{color:var(--s);font-size:12px} code{background:var(--f);padding:1px 5px;border-radius:4px}
+button.link{background:none;border:0;color:var(--p);text-decoration:underline;cursor:pointer;font:inherit;padding:0}
+.hist{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:8px;margin-top:8px}
+.hist div{border:1px solid var(--l);border-radius:8px;padding:8px 10px;cursor:pointer;font-size:13px} .hist div:hover{background:var(--f)}
+.certok{background:#eaf5ea;color:var(--b);border-radius:8px;padding:8px 12px;margin-bottom:10px}
+.certno{background:#fdecea;color:var(--r);border-radius:8px;padding:8px 12px;margin-bottom:10px}
 .tab-list span{display:inline-block;margin:2px 6px 2px 0;padding:2px 8px;background:var(--f);border-radius:6px;font-size:12px;cursor:pointer}
 </style></head><body>
 <header><h1>Robô de Planilhas · Estúdio</h1>
 <nav><button class="ativo" data-aba="tratar">1. Tratar planilha</button><button data-aba="sql">2. SQL</button></nav>
-<span class="nota">Tudo roda neste computador. A planilha não sai dele.</span></header>
+<span class="nota">Tudo roda neste computador. Cada entrega fica salva em <b id="pastaraiz"></b>
+ <button class="link" id="abrirraiz">abrir</button></span></header>
 <main>
 <section id="tratar" class="aba ativa">
  <div class="caixa">
@@ -256,9 +322,11 @@ th{background:var(--f);position:sticky;top:0} .resultado{max-height:60vh;overflo
   </div>
   <p id="status" class="nota"></p>
  </div>
+ <div class="caixa"><b>Entregas salvas</b> <span class="nota">(clique para abrir de novo)</span><div id="historico" class="hist"></div></div>
  <div id="saida" hidden>
-  <div class="caixa"><b>Recomendações</b><ol id="recs"></ol>
-   <div class="downloads">Baixar: <a id="d1" target="_blank">relatório (HTML)</a><a id="d2">indicadores.xlsx</a><a id="d3">base tratada.xlsx</a></div>
+  <div class="caixa"><div id="cert"></div><b>Recomendações</b><ol id="recs"></ol>
+   <div class="downloads">Baixar: <a id="d1" target="_blank">relatório (HTML)</a><a id="d2">indicadores.xlsx</a><a id="d3">base tratada.xlsx</a><a id="d4" target="_blank">certificado (manifesto.json)</a></div>
+   <p class="nota">Salvo em <b id="pastaent"></b> <button class="link" id="abrirent">abrir a pasta</button> — original, base tratada, indicadores, relatório, certificado e o histórico do SQL.</p>
    <p class="nota">Quer cruzar ou filtrar do seu jeito? Vá na aba <b>2. SQL</b>: os dados tratados já estão lá como tabela.</p></div>
   <iframe id="relatorio" title="Relatório"></iframe>
  </div>
@@ -294,21 +362,32 @@ $('#enviar').onclick=async()=>{
  $('#enviar').disabled=true;$('#status').className='nota';$('#status').textContent='Lendo, limpando, padronizando e analisando… (alguns segundos)';
  try{const r=await fetch('/api/tratar',{method:'POST',body:fd});const j=await r.json();
   if(!r.ok)throw new Error(j.erro||'falhou');
-  atual=j.id;$('#status').className=j.ok?'ok':'erro';
+  $('#status').className=j.ok?'ok':'erro';
   $('#status').textContent=j.ok?`Pronto: ${j.linhas.toLocaleString('pt-BR')} linhas tratadas e analisadas.`:'A planilha teve problemas: veja o relatório.';
-  $('#recs').innerHTML=j.recomendacoes.map(x=>'<li>'+esc(x).replace(/\*\*(.+?)\*\*/g,'<b>$1</b>')+'</li>').join('');
-  $('#d1').href=`/entrega/${j.id}/relatorio.html`;$('#d2').href=`/entrega/${j.id}/indicadores.xlsx`;$('#d3').href=`/entrega/${j.id}/base_tratada.xlsx`;
-  $('#d3').style.display=j.arquivos.includes('base_tratada.xlsx')?'':'none';$('#d2').style.display=j.arquivos.includes('indicadores.xlsx')?'':'none';
-  $('#relatorio').src=`/entrega/${j.id}/relatorio.html`;$('#saida').hidden=false;
-  await carregarFontes();mostrarTabelas(j.tabelas);
-  if(j.tabelas.length)$('#consulta').value=`-- ${j.arquivo}: as 20 primeiras linhas\nSELECT * FROM ${j.tabelas[0].tabela} LIMIT 20`;
+  await mostrarEntrega(j.id,j.arquivo,j.recomendacoes,j.conferencias,j.pasta);
  }catch(e){$('#status').className='erro';$('#status').textContent='Erro: '+e.message}
  $('#enviar').disabled=false};
+async function mostrarEntrega(id,arquivo,recs,conf,pasta){
+ atual=id;const base=`/entrega/${encodeURIComponent(id)}/`;
+ if(!recs){try{const m=await (await fetch(base+'manifesto.json')).json();recs=m.recomendacoes||[];conf=m.conferencias||[];arquivo=(m.original||{}).nome||id}catch(e){recs=[];conf=[]}}
+ const ok=conf.filter(c=>c.ok).length;
+ $('#cert').className=conf.length&&ok===conf.length?'certok':'certno';
+ $('#cert').textContent=conf.length?`Certificado de conferência: ${ok} de ${conf.length} conferências batem${ok===conf.length?' ✓':' — veja no relatório'}`:'Sem certificado (entrega antiga ou planilha não lida)';
+ $('#recs').innerHTML=recs.map(x=>'<li>'+esc(x).replace(/\*\*(.+?)\*\*/g,'<b>$1</b>')+'</li>').join('');
+ $('#d1').href=base+'relatorio.html';$('#d2').href=base+'indicadores.xlsx';$('#d3').href=base+'base_tratada.xlsx';$('#d4').href=base+'manifesto.json';
+ $('#pastaent').textContent=pasta||id;$('#relatorio').src=base+'relatorio.html';$('#saida').hidden=false;
+ await carregarFontes();const r=await (await fetch('/api/esquema/'+encodeURIComponent(id))).json();mostrarTabelas(r.tabelas);
+ if(r.tabelas.length)$('#consulta').value=`-- ${arquivo}: as 20 primeiras linhas\nSELECT * FROM ${r.tabelas[0].tabela} LIMIT 20`;}
+$('#abrirent').onclick=()=>fetch('/api/abrir',{method:'POST',body:JSON.stringify({id:atual})});
+$('#abrirraiz').onclick=()=>fetch('/api/abrir',{method:'POST',body:'{}'});
 async function carregarFontes(){const r=await (await fetch('/api/estado')).json();const s=$('#fonte');s.innerHTML='';
- r.entregas.slice().reverse().forEach(e=>s.add(new Option(`Planilha tratada: ${e.arquivo} (${e.quando})`,'p:'+e.id)));
+ $('#pastaraiz').textContent=r.pasta;
+ $('#historico').innerHTML=r.entregas.map(e=>`<div data-id="${esc(e.id)}"><b>${esc(e.arquivo)}</b><br><span class="nota">${esc(e.quando)} · ${e.linhas??'?'} linhas · ${e.conferido?'conferido ✓':'sem certificado'}</span></div>`).join('')||'<span class="nota">Nenhuma ainda.</span>';
+ $('#historico').querySelectorAll('div[data-id]').forEach(d=>d.onclick=()=>mostrarEntrega(d.dataset.id));
+ r.entregas.forEach(e=>s.add(new Option(`Planilha tratada: ${e.arquivo} (${e.quando})`,'p:'+e.id)));
  if(r.postgres)s.add(new Option('PostgreSQL do robô (somente leitura)','pg'));
  if(atual)s.value='p:'+atual;}
-$('#fonte').onchange=async()=>{const v=$('#fonte').value;if(v.startsWith('p:')){atual=v.slice(2);const r=await (await fetch('/api/esquema/'+atual)).json();mostrarTabelas(r.tabelas)}
+$('#fonte').onchange=async()=>{const v=$('#fonte').value;if(v.startsWith('p:')){atual=v.slice(2);const r=await (await fetch('/api/esquema/'+encodeURIComponent(atual))).json();mostrarTabelas(r.tabelas)}
  else $('#tabelas').innerHTML='<span class="nota">PostgreSQL: use schema.tabela (ex.: tratado.minha_base). Só leitura.</span>'};
 function mostrarTabelas(t){$('#tabelas').innerHTML=t.map(x=>`<span title="${esc(x.colunas.join(', '))}">${esc(x.tabela)} (${x.linhas})</span>`).join('')||'<span class="nota">Nenhuma tabela.</span>';
  $('#tabelas').querySelectorAll('span').forEach((s,i)=>s.onclick=()=>{const ta=$('#consulta');ta.setRangeText(t[i].tabela,ta.selectionStart,ta.selectionEnd,'end');ta.focus()})}

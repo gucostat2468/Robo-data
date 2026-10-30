@@ -135,3 +135,30 @@ foreach ($d in $destinos) {{
 """
     _powershell(script, esperar=True)
     return ["Área de Trabalho", "Menu Iniciar"]
+
+
+def criar_atalho_estudio() -> list[str]:
+    """Atalho 'Robô de Planilhas — Estúdio' na Área de Trabalho e no Menu Iniciar: dois cliques abrem o Estúdio no
+    navegador (sem janela preta: usa o pythonw do mesmo Python)."""
+    if not EH_WINDOWS:
+        raise RuntimeError("Atalhos só podem ser criados no Windows.")
+    import sys
+    python = Path(sys.executable)
+    pythonw = python.with_name("pythonw.exe")
+    alvo = pythonw if pythonw.exists() else python
+    icone = RAIZ_PROJETO / "robo" / "painel" / "estaticos" / "robo.ico"
+    script = f"""
+$sh = New-Object -ComObject WScript.Shell
+$destinos = @([Environment]::GetFolderPath('Desktop'), [Environment]::GetFolderPath('Programs'))
+foreach ($d in $destinos) {{
+  $l = $sh.CreateShortcut((Join-Path $d {_ps_texto('Robô de Planilhas - Estúdio.lnk')}))
+  $l.TargetPath = {_ps_texto(alvo)}
+  $l.Arguments = '-m robo estudio'
+  $l.WorkingDirectory = {_ps_texto(RAIZ_PROJETO)}
+  $l.IconLocation = {_ps_texto(icone)}
+  $l.Description = 'Tratar planilhas e consultar em SQL (Robô de Planilhas)'
+  $l.Save()
+}}
+"""
+    _powershell(script, esperar=True)
+    return ["Área de Trabalho", "Menu Iniciar"]

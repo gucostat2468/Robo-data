@@ -33,7 +33,9 @@ def teste_pesquisa_nps_vira_entrega_completa(cfg_factory, tmp_path):
     arq = _lote(cfg, "nps")
     antes = hashlib.sha256(arq.read_bytes()).hexdigest()
     r = entrega.entregar(cfg, arq, tmp_path / "saida")
-    assert r["ok"] and set(r["arquivos"]) == {"base_tratada.xlsx", "indicadores.xlsx", "relatorio.html"}
+    assert r["ok"] and set(r["arquivos"]) == {"base_tratada.xlsx", "indicadores.xlsx", "relatorio.html",
+                                         "manifesto.json"}
+    assert all(c["ok"] for c in r["conferencias"]), r["conferencias"]  # o certificado bate
     assert hashlib.sha256(arq.read_bytes()).hexdigest() == antes  # o original não muda
     pasta = Path(r["pasta"])
     h = (pasta / "relatorio.html").read_text(encoding="utf-8")
@@ -86,7 +88,7 @@ def teste_texto_da_base_nao_vira_html(cfg_factory, tmp_path):
 def teste_arquivo_ruim_gera_relatorio_que_explica(cfg_factory, tmp_path):
     cfg = _cfg(cfg_factory)
     r = entrega.entregar(cfg, tmp_path / "nao_existe.xlsx", tmp_path / "saida")
-    assert not r["ok"] and r["erros"] and r["arquivos"] == ["relatorio.html"]
+    assert not r["ok"] and r["erros"] and r["arquivos"] == ["relatorio.html", "manifesto.json"]
     assert "Corrigir a origem dos dados" in r["recomendacoes"][0]
 
 
