@@ -5,3 +5,4 @@ PyYAML>=6.0
 psycopg[binary]>=3.2
 segno>=1.6        # QR code do diagnóstico do celular (opcional: sem ele o endereço aparece por escrito)
 pillow>=10.0      # cartões com foto dos funcionários no grupo do Telegram
+scikit-learn>=1.4 # Machine Learning da entrega (python -m robo entregar --alvo); sem ele o resto funciona

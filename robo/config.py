@@ -53,7 +53,7 @@ PADROES: dict = {
                                   # chaves de negócio (achado da Fábrica de Planilhas, 23/10/2026: sem elas, a cópia exata de
                                   # uma nota fiscal não era removida e a soma do faturamento saía maior)
                                   "nota_fiscal*", "nf", "nf_*", "numero_nf*", "pedido", "pedido_*", "numero_pedido*", "titulo",
-                                  "numero_titulo*", "protocolo*", "sku", "sku_*", "chamado*", "ticket_id*"],
+                                  "numero_titulo*", "protocolo*", "sku", "sku_*", "chamado", "numero_chamado*", "ticket_id*"],
     },
     "saida": {
         # xlsx | csv | ambos | nenhum (nenhum = só grava no banco)

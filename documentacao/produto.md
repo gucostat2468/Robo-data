@@ -2,18 +2,29 @@
 
 ## O que é (em uma frase)
 
-Você entrega uma planilha de pesquisa (NPS, CSAT, CES) ou de entregas (prazo e atraso) e recebe, em segundos, o que um
-analista sênior entregaria ao gestor: **base tratada, indicadores com margem de erro, o que mais pesa na nota,
-diferenças reais entre grupos e recomendações**, num relatório que abre em qualquer navegador.
+Você entrega **qualquer planilha** (vendas, financeiro, RH, logística, estoque, marketing, pesquisa…) e recebe a
+esteira inteira que um time de dados faria antes do Power BI: **limpeza e padronização registradas, qualidade medida,
+análise, modelo estrela com medidas DAX, Machine Learning opcional e um relatório organizado**, tudo conferido por um
+certificado.
 
-## Para quem e por quê
+## A esteira (o que acontece, na ordem)
 
-| | |
-|---|---|
-| **Usuário** | analista de Customer Insights que recebe bases de pesquisa e precisa apresentar resultado rápido e certo |
-| **Dor** | horas limpando base, calculando NPS por segmento e montando slide; risco de comunicar "diferença" que é acaso |
-| **Valor** | minutos em vez de horas; estatística correta por padrão (margem de erro, base mínima, correção de Holm) |
-| **Privacidade** | roda no SEU computador: a base nunca vai para a nuvem nem para o GitHub (o repositório é público) |
+| Etapa | Disciplina | O que o robô faz | Prova |
+|---|---|---|---|
+| 1. Leitura | Engenharia | acha o cabeçalho, ignora linhas de título/total, lê .xlsx/.xls/.csv | linhas: entrada − removidas = saída |
+| 2. Limpeza e padronização | Engenharia | datas, números no padrão BR, duplicatas, **grafias unificadas** ('sudeste ' = 'Sudeste') | cada mudança listada no relatório |
+| 3. Qualidade (DAMA) | Engenharia | completude, unicidade, validade, consistência e atualidade por coluna, nota 0–100 | tabela no relatório e aba `qualidade_dama` |
+| 4. Análise | Análise | métricas (soma × média do jeito certo), por segmento, Pareto, tendência mensal sem o mês incompleto, valores fora do padrão, diferenças reais (Holm) | somas refeitas em SQL |
+| 5. Modelo estrela | Engenharia/BI | fato + uma dimensão por categoria + calendário, relações 1:* e **medidas DAX prontas** | fato com as mesmas linhas; chaves únicas |
+| 6. Machine Learning (opcional) | Ciência | escolha uma coluna para prever: linha de base, validação cruzada, teste usado uma vez, divisão por tempo, checagem de vazamento, importância por permutação | veredito "vale a pena" ou "não use" |
+| 7. Entrega | — | relatório HTML, planilhas, modelo Power BI, manifesto com SHA-256 | certificado de conferência |
+
+**Machine Learning, as regras que impedem resultado mentiroso:**
+- o modelo só "vale" se superar a **linha de base** (chutar a classe mais comum ou a média) no treino E no teste;
+- coluna que sozinha acerta o alvo ~100% é **vazamento** (o resultado disfarçado) e é retirada, com aviso;
+- com data na base, treina no passado e testa no futuro;
+- base com menos de 100 linhas ou categoria com menos de 10 casos: o robô **recusa e explica**;
+- dado sintético é aceito: o modelo aprende o mundo daquele dado (e isso fica registrado).
 
 ## O que vem no pacote (`Entrega_<base>_<data>/`)
 
@@ -22,6 +33,8 @@ diferenças reais entre grupos e recomendações**, num relatório que abre em q
 | `relatorio.html` | o relatório executivo: cartões de KPI, recomendações, drivers, gráficos por segmento, diferenças reais, qualidade dos dados e metodologia. Abre com dois cliques, funciona sem internet, pode ir por e-mail |
 | `indicadores.xlsx` | os números conferíveis (abas: indicadores, destaques, drivers, perfil, qualidade, logística) — base para o Power BI |
 | `base_tratada.xlsx` | a base limpa (datas, números BR, duplicatas, totais removidos), pronta para o Power BI ou para cruzar com outra |
+| `modelo_powerbi.xlsx` | o modelo estrela: uma aba por tabela (fato, dimensões, calendário) |
+| `medidas_dax.txt` | as medidas DAX comentadas, para colar em Modelagem > Nova medida |
 
 ## Jeito mais fácil: o Estúdio (interface no navegador)
 
@@ -30,10 +43,12 @@ Sem pastas, sem comandos longos, sem o painel 3D.
 1. Na pasta do projeto, clique na **barra de endereço** do Explorador, digite `cmd` e aperte **Enter**.
 2. Digite `python -m robo estudio` e aperte **Enter**. O navegador abre sozinho em `http://127.0.0.1:8765`.
 3. Aba **1. Tratar planilha**: **arraste a planilha** para o quadro (ou clique nele e escolha). Se quiser, escreva os
-   segmentos (ex.: `regiao, curso`). Clique em **Tratar e analisar**.
+   segmentos (ex.: `regiao, produto`) e, para Machine Learning, a **coluna a prever** (ex.: `cancelou`).
+   Clique em **Tratar e analisar**.
 4. Em segundos aparecem as **recomendações**, o **relatório completo** na própria tela e os links para baixar
    `relatório (HTML)`, `indicadores.xlsx` e `base tratada.xlsx`.
-5. Aba **2. SQL**: os dados **já tratados** viram a tabela `dados`. Escreva, por exemplo:
+5. Aba **2. SQL**: os dados **já tratados** viram a tabela `dados`, e o modelo estrela vira `fato_dados`,
+   `dim_...` e `dim_calendario` (dá para praticar JOIN). Escreva, por exemplo:
 
    ```sql
    SELECT regiao, COUNT(*) AS respostas, ROUND(AVG(nota_nps), 1) AS nota_media
@@ -53,7 +68,9 @@ Sem pastas, sem comandos longos, sem o painel 3D.
 |---|---|
 | `original_<arquivo>` | cópia exata do que você enviou (o seu arquivo nunca é alterado) |
 | `base_tratada.xlsx` | a base limpa e padronizada |
-| `indicadores.xlsx` | todos os números conferíveis |
+| `indicadores.xlsx` | todos os números conferíveis (inclui qualidade, relações do Power BI e, com ML, comparação, importância e previsões do teste) |
+| `modelo_powerbi.xlsx` | fato + dimensões + calendário |
+| `medidas_dax.txt` | medidas DAX comentadas |
 | `relatorio.html` | o relatório completo |
 | `manifesto.json` | o **certificado**: as conferências e a impressão digital (SHA-256) de cada arquivo |
 | `consultas_sql.sql` | cada consulta SQL que você rodou, com data, hora e resultado |
@@ -97,6 +114,12 @@ total/duplicadas que a seção "Limpeza e padronização feitas" do relatório l
 python -m robo entregar "Pesquisa NPS outubro.xlsx" --segmentos regional,curso,canal
 ```
 
+**Machine Learning** (prever uma coluna):
+
+```
+python -m robo entregar "clientes.xlsx" --alvo cancelou
+```
+
 **Salvar a entrega em outra pasta**: acrescente `--destino "C:\Users\voce\Desktop\Entregas"`.
 
 ### Como validar se deu certo
@@ -132,8 +155,12 @@ celular mostra a última entrega. Ou seja: o produto é testado continuamente pe
 
 | Fase | O que | Estado |
 |---|---|---|
-| MVP | pacote de entrega (pesquisa + logística) por comando | **pronto** |
-| 2 | botão "Gerar entrega" no painel (sem digitar comando) | próximo |
-| 3 | comparação entre ondas (esta pesquisa × a anterior) no relatório | próximo |
-| 4 | verbatins (respostas abertas): temas e sentimento | depende de IA local (Ollama) no seu notebook |
-| 5 | modelo do Power BI (.pbit) lendo `indicadores.xlsx` | planejado |
+| 1 | esteira genérica: limpeza, padronização, qualidade DAMA, análise, certificado | **pronto** |
+| 2 | Estúdio no navegador (upload + SQL + entregas salvas) | **pronto** |
+| 3 | modelo estrela + medidas DAX para o Power BI | **pronto** |
+| 4 | Machine Learning supervisionado com linha de base, vazamento e divisão por tempo | **pronto** |
+| 5 | aba **3. Conversar**: perguntas em português → o código calcula → a IA escreve → verificador confere cada número (API gratuita com troca automática para LLM local) | próximo |
+| 6 | dashboard HTML interativo (filtros) com o visual certo por tipo de análise | próximo |
+| 7 | ML sem alvo: segmentação (clusters) e detecção de anomalias; textos livres (temas) | planejado |
+| 8 | juntar várias planilhas (append por período, merge por chave com checagem de duplicidade) | planejado |
+| 9 | gravar cada entrega no PostgreSQL (camadas bruto/tratado/analitico) para histórico e ML entre bases | planejado |

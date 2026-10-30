@@ -75,7 +75,7 @@ class Estudio:
         return saida
 
     # ------------------------------------------------------------------ tratar
-    def tratar(self, nome: str, dados: bytes, segmentos: list[str] | None = None) -> dict:
+    def tratar(self, nome: str, dados: bytes, segmentos: list[str] | None = None, alvo: str | None = None) -> dict:
         from robo import entrega
         nome = Path(nome or "planilha.xlsx").name
         if Path(nome).suffix.lower() not in EXTENSOES:
@@ -83,17 +83,21 @@ class Estudio:
         with tempfile.TemporaryDirectory(prefix="robo_estudio_") as tmp:
             entrada = Path(tmp) / nome
             entrada.write_bytes(dados)
-            r = entrega.entregar(self.cfg, entrada, self.pasta, segmentos)  # copia o original para a entrega
+            r = entrega.entregar(self.cfg, entrada, self.pasta, segmentos, alvo)  # copia o original para a entrega
         eid = Path(r["pasta"]).name
         return {"id": eid, "ok": r["ok"], "arquivo": nome, "recomendacoes": r["recomendacoes"], "erros": r["erros"],
                 "linhas": r["linhas"], "arquivos": r["arquivos"], "tabelas": self.esquema(eid), "pasta": r["pasta"],
-                "conferencias": r.get("conferencias") or []}
+                "conferencias": r.get("conferencias") or [], "ml": r.get("ml"), "qualidade": r.get("qualidade")}
 
     def _tabelas(self, eid: str) -> dict[str, pd.DataFrame]:
         p = self._pasta_da(eid)
         if not p or not (p / "base_tratada.xlsx").exists():
             return {}
-        return {_nome_tabela(aba): df for aba, df in pd.read_excel(p / "base_tratada.xlsx", sheet_name=None).items()}
+        saida = {_nome_tabela(aba): df for aba, df in pd.read_excel(p / "base_tratada.xlsx", sheet_name=None).items()}
+        if (p / "modelo_powerbi.xlsx").exists():  # o modelo estrela também vira tabela (JOIN fato × dimensões)
+            for aba, df in pd.read_excel(p / "modelo_powerbi.xlsx", sheet_name=None).items():
+                saida.setdefault(_nome_tabela(aba), df)
+        return saida
 
     def esquema(self, eid: str) -> list[dict]:
         return [{"tabela": t, "linhas": len(df), "colunas": [str(c) for c in df.columns]}
@@ -150,7 +154,7 @@ class Estudio:
         """Só os arquivos da própria entrega, pelo nome exato."""
         p = self._pasta_da(eid)
         if not p or nome not in {"relatorio.html", "indicadores.xlsx", "base_tratada.xlsx", "manifesto.json",
-                                 "consultas_sql.sql"}:
+                                 "consultas_sql.sql", "modelo_powerbi.xlsx", "medidas_dax.txt"}:
             return None
         f = p / nome
         return f if f.exists() else None
@@ -206,13 +210,13 @@ def _handler(est: Estudio):
             caminho = urlparse(self.path).path
             if caminho in ("/", "/index.html"):
                 return self._resp(200, PAGINA.encode(), "text/html; charset=utf-8")
-            m = re.fullmatch(r"/entrega/([^/]+)/([a-z_]+\.(?:html|xlsx|json|sql))", caminho)
+            m = re.fullmatch(r"/entrega/([^/]+)/([a-z_]+\.(?:html|xlsx|json|sql|txt))", caminho)
             if m:
                 p = est.arquivo(m.group(1), unquote(m.group(2)))
                 if not p:
                     return self._json(404, {"erro": "arquivo não encontrado"})
                 tipo = {".html": "text/html; charset=utf-8", ".json": "application/json; charset=utf-8",
-                        ".sql": "text/plain; charset=utf-8"}.get(p.suffix,
+                        ".sql": "text/plain; charset=utf-8", ".txt": "text/plain; charset=utf-8"}.get(p.suffix,
                                                                 "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
                 extra = {"Content-Disposition": f'attachment; filename="{p.name}"'} if p.suffix == ".xlsx" else {}
                 return self._resp(200, p.read_bytes(), tipo, extra)
@@ -233,7 +237,7 @@ def _handler(est: Estudio):
                 if caminho == "/api/tratar":
                     msg = BytesParser(policy=politica_email).parsebytes(
                         b"Content-Type: " + self.headers.get("Content-Type", "").encode() + b"\r\n\r\n" + corpo)
-                    arquivo, segmentos = None, None
+                    arquivo, segmentos, alvo = None, None, None
                     for parte in msg.iter_parts():
                         nome_campo = parte.get_param("name", header="content-disposition")
                         if nome_campo == "arquivo":
@@ -241,9 +245,11 @@ def _handler(est: Estudio):
                         elif nome_campo == "segmentos":
                             txt = (parte.get_payload(decode=True) or b"").decode("utf-8").strip()
                             segmentos = [s.strip() for s in txt.split(",") if s.strip()] or None
+                        elif nome_campo == "alvo":
+                            alvo = (parte.get_payload(decode=True) or b"").decode("utf-8").strip() or None
                     if not arquivo or not arquivo[1]:
                         return self._json(400, {"erro": "nenhum arquivo enviado"})
-                    return self._json(200, est.tratar(arquivo[0], arquivo[1], segmentos))
+                    return self._json(200, est.tratar(arquivo[0], arquivo[1], segmentos, alvo))
                 if caminho == "/api/abrir":
                     p = json.loads(corpo or b"{}")
                     return self._json(200, {"pasta": est.abrir_pasta(p.get("id"))})
@@ -314,10 +320,11 @@ button.link{background:none;border:0;color:var(--p);text-decoration:underline;cu
 <main>
 <section id="tratar" class="aba ativa">
  <div class="caixa">
-  <div id="soltar">Arraste a planilha aqui ou <b>clique para escolher</b><br><span class="nota">.xlsx, .xls, .csv — pesquisa (NPS, CSAT, CES), vendas, financeiro, RH, logística…</span></div>
+  <div id="soltar">Arraste a planilha aqui ou <b>clique para escolher</b><br><span class="nota">.xlsx, .xls, .csv — vendas, financeiro, RH, logística, estoque, marketing, pesquisa…</span></div>
   <input id="arquivo" type="file" accept=".xlsx,.xlsm,.xls,.csv,.txt" hidden>
   <div class="linha" style="margin-top:12px">
    <div><label>Segmentos (opcional, separados por vírgula)</label><input id="segmentos" type="text" placeholder="ex.: regiao, curso, canal"></div>
+   <div><label>Machine Learning: coluna a prever (opcional)</label><input id="alvo" type="text" placeholder="ex.: cancelou, valor_venda"></div>
    <div style="flex:0"><button class="acao" id="enviar" disabled>Tratar e analisar</button></div>
   </div>
   <p id="status" class="nota"></p>
@@ -325,7 +332,7 @@ button.link{background:none;border:0;color:var(--p);text-decoration:underline;cu
  <div class="caixa"><b>Entregas salvas</b> <span class="nota">(clique para abrir de novo)</span><div id="historico" class="hist"></div></div>
  <div id="saida" hidden>
   <div class="caixa"><div id="cert"></div><b>Recomendações</b><ol id="recs"></ol>
-   <div class="downloads">Baixar: <a id="d1" target="_blank">relatório (HTML)</a><a id="d2">indicadores.xlsx</a><a id="d3">base tratada.xlsx</a><a id="d4" target="_blank">certificado (manifesto.json)</a></div>
+   <div class="downloads">Baixar: <a id="d1" target="_blank">relatório (HTML)</a><a id="d2">indicadores.xlsx</a><a id="d3">base tratada.xlsx</a><a id="d4" target="_blank">certificado (manifesto.json)</a><a id="d5">modelo Power BI (.xlsx)</a><a id="d6" target="_blank">medidas DAX</a></div>
    <p class="nota">Salvo em <b id="pastaent"></b> <button class="link" id="abrirent">abrir a pasta</button> — original, base tratada, indicadores, relatório, certificado e o histórico do SQL.</p>
    <p class="nota">Quer cruzar ou filtrar do seu jeito? Vá na aba <b>2. SQL</b>: os dados tratados já estão lá como tabela.</p></div>
   <iframe id="relatorio" title="Relatório"></iframe>
@@ -358,8 +365,8 @@ solto.addEventListener('drop',e=>escolher(e.dataTransfer.files[0]));
 function escolher(f){if(!f)return;arquivo=f;solto.innerHTML='Arquivo: <b></b> <span class="nota">(clique para trocar)</span>';solto.querySelector('b').textContent=f.name;$('#enviar').disabled=false}
 function esc(t){const d=document.createElement('div');d.textContent=t==null?'':String(t);return d.innerHTML}
 $('#enviar').onclick=async()=>{
- const fd=new FormData();fd.append('arquivo',arquivo);fd.append('segmentos',$('#segmentos').value);
- $('#enviar').disabled=true;$('#status').className='nota';$('#status').textContent='Lendo, limpando, padronizando e analisando… (alguns segundos)';
+ const fd=new FormData();fd.append('arquivo',arquivo);fd.append('segmentos',$('#segmentos').value);fd.append('alvo',$('#alvo').value);
+ $('#enviar').disabled=true;$('#status').className='nota';$('#status').textContent='Lendo, limpando, padronizando, conferindo e analisando… ('+($('#alvo').value?'com Machine Learning: até 1 minuto':'alguns segundos')+')';
  try{const r=await fetch('/api/tratar',{method:'POST',body:fd});const j=await r.json();
   if(!r.ok)throw new Error(j.erro||'falhou');
   $('#status').className=j.ok?'ok':'erro';
@@ -374,7 +381,7 @@ async function mostrarEntrega(id,arquivo,recs,conf,pasta){
  $('#cert').className=conf.length&&ok===conf.length?'certok':'certno';
  $('#cert').textContent=conf.length?`Certificado de conferência: ${ok} de ${conf.length} conferências batem${ok===conf.length?' ✓':' — veja no relatório'}`:'Sem certificado (entrega antiga ou planilha não lida)';
  $('#recs').innerHTML=recs.map(x=>'<li>'+esc(x).replace(/\*\*(.+?)\*\*/g,'<b>$1</b>')+'</li>').join('');
- $('#d1').href=base+'relatorio.html';$('#d2').href=base+'indicadores.xlsx';$('#d3').href=base+'base_tratada.xlsx';$('#d4').href=base+'manifesto.json';
+ $('#d1').href=base+'relatorio.html';$('#d2').href=base+'indicadores.xlsx';$('#d3').href=base+'base_tratada.xlsx';$('#d4').href=base+'manifesto.json';$('#d5').href=base+'modelo_powerbi.xlsx';$('#d6').href=base+'medidas_dax.txt';
  $('#pastaent').textContent=pasta||id;$('#relatorio').src=base+'relatorio.html';$('#saida').hidden=false;
  await carregarFontes();const r=await (await fetch('/api/esquema/'+encodeURIComponent(id))).json();mostrarTabelas(r.tabelas);
  if(r.tabelas.length)$('#consulta').value=`-- ${arquivo}: as 20 primeiras linhas\nSELECT * FROM ${r.tabelas[0].tabela} LIMIT 20`;}

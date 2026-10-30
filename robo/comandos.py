@@ -307,12 +307,13 @@ def principal(argv: list[str] | None = None) -> int:
     sest.add_argument("--porta", type=int, default=8765)
     sest.add_argument("--sem-navegador", action="store_true", help="não abre o navegador sozinho")
     sest.add_argument("--atalho", action="store_true", help="cria o atalho do Estúdio na Área de Trabalho (Windows)")
-    sen = sub.add_parser("entregar", help="PRODUTO: transforma uma planilha (pesquisa NPS/CSAT/CES ou entregas) num pacote "
-                                          "para o gestor: base tratada, indicadores.xlsx e relatorio.html com "
-                                          "recomendações. Roda só no seu computador; a base não sai dele")
+    sen = sub.add_parser("entregar", help="PRODUTO: transforma QUALQUER planilha num pacote "
+                                          "para o gestor: base tratada, qualidade, modelo Power BI + DAX, ML opcional e "
+                                          "relatorio.html com recomendações. Roda só no seu computador; a base não sai dele")
     sen.add_argument("arquivo")
     sen.add_argument("--destino", help="pasta onde criar a entrega (padrão: a pasta do arquivo)")
     sen.add_argument("--segmentos", help="colunas de segmento separadas por vírgula (padrão: o robô escolhe)")
+    sen.add_argument("--alvo", help="Machine Learning: coluna a prever (com linha de base, teste e checagem de vazamento)")
     sub.add_parser("status", help="mostra pastas, fila e histórico")
     sub.add_parser("manutencao", help="remove arquivos antigos conforme a retenção")
     sdm = sub.add_parser("demo", help="abre a empresa de demonstração (pasta separada, planilhas de 6 áreas)")
@@ -659,7 +660,7 @@ def principal(argv: list[str] | None = None) -> int:
     if args.comando == "entregar":
         from robo import entrega
         r = entrega.entregar(cfg, args.arquivo, args.destino,
-                             [x.strip() for x in args.segmentos.split(",")] if args.segmentos else None)
+                             [x.strip() for x in args.segmentos.split(",")] if args.segmentos else None, args.alvo)
         print(f"Entrega {'pronta' if r['ok'] else 'com problemas'}: {r['pasta']}")
         for a in r["arquivos"]:
             print(f"  • {a}")

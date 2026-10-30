@@ -34,7 +34,7 @@ def teste_pesquisa_nps_vira_entrega_completa(cfg_factory, tmp_path):
     antes = hashlib.sha256(arq.read_bytes()).hexdigest()
     r = entrega.entregar(cfg, arq, tmp_path / "saida")
     assert r["ok"] and set(r["arquivos"]) == {"base_tratada.xlsx", "indicadores.xlsx", "relatorio.html",
-                                         "manifesto.json"}
+                                         "manifesto.json", "modelo_powerbi.xlsx", "medidas_dax.txt"}
     assert all(c["ok"] for c in r["conferencias"]), r["conferencias"]  # o certificado bate
     assert hashlib.sha256(arq.read_bytes()).hexdigest() == antes  # o original não muda
     pasta = Path(r["pasta"])

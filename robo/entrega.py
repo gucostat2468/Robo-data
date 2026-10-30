@@ -446,6 +446,15 @@ def montar_html(info: dict) -> str:
             cards.append(_card(f"{'Total' if m['op'] == 'soma' else 'Média'} de {m['coluna']}",
                                _n(m["valor"], 0 if m["op"] == "soma" and abs(m["valor"]) >= 1000 else 2),
                                f"n={m['n']}"))
+    if info.get("qualidade") and info["qualidade"]["tabela"]["nota_geral"] is not None:
+        qt = info["qualidade"]["tabela"]
+        cards.append(_card("Qualidade dos dados", f"{_n(qt['nota_geral'])}/100",
+                           f"{len(qt['criticas'])} coluna(s) crítica(s) · {qt['linhas_duplicadas']} linha(s) repetida(s)"))
+    ml = info.get("ml")
+    if ml and ml.get("ok"):
+        mp = ml["metrica_principal"]
+        cards.append(_card(f"Modelo de ML ({ml['alvo']})", "vale a pena" if ml["vale"] else "não use",
+                           f"{_ML_NOME[mp]} {_n(ml['teste'][mp], 3)} × linha de base {_n(ml['teste_linha_base'][mp], 3)}"))
     cards.append(_card("Registros analisados", f"{info['linhas']:,}".replace(",", "."),
                        f"{len(rel.erros)} erro(s) · {len(rel.avisos)} aviso(s) na limpeza"))
 
@@ -463,6 +472,10 @@ def montar_html(info: dict) -> str:
     secoes.append("<h2>Recomendações</h2><ol>" + "".join(f"<li>{_md(x)}</li>" for x in info["recomendacoes"]) +
                   "</ol><p class='nota'>Geradas por regra a partir dos números desta base. Valide com o contexto do "
                   "negócio antes de decidir.</p>")
+    if ml:
+        secoes.append(_secao_ml(ml))
+    if info.get("estrela"):
+        secoes.append(_secao_estrela(info["estrela"]))
     if prio:
         classe = {"Melhorar primeiro": "q0", "Mais importante": "q0", "Manter (é força)": "q1"}
         linhas = "".join(f"<tr><td>{_e(x['atributo'])}</td><td>{_n(x['importancia'], 2)}</td><td>{_n(x['media'])} de "
@@ -549,7 +562,22 @@ def montar_html(info: dict) -> str:
         secoes.append("<h3>Valores fora do padrão</h3><ul>" + "".join(
             f"<li>{_e(f['coluna'])}: {f['n']} valor(es) ({_n(f['pct'])}%)</li>" for f in vg["fora_do_padrao"]) +
             "</ul><p class='nota'>Regra de Tukey (3 × intervalo interquartil). Fora do padrão não quer dizer errado.</p>")
-    secoes.append("<h2>Qualidade dos dados</h2>" + (
+    if info.get("qualidade"):
+        q = info["qualidade"]["colunas"]
+        ruins = q[q["situacao"] != "OK"] if len(q) else q
+        fmt = lambda v: "—" if v is None or (isinstance(v, float) and math.isnan(v)) else f"{_n(v)}%"  # noqa: E731
+        secoes.append("<h2>Qualidade dos dados (dimensões DAMA)</h2><p class='nota'>Completude = preenchido; unicidade = "
+                      "identificador sem repetição; validade = valor no tipo certo; consistência = % de linhas na grafia de referência do valor "
+                      "(maiúsculas, acentos, espaços). Nota = média das dimensões que se aplicam à coluna.</p>" +
+                      ("<table><tr><th>Coluna</th><th>Completude</th><th>Unicidade</th><th>Validade</th>"
+                       "<th>Consistência</th><th>Nota</th><th>Situação</th></tr>" +
+                       "".join(f"<tr><td>{_e(r['coluna'])}</td><td>{fmt(r['completude'])}</td><td>{fmt(r['unicidade'])}"
+                               f"</td><td>{fmt(r['validade'])}</td><td>{fmt(r['consistencia'])}</td>"
+                               f"<td>{fmt(r['nota']).rstrip('%')}</td><td class='{'neg' if r['situacao'] == 'Crítico' else ''}'>"
+                               f"{_e(r['situacao'])}</td></tr>" for _, r in ruins.iterrows()) + "</table>"
+                       if len(ruins) else "<p>Todas as colunas com nota 95 ou mais.</p>") +
+                      "".join(f"<p class='nota'>{_e(x)}</p>" for x in info["qualidade"]["notas"]))
+    secoes.append("<h2>Ocorrências da leitura e da limpeza</h2>" + (
         "<table><tr><th>Nível</th><th>O que aconteceu</th><th>Coluna</th></tr>" +
         "".join(f"<tr><td>{_e(o.nivel)}</td><td>{_e(o.mensagem)}</td><td>{_e(o.coluna)}</td></tr>"
                 for o in oc if o.nivel in ("ERRO", "AVISO"))[:20000] + "</table>"
@@ -558,7 +586,10 @@ def montar_html(info: dict) -> str:
         leitura = [x for x in a.resumo if not ("Nenhuma coluna de NPS" in x and a.indicadores.empty
                                                  and (logi or vg.get("metricas")))]
         secoes.append("<h2>Leitura do analista</h2><ul>" + "".join(f"<li>{_e(x)}</li>" for x in leitura) + "</ul>")
-    secoes.append("<h2>Metodologia</h2><ul><li>NPS = % promotores (9–10) − % detratores (0–6); CSAT = top-2-box; "
+    secoes.append("<h2>Metodologia</h2><ul><li>Esteira: leitura → limpeza e padronização (registrada) → qualidade "
+                  "(DAMA) → análise → modelo estrela → ML opcional → certificado com conferências independentes.</li>"
+                  "<li>ML: linha de base, validação cruzada no treino, teste usado uma vez, checagem de vazamento, "
+                  "divisão por tempo quando há data.</li><li>NPS = % promotores (9–10) − % detratores (0–6); CSAT = top-2-box; "
                   "CES = % fácil.</li><li>Margem de erro a 95% de confiança.</li><li>Grupos com menos de 30 respostas "
                   "não viram destaque.</li><li>Diferenças entre grupos: teste z com correção de Holm.</li>"
                   "<li>Drivers: correlação e regressão padronizada; não provam causa.</li>"
@@ -588,10 +619,65 @@ Robô de Planilhas</div><div class="cards">{''.join(cards)}</div>{''.join(secoes
 </main></body></html>"""
 
 
+_ML_NOME = {"acuracia_balanceada": "acurácia balanceada", "mae": "erro médio (MAE)"}
+_ML_ROTULO = {"acuracia": "Acurácia (acertos ÷ total)", "acuracia_balanceada": "Acurácia balanceada (média do acerto "
+              "de cada classe)", "f1_macro": "F1 macro (equilíbrio entre achar e não alarmar)", "auc": "AUC (ordena "
+              "bem quem tem mais chance; 0,5 = sorteio)", "mae": "MAE (erro médio, na unidade do alvo; menor é melhor)",
+              "rmse": "RMSE (pune mais os erros grandes; menor é melhor)", "r2": "R² (quanto da variação explica; "
+              "0 = igual à média)"}
+
+
+def _secao_ml(ml: dict) -> str:
+    if not ml.get("ok"):
+        return (f"<h2>Machine Learning — {_e(ml.get('alvo'))}</h2><p><b>Não treinado:</b> {_e(ml.get('motivo'))}</p>"
+                "<p class='nota'>Melhor recusar do que entregar um modelo que não dá para avaliar com honestidade.</p>")
+    tipo = "classificação (prever uma categoria)" if ml["tipo"] == "classificacao" else "regressão (prever um número)"
+    menor = ml["metrica_principal"] == "mae"
+    linhas = "".join(f"<tr><td>{_e(c['modelo'])}{' ✔' if c['modelo'] == ml['escolhido'] else ''}</td>"
+                     f"<td>{_n(c['cv_media'], 3) if 'cv_media' in c else '—'}</td>"
+                     f"<td>{'±' + _n(c['cv_desvio'], 3) if 'cv_desvio' in c else _e(c.get('erro', ''))}</td></tr>"
+                     for c in ml["comparacao"])
+    teste = "".join(f"<tr><td>{_e(_ML_ROTULO.get(k, k))}</td><td>{_n(v, 3)}</td><td>{_n(ml['teste_linha_base'].get(k, float('nan')), 3)}</td>"
+                    f"<td>{_n(ml['treino'][k], 3) if k in ml['treino'] else '—'}</td></tr>" for k, v in ml["teste"].items())
+    imp = [(x["variavel"], x["importancia"], COR["primaria"]) for x in ml["importancias"] if x["importancia"] > 0][:10]
+    return (f"<h2>Machine Learning — prever <i>{_e(ml['alvo'])}</i></h2>"
+            f"<p class='{'pos' if ml['vale'] else 'neg'}'><b>{_e(ml['veredito'])}</b></p>"
+            f"<p class='nota'>Tarefa: {tipo}. {ml['n']} linhas; divisão {_e(ml['divisao'])} "
+            f"({ml['n_treino']} treino · {ml['n_teste']} teste). Determinístico (semente 42).</p>"
+            + "".join(f"<p class='neg'>⚠️ {_e(x)}</p>" for x in ml["avisos"]) +
+            f"<h3>1. Escolha do modelo só com o treino (validação cruzada, {_e(_ML_NOME[ml['metrica_principal']])}"
+            f"{', menor é melhor' if menor else ', maior é melhor'})</h3>"
+            f"<table><tr><th>Modelo</th><th>Média</th><th>Oscilação</th></tr>{linhas}</table>"
+            "<h3>2. Prova final no teste (dados que o modelo nunca viu, usados uma única vez)</h3>"
+            f"<table><tr><th>Métrica</th><th>Modelo</th><th>Linha de base</th><th>No treino</th></tr>{teste}</table>"
+            + ("<p class='nota'>Com classes desiguais, a acurácia comum da linha de base parece alta só por chutar "
+               "sempre a classe mais comum; por isso a decisão usa a acurácia balanceada.</p>"
+               if ml["tipo"] == "classificacao" else "")
+            + (f"<h3>3. O que mais ajuda a prever (importância por permutação no teste)</h3>{_barras(imp, casas=3)}"
+               "<p class='nota'>Quanto a métrica piora quando a coluna é embaralhada. Ajuda a prever ≠ causa.</p>"
+               if imp else "")
+            + ("<p class='nota'>Fora do modelo: " + _e(", ".join(ml["fora"])) + ".</p>" if ml.get("fora") else "")
+            + "<p class='nota'>As previsões do teste estão na aba ml_previsoes_teste do indicadores.xlsx.</p>")
+
+
+def _secao_estrela(e: dict) -> str:
+    tabs = "".join(f"<tr><td>{_e(n)}</td><td>{'fato' if n == e['fato'] else 'dimensão'}</td><td>{len(df)}</td>"
+                   f"<td>{_e(', '.join(map(str, df.columns[:8])))}{'…' if len(df.columns) > 8 else ''}</td></tr>"
+                   for n, df in e["tabelas"].items())
+    rels = "".join(f"<li>{_e(r['de'])} → {_e(r['para'])} ({_e(r['cardinalidade'])}, filtro {_e(r['filtro'])})</li>"
+                   for r in e["relacoes"])
+    return ("<h2>Modelo pronto para o Power BI (esquema estrela)</h2>"
+            "<p class='nota'>Arquivo modelo_powerbi.xlsx (uma aba por tabela) e medidas_dax.txt. Fato = os eventos e "
+            "números; dimensões = os filtros. Relacionar sempre da dimensão (1) para a fato (*), filtro em direção "
+            "única.</p>"
+            f"<table><tr><th>Tabela</th><th>Tipo</th><th>Linhas</th><th>Colunas</th></tr>{tabs}</table>"
+            + (f"<h3>Relações a criar (Modelagem &gt; Gerenciar relações)</h3><ul>{rels}</ul>" if rels else ""))
+
+
 # =============================================================================== entrega
-def entregar(cfg, arquivo, destino=None, segmentos: list[str] | None = None) -> dict:
+def entregar(cfg, arquivo, destino=None, segmentos: list[str] | None = None, alvo: str | None = None) -> dict:
     """Gera a pasta de entrega. Devolve {ok, pasta, arquivos, recomendacoes, erros}. Nunca altera o arquivo original."""
-    from robo import analise, ciencia, pipeline
+    from robo import analise, ciencia, esteira_dados, pipeline
     from robo.escrita import _gravar_xlsx
     from robo.relatorio import Relatorio
     caminho = Path(arquivo)
@@ -604,12 +690,16 @@ def entregar(cfg, arquivo, destino=None, segmentos: list[str] | None = None) -> 
         import shutil
         shutil.copy2(caminho, pasta / f"original_{caminho.name}")
     arquivos = []
-    a = drv = logi = None
+    a = drv = logi = qual = estrela = ml = None
     visao: dict = {}
     prio: list[dict] = []
     linhas = 0
     if t.analisaveis:
         nome, df = max(t.analisaveis.items(), key=lambda kv: len(kv[1]))  # a tabela principal
+        df = esteira_dados.padronizar_categorias(df, rel, nome)  # 'sudeste ' e 'Sudeste' viram um valor só
+        t.analisaveis[nome] = df
+        if nome in t.tabelas:
+            t.tabelas[nome] = df.reset_index(drop=True)
         linhas = len(df)
         c = {**analise.PADRAO_ANALISE, **(cfg.dados.get("analise") or {})}
         a = analise.Analise(df, nome, caminho.name, base, c, cfg.limpeza.get("padroes_identificador", []),
@@ -620,12 +710,31 @@ def entregar(cfg, arquivo, destino=None, segmentos: list[str] | None = None) -> 
             except Exception as e:  # um analista com problema não derruba a entrega: vira observação
                 log.exception("Entrega: %s falhou", etapa.__name__)
                 a.observacoes.append(f"{etapa.__name__} não concluiu: {type(e).__name__}: {e}")
-        alvo = a.indicadores_cols.get("nps") or a.indicadores_cols.get("csat")
-        if alvo:
-            drv = ciencia.drivers(a.df, alvo)
+        nota = a.indicadores_cols.get("nps") or a.indicadores_cols.get("csat")
+        if nota:
+            drv = ciencia.drivers(a.df, nota)
             prio = prioridades(drv, a.df)
         logi = logistica(a.df, int(c["base_minima"]))
         visao = visao_geral(a)
+        try:
+            qual = esteira_dados.qualidade(a.df, a.papeis, rel)
+        except Exception as e:  # noqa: BLE001 — etapa que falha vira observação, não derruba a entrega
+            log.exception("Entrega: qualidade falhou")
+            a.observacoes.append(f"qualidade não concluiu: {type(e).__name__}: {e}")
+        try:
+            estrela = esteira_dados.modelo_estrela(a.df, a.papeis, nome, rel, visao.get("metricas"))
+            _gravar_xlsx(estrela["tabelas"], pasta / "modelo_powerbi.xlsx")
+            (pasta / "medidas_dax.txt").write_text(estrela["dax"], encoding="utf-8")
+            arquivos += ["modelo_powerbi.xlsx", "medidas_dax.txt"]
+        except Exception as e:  # noqa: BLE001
+            log.exception("Entrega: modelo estrela falhou")
+            a.observacoes.append(f"modelo para o Power BI não concluiu: {type(e).__name__}: {e}")
+        if alvo:
+            try:
+                ml = esteira_dados.aprender(a.df, a.papeis, alvo)
+            except Exception as e:  # noqa: BLE001
+                log.exception("Entrega: ML falhou")
+                ml = {"ok": False, "alvo": alvo, "motivo": f"erro inesperado: {type(e).__name__}: {e}"}
         if t.tabelas:
             _gravar_xlsx({k: v for k, v in t.tabelas.items()}, pasta / "base_tratada.xlsx")
             arquivos.append("base_tratada.xlsx")
@@ -644,22 +753,42 @@ def entregar(cfg, arquivo, destino=None, segmentos: list[str] | None = None) -> 
             planilhas["logistica_geral"] = pd.DataFrame([logi["geral"]])
             for papel, g in logi["grupos"].items():
                 planilhas[f"logistica_{papel}"] = pd.DataFrame(g["linhas"])
+        if qual:
+            planilhas["qualidade_dama"] = qual["colunas"]
+        if estrela:
+            planilhas["powerbi_relacoes"] = pd.DataFrame(estrela["relacoes"] or [{"de": "(sem dimensões)"}])
+        if ml and ml.get("ok"):
+            planilhas["ml_comparacao"] = pd.DataFrame(ml["comparacao"])
+            planilhas["ml_importancia"] = pd.DataFrame(ml["importancias"])
+            planilhas["ml_previsoes_teste"] = ml["previsoes"]
         _gravar_xlsx(planilhas, pasta / "indicadores.xlsx")
         arquivos.append("indicadores.xlsx")
     rec = recomendacoes(a, prio, logi, rel, visao)
+    if qual and qual["tabela"]["criticas"]:
+        rec.append(f"**Qualidade:** {len(qual['tabela']['criticas'])} coluna(s) em situação crítica "
+                   f"({', '.join(map(str, qual['tabela']['criticas'][:5]))}): corrija na origem antes de usar em decisão.")
+    if ml:
+        rec.append(f"**Machine Learning ({ml.get('alvo')}):** " + (ml["veredito"] if ml.get("ok") else
+                                                                   f"não treinado — {ml.get('motivo')}"))
     try:
-        conferencias = certificar(t, rel, a, pasta)
+        conferencias = certificar(t, rel, a, pasta) + (estrela["conferencias"] if estrela else [])
     except Exception as e:  # conferir nunca impede a entrega, mas a falha aparece no certificado
         log.exception("Entrega: certificado falhou")
         conferencias = [{"conferencia": "Certificado", "ok": False, "detalhe": f"{type(e).__name__}: {e}"}]
     info = {"analise": a, "relatorio": rel, "logistica": logi, "prioridades": prio, "visao": visao,
-            "conferencias": conferencias,
+            "conferencias": conferencias, "qualidade": qual, "estrela": estrela, "ml": ml,
             "drivers": drv if drv and drv.get("ok") else None, "recomendacoes": rec, "base": base,
             "arquivo": caminho.name, "linhas": linhas, "gerado_em": datetime.now()}
     (pasta / "relatorio.html").write_text(montar_html(info), encoding="utf-8")
     arquivos.append("relatorio.html")
-    gravar_manifesto(pasta, caminho, conferencias, {"linhas": linhas, "recomendacoes": rec,
-                                                     "erros": [o.mensagem for o in rel.erros]})
+    extra = {"linhas": linhas, "recomendacoes": rec, "erros": [o.mensagem for o in rel.erros]}
+    if qual:
+        extra["qualidade"] = qual["tabela"]
+    if ml:
+        extra["ml"] = {k: v for k, v in ml.items() if k not in ("previsoes",)}
+    gravar_manifesto(pasta, caminho, conferencias, extra)
     arquivos.append("manifesto.json")
     return {"ok": bool(t.analisaveis), "pasta": str(pasta), "arquivos": arquivos, "recomendacoes": rec,
-            "erros": [o.mensagem for o in rel.erros], "linhas": linhas, "conferencias": conferencias}
+            "erros": [o.mensagem for o in rel.erros], "linhas": linhas, "conferencias": conferencias,
+            "qualidade": qual["tabela"] if qual else None,
+            "ml": {k: v for k, v in ml.items() if k not in ("previsoes",)} if ml else None}

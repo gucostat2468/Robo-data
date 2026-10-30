@@ -31,11 +31,12 @@ def no_ar(cfg_factory, tmp_path):
     srv.server_close()
 
 
-def _post_arquivo(url, nome, dados, segmentos=""):
+def _post_arquivo(url, nome, dados, segmentos="", alvo=""):
     b = uuid.uuid4().hex
     corpo = (f"--{b}\r\nContent-Disposition: form-data; name=\"arquivo\"; filename=\"{nome}\"\r\n"
              f"Content-Type: application/octet-stream\r\n\r\n").encode() + dados + \
-        f"\r\n--{b}\r\nContent-Disposition: form-data; name=\"segmentos\"\r\n\r\n{segmentos}\r\n--{b}--\r\n".encode()
+        (f"\r\n--{b}\r\nContent-Disposition: form-data; name=\"segmentos\"\r\n\r\n{segmentos}\r\n"
+         f"--{b}\r\nContent-Disposition: form-data; name=\"alvo\"\r\n\r\n{alvo}\r\n--{b}--\r\n").encode()
     req = urllib.request.Request(url + "/api/tratar", corpo, {"Content-Type": f"multipart/form-data; boundary={b}"})
     with urllib.request.urlopen(req, timeout=120) as r:
         return json.loads(r.read())
@@ -122,3 +123,17 @@ def teste_tudo_fica_salvo_com_certificado_e_historico_do_sql(no_ar, tmp_path):
     with urllib.request.urlopen(url + "/api/estado", timeout=10) as r:
         est = json.loads(r.read())
     assert est["entregas"][0]["id"] == j["id"] and est["entregas"][0]["conferido"] is True
+
+
+def teste_alvo_de_ml_e_modelo_power_bi(no_ar, tmp_path):
+    """Com a coluna alvo preenchida, a entrega traz o resultado do ML com o veredito, os arquivos do Power BI ficam
+    disponíveis para baixar e as tabelas do modelo estrela entram no SQL."""
+    pytest.importorskip("sklearn")
+    url, _ = no_ar
+    j = _post_arquivo(url, "pesquisa.xlsx", _planilha(tmp_path), alvo="regiao")
+    assert j["ml"]["ok"] and j["ml"]["alvo"] == "regiao" and isinstance(j["ml"]["vale"], bool) and j["ml"]["veredito"]
+    for nome in ("modelo_powerbi.xlsx", "medidas_dax.txt"):
+        with urllib.request.urlopen(f"{url}/entrega/{j['id']}/{nome}", timeout=10) as r:
+            assert r.status == 200
+    tabelas = {t["tabela"] for t in j["tabelas"]}
+    assert "dados" in tabelas and any(t.startswith("fato_") for t in tabelas) and "dim_regiao" in tabelas
