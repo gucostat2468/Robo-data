@@ -1,7 +1,7 @@
 """Esteira de dados genérica — o que vem DEPOIS da limpeza, para qualquer planilha (vendas, RH, logística, financeiro,
 pesquisa, estoque...). Três etapas, cada uma com a sua prova:
 
-  1. qualidade()      as dimensões de qualidade (DAMA): completude, unicidade, validade, consistência e atualidade,
+  1. qualidade()      as dimensões de qualidade (DAMA) e os valores suspeitos (suspeitos()): completude, unicidade, validade, consistência e atualidade,
                       por coluna. Exatidão NÃO é medida: sem uma fonte de referência ninguém consegue (e o relatório diz).
   2. modelo_estrela() fato + dimensões + calendário prontos para o Power BI, as relações (1:*) e as medidas DAX.
                       Prova: a fato tem as mesmas linhas da base e cada chave de dimensão é única.
@@ -87,6 +87,57 @@ def padronizar_categorias(df: pd.DataFrame, rel=None, tabela: str = "", max_dist
     return df
 
 
+DATAS_FUTURAS_OK = ("venc", "previs", "prazo", "agend", "validade", "expira", "fim", "termino", "renova", "proxim")
+
+
+def suspeitos(df: pd.DataFrame, papeis: dict, hoje: datetime | None = None, limite: int = 20_000) -> pd.DataFrame:
+    """Valores que provavelmente estão ERRADOS no conteúdo (a limpeza não tem como adivinhar o certo, então aponta):
+      - idade fora de 0–120;
+      - negativo numa coluna que é positiva em mais de 98% das linhas (provável sinal trocado; estorno legítimo
+        aparece em volume e não é apontado);
+      - valor muito acima do padrão da coluna (3 × intervalo interquartil na escala log: pega o erro de digitação de
+        1000x sem apontar a cauda natural de valores, horas, prazos);
+      - data no futuro (exceto colunas de vencimento, previsão, prazo...);
+      - mesmo identificador em mais de uma linha (quase-duplicata: uma das duas está errada).
+    Devolve [linha, chave, coluna, valor, regra]; chave = o 1º identificador da base (para achar a linha na origem)."""
+    hoje = pd.Timestamp(hoje or datetime.now())
+    ids = [c for c, p in papeis.items() if p == "id" and c in df.columns]
+    achados = []
+
+    def add(mascara, col, regra):
+        for i in df.index[mascara.fillna(False).to_numpy()]:
+            achados.append({"linha": int(i), "chave": df.at[i, ids[0]] if ids else None, "coluna": col,
+                            "valor": df.at[i, col], "regra": regra})
+
+    for col in df.columns:
+        p = papeis.get(col, "")
+        if p == "numero":
+            x = pd.to_numeric(df[col], errors="coerce")
+            v = x.dropna()
+            if len(v) < 20:
+                continue
+            if "idade" in str(col).lower():
+                add((x < 0) | (x > 120), col, "idade impossível (fora de 0 a 120)")
+                continue
+            neg = v < 0
+            if 0 < neg.mean() <= 0.02 and v.median() > 0:
+                add(x < 0, col, "negativo numa coluna positiva (sinal trocado?)")
+            pos = v[v > 0]
+            if pos.nunique() > 20:
+                lg = np.log10(pos)
+                q1, q3 = lg.quantile(.25), lg.quantile(.75)
+                if q3 > q1:
+                    add(x > 10 ** (q3 + 3 * (q3 - q1)), col, "valor muito acima do padrão (digitação?)")
+        elif p == "data" and not any(k in str(col).lower() for k in DATAS_FUTURAS_OK):
+            d = pd.to_datetime(df[col], errors="coerce")
+            add(d > hoje + pd.Timedelta(days=1), col, "data no futuro")
+    for col in ids[:1]:
+        rep = df[col].notna() & df[col].duplicated(keep=False)
+        add(rep, col, "identificador repetido (quase-duplicata)")
+    out = pd.DataFrame(achados, columns=["linha", "chave", "coluna", "valor", "regra"])
+    return out.head(limite)
+
+
 def qualidade(df: pd.DataFrame, papeis: dict, rel=None, hoje: datetime | None = None) -> dict:
     """Devolve {colunas: DataFrame por coluna, tabela: {...}, notas: [...]}. Nota de 0 a 100 = média das dimensões
     que se aplicam à coluna (as que não se aplicam ficam vazias, não contam como 100)."""
@@ -99,6 +150,8 @@ def qualidade(df: pd.DataFrame, papeis: dict, rel=None, hoje: datetime | None = 
             perdas[o.coluna] = perdas.get(o.coluna, 0) + int(o.quantidade or 0)
         if o.coluna and "misturados" in o.mensagem:
             consist_rel[o.coluna] = consist_rel.get(o.coluna, 0) + int(o.quantidade or 0)
+    sus = suspeitos(df, papeis, hoje)
+    por_col = sus.groupby("coluna").size().to_dict() if len(sus) else {}
     linhas = []
     for col in df.columns:
         papel = papeis.get(col, "")
@@ -111,9 +164,11 @@ def qualidade(df: pd.DataFrame, papeis: dict, rel=None, hoje: datetime | None = 
         if papel == "id":
             v = s.dropna()
             item["unicidade"] = round(100 * v.nunique() / len(v), 1) if len(v) else None
-        if papel in ("numero", "data") or col in perdas:
+        if papel in ("numero", "data") or col in perdas:  # inválido = não converteu (esvaziado) ou suspeito
             perdidos = perdas.get(col, 0)
-            item["validade"] = round(100 * preench / (preench + perdidos), 1) if preench + perdidos else None
+            ruins = perdidos + (por_col.get(col, 0) if papel != "id" else 0)
+            item["validade"] = round(100 * (1 - ruins / (preench + perdidos)), 1) if preench + perdidos else None
+        item["suspeitos"] = int(por_col.get(col, 0))
         if papel in ("categoria", "texto"):
             fora, total = _fora_da_grafia(s)
             item["consistencia"] = round(100 * (1 - fora / total), 1) if total else None
@@ -138,7 +193,9 @@ def qualidade(df: pd.DataFrame, papeis: dict, rel=None, hoje: datetime | None = 
     if len(datas):
         r = datas.sort_values("atualidade_dias").iloc[0]
         notas.append(f"Dado mais recente ({r['coluna']}) tem {int(r['atualidade_dias'])} dia(s).")
-    return {"colunas": cols, "tabela": tabela, "notas": notas}
+    if len(sus):
+        tabela["suspeitos"] = sus.groupby("regra").size().to_dict()
+    return {"colunas": cols, "tabela": tabela, "notas": notas, "suspeitos": sus}
 
 
 # =============================================================================== 2. modelo estrela

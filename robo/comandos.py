@@ -314,6 +314,18 @@ def principal(argv: list[str] | None = None) -> int:
     sen.add_argument("--destino", help="pasta onde criar a entrega (padrão: a pasta do arquivo)")
     sen.add_argument("--segmentos", help="colunas de segmento separadas por vírgula (padrão: o robô escolhe)")
     sen.add_argument("--alvo", help="Machine Learning: coluna a prever (com linha de base, teste e checagem de vazamento)")
+    scen = sub.add_parser("cenario", help="gera uma planilha SINTÉTICA de clientes (até 100 mil linhas) com erros "
+                                          "plantados e o gabarito (números, erros e ML) ao lado")
+    scen.add_argument("--linhas", type=int, default=10_000)
+    scen.add_argument("--semente", type=int, default=1)
+    scen.add_argument("--nivel", type=float, default=1.0, help="multiplica a quantidade de erros (1 = padrão)")
+    scen.add_argument("--destino", default=".", help="pasta onde gravar (padrão: a pasta atual)")
+    spl = sub.add_parser("placar", help="prova da esteira: gera cenários com gabarito, roda a entrega completa em cada "
+                                        "um e mostra o que bateu e o que falhou")
+    spl.add_argument("--cenarios", type=int, default=3)
+    spl.add_argument("--linhas", type=int, default=5000)
+    spl.add_argument("--semente", type=int, default=1)
+    spl.add_argument("--nivel", type=float, default=1.0)
     sub.add_parser("status", help="mostra pastas, fila e histórico")
     sub.add_parser("manutencao", help="remove arquivos antigos conforme a retenção")
     sdm = sub.add_parser("demo", help="abre a empresa de demonstração (pasta separada, planilhas de 6 áreas)")
@@ -657,6 +669,25 @@ def principal(argv: list[str] | None = None) -> int:
         from robo import estudio
         estudio.abrir(cfg, args.porta, navegador=not args.sem_navegador)
         return 0
+    if args.comando == "cenario":
+        from robo import cenarios
+        cen = cenarios.gerar(args.linhas, args.semente, args.nivel)
+        arq = cenarios.gravar(cen, Path(args.destino))
+        g = cen["gabarito"]
+        print(f"Planilha: {arq}\nGabarito: {arq.with_suffix('').with_suffix('.gabarito.json')}")
+        print(f"  {g['numeros']['linhas_planilha']} linhas na planilha · {len(cen['manifesto'])} erros plantados · "
+              f"{100 * g['numeros']['taxa_cancelamento']:.1f}% cancelaram")
+        return 0
+    if args.comando == "placar":
+        from robo import cenarios
+        cfg.criar_pastas()
+        r = cenarios.placar(cfg, args.cenarios, args.linhas, semente_inicial=args.semente, nivel=args.nivel)
+        for c in r["cenarios"]:
+            print(f"\nCenário semente {c['semente']} ({c['linhas']} linhas, {c['segundos']}s): {c['ok']} de {c['total']}")
+            for i in c["itens"]:
+                print(f"  {'OK   ' if i['ok'] else 'FALHA'} [{i['grupo']}] {i['verificacao']}: {i['detalhe']}")
+        print(f"\nPlacar: {r['acertos']} de {r['verificacoes']} ({r['pct']}%) · detalhes em {r['pasta']}")
+        return 0 if r["acertos"] == r["verificacoes"] else 1
     if args.comando == "entregar":
         from robo import entrega
         r = entrega.entregar(cfg, args.arquivo, args.destino,

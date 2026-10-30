@@ -236,7 +236,17 @@ def _como_data(serie: pd.Series, serial: bool = False) -> pd.Series:
         except (ValueError, OverflowError):
             return pd.NaT
         return d if d is not None and DATA_MIN <= d <= DATA_MAX else pd.NaT
-    return pd.Series([uma(v) for v in serie], index=serie.index, dtype="datetime64[ns]")
+    cache: dict = {}  # cada valor DIFERENTE é interpretado uma vez (100 mil linhas costumam ter poucas centenas de datas)
+
+    def memo(v):
+        try:
+            chave = (type(v), v)
+            if chave not in cache:
+                cache[chave] = uma(v)
+            return cache[chave]
+        except TypeError:  # valor não "hasheável": interpreta direto
+            return uma(v)
+    return pd.Series([memo(v) for v in serie], index=serie.index, dtype="datetime64[ns]")
 
 
 def _como_texto(serie: pd.Series) -> pd.Series:
@@ -261,6 +271,28 @@ def _converter(serie: pd.Series, tipo: str, decimal: str) -> pd.Series:
     return _como_texto(serie)
 
 
+def _contar_ok(valores, teste, limiar: float) -> int:
+    """Quantos valores passam no teste, olhando cada valor DIFERENTE uma vez só (com o peso de quantas vezes aparece).
+    Para assim que as falhas já impedem chegar ao limiar: o resultado continua abaixo do limiar, e a decisão é a mesma
+    de contar tudo. Em 100 mil linhas, era o que mais custava (a mesma data ou categoria testada milhares de vezes)."""
+    from collections import Counter
+    total = len(valores)
+    max_falhas = total * (1 - limiar) + 1e-9
+    try:
+        contagem = Counter((type(v), v) for v in valores).items()
+    except TypeError:
+        contagem = (((type(v), v), 1) for v in valores)
+    ok = falhas = 0
+    for (_, v), q in contagem:
+        if teste(v):
+            ok += q
+        else:
+            falhas += q
+            if falhas > max_falhas:
+                break
+    return ok
+
+
 def _inferir(serie: pd.Series, coluna: str, cfg: dict, tabela: str, rel: Relatorio) -> pd.Series:
     valores = serie.dropna()
     if valores.empty:
@@ -282,7 +314,7 @@ def _inferir(serie: pd.Series, coluna: str, cfg: dict, tabela: str, rel: Relator
         return _como_data(serie)
 
     decimal = _detectar_decimal(valores)
-    ok_num = sum(numero_de(v, decimal) is not None for v in valores)
+    ok_num = _contar_ok(valores, lambda v: numero_de(v, decimal) is not None, limiar)
     if ok_num / total >= limiar:
         convertida = _como_numero(serie, decimal)
         _registrar_perdas(serie, convertida, coluna, tabela, "número", rel)
@@ -292,8 +324,8 @@ def _inferir(serie: pd.Series, coluna: str, cfg: dict, tabela: str, rel: Relator
         return convertida
 
     # números do Excel por baixo de datas só contam se a coluna já tem datas escritas como texto
-    serial = any(data_de(v) is not None for v in textos)
-    ok_data = sum(data_de(v, serial) is not None for v in valores)
+    serial = any(data_de(v) is not None for v in dict.fromkeys(textos))
+    ok_data = _contar_ok(valores, lambda v: data_de(v, serial) is not None, limiar)
     if ok_data / total >= limiar:
         convertida = _como_data(serie, serial)
         _registrar_perdas(serie, convertida, coluna, tabela, "data", rel)

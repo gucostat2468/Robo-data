@@ -577,6 +577,15 @@ def montar_html(info: dict) -> str:
                                f"{_e(r['situacao'])}</td></tr>" for _, r in ruins.iterrows()) + "</table>"
                        if len(ruins) else "<p>Todas as colunas com nota 95 ou mais.</p>") +
                       "".join(f"<p class='nota'>{_e(x)}</p>" for x in info["qualidade"]["notas"]))
+        sus = info["qualidade"]["suspeitos"]
+        if len(sus):
+            secoes.append("<h3>Valores suspeitos (provável erro de conteúdo)</h3><table><tr><th>Regra</th><th>Coluna</th>"
+                          "<th>Linhas</th><th>Exemplos</th></tr>" +
+                          "".join(f"<tr><td>{_e(r)}</td><td>{_e(c)}</td><td>{len(g)}</td><td>"
+                                  f"{_e(', '.join(str(v) for v in g['valor'].head(4)))}</td></tr>"
+                                  for (r, c), g in sus.groupby(["regra", "coluna"])) +
+                          "</table><p class='nota'>A esteira não troca esses valores (não tem como saber o certo): "
+                          "aponta, com a chave de cada linha, na aba suspeitos do indicadores.xlsx.</p>")
     secoes.append("<h2>Ocorrências da leitura e da limpeza</h2>" + (
         "<table><tr><th>Nível</th><th>O que aconteceu</th><th>Coluna</th></tr>" +
         "".join(f"<tr><td>{_e(o.nivel)}</td><td>{_e(o.mensagem)}</td><td>{_e(o.coluna)}</td></tr>"
@@ -755,6 +764,8 @@ def entregar(cfg, arquivo, destino=None, segmentos: list[str] | None = None, alv
                 planilhas[f"logistica_{papel}"] = pd.DataFrame(g["linhas"])
         if qual:
             planilhas["qualidade_dama"] = qual["colunas"]
+            if len(qual["suspeitos"]):
+                planilhas["suspeitos"] = qual["suspeitos"]
         if estrela:
             planilhas["powerbi_relacoes"] = pd.DataFrame(estrela["relacoes"] or [{"de": "(sem dimensões)"}])
         if ml and ml.get("ok"):
@@ -764,6 +775,11 @@ def entregar(cfg, arquivo, destino=None, segmentos: list[str] | None = None, alv
         _gravar_xlsx(planilhas, pasta / "indicadores.xlsx")
         arquivos.append("indicadores.xlsx")
     rec = recomendacoes(a, prio, logi, rel, visao)
+    if qual and qual["tabela"].get("suspeitos"):
+        n_sus = sum(qual["tabela"]["suspeitos"].values())
+        rec.append(f"**Valores suspeitos:** {n_sus} apontado(s) ("
+                   + "; ".join(f"{r}: {q}" for r, q in qual["tabela"]["suspeitos"].items())
+                   + "). Estão na aba suspeitos do indicadores.xlsx com a chave de cada linha: confira na origem.")
     if qual and qual["tabela"]["criticas"]:
         rec.append(f"**Qualidade:** {len(qual['tabela']['criticas'])} coluna(s) em situação crítica "
                    f"({', '.join(map(str, qual['tabela']['criticas'][:5]))}): corrija na origem antes de usar em decisão.")

@@ -137,6 +137,43 @@ python -m robo entregar "clientes.xlsx" --alvo cancelou
 | `drivers precisam de pelo menos 30` | base pequena ou sem notas de atributo | normal em base pequena: o resto do relatório continua valendo |
 | O Excel não abre o `indicadores.xlsx` | arquivo aberto em outro programa | feche e gere de novo |
 
+## Prova da esteira: cenários sintéticos com gabarito e o placar
+
+**Por quê:** só dá para afirmar que a esteira é confiável comparando o que ela fez com a resposta certa. Planilha
+real não tem resposta certa conhecida; planilha sintética tem.
+
+**Gerar uma planilha de treino** (clientes de uma assinatura, até 100 mil linhas):
+
+```
+python -m robo cenario --linhas 50000 --semente 3
+```
+
+Saem dois arquivos: `cenario_clientes_s3_n50000.xlsx` (a planilha suja, para mandar ao Estúdio) e
+`...gabarito.json` (a resposta certa e a lista de cada erro plantado, com o id do cliente).
+
+O que o cenário traz:
+
+| Camada | Conteúdo |
+|---|---|
+| Regra conhecida | a chance de cancelar depende de chamados, uso do app, atraso de pagamento e plano; região, canal, idade, dia de vencimento e campanha são **ruído** |
+| Vazamento plantado | `motivo_cancelamento` só existe para quem cancelou (o ML tem que retirar) |
+| Erros que a esteira CORRIGE | grafias ('sudeste ', 'SUDESTE'), cópias exatas, R$ 1.234,56, data em texto |
+| Erros que a esteira APONTA | idade impossível, valor negativo, data no futuro, digitação 1000x, mesmo id com valor diferente |
+
+**Rodar o placar** (gera N cenários, roda a entrega completa em cada um e compara com o gabarito):
+
+```
+python -m robo placar --cenarios 3 --linhas 5000
+python -m robo placar --cenarios 3 --linhas 5000 --nivel 3     # o triplo de erros
+```
+
+São 15 verificações por cenário: números (linhas, soma, certificado), correções (grafias), detecção (cada tipo de
+erro: quanto achou e quantos alarmes falsos) e ML (veredito, vazamento, fatores verdadeiros no topo, ruído ignorado).
+Resultado em `logs/placar/<data>/placar.json`.
+
+**Limite honesto:** o placar mede os erros que nós sabemos plantar. Erro novo encontrado numa planilha real deve virar
+um tipo novo no gerador (`robo/cenarios.py`): é assim que a prova cresce.
+
 ## Como a "empresa" se liga ao produto
 
 Os 105 funcionários virtuais treinam todos os dias, na nuvem, com planilhas sintéticas da fábrica (15 tipos). Cada
