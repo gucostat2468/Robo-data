@@ -23,7 +23,35 @@ diferenças reais entre grupos e recomendações**, num relatório que abre em q
 | `indicadores.xlsx` | os números conferíveis (abas: indicadores, destaques, drivers, perfil, qualidade, logística) — base para o Power BI |
 | `base_tratada.xlsx` | a base limpa (datas, números BR, duplicatas, totais removidos), pronta para o Power BI ou para cruzar com outra |
 
-## Como usar no trabalho (passo a passo, Windows)
+## Jeito mais fácil: o Estúdio (interface no navegador)
+
+Sem pastas, sem comandos longos, sem o painel 3D.
+
+1. Na pasta do projeto, clique na **barra de endereço** do Explorador, digite `cmd` e aperte **Enter**.
+2. Digite `python -m robo estudio` e aperte **Enter**. O navegador abre sozinho em `http://127.0.0.1:8765`.
+3. Aba **1. Tratar planilha**: **arraste a planilha** para o quadro (ou clique nele e escolha). Se quiser, escreva os
+   segmentos (ex.: `regiao, curso`). Clique em **Tratar e analisar**.
+4. Em segundos aparecem as **recomendações**, o **relatório completo** na própria tela e os links para baixar
+   `relatório (HTML)`, `indicadores.xlsx` e `base tratada.xlsx`.
+5. Aba **2. SQL**: os dados **já tratados** viram a tabela `dados`. Escreva, por exemplo:
+
+   ```sql
+   SELECT regiao, COUNT(*) AS respostas, ROUND(AVG(nota_nps), 1) AS nota_media
+   FROM dados
+   GROUP BY regiao
+   ORDER BY respostas DESC
+   ```
+
+   e clique em **Executar** (ou **Ctrl+Enter**). Só leitura: `DELETE`, `DROP` e afins são recusados.
+   Com o PostgreSQL do robô configurado, a lista **Consultar** também oferece o banco (sempre só leitura).
+6. Para fechar: feche a janela preta (ou **Ctrl+C** nela).
+
+**Validação:** a contagem de linhas no topo ("Pronto: N linhas") deve bater com a planilha original menos as linhas de
+total/duplicadas que a seção "Limpeza e padronização feitas" do relatório lista.
+
+**Segurança:** o Estúdio só atende este computador (127.0.0.1); ninguém da rede consegue abrir.
+
+## Pelo comando (passo a passo, Windows)
 
 **Antes da 1ª vez** (uma vez só): o projeto já precisa estar instalado no computador (é o mesmo do painel do robô).
 

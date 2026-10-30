@@ -301,6 +301,11 @@ def principal(argv: list[str] | None = None) -> int:
     sp.add_argument("arquivo")
     sd = sub.add_parser("diagnosticar", help="analisa um arquivo sem gravar nem mover")
     sd.add_argument("arquivo")
+    sest = sub.add_parser("estudio", help="PRODUTO: interface simples no navegador — envie a planilha (limpeza, "
+                                         "padronização, análise e relatório) e consulte os dados tratados em SQL. "
+                                         "Só neste computador")
+    sest.add_argument("--porta", type=int, default=8765)
+    sest.add_argument("--sem-navegador", action="store_true", help="não abre o navegador sozinho")
     sen = sub.add_parser("entregar", help="PRODUTO: transforma uma planilha (pesquisa NPS/CSAT/CES ou entregas) num pacote "
                                           "para o gestor: base tratada, indicadores.xlsx e relatorio.html com "
                                           "recomendações. Roda só no seu computador; a base não sai dele")
@@ -638,6 +643,10 @@ def principal(argv: list[str] | None = None) -> int:
         r = processar_arquivo(args.arquivo, cfg, gravar=False)
         _imprimir_resultado(r)
         return 1 if r.relatorio.tem_erros else 0
+    if args.comando == "estudio":
+        from robo import estudio
+        estudio.abrir(cfg, args.porta, navegador=not args.sem_navegador)
+        return 0
     if args.comando == "entregar":
         from robo import entrega
         r = entrega.entregar(cfg, args.arquivo, args.destino,
