@@ -96,6 +96,82 @@ def logistica(df: pd.DataFrame, base_minima: int = 30) -> dict | None:
     return saida
 
 
+RE_SOMA = ("valor", "receita", "venda", "faturamento", "custo", "salario", "despesa", "investimento", "quantidade",
+           "qtd", "volume", "preco", "total", "leads", "mql", "estoque", "horas")
+
+
+def visao_geral(a, max_grupos: int = 12) -> dict:
+    """Para QUALQUER planilha: as métricas numéricas (soma quando é valor/quantidade, média nas demais), a métrica
+    principal por segmento e a evolução por mês quando há data. Nada de indicador de pesquisa aqui."""
+    if a is None or a.df.empty:
+        return {}
+    usadas = set(a.indicadores_cols.values())
+    numeros = [c for c, p in a.papeis.items() if p == "numero" and c not in usadas]
+    def op(c):
+        return "soma" if any(k in str(c).lower() for k in RE_SOMA) else "média"
+    metricas = []
+    for c in numeros[:6]:
+        v = pd.to_numeric(a.df[c], errors="coerce").dropna()
+        if len(v):
+            metricas.append({"coluna": c, "op": op(c), "valor": float(v.sum() if op(c) == "soma" else v.mean()),
+                             "n": int(len(v))})
+    saida = {"metricas": metricas, "por_segmento": [], "por_mes": None}
+    if not metricas:
+        return saida
+    def rank(m):  # dinheiro antes de quantidade: valor/receita/faturamento são a métrica principal do negócio
+        nome = str(m["coluna"]).lower()
+        return next((i for i, k in enumerate(RE_SOMA) if k in nome), len(RE_SOMA)) if m["op"] == "soma" else 99
+    principal = min(metricas, key=rank)
+    col, oper = principal["coluna"], principal["op"]
+    saida["principal"] = principal
+    base = a.df.assign(_v=pd.to_numeric(a.df[col], errors="coerce"))
+    for seg in a.segmentos[:4]:
+        g = base.groupby(seg, dropna=True, observed=True)["_v"]
+        r = (g.sum() if oper == "soma" else g.mean()).dropna().sort_values(ascending=False)
+        n = g.count()
+        if len(r) >= 2:
+            linhas = [{"grupo": str(k), "valor": float(v), "n": int(n.get(k, 0))} for k, v in r.head(max_grupos).items()]
+            total = float(r.sum()) if oper == "soma" else None
+            pareto = None
+            if total and len(r) >= 5:  # quantos grupos (20% do total de grupos) concentram quanto do total
+                k = max(1, round(0.2 * len(r)))
+                pareto = {"grupos_top": k, "grupos": len(r), "pct": 100 * float(r.head(k).sum()) / total}
+            saida["por_segmento"].append({"segmento": seg, "linhas": linhas, "total": total, "pareto": pareto,
+                                          "outros": max(0, len(r) - max_grupos)})
+    # valores fora do padrão (regra de Tukey: abaixo de Q1 − 3·IQR ou acima de Q3 + 3·IQR), por métrica
+    saida["fora_do_padrao"] = []
+    for m in metricas:
+        v = pd.to_numeric(a.df[m["coluna"]], errors="coerce").dropna()
+        q1, q3 = v.quantile(.25), v.quantile(.75)
+        iqr = q3 - q1
+        if iqr > 0:
+            n_fora = int(((v < q1 - 3 * iqr) | (v > q3 + 3 * iqr)).sum())
+            if n_fora:
+                saida["fora_do_padrao"].append({"coluna": m["coluna"], "n": n_fora, "pct": 100 * n_fora / len(v)})
+    datas = [c for c, p in a.papeis.items() if p == "data"]
+    if datas:
+        d = base.dropna(subset=[datas[0]])
+        if len(d):
+            mes = d[datas[0]].dt.to_period("M")
+            g = d.groupby(mes)["_v"]
+            r = (g.sum() if oper == "soma" else g.mean()).dropna()
+            cont = g.count()
+            # último mês com bem menos registros que os anteriores = mês ainda em andamento: fica fora da tendência
+            # (senão toda base parcial "cai 90%" no último mês — alarme falso)
+            parcial = len(cont) >= 4 and cont.iloc[-1] < 0.6 * cont.iloc[-4:-1].median()
+            if len(r) >= 2:
+                saida["por_mes"] = {"coluna_data": datas[0], "linhas": [(str(k), float(v)) for k, v in r.tail(18).items()]}
+                saida["por_mes"]["mes_parcial"] = str(r.index[-1]) if parcial else None
+                rt = r.iloc[:-1] if parcial else r
+                if len(rt) >= 4:  # último mês completo × média dos 3 anteriores (descritivo, não é teste estatístico)
+                    r = rt
+                    ult, ant = float(r.iloc[-1]), float(r.iloc[-4:-1].mean())
+                    if ant:
+                        saida["tendencia"] = {"mes": str(r.index[-1]), "valor": ult, "media_3_anteriores": ant,
+                                              "variacao_pct": 100 * (ult - ant) / abs(ant)}
+    return saida
+
+
 def prioridades(drv: dict, df: pd.DataFrame) -> list[dict]:
     """Matriz importância × desempenho (padrão de Customer Insights): importância = |correlação| com a nota;
     desempenho = média do atributo na própria escala (0 a 1). Importante e abaixo da mediana = melhorar primeiro."""
@@ -127,9 +203,38 @@ def prioridades(drv: dict, df: pd.DataFrame) -> list[dict]:
     return sorted(linhas, key=lambda x: (ordem[x["quadrante"]], -x["importancia"]))
 
 
-def recomendacoes(a, prio: list[dict], logi: dict | None, rel) -> list[str]:
+def recomendacoes(a, prio: list[dict], logi: dict | None, rel, visao: dict | None = None) -> list[str]:
     """Só o que os números sustentam. Cada frase diz de onde veio."""
     rec = []
+    vg = visao or {}
+    pr = vg.get("principal")
+    if pr and pr["op"] == "soma":
+        for blo in vg.get("por_segmento", [])[:2]:
+            lider = blo["linhas"][0]
+            if blo["total"] and lider["valor"] / blo["total"] >= 0.5 and len(blo["linhas"]) >= 3:
+                rec.append(f"Atenção à concentração: **{lider['grupo']}** responde por "
+                           f"{_n(100 * lider['valor'] / blo['total'])}% do total de {pr['coluna']} "
+                           f"(por {blo['segmento']}). Dependência de um grupo só é risco.")
+            elif blo.get("pareto") and blo["pareto"]["pct"] >= 50:
+                pa = blo["pareto"]
+                rec.append(f"Foco nos maiores: {pa['grupos_top']} de {pa['grupos']} grupos de {blo['segmento']} "
+                           f"concentram {_n(pa['pct'])}% do total de {pr['coluna']} (Pareto). Comece por eles.")
+    t = vg.get("tendencia")
+    if t and abs(t["variacao_pct"]) >= 15:
+        rec.append(f"{'Queda' if t['variacao_pct'] < 0 else 'Alta'} no último mês ({t['mes']}): "
+                   f"{pr['op'] if pr else ''} de {pr['coluna'] if pr else ''} {_n(abs(t['variacao_pct']))}% "
+                   f"{'abaixo' if t['variacao_pct'] < 0 else 'acima'} da média dos 3 meses anteriores. Confirme se o "
+                   f"mês está completo antes de concluir.")
+    for f in vg.get("fora_do_padrao", [])[:2]:
+        if f["pct"] >= 0.5:
+            rec.append(f"Conferir {f['n']} valor(es) fora do padrão em **{f['coluna']}** ({_n(f['pct'])}% da base): "
+                       "podem ser erro de digitação ou casos reais que merecem olhar.")
+    if a is not None and not a.destaques.empty:
+        med = a.destaques[a.destaques["significativo"] & ~a.destaques["medida"].astype(str).str.match(r"^(NPS|CSAT|CES)")]
+        for _, r in med.head(1).iterrows():
+            rec.append(f"Entender a diferença em **{r['segmento_coluna']} = {r['segmento']}**: {r['medida']} "
+                       f"{_n(r['valor_grupo'], 2)} contra {_n(r['valor_restante'], 2)} no restante (diferença real, "
+                       f"n={r['n_grupo']}).")
     for x in [p for p in prio if p["quadrante"] == "Melhorar primeiro"][:2]:
         rec.append(f"Priorizar **{x['atributo']}**: é dos atributos que mais andam junto com a nota (correlação "
                    f"{_n(x['importancia'], 2)}) e tem desempenho abaixo dos demais (média {_n(x['media'])} de "
@@ -244,6 +349,12 @@ def montar_html(info: dict) -> str:
                            f"{g['atrasadas']} entregas atrasadas"))
         if "lead_time_medio" in g:
             cards.append(_card("Lead time médio", f"{_n(g['lead_time_medio'])} dias", "prazo + atraso"))
+    vg = info.get("visao") or {}
+    if not cards and vg.get("metricas"):  # planilha que não é pesquisa nem logística: as métricas dela
+        for m in vg["metricas"][:3]:
+            cards.append(_card(f"{'Total' if m['op'] == 'soma' else 'Média'} de {m['coluna']}",
+                               _n(m["valor"], 0 if m["op"] == "soma" and abs(m["valor"]) >= 1000 else 2),
+                               f"n={m['n']}"))
     cards.append(_card("Registros analisados", f"{info['linhas']:,}".replace(",", "."),
                        f"{len(rel.erros)} erro(s) · {len(rel.avisos)} aviso(s) na limpeza"))
 
@@ -270,6 +381,43 @@ def montar_html(info: dict) -> str:
             secoes.append(f"<h3>{_e(ind)} por {_e(seg)}</h3>{_barras(itens, casas=0 if ind == 'NPS' else 1)}"
                           + ("<p class='nota'>* base pequena (menos de 30): não compare.</p>"
                              if any(g["base_pequena"]) else ""))
+    if vg.get("principal") and (a is None or a.indicadores.empty):
+        pr = vg["principal"]
+        nome = f"{'Total' if pr['op'] == 'soma' else 'Média'} de {pr['coluna']}"
+        for blo in vg["por_segmento"]:
+            itens = [(x["grupo"], x["valor"], COR["primaria"]) for x in blo["linhas"]]
+            parte = ""
+            if blo["total"]:
+                lider = blo["linhas"][0]
+                parte = (f"<p class='nota'>{_e(lider['grupo'])} responde por "
+                         f"{_n(100 * lider['valor'] / blo['total'])}% do total"
+                         + (f"; {blo['pareto']['grupos_top']} de {blo['pareto']['grupos']} grupos concentram "
+                            f"{_n(blo['pareto']['pct'])}% (Pareto)" if blo.get("pareto") else "") + ".</p>")
+            secoes.append(f"<h3>{_e(nome)} por {_e(blo['segmento'])}</h3>{_barras(itens, casas=0 if pr['op'] == 'soma' else 2)}"
+                          + parte + (f"<p class='nota'>+{blo['outros']} grupo(s) menores não mostrados (estão no "
+                                     "indicadores.xlsx).</p>" if blo["outros"] else ""))
+        if vg.get("por_mes"):
+            pm = vg["por_mes"]
+            itens = [(k, v, COR["primaria"]) for k, v in pm["linhas"]]
+            secoes.append(f"<h3>{_e(nome)} por mês ({_e(pm['coluna_data'])})</h3>"
+                          f"{_barras(itens, casas=0 if pr['op'] == 'soma' else 2)}"
+                          "<p class='nota'>Em ordem de tempo (mês mais antigo em cima)."
+                          + (f" {_e(pm['mes_parcial'])} parece incompleto (bem menos registros) e não entra na "
+                             "tendência." if pm.get("mes_parcial") else "") + "</p>")
+    if a is not None and not a.perfil.empty:
+        def resumo_col(r):
+            if r.get("papel") == "numero" and pd.notna(r.get("minimo")):
+                return f"{_n(r['minimo'], 2)} a {_n(r['maximo'], 2)} (mediana {_n(r['mediana'], 2)})"
+            if r.get("papel") == "data" and isinstance(r.get("minimo"), str):
+                return f"{r['minimo']} a {r['maximo']}"
+            mc = r.get("mais_comuns")
+            return "" if mc is None or (isinstance(mc, float) and math.isnan(mc)) else str(mc)[:120]
+        p = a.perfil[~a.perfil["papel"].isin(["auditoria"])]
+        secoes.append("<h2>Visão geral da base</h2><table><tr><th>Coluna</th><th>Tipo</th><th>Preenchido</th>"
+                      "<th>Distintos</th><th>Resumo</th></tr>" +
+                      "".join(f"<tr><td>{_e(r['coluna'])}</td><td>{_e(r['papel'])}</td><td>{_n(r['pct_preenchido'])}%"
+                              f"</td><td>{int(r['distintos'])}</td><td>{_e(resumo_col(r))}</td></tr>"
+                              for _, r in p.iterrows()) + "</table>")
     if a is not None and not a.destaques.empty:
         sig = a.destaques[a.destaques["significativo"]]
         if len(sig):
@@ -290,18 +438,31 @@ def montar_html(info: dict) -> str:
             secoes.append(f"<h3>% no prazo por {_e(g['coluna'])}</h3>{_barras(itens, '%')}"
                           "<p class='nota'>Em vermelho: abaixo do restante de forma significativa. * base pequena.</p>")
     oc = rel.ocorrencias
+    passos = [o_ for o_ in oc if o_.nivel == "INFO"]
+    if passos:
+        secoes.append("<h2>Limpeza e padronização feitas</h2><ul>" +
+                      "".join(f"<li>{_e(o_.mensagem)}" + (f" <span class='nota'>({_e(o_.coluna)})</span>" if o_.coluna
+                                                           else "") + "</li>" for o_ in passos[:40]) + "</ul>")
+    if vg.get("fora_do_padrao"):
+        secoes.append("<h3>Valores fora do padrão</h3><ul>" + "".join(
+            f"<li>{_e(f['coluna'])}: {f['n']} valor(es) ({_n(f['pct'])}%)</li>" for f in vg["fora_do_padrao"]) +
+            "</ul><p class='nota'>Regra de Tukey (3 × intervalo interquartil). Fora do padrão não quer dizer errado.</p>")
     secoes.append("<h2>Qualidade dos dados</h2>" + (
         "<table><tr><th>Nível</th><th>O que aconteceu</th><th>Coluna</th></tr>" +
         "".join(f"<tr><td>{_e(o.nivel)}</td><td>{_e(o.mensagem)}</td><td>{_e(o.coluna)}</td></tr>"
                 for o in oc if o.nivel in ("ERRO", "AVISO"))[:20000] + "</table>"
         if any(o.nivel in ("ERRO", "AVISO") for o in oc) else "<p>Nenhum erro ou aviso na leitura e na limpeza.</p>"))
     if a is not None and a.resumo:
-        secoes.append("<h2>Leitura do analista</h2><ul>" + "".join(f"<li>{_e(x)}</li>" for x in a.resumo) + "</ul>")
+        leitura = [x for x in a.resumo if not ("Nenhuma coluna de NPS" in x and a.indicadores.empty
+                                                 and (logi or vg.get("metricas")))]
+        secoes.append("<h2>Leitura do analista</h2><ul>" + "".join(f"<li>{_e(x)}</li>" for x in leitura) + "</ul>")
     secoes.append("<h2>Metodologia</h2><ul><li>NPS = % promotores (9–10) − % detratores (0–6); CSAT = top-2-box; "
                   "CES = % fácil.</li><li>Margem de erro a 95% de confiança.</li><li>Grupos com menos de 30 respostas "
                   "não viram destaque.</li><li>Diferenças entre grupos: teste z com correção de Holm.</li>"
                   "<li>Drivers: correlação e regressão padronizada; não provam causa.</li>"
-                  "<li>Logística: no prazo = atraso ≤ 0. Sem informação de pedido completo, não é OTIF.</li></ul>")
+                  "<li>Logística: no prazo = atraso ≤ 0. Sem informação de pedido completo, não é OTIF.</li>"
+                  "<li>Valor/quantidade: soma; demais números: média. Pareto: 20% dos grupos × % do total.</li>"
+                  "<li>Tendência: último mês × média dos 3 anteriores (descritivo, não é teste).</li></ul>")
     titulo = f"Relatório — {info['base']}"
     return f"""<!doctype html><html lang="pt-BR"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1"><title>{_e(titulo)}</title><style>
@@ -339,6 +500,7 @@ def entregar(cfg, arquivo, destino=None, segmentos: list[str] | None = None) -> 
     pasta.mkdir(parents=True, exist_ok=True)
     arquivos = []
     a = drv = logi = None
+    visao: dict = {}
     prio: list[dict] = []
     linhas = 0
     if t.analisaveis:
@@ -358,6 +520,7 @@ def entregar(cfg, arquivo, destino=None, segmentos: list[str] | None = None) -> 
             drv = ciencia.drivers(a.df, alvo)
             prio = prioridades(drv, a.df)
         logi = logistica(a.df, int(c["base_minima"]))
+        visao = visao_geral(a)
         if t.tabelas:
             _gravar_xlsx({k: v for k, v in t.tabelas.items()}, pasta / "base_tratada.xlsx")
             arquivos.append("base_tratada.xlsx")
@@ -368,14 +531,18 @@ def entregar(cfg, arquivo, destino=None, segmentos: list[str] | None = None) -> 
                 planilhas[nome_aba] = df_aba
         if drv and drv.get("ok"):
             planilhas["drivers"] = pd.DataFrame(prio or drv["drivers"])
+        for blo in visao.get("por_segmento", []):
+            planilhas[f"por_{blo['segmento']}"[:31]] = pd.DataFrame(blo["linhas"])
+        if visao.get("por_mes"):
+            planilhas["por_mes"] = pd.DataFrame(visao["por_mes"]["linhas"], columns=["mes", "valor"])
         if logi:
             planilhas["logistica_geral"] = pd.DataFrame([logi["geral"]])
             for papel, g in logi["grupos"].items():
                 planilhas[f"logistica_{papel}"] = pd.DataFrame(g["linhas"])
         _gravar_xlsx(planilhas, pasta / "indicadores.xlsx")
         arquivos.append("indicadores.xlsx")
-    rec = recomendacoes(a, prio, logi, rel)
-    info = {"analise": a, "relatorio": rel, "logistica": logi, "prioridades": prio,
+    rec = recomendacoes(a, prio, logi, rel, visao)
+    info = {"analise": a, "relatorio": rel, "logistica": logi, "prioridades": prio, "visao": visao,
             "drivers": drv if drv and drv.get("ok") else None, "recomendacoes": rec, "base": base,
             "arquivo": caminho.name, "linhas": linhas, "gerado_em": datetime.now()}
     (pasta / "relatorio.html").write_text(montar_html(info), encoding="utf-8")

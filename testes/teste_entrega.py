@@ -92,3 +92,31 @@ def teste_arquivo_ruim_gera_relatorio_que_explica(cfg_factory, tmp_path):
 
 def teste_numero_no_padrao_brasileiro():
     assert entrega._n(1234.5) == "1.234,5" and entrega._n(-0.04) == "0,0" and entrega._n(7.38, 0) == "7"
+
+
+def teste_qualquer_planilha_da_fabrica_vira_entrega(cfg_factory, tmp_path):
+    """As 15 regras da fábrica (vendas, financeiro, folha, estoque, churn...): limpeza, análise e relatório completos."""
+    from robo import regras_negocio
+    cfg = _cfg(cfg_factory)
+    for regra in regras_negocio.catalogo(cfg):
+        r = entrega.entregar(cfg, _lote(cfg, regra.id), tmp_path / "saida")
+        assert r["ok"] and r["linhas"] > 1000 and r["recomendacoes"], regra.id
+        h = (Path(r["pasta"]) / "relatorio.html").read_text(encoding="utf-8")
+        assert "Visão geral da base" in h and "Limpeza e padronização feitas" in h, regra.id
+        assert ">nan<" not in h.lower(), regra.id
+
+
+def teste_vendas_usa_valor_como_metrica_principal_e_ignora_mes_incompleto(cfg_factory, tmp_path):
+    import numpy as np
+    cfg = _cfg(cfg_factory)
+    rng = np.random.default_rng(1)
+    datas = list(pd.date_range("2026-01-01", "2026-06-30", freq="D")) * 6 + list(pd.date_range("2026-07-01", "2026-07-03"))
+    n = len(datas)
+    arq = tmp_path / "vendas.xlsx"
+    pd.DataFrame({"pedido": range(n), "regiao": rng.choice(["Sul", "Norte", "Sudeste"], n), "quantidade": rng.integers(1, 9, n),
+                  "valor_da_venda": rng.uniform(100, 900, n).round(2), "data_da_venda": datas}).to_excel(arq, index=False)
+    r = entrega.entregar(cfg, arq, tmp_path / "saida")
+    h = (Path(r["pasta"]) / "relatorio.html").read_text(encoding="utf-8")
+    assert "Total de valor_da_venda por regiao" in h
+    assert "2026-07 parece incompleto" in h  # 3 dias de julho não viram "queda de 95%"
+    assert not any("Queda no último mês (2026-07)" in x for x in r["recomendacoes"])
