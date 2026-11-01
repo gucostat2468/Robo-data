@@ -1,6 +1,6 @@
 # Empresa ao vivo
 
-**Boletim das 01/11 00:40** (horário de Brasília) · entre turnos: memória salva; o próximo turno começa em poucos minutos
+**Boletim das 01/11 00:41** (horário de Brasília) · trabalhando
 
 > Atualiza a cada 5 minutos enquanto a empresa trabalha. Recarregue a página para ver o mais novo.
 
@@ -9,7 +9,7 @@
 - **61** demandas, **61** concluídas (100%), 0 parciais, 0 com falha
 - **105** de 105 funcionários já trabalharam
 - SQL: 8 exercícios, 8 conferidos com o gabarito
-- Fábrica: 7 planilhas, 7 conferidas sem erro
+- Fábrica: 9 planilhas, 7 conferidas sem erro
 
 ## Trabalhando agora
 
@@ -265,21 +265,22 @@ Pacote gerado pelo produto (`python -m robo entregar`) a partir de um projeto ap
 - risco_demanda-v55: **reprovado** (treinado por ml_engenheiro)
 - risco_demanda-v56: **reprovado** (treinado por ml_engenheiro)
 - risco_demanda-v57: **reprovado** (treinado por ml_engenheiro)
-- Última avaliação independente (ml_avaliador): risco_demanda-v57 reprovado — log loss 0.059 contra baseline 0.040; motivos: não bate o baseline (log loss 0.0590 ≥ 0.0396)
-- Referência em sombra: risco_demanda-v48; 1305 previsões em sombra
+- risco_demanda-v58: **reprovado** (treinado por ml_engenheiro)
+- Última avaliação independente (ml_avaliador): risco_demanda-v58 reprovado — log loss 0.058 contra baseline 0.039; motivos: não bate o baseline (log loss 0.0577 ≥ 0.0386)
+- Referência em sombra: risco_demanda-v48; 1325 previsões em sombra
 - Uso operacional: desligado: o modelo só roda em sombra até o dono decidir usá-lo em alguma escolha da empresa
 
 ## Banco de dados
 
-Levantamento das 01/11 00:36: **82 de 101** tabelas com dados (444.324 linhas contadas uma a uma).
+Levantamento das 01/11 00:27: **80 de 99** tabelas com dados (434.747 linhas contadas uma a uma).
 
 
 | Onde | Tabelas | Com dados |
 |---|--:|--:|
 | sqlite | 81 | 67 |
-| postgres.laboratorio | 4 | 4 |
+| postgres.laboratorio | 3 | 3 |
 | postgres.robo | 2 | 0 |
-| postgres.treino | 11 | 11 |
+| postgres.treino | 10 | 10 |
 | postgres.bruto | 1 | 0 |
 | postgres.tratado | 1 | 0 |
 | postgres.analitico | 1 | 0 |
