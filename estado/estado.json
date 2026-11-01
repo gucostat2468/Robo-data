@@ -1,12 +1,12 @@
 {
  "versao": 1,
- "gerado_em": "2026-11-01T09:32:58",
+ "gerado_em": "2026-11-01T09:34:57",
  "turno": {
-  "estado": "entre turnos: memória salva; o próximo turno começa em poucos minutos",
-  "inicio": "2026-11-01T08:52:05",
-  "fim_previsto": "2026-11-01T09:32:05",
-  "voltas": 133,
-  "planilhas": 4
+  "estado": "trabalhando",
+  "inicio": "2026-11-01T09:34:57",
+  "fim_previsto": "2026-11-01T10:14:57",
+  "voltas": 0,
+  "planilhas": 2
  },
  "funcionarios": 105,
  "andares": [
@@ -154,7 +154,7 @@
   "concluidos_hoje": 25
  },
  "fabrica": {
-  "lotes_hoje": 39,
+  "lotes_hoje": 41,
   "conferidos_ok_hoje": 39
  },
  "rotinas": [
@@ -166,9 +166,9 @@
   },
   {
    "rotina": "caixa_dono",
-   "execucoes_24h": 10,
+   "execucoes_24h": 11,
    "erros_24h": 0,
-   "ultima": "2026-11-01T08:51:03"
+   "ultima": "2026-11-01T09:34:39"
   },
   {
    "rotina": "demandas",
@@ -202,9 +202,9 @@
   },
   {
    "rotina": "jornada",
-   "execucoes_24h": 10,
+   "execucoes_24h": 11,
    "erros_24h": 0,
-   "ultima": "2026-11-01T08:51:03"
+   "ultima": "2026-11-01T09:34:39"
   },
   {
    "rotina": "laboratorio",
@@ -214,27 +214,27 @@
   },
   {
    "rotina": "licoes",
-   "execucoes_24h": 5,
+   "execucoes_24h": 6,
    "erros_24h": 0,
-   "ultima": "2026-11-01T08:06:44"
+   "ultima": "2026-11-01T09:34:39"
   },
   {
    "rotina": "memoria_pg",
-   "execucoes_24h": 11,
+   "execucoes_24h": 10,
    "erros_24h": 0,
-   "ultima": "2026-11-01T09:32:55"
+   "ultima": "2026-11-01T09:24:14"
   },
   {
    "rotina": "modelos",
-   "execucoes_24h": 10,
+   "execucoes_24h": 11,
    "erros_24h": 0,
-   "ultima": "2026-11-01T08:51:14"
+   "ultima": "2026-11-01T09:34:50"
   },
   {
    "rotina": "paineis",
-   "execucoes_24h": 10,
+   "execucoes_24h": 11,
    "erros_24h": 0,
-   "ultima": "2026-11-01T08:51:11"
+   "ultima": "2026-11-01T09:34:47"
   },
   {
    "rotina": "registro",
@@ -250,9 +250,9 @@
   },
   {
    "rotina": "ronda_ti",
-   "execucoes_24h": 30,
+   "execucoes_24h": 31,
    "erros_24h": 0,
-   "ultima": "2026-11-01T09:30:44"
+   "ultima": "2026-11-01T09:34:31"
   },
   {
    "rotina": "treino",
@@ -265,15 +265,15 @@
   "demandas": 1954,
   "tentativas_treino": 18798,
   "conversas": 5841,
-  "trabalhos_com_prova": 11396
+  "trabalhos_com_prova": 11405
  },
  "banco": {
-  "levantamento": "2026-11-01T09:30:45",
+  "levantamento": "2026-11-01T09:22:06",
   "postgres_conferido": true,
   "erro_postgres": null,
   "tabelas": 101,
   "com_dados": 82,
-  "linhas": 458636,
+  "linhas": 458322,
   "resumo": {
    "sqlite": {
     "tabelas": 81,
@@ -2141,8 +2141,8 @@
   "finalidade": "risco_demanda",
   "rotuladas_agora": 1911,
   "minimo_para_treinar": 60,
-  "datasets": 61,
-  "maior_dataset": 1870,
+  "datasets": 62,
+  "maior_dataset": 1911,
   "modelos": [
    {
     "id": "risco_demanda-v1",
@@ -2448,31 +2448,36 @@
     "id": "risco_demanda-v61",
     "estado": "reprovado",
     "criado_por": "ml_engenheiro"
+   },
+   {
+    "id": "risco_demanda-v62",
+    "estado": "reprovado",
+    "criado_por": "ml_engenheiro"
    }
   ],
   "referencia": "risco_demanda-v48",
-  "inferencias_sombra": 1447,
+  "inferencias_sombra": 1448,
   "uso_operacional": "desligado: o modelo só roda em sombra até o dono decidir usá-lo em alguma escolha da empresa",
   "ultima_avaliacao": {
-   "modelo": "risco_demanda-v61",
+   "modelo": "risco_demanda-v62",
    "resultado": "avaliado_reprovado",
    "quem": "ml_avaliador",
    "candidato": {
-    "n": 281,
-    "taxa_real": 0.014235,
-    "log_loss": 0.047868,
-    "brier": 0.009581,
-    "auc": 0.98917
+    "n": 287,
+    "taxa_real": 0.013937,
+    "log_loss": 0.043487,
+    "brier": 0.008826,
+    "auc": 0.989399
    },
    "baseline": {
-    "n": 281,
-    "taxa_real": 0.014235,
-    "log_loss": 0.034125,
-    "brier": 0.011061,
-    "auc": 0.983303
+    "n": 287,
+    "taxa_real": 0.013937,
+    "log_loss": 0.033244,
+    "brier": 0.010668,
+    "auc": 0.988516
    },
    "motivos": [
-    "não bate o baseline (log loss 0.0479 ≥ 0.0341)"
+    "não bate o baseline (log loss 0.0435 ≥ 0.0332)"
    ]
   }
  },
