@@ -1,6 +1,6 @@
 # Empresa ao vivo
 
-**Boletim das 01/11 11:42** (horário de Brasília) · entre turnos: memória salva; o próximo turno começa em poucos minutos
+**Boletim das 01/11 11:44** (horário de Brasília) · trabalhando
 
 > Atualiza a cada 5 minutos enquanto a empresa trabalha. Recarregue a página para ver o mais novo.
 
@@ -9,7 +9,7 @@
 - **266** demandas, **262** concluídas (98%), 0 parciais, 4 com falha
 - **105** de 105 funcionários já trabalharam
 - SQL: 32 exercícios, 32 conferidos com o gabarito
-- Fábrica: 67 planilhas, 67 conferidas sem erro
+- Fábrica: 69 planilhas, 67 conferidas sem erro
 
 ## Trabalhando agora
 
@@ -272,21 +272,22 @@ Pacote gerado pelo produto (`python -m robo entregar`) a partir de um projeto ap
 - risco_demanda-v62: **reprovado** (treinado por ml_engenheiro)
 - risco_demanda-v63: **reprovado** (treinado por ml_engenheiro)
 - risco_demanda-v64: **reprovado** (treinado por ml_engenheiro)
-- Última avaliação independente (ml_avaliador): risco_demanda-v64 reprovado — log loss 0.046 contra baseline 0.044; motivos: não bate o baseline (log loss 0.0461 ≥ 0.0442)
-- Referência em sombra: risco_demanda-v48; 1509 previsões em sombra
+- risco_demanda-v65: **reprovado** (treinado por ml_engenheiro)
+- Última avaliação independente (ml_avaliador): risco_demanda-v65 reprovado — log loss 0.059 contra baseline 0.043; motivos: não bate o baseline (log loss 0.0588 ≥ 0.0433); não bate a referência atual risco_demanda-v48 (log loss 0.0588 ≥ 0.0569)
+- Referência em sombra: risco_demanda-v48; 1530 previsões em sombra
 - Uso operacional: desligado: o modelo só roda em sombra até o dono decidir usá-lo em alguma escolha da empresa
 
 ## Banco de dados
 
-Levantamento das 01/11 11:39: **82 de 101** tabelas com dados (488.106 linhas contadas uma a uma).
+Levantamento das 01/11 11:30: **80 de 99** tabelas com dados (481.076 linhas contadas uma a uma).
 
 
 | Onde | Tabelas | Com dados |
 |---|--:|--:|
 | sqlite | 81 | 67 |
-| postgres.laboratorio | 4 | 4 |
+| postgres.laboratorio | 3 | 3 |
 | postgres.robo | 2 | 0 |
-| postgres.treino | 11 | 11 |
+| postgres.treino | 10 | 10 |
 | postgres.bruto | 1 | 0 |
 | postgres.tratado | 1 | 0 |
 | postgres.analitico | 1 | 0 |
