@@ -1,6 +1,6 @@
 # Empresa ao vivo
 
-**Boletim das 01/11 16:35** (horário de Brasília) · trabalhando
+**Boletim das 01/11 16:41** (horário de Brasília) · trabalhando
 
 > Atualiza a cada 5 minutos enquanto a empresa trabalha. Recarregue a página para ver o mais novo.
 
@@ -9,7 +9,7 @@
 - **367** demandas, **363** concluídas (99%), 0 parciais, 4 com falha
 - **105** de 105 funcionários já trabalharam
 - SQL: 42 exercícios, 42 conferidos com o gabarito
-- Fábrica: 94 planilhas, 94 conferidas sem erro
+- Fábrica: 95 planilhas, 94 conferidas sem erro
 
 ## Trabalhando agora
 
@@ -283,15 +283,15 @@ Pacote gerado pelo produto (`python -m robo entregar`) a partir de um projeto ap
 
 ## Banco de dados
 
-Levantamento das 01/11 15:55: **80 de 99** tabelas com dados (493.009 linhas contadas uma a uma).
+Levantamento das 01/11 16:39: **82 de 101** tabelas com dados (502.470 linhas contadas uma a uma).
 
 
 | Onde | Tabelas | Com dados |
 |---|--:|--:|
 | sqlite | 81 | 67 |
-| postgres.laboratorio | 3 | 3 |
+| postgres.laboratorio | 4 | 4 |
 | postgres.robo | 2 | 0 |
-| postgres.treino | 10 | 10 |
+| postgres.treino | 11 | 11 |
 | postgres.bruto | 1 | 0 |
 | postgres.tratado | 1 | 0 |
 | postgres.analitico | 1 | 0 |
