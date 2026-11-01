@@ -1,6 +1,6 @@
 # Empresa ao vivo
 
-**Boletim das 01/11 11:38** (horário de Brasília) · trabalhando
+**Boletim das 01/11 11:42** (horário de Brasília) · entre turnos: memória salva; o próximo turno começa em poucos minutos
 
 > Atualiza a cada 5 minutos enquanto a empresa trabalha. Recarregue a página para ver o mais novo.
 
@@ -186,11 +186,11 @@
 
 ## Tempo do último turno (medido)
 
-- 13:15–13:55 (40 min, 137 voltas; cobertura do cronômetro 100%)
-- **Entregas aprovadas na revisão independente: 7 (10.5 por hora)** — o indicador principal
-- operacional 1% · estudo 1% · revisao 0% · coordenacao 0% · manutencao 12% · erro 0% · parado 86% · sem_medicao 0%
-- Bloqueios: 0; etapas esperando dependência: 0
-- Turnos anteriores (entregas/hora): 7.5, 15.0, 10.5, 15.0, 30.0
+- 13:59–14:39 (40 min, 136 voltas; cobertura do cronômetro 100%)
+- **Entregas aprovadas na revisão independente: 21 (31.5 por hora)** — o indicador principal
+- operacional 1% · estudo 1% · revisao 0% · coordenacao 0% · manutencao 13% · erro 0% · parado 85% · sem_medicao 0%
+- Bloqueios: 2; etapas esperando dependência: 0
+- Turnos anteriores (entregas/hora): 10.5, 7.5, 15.0, 10.5, 15.0
 
 ## Projetos entre andares (várias pessoas, uma etapa depende da outra)
 
@@ -278,15 +278,15 @@ Pacote gerado pelo produto (`python -m robo entregar`) a partir de um projeto ap
 
 ## Banco de dados
 
-Levantamento das 01/11 11:30: **80 de 99** tabelas com dados (481.076 linhas contadas uma a uma).
+Levantamento das 01/11 11:39: **82 de 101** tabelas com dados (488.106 linhas contadas uma a uma).
 
 
 | Onde | Tabelas | Com dados |
 |---|--:|--:|
 | sqlite | 81 | 67 |
-| postgres.laboratorio | 3 | 3 |
+| postgres.laboratorio | 4 | 4 |
 | postgres.robo | 2 | 0 |
-| postgres.treino | 10 | 10 |
+| postgres.treino | 11 | 11 |
 | postgres.bruto | 1 | 0 |
 | postgres.tratado | 1 | 0 |
 | postgres.analitico | 1 | 0 |
