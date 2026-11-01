@@ -1,11 +1,11 @@
 {
  "versao": 1,
- "gerado_em": "2026-11-01T16:56:41",
+ "gerado_em": "2026-11-01T17:01:47",
  "turno": {
   "estado": "trabalhando",
   "inicio": "2026-11-01T16:56:41",
   "fim_previsto": "2026-11-01T17:36:41",
-  "voltas": 0,
+  "voltas": 20,
   "planilhas": 2
  },
  "funcionarios": 105,
@@ -18,7 +18,7 @@
    "concluidas": 54,
    "parciais": 0,
    "falhas": 0,
-   "treino": 492,
+   "treino": 496,
    "acertos": 127
   },
   {
@@ -29,7 +29,7 @@
    "concluidas": 62,
    "parciais": 0,
    "falhas": 0,
-   "treino": 454,
+   "treino": 461,
    "acertos": 120
   },
   {
@@ -40,7 +40,7 @@
    "concluidas": 33,
    "parciais": 0,
    "falhas": 0,
-   "treino": 305,
+   "treino": 306,
    "acertos": 72
   },
   {
@@ -51,23 +51,31 @@
    "concluidas": 63,
    "parciais": 0,
    "falhas": 0,
-   "treino": 638,
+   "treino": 641,
    "acertos": 142
   },
   {
    "andar": 5,
    "pessoas": 24,
    "trabalharam_hoje": 24,
-   "demandas": 124,
-   "concluidas": 120,
+   "demandas": 125,
+   "concluidas": 121,
    "parciais": 0,
    "falhas": 4,
-   "treino": 606,
+   "treino": 609,
    "acertos": 157
   }
  ],
  "agora": [],
  "ultimos": [
+  {
+   "quando": "2026-11-01T16:58:25",
+   "funcionario": "Marina",
+   "cargo": "Arquiteta de Cloud (AWS)",
+   "andar": 5,
+   "trabalho": "Testar se o último backup volta — nível dificil",
+   "estado": "concluida"
+  },
   {
    "quando": "2026-11-01T16:28:26",
    "funcionario": "Marcos",
@@ -139,14 +147,6 @@
    "andar": 4,
    "trabalho": "Verificar dados pessoais (LGPD) na base sintética — nível medio",
    "estado": "concluida"
-  },
-  {
-   "quando": "2026-11-01T15:58:16",
-   "funcionario": "Otto",
-   "cargo": "Auditoria (Validação)",
-   "andar": 1,
-   "trabalho": "Diagnosticar a planilha original da fábrica — nível dificil",
-   "estado": "concluida"
   }
  ],
  "sql": {
@@ -155,7 +155,7 @@
  },
  "fabrica": {
   "lotes_hoje": 81,
-  "conferidos_ok_hoje": 79
+  "conferidos_ok_hoje": 81
  },
  "rotinas": [
   {
@@ -172,9 +172,9 @@
   },
   {
    "rotina": "demandas",
-   "execucoes_24h": 29,
+   "execucoes_24h": 30,
    "erros_24h": 0,
-   "ultima": "2026-11-01T16:28:29"
+   "ultima": "2026-11-01T16:58:25"
   },
   {
    "rotina": "dialogo",
@@ -190,9 +190,9 @@
   },
   {
    "rotina": "fabrica",
-   "execucoes_24h": 101,
+   "execucoes_24h": 102,
    "erros_24h": 0,
-   "ultima": "2026-11-01T16:46:19"
+   "ultima": "2026-11-01T16:56:49"
   },
   {
    "rotina": "ideias",
@@ -208,9 +208,9 @@
   },
   {
    "rotina": "laboratorio",
-   "execucoes_24h": 80,
+   "execucoes_24h": 81,
    "erros_24h": 0,
-   "ultima": "2026-11-01T16:46:19"
+   "ultima": "2026-11-01T16:56:48"
   },
   {
    "rotina": "licoes",
@@ -238,9 +238,9 @@
   },
   {
    "rotina": "registro",
-   "execucoes_24h": 358,
+   "execucoes_24h": 361,
    "erros_24h": 0,
-   "ultima": "2026-11-01T16:51:06"
+   "ultima": "2026-11-01T16:58:41"
   },
   {
    "rotina": "rh_desempenho",
@@ -256,16 +256,16 @@
   },
   {
    "rotina": "treino",
-   "execucoes_24h": 386,
+   "execucoes_24h": 390,
    "erros_24h": 0,
-   "ultima": "2026-11-01T16:50:26"
+   "ultima": "2026-11-01T17:01:16"
   }
  ],
  "totais": {
-  "demandas": 2106,
-  "tentativas_treino": 20027,
+  "demandas": 2107,
+  "tentativas_treino": 20045,
   "conversas": 5984,
-  "trabalhos_com_prova": 12492
+  "trabalhos_com_prova": 12511
  },
  "banco": {
   "levantamento": "2026-11-01T16:42:05",
@@ -635,7 +635,7 @@
    "ultimo": "",
    "quando": "",
    "estado": "",
-   "situacao": "estagiário: observa (regra do dono) — Observei Marcelo (Gerente de Engenharia de Dados) fazendo \"Conferir no PostgreSQL os lotes da fábrica\" no nível profissi"
+   "situacao": "estagiário: observa (regra do dono) — Observei Marina (Arquiteta de Cloud (AWS)) fazendo \"Testar se o último backup volta\" no nível dificil: terminou concluid"
   },
   {
    "nome": "Tina",
@@ -866,7 +866,7 @@
    "ultimo": "",
    "quando": "",
    "estado": "",
-   "situacao": "estagiário: observa (regra do dono) — Observei Marcelo (Gerente de Engenharia de Dados) fazendo \"Conferir no PostgreSQL os lotes da fábrica\" no nível profissi"
+   "situacao": "estagiário: observa (regra do dono) — Observei Marina (Arquiteta de Cloud (AWS)) fazendo \"Testar se o último backup volta\" no nível dificil: terminou concluid"
   },
   {
    "nome": "Felipe",
@@ -1108,7 +1108,7 @@
    "ultimo": "",
    "quando": "",
    "estado": "",
-   "situacao": "estagiário: observa (regra do dono) — Observei Vitor (Analista de Governança Pleno) fazendo \"Verificar dados pessoais (LGPD) na base sintética\" no nível medio"
+   "situacao": "estagiário: observa (regra do dono)"
   },
   {
    "nome": "Lorena",
@@ -1119,7 +1119,7 @@
    "ultimo": "",
    "quando": "",
    "estado": "",
-   "situacao": "estagiário: observa (regra do dono) — Observei Vitor (Analista de Governança Pleno) fazendo \"Verificar dados pessoais (LGPD) na base sintética\" no nível medio"
+   "situacao": "estagiário: observa (regra do dono)"
   },
   {
    "nome": "Lívia",
@@ -1383,7 +1383,7 @@
    "ultimo": "",
    "quando": "",
    "estado": "",
-   "situacao": "estagiário: observa (regra do dono) — Observei Marcelo (Gerente de Engenharia de Dados) fazendo \"Conferir no PostgreSQL os lotes da fábrica\" no nível profissi"
+   "situacao": "estagiário: observa (regra do dono) — Observei Marina (Arquiteta de Cloud (AWS)) fazendo \"Testar se o último backup volta\" no nível dificil: terminou concluid"
   },
   {
    "nome": "Diego",
@@ -1427,7 +1427,7 @@
    "ultimo": "",
    "quando": "",
    "estado": "",
-   "situacao": "estagiário: observa (regra do dono) — Observei Marcelo (Gerente de Engenharia de Dados) fazendo \"Conferir no PostgreSQL os lotes da fábrica\" no nível profissi"
+   "situacao": "estagiário: observa (regra do dono) — Observei Marina (Arquiteta de Cloud (AWS)) fazendo \"Testar se o último backup volta\" no nível dificil: terminou concluid"
   },
   {
    "nome": "Gustavo",
@@ -1489,9 +1489,9 @@
    "andar": 5,
    "cargo": "Arquiteta de Cloud (AWS)",
    "area": "Engenharia de Dados",
-   "demandas_hoje": 10,
-   "ultimo": "Procurar segredos no repositório público — nível medio",
-   "quando": "2026-11-01T15:58:16",
+   "demandas_hoje": 11,
+   "ultimo": "Testar se o último backup volta — nível dificil",
+   "quando": "2026-11-01T16:58:24",
    "estado": "concluida",
    "situacao": "trabalho do papel"
   },
@@ -2138,7 +2138,7 @@
  ],
  "modelos": {
   "finalidade": "risco_demanda",
-  "rotuladas_agora": 2063,
+  "rotuladas_agora": 2064,
   "minimo_para_treinar": 60,
   "datasets": 67,
   "maior_dataset": 2054,
@@ -2522,8 +2522,8 @@
   },
   {
    "nivel": "dificil",
-   "demandas": 928,
-   "concluidas": 908,
+   "demandas": 929,
+   "concluidas": 909,
    "parciais": 1,
    "falhas": 19
   },
