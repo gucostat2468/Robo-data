@@ -1,12 +1,12 @@
 {
  "versao": 1,
- "gerado_em": "2026-11-01T13:14:22",
+ "gerado_em": "2026-11-01T13:16:03",
  "turno": {
-  "estado": "entre turnos: memória salva; o próximo turno começa em poucos minutos",
-  "inicio": "2026-11-01T12:32:46",
-  "fim_previsto": "2026-11-01T13:12:46",
-  "voltas": 138,
-  "planilhas": 4
+  "estado": "trabalhando",
+  "inicio": "2026-11-01T13:16:03",
+  "fim_previsto": "2026-11-01T13:56:03",
+  "voltas": 0,
+  "planilhas": 2
  },
  "funcionarios": 105,
  "andares": [
@@ -154,7 +154,7 @@
   "concluidos_hoje": 30
  },
  "fabrica": {
-  "lotes_hoje": 59,
+  "lotes_hoje": 61,
   "conferidos_ok_hoje": 59
  },
  "rotinas": [
@@ -166,9 +166,9 @@
   },
   {
    "rotina": "caixa_dono",
-   "execucoes_24h": 15,
+   "execucoes_24h": 16,
    "erros_24h": 0,
-   "ultima": "2026-11-01T12:32:31"
+   "ultima": "2026-11-01T13:15:52"
   },
   {
    "rotina": "demandas",
@@ -202,9 +202,9 @@
   },
   {
    "rotina": "jornada",
-   "execucoes_24h": 15,
+   "execucoes_24h": 16,
    "erros_24h": 0,
-   "ultima": "2026-11-01T12:32:31"
+   "ultima": "2026-11-01T13:15:52"
   },
   {
    "rotina": "laboratorio",
@@ -220,21 +220,21 @@
   },
   {
    "rotina": "memoria_pg",
-   "execucoes_24h": 16,
+   "execucoes_24h": 15,
    "erros_24h": 0,
-   "ultima": "2026-11-01T13:14:19"
+   "ultima": "2026-11-01T13:05:14"
   },
   {
    "rotina": "modelos",
-   "execucoes_24h": 15,
+   "execucoes_24h": 16,
    "erros_24h": 0,
-   "ultima": "2026-11-01T12:32:39"
+   "ultima": "2026-11-01T13:15:57"
   },
   {
    "rotina": "paineis",
-   "execucoes_24h": 15,
+   "execucoes_24h": 16,
    "erros_24h": 0,
-   "ultima": "2026-11-01T12:32:36"
+   "ultima": "2026-11-01T13:15:56"
   },
   {
    "rotina": "registro",
@@ -250,9 +250,9 @@
   },
   {
    "rotina": "ronda_ti",
-   "execucoes_24h": 45,
+   "execucoes_24h": 46,
    "erros_24h": 0,
-   "ultima": "2026-11-01T13:12:10"
+   "ultima": "2026-11-01T13:15:46"
   },
   {
    "rotina": "treino",
@@ -265,15 +265,15 @@
   "demandas": 2008,
   "tentativas_treino": 19407,
   "conversas": 5905,
-  "trabalhos_com_prova": 11910
+  "trabalhos_com_prova": 11918
  },
  "banco": {
-  "levantamento": "2026-11-01T13:12:10",
+  "levantamento": "2026-11-01T13:03:02",
   "postgres_conferido": true,
   "erro_postgres": null,
   "tabelas": 101,
   "com_dados": 82,
-  "linhas": 480465,
+  "linhas": 480135,
   "resumo": {
    "sqlite": {
     "tabelas": 81,
@@ -2465,7 +2465,7 @@
    }
   ],
   "referencia": "risco_demanda-v48",
-  "inferencias_sombra": 1497,
+  "inferencias_sombra": 1502,
   "uso_operacional": "desligado: o modelo só roda em sombra até o dono decidir usá-lo em alguma escolha da empresa",
   "ultima_avaliacao": {
    "modelo": "risco_demanda-v64",
