@@ -1,11 +1,11 @@
 {
  "versao": 1,
- "gerado_em": "2026-11-01T12:48:47",
+ "gerado_em": "2026-11-01T12:54:00",
  "turno": {
   "estado": "trabalhando",
   "inicio": "2026-11-01T12:32:46",
   "fim_previsto": "2026-11-01T13:12:46",
-  "voltas": 61,
+  "voltas": 81,
   "planilhas": 3
  },
  "funcionarios": 105,
@@ -18,8 +18,8 @@
    "concluidas": 36,
    "parciais": 0,
    "falhas": 0,
-   "treino": 358,
-   "acertos": 101
+   "treino": 360,
+   "acertos": 103
   },
   {
    "andar": 2,
@@ -29,8 +29,8 @@
    "concluidas": 42,
    "parciais": 0,
    "falhas": 0,
-   "treino": 330,
-   "acertos": 90
+   "treino": 335,
+   "acertos": 95
   },
   {
    "andar": 3,
@@ -40,8 +40,8 @@
    "concluidas": 22,
    "parciais": 0,
    "falhas": 0,
-   "treino": 220,
-   "acertos": 53
+   "treino": 222,
+   "acertos": 55
   },
   {
    "andar": 4,
@@ -51,23 +51,63 @@
    "concluidas": 42,
    "parciais": 0,
    "falhas": 0,
-   "treino": 466,
-   "acertos": 113
+   "treino": 470,
+   "acertos": 116
   },
   {
    "andar": 5,
    "pessoas": 24,
    "trabalharam_hoje": 24,
-   "demandas": 91,
-   "concluidas": 87,
+   "demandas": 96,
+   "concluidas": 92,
    "parciais": 0,
    "falhas": 4,
-   "treino": 439,
-   "acertos": 123
+   "treino": 444,
+   "acertos": 126
   }
  ],
  "agora": [],
  "ultimos": [
+  {
+   "quando": "2026-11-01T12:53:45",
+   "funcionario": "Elisa",
+   "cargo": "Especialista em PyYAML (configuração)",
+   "andar": 5,
+   "trabalho": "Ronda de saúde do sistema — nível dificil",
+   "estado": "concluida"
+  },
+  {
+   "quando": "2026-11-01T12:53:45",
+   "funcionario": "Ícaro",
+   "cargo": "Sênior de AWS, Linux e Ubuntu",
+   "andar": 5,
+   "trabalho": "Medir a saúde do PostgreSQL — nível dificil",
+   "estado": "concluida"
+  },
+  {
+   "quando": "2026-11-01T12:53:43",
+   "funcionario": "Pietro",
+   "cargo": "Especialista em psycopg (PostgreSQL)",
+   "andar": 5,
+   "trabalho": "Exercício de SQL no PostgreSQL com os dados da fábrica — nível dificil",
+   "estado": "concluida"
+  },
+  {
+   "quando": "2026-11-01T12:53:43",
+   "funcionario": "Silas",
+   "cargo": "Especialista em sqlite3 (memória da empresa)",
+   "andar": 5,
+   "trabalho": "Medir a saúde do PostgreSQL — nível dificil",
+   "estado": "concluida"
+  },
+  {
+   "quando": "2026-11-01T12:53:43",
+   "funcionario": "Xavier",
+   "cargo": "Especialista em xlrd (.xls antigo)",
+   "andar": 5,
+   "trabalho": "Medir a saúde do PostgreSQL — nível dificil",
+   "estado": "concluida"
+  },
   {
    "quando": "2026-11-01T12:23:39",
    "funcionario": "Marcos",
@@ -107,51 +147,11 @@
    "andar": 5,
    "trabalho": "Medir a saúde do PostgreSQL — nível dificil",
    "estado": "concluida"
-  },
-  {
-   "quando": "2026-11-01T12:23:31",
-   "funcionario": "Olívia",
-   "cargo": "Especialista em openpyxl (Excel)",
-   "andar": 5,
-   "trabalho": "Medir a saúde do PostgreSQL — nível dificil",
-   "estado": "concluida"
-  },
-  {
-   "quando": "2026-11-01T12:23:31",
-   "funcionario": "Sofia",
-   "cargo": "Especialista em pandas",
-   "andar": 5,
-   "trabalho": "Exercício de SQL no PostgreSQL com os dados da fábrica — nível dificil",
-   "estado": "concluida"
-  },
-  {
-   "quando": "2026-11-01T11:53:20",
-   "funcionario": "Ícaro",
-   "cargo": "Sênior de AWS, Linux e Ubuntu",
-   "andar": 5,
-   "trabalho": "Testar se o último backup volta — nível dificil",
-   "estado": "concluida"
-  },
-  {
-   "quando": "2026-11-01T11:53:19",
-   "funcionario": "Diego",
-   "cargo": "Desenvolvedor Python Pleno",
-   "andar": 5,
-   "trabalho": "Procurar segredos no repositório público",
-   "estado": "concluida"
-  },
-  {
-   "quando": "2026-11-01T11:53:19",
-   "funcionario": "Alexandre",
-   "cargo": "Diretor de Tecnologia (CTO)",
-   "andar": 5,
-   "trabalho": "Medir a saúde do PostgreSQL — nível profissional",
-   "estado": "concluida"
   }
  ],
  "sql": {
-  "exercicios_hoje": 29,
-  "concluidos_hoje": 29
+  "exercicios_hoje": 30,
+  "concluidos_hoje": 30
  },
  "fabrica": {
   "lotes_hoje": 58,
@@ -172,9 +172,9 @@
   },
   {
    "rotina": "demandas",
-   "execucoes_24h": 21,
+   "execucoes_24h": 22,
    "erros_24h": 0,
-   "ultima": "2026-11-01T12:23:42"
+   "ultima": "2026-11-01T12:53:45"
   },
   {
    "rotina": "dialogo",
@@ -208,9 +208,9 @@
   },
   {
    "rotina": "laboratorio",
-   "execucoes_24h": 58,
+   "execucoes_24h": 59,
    "erros_24h": 0,
-   "ultima": "2026-11-01T12:42:51"
+   "ultima": "2026-11-01T12:52:55"
   },
   {
    "rotina": "licoes",
@@ -238,9 +238,9 @@
   },
   {
    "rotina": "registro",
-   "execucoes_24h": 257,
+   "execucoes_24h": 260,
    "erros_24h": 0,
-   "ultima": "2026-11-01T12:48:16"
+   "ultima": "2026-11-01T12:54:00"
   },
   {
    "rotina": "rh_desempenho",
@@ -256,16 +256,16 @@
   },
   {
    "rotina": "treino",
-   "execucoes_24h": 274,
+   "execucoes_24h": 277,
    "erros_24h": 0,
-   "ultima": "2026-11-01T12:47:25"
+   "ultima": "2026-11-01T12:53:42"
   }
  ],
  "totais": {
-  "demandas": 2003,
-  "tentativas_treino": 19345,
-  "conversas": 5899,
-  "trabalhos_com_prova": 11859
+  "demandas": 2008,
+  "tentativas_treino": 19363,
+  "conversas": 5901,
+  "trabalhos_com_prova": 11877
  },
  "banco": {
   "levantamento": "2026-11-01T12:18:08",
@@ -635,7 +635,7 @@
    "ultimo": "",
    "quando": "",
    "estado": "",
-   "situacao": "estagiário: observa (regra do dono) — Observei Olívia (Especialista em openpyxl (Excel)) fazendo \"Medir a saúde do PostgreSQL\" no nível dificil: terminou conc"
+   "situacao": "estagiário: observa (regra do dono) — Observei Pietro (Especialista em psycopg (PostgreSQL)) fazendo \"Exercício de SQL no PostgreSQL com os dados da fábrica\" "
   },
   {
    "nome": "Tina",
@@ -866,7 +866,7 @@
    "ultimo": "",
    "quando": "",
    "estado": "",
-   "situacao": "estagiário: observa (regra do dono) — Observei Olívia (Especialista em openpyxl (Excel)) fazendo \"Medir a saúde do PostgreSQL\" no nível dificil: terminou conc"
+   "situacao": "estagiário: observa (regra do dono) — Observei Pietro (Especialista em psycopg (PostgreSQL)) fazendo \"Exercício de SQL no PostgreSQL com os dados da fábrica\" "
   },
   {
    "nome": "Felipe",
@@ -1108,7 +1108,7 @@
    "ultimo": "",
    "quando": "",
    "estado": "",
-   "situacao": "estagiário: observa (regra do dono)"
+   "situacao": "estagiário: observa (regra do dono) — Observei Elisa (Especialista em PyYAML (configuração)) fazendo \"Ronda de saúde do sistema\" no nível dificil: terminou co"
   },
   {
    "nome": "Lorena",
@@ -1383,7 +1383,7 @@
    "ultimo": "",
    "quando": "",
    "estado": "",
-   "situacao": "estagiário: observa (regra do dono) — Observei Olívia (Especialista em openpyxl (Excel)) fazendo \"Medir a saúde do PostgreSQL\" no nível dificil: terminou conc"
+   "situacao": "estagiário: observa (regra do dono) — Observei Pietro (Especialista em psycopg (PostgreSQL)) fazendo \"Exercício de SQL no PostgreSQL com os dados da fábrica\" "
   },
   {
    "nome": "Diego",
@@ -1401,9 +1401,9 @@
    "andar": 5,
    "cargo": "Especialista em PyYAML (configuração)",
    "area": "Governança e Privacidade",
-   "demandas_hoje": 3,
-   "ultimo": "Revisão da biblioteca sob sua responsabilidade — nível dificil",
-   "quando": "2026-11-01T09:51:43",
+   "demandas_hoje": 4,
+   "ultimo": "Ronda de saúde do sistema — nível dificil",
+   "quando": "2026-11-01T12:53:44",
    "estado": "concluida",
    "situacao": "trabalho do papel"
   },
@@ -1427,7 +1427,7 @@
    "ultimo": "",
    "quando": "",
    "estado": "",
-   "situacao": "estagiário: observa (regra do dono) — Observei Olívia (Especialista em openpyxl (Excel)) fazendo \"Medir a saúde do PostgreSQL\" no nível dificil: terminou conc"
+   "situacao": "estagiário: observa (regra do dono) — Observei Pietro (Especialista em psycopg (PostgreSQL)) fazendo \"Exercício de SQL no PostgreSQL com os dados da fábrica\" "
   },
   {
    "nome": "Gustavo",
@@ -1522,9 +1522,9 @@
    "andar": 5,
    "cargo": "Especialista em psycopg (PostgreSQL)",
    "area": "Engenharia de Dados",
-   "demandas_hoje": 3,
-   "ultimo": "Testar se o último backup volta — nível dificil",
-   "quando": "2026-11-01T09:51:38",
+   "demandas_hoje": 4,
+   "ultimo": "Exercício de SQL no PostgreSQL com os dados da fábrica — nível dificil",
+   "quando": "2026-11-01T12:53:43",
    "estado": "concluida",
    "situacao": "trabalho do papel"
   },
@@ -1544,9 +1544,9 @@
    "andar": 5,
    "cargo": "Especialista em sqlite3 (memória da empresa)",
    "area": "Engenharia de Dados",
-   "demandas_hoje": 3,
-   "ultimo": "SLA das rotinas — nível dificil",
-   "quando": "2026-11-01T09:51:40",
+   "demandas_hoje": 4,
+   "ultimo": "Medir a saúde do PostgreSQL — nível dificil",
+   "quando": "2026-11-01T12:53:43",
    "estado": "concluida",
    "situacao": "trabalho do papel"
   },
@@ -1577,9 +1577,9 @@
    "andar": 5,
    "cargo": "Especialista em xlrd (.xls antigo)",
    "area": "Engenharia de Dados",
-   "demandas_hoje": 3,
-   "ultimo": "SLA das rotinas — nível dificil",
-   "quando": "2026-11-01T09:51:41",
+   "demandas_hoje": 4,
+   "ultimo": "Medir a saúde do PostgreSQL — nível dificil",
+   "quando": "2026-11-01T12:53:43",
    "estado": "concluida",
    "situacao": "trabalho do papel"
   },
@@ -1588,9 +1588,9 @@
    "andar": 5,
    "cargo": "Sênior de AWS, Linux e Ubuntu",
    "area": "Engenharia de Dados",
-   "demandas_hoje": 7,
-   "ultimo": "Testar se o último backup volta — nível dificil",
-   "quando": "2026-11-01T11:53:19",
+   "demandas_hoje": 8,
+   "ultimo": "Medir a saúde do PostgreSQL — nível dificil",
+   "quando": "2026-11-01T12:53:45",
    "estado": "concluida",
    "situacao": "trabalho do papel"
   }
@@ -2138,7 +2138,7 @@
  ],
  "modelos": {
   "finalidade": "risco_demanda",
-  "rotuladas_agora": 1960,
+  "rotuladas_agora": 1965,
   "minimo_para_treinar": 60,
   "datasets": 64,
   "maior_dataset": 1960,
@@ -2507,8 +2507,8 @@
   },
   {
    "nivel": "dificil",
-   "demandas": 875,
-   "concluidas": 855,
+   "demandas": 880,
+   "concluidas": 860,
    "parciais": 1,
    "falhas": 19
   },
