@@ -1,12 +1,12 @@
 {
  "versao": 1,
- "gerado_em": "2026-11-01T04:37:00",
+ "gerado_em": "2026-11-01T04:42:13",
  "turno": {
   "estado": "trabalhando",
   "inicio": "2026-11-01T04:26:03",
   "fim_previsto": "2026-11-01T05:06:03",
-  "voltas": 41,
-  "planilhas": 2
+  "voltas": 61,
+  "planilhas": 3
  },
  "funcionarios": 105,
  "andares": [
@@ -18,7 +18,7 @@
    "concluidas": 18,
    "parciais": 0,
    "falhas": 0,
-   "treino": 91,
+   "treino": 93,
    "acertos": 15
   },
   {
@@ -29,7 +29,7 @@
    "concluidas": 18,
    "parciais": 0,
    "falhas": 0,
-   "treino": 81,
+   "treino": 83,
    "acertos": 10
   },
   {
@@ -40,7 +40,7 @@
    "concluidas": 11,
    "parciais": 0,
    "falhas": 0,
-   "treino": 52,
+   "treino": 55,
    "acertos": 5
   },
   {
@@ -51,7 +51,7 @@
    "concluidas": 21,
    "parciais": 0,
    "falhas": 0,
-   "treino": 120,
+   "treino": 125,
    "acertos": 23
   },
   {
@@ -62,7 +62,7 @@
    "concluidas": 22,
    "parciais": 0,
    "falhas": 0,
-   "treino": 114,
+   "treino": 117,
    "acertos": 30
   }
  ],
@@ -154,8 +154,8 @@
   "concluidos_hoje": 11
  },
  "fabrica": {
-  "lotes_hoje": 13,
-  "conferidos_ok_hoje": 13
+  "lotes_hoje": 14,
+  "conferidos_ok_hoje": 14
  },
  "rotinas": [
   {
@@ -190,9 +190,9 @@
   },
   {
    "rotina": "fabrica",
-   "execucoes_24h": 17,
+   "execucoes_24h": 19,
    "erros_24h": 0,
-   "ultima": "2026-11-01T04:26:10"
+   "ultima": "2026-11-01T04:41:27"
   },
   {
    "rotina": "ideias",
@@ -238,9 +238,9 @@
   },
   {
    "rotina": "registro",
-   "execucoes_24h": 60,
+   "execucoes_24h": 61,
    "erros_24h": 0,
-   "ultima": "2026-11-01T04:37:00"
+   "ultima": "2026-11-01T04:41:27"
   },
   {
    "rotina": "rh_desempenho",
@@ -256,16 +256,16 @@
   },
   {
    "rotina": "treino",
-   "execucoes_24h": 63,
+   "execucoes_24h": 65,
    "erros_24h": 0,
-   "ultima": "2026-11-01T04:36:44"
+   "ultima": "2026-11-01T04:40:53"
   }
  ],
  "totais": {
   "demandas": 1860,
-  "tentativas_treino": 17990,
+  "tentativas_treino": 18005,
   "conversas": 5647,
-  "trabalhos_com_prova": 10682
+  "trabalhos_com_prova": 10692
  },
  "banco": {
   "levantamento": "2026-11-01T04:12:01",
