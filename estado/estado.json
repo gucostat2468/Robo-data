@@ -1,12 +1,12 @@
 {
  "versao": 1,
- "gerado_em": "2026-11-01T08:05:01",
+ "gerado_em": "2026-11-01T08:07:02",
  "turno": {
-  "estado": "entre turnos: memória salva; o próximo turno começa em poucos minutos",
-  "inicio": "2026-11-01T07:22:16",
-  "fim_previsto": "2026-11-01T08:02:16",
-  "voltas": 136,
-  "planilhas": 4
+  "estado": "trabalhando",
+  "inicio": "2026-11-01T08:07:02",
+  "fim_previsto": "2026-11-01T08:47:02",
+  "voltas": 0,
+  "planilhas": 2
  },
  "funcionarios": 105,
  "andares": [
@@ -154,7 +154,7 @@
   "concluidos_hoje": 15
  },
  "fabrica": {
-  "lotes_hoje": 31,
+  "lotes_hoje": 33,
   "conferidos_ok_hoje": 31
  },
  "rotinas": [
@@ -166,9 +166,9 @@
   },
   {
    "rotina": "caixa_dono",
-   "execucoes_24h": 8,
+   "execucoes_24h": 9,
    "erros_24h": 0,
-   "ultima": "2026-11-01T07:22:06"
+   "ultima": "2026-11-01T08:06:44"
   },
   {
    "rotina": "demandas",
@@ -202,9 +202,9 @@
   },
   {
    "rotina": "jornada",
-   "execucoes_24h": 8,
+   "execucoes_24h": 9,
    "erros_24h": 0,
-   "ultima": "2026-11-01T07:22:06"
+   "ultima": "2026-11-01T08:06:44"
   },
   {
    "rotina": "laboratorio",
@@ -214,27 +214,27 @@
   },
   {
    "rotina": "licoes",
-   "execucoes_24h": 4,
+   "execucoes_24h": 5,
    "erros_24h": 0,
-   "ultima": "2026-11-01T06:37:27"
+   "ultima": "2026-11-01T08:06:44"
   },
   {
    "rotina": "memoria_pg",
-   "execucoes_24h": 9,
+   "execucoes_24h": 8,
    "erros_24h": 0,
-   "ultima": "2026-11-01T08:04:57"
+   "ultima": "2026-11-01T07:55:51"
   },
   {
    "rotina": "modelos",
-   "execucoes_24h": 8,
+   "execucoes_24h": 9,
    "erros_24h": 0,
-   "ultima": "2026-11-01T07:22:11"
+   "ultima": "2026-11-01T08:06:54"
   },
   {
    "rotina": "paineis",
-   "execucoes_24h": 8,
+   "execucoes_24h": 9,
    "erros_24h": 0,
-   "ultima": "2026-11-01T07:22:10"
+   "ultima": "2026-11-01T08:06:52"
   },
   {
    "rotina": "registro",
@@ -250,9 +250,9 @@
   },
   {
    "rotina": "ronda_ti",
-   "execucoes_24h": 24,
+   "execucoes_24h": 25,
    "erros_24h": 0,
-   "ultima": "2026-11-01T08:01:43"
+   "ultima": "2026-11-01T08:06:36"
   },
   {
    "rotina": "treino",
@@ -265,15 +265,15 @@
   "demandas": 1893,
   "tentativas_treino": 18553,
   "conversas": 5817,
-  "trabalhos_com_prova": 11154
+  "trabalhos_com_prova": 11163
  },
  "banco": {
-  "levantamento": "2026-11-01T08:01:44",
+  "levantamento": "2026-11-01T07:52:29",
   "postgres_conferido": true,
   "erro_postgres": null,
   "tabelas": 99,
   "com_dados": 80,
-  "linhas": 458640,
+  "linhas": 458256,
   "resumo": {
    "sqlite": {
     "tabelas": 81,
@@ -2444,7 +2444,7 @@
    }
   ],
   "referencia": "risco_demanda-v48",
-  "inferencias_sombra": 1385,
+  "inferencias_sombra": 1387,
   "uso_operacional": "desligado: o modelo só roda em sombra até o dono decidir usá-lo em alguma escolha da empresa",
   "ultima_avaliacao": {
    "modelo": "risco_demanda-v60",
