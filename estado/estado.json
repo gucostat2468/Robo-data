@@ -1,11 +1,11 @@
 {
  "versao": 1,
- "gerado_em": "2026-11-01T02:46:38",
+ "gerado_em": "2026-11-01T02:52:20",
  "turno": {
   "estado": "trabalhando",
   "inicio": "2026-11-01T02:14:03",
   "fim_previsto": "2026-11-01T02:54:03",
-  "voltas": 111,
+  "voltas": 131,
   "planilhas": 3
  },
  "funcionarios": 105,
@@ -18,8 +18,8 @@
    "concluidas": 8,
    "parciais": 0,
    "falhas": 0,
-   "treino": 31,
-   "acertos": 0
+   "treino": 35,
+   "acertos": 3
   },
   {
    "andar": 2,
@@ -29,8 +29,8 @@
    "concluidas": 9,
    "parciais": 0,
    "falhas": 0,
-   "treino": 23,
-   "acertos": 0
+   "treino": 28,
+   "acertos": 4
   },
   {
    "andar": 3,
@@ -40,8 +40,8 @@
    "concluidas": 8,
    "parciais": 0,
    "falhas": 0,
-   "treino": 15,
-   "acertos": 0
+   "treino": 17,
+   "acertos": 1
   },
   {
    "andar": 4,
@@ -51,8 +51,8 @@
    "concluidas": 8,
    "parciais": 0,
    "falhas": 0,
-   "treino": 44,
-   "acertos": 7
+   "treino": 49,
+   "acertos": 9
   },
   {
    "andar": 5,
@@ -62,8 +62,8 @@
    "concluidas": 8,
    "parciais": 0,
    "falhas": 0,
-   "treino": 39,
-   "acertos": 0
+   "treino": 44,
+   "acertos": 5
   }
  ],
  "agora": [],
@@ -155,7 +155,7 @@
  },
  "fabrica": {
   "lotes_hoje": 3,
-  "conferidos_ok_hoje": 2
+  "conferidos_ok_hoje": 3
  },
  "rotinas": [
   {
@@ -190,9 +190,9 @@
   },
   {
    "rotina": "fabrica",
-   "execucoes_24h": 5,
+   "execucoes_24h": 6,
    "erros_24h": 0,
-   "ultima": "2026-11-01T02:43:43"
+   "ultima": "2026-11-01T02:47:27"
   },
   {
    "rotina": "ideias",
@@ -208,9 +208,9 @@
   },
   {
    "rotina": "laboratorio",
-   "execucoes_24h": 3,
+   "execucoes_24h": 4,
    "erros_24h": 0,
-   "ultima": "2026-11-01T02:34:23"
+   "ultima": "2026-11-01T02:47:27"
   },
   {
    "rotina": "licoes",
@@ -238,9 +238,9 @@
   },
   {
    "rotina": "registro",
-   "execucoes_24h": 15,
+   "execucoes_24h": 18,
    "erros_24h": 0,
-   "ultima": "2026-11-01T02:44:05"
+   "ultima": "2026-11-01T02:49:45"
   },
   {
    "rotina": "rh_desempenho",
@@ -256,16 +256,16 @@
   },
   {
    "rotina": "treino",
-   "execucoes_24h": 15,
+   "execucoes_24h": 18,
    "erros_24h": 0,
-   "ultima": "2026-11-01T02:43:11"
+   "ultima": "2026-11-01T02:51:34"
   }
  ],
  "totais": {
   "demandas": 1811,
-  "tentativas_treino": 17684,
-  "conversas": 5533,
-  "trabalhos_com_prova": 10393
+  "tentativas_treino": 17705,
+  "conversas": 5537,
+  "trabalhos_com_prova": 10406
  },
  "banco": {
   "levantamento": "2026-11-01T02:44:05",
