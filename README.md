@@ -1,6 +1,6 @@
 # Empresa ao vivo
 
-**Boletim das 01/11 15:19** (horário de Brasília) · trabalhando
+**Boletim das 01/11 15:23** (horário de Brasília) · entre turnos: memória salva; o próximo turno começa em poucos minutos
 
 > Atualiza a cada 5 minutos enquanto a empresa trabalha. Recarregue a página para ver o mais novo.
 
@@ -186,11 +186,11 @@
 
 ## Tempo do último turno (medido)
 
-- 16:55–17:35 (40 min, 129 voltas; cobertura do cronômetro 100%)
-- **Entregas aprovadas na revisão independente: 8 (12.0 por hora)** — o indicador principal
-- operacional 2% · estudo 2% · revisao 0% · coordenacao 0% · manutencao 16% · erro 0% · parado 80% · sem_medicao 0%
+- 17:40–18:20 (40 min, 135 voltas; cobertura do cronômetro 100%)
+- **Entregas aprovadas na revisão independente: 5 (7.5 por hora)** — o indicador principal
+- operacional 1% · estudo 1% · revisao 0% · coordenacao 0% · manutencao 14% · erro 0% · parado 84% · sem_medicao 0%
 - Bloqueios: 0; etapas esperando dependência: 0
-- Turnos anteriores (entregas/hora): 13.5, 61.5, 30.0, 31.5, 10.5
+- Turnos anteriores (entregas/hora): 12.0, 13.5, 61.5, 30.0, 31.5
 
 ## Projetos entre andares (várias pessoas, uma etapa depende da outra)
 
@@ -279,7 +279,7 @@ Pacote gerado pelo produto (`python -m robo entregar`) a partir de um projeto ap
 
 ## Banco de dados
 
-Levantamento das 01/11 15:11: **82 de 101** tabelas com dados (493.701 linhas contadas uma a uma).
+Levantamento das 01/11 15:20: **82 de 101** tabelas com dados (494.088 linhas contadas uma a uma).
 
 
 | Onde | Tabelas | Com dados |
