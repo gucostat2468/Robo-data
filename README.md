@@ -1,6 +1,6 @@
 # Empresa ao vivo
 
-**Boletim das 01/11 02:07** (horário de Brasília) · entre turnos: memória salva; o próximo turno começa em poucos minutos
+**Boletim das 01/11 02:09** (horário de Brasília) · trabalhando
 
 > Atualiza a cada 5 minutos enquanto a empresa trabalha. Recarregue a página para ver o mais novo.
 
@@ -9,7 +9,7 @@
 - **92** demandas, **92** concluídas (100%), 0 parciais, 0 com falha
 - **105** de 105 funcionários já trabalharam
 - SQL: 11 exercícios, 11 conferidos com o gabarito
-- Fábrica: 15 planilhas, 15 conferidas sem erro
+- Fábrica: 17 planilhas, 15 conferidas sem erro
 
 ## Trabalhando agora
 
@@ -266,20 +266,20 @@ Pacote gerado pelo produto (`python -m robo entregar`) a partir de um projeto ap
 - risco_demanda-v58: **reprovado** (treinado por ml_engenheiro)
 - risco_demanda-v59: **reprovado** (treinado por ml_engenheiro)
 - Última avaliação independente (ml_avaliador): risco_demanda-v59 reprovado — log loss 0.053 contra baseline 0.030; motivos: não bate o baseline (log loss 0.0530 ≥ 0.0302)
-- Referência em sombra: risco_demanda-v48; 1354 previsões em sombra
+- Referência em sombra: risco_demanda-v48; 1356 previsões em sombra
 - Uso operacional: desligado: o modelo só roda em sombra até o dono decidir usá-lo em alguma escolha da empresa
 
 ## Banco de dados
 
-Levantamento das 01/11 02:05: **82 de 101** tabelas com dados (450.031 linhas contadas uma a uma).
+Levantamento das 01/11 01:56: **80 de 99** tabelas com dados (442.163 linhas contadas uma a uma).
 
 
 | Onde | Tabelas | Com dados |
 |---|--:|--:|
 | sqlite | 81 | 67 |
-| postgres.laboratorio | 4 | 4 |
+| postgres.laboratorio | 3 | 3 |
 | postgres.robo | 2 | 0 |
-| postgres.treino | 11 | 11 |
+| postgres.treino | 10 | 10 |
 | postgres.bruto | 1 | 0 |
 | postgres.tratado | 1 | 0 |
 | postgres.analitico | 1 | 0 |
