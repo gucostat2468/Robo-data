@@ -1,12 +1,12 @@
 # Empresa ao vivo
 
-**Boletim das 01/11 16:58** (horário de Brasília) · trabalhando
+**Boletim das 01/11 17:04** (horário de Brasília) · trabalhando
 
 > Atualiza a cada 5 minutos enquanto a empresa trabalha. Recarregue a página para ver o mais novo.
 
 ## Hoje
 
-- **367** demandas, **363** concluídas (99%), 0 parciais, 4 com falha
+- **368** demandas, **364** concluídas (99%), 0 parciais, 4 com falha
 - **105** de 105 funcionários já trabalharam
 - SQL: 42 exercícios, 42 conferidos com o gabarito
 - Fábrica: 97 planilhas, 97 conferidas sem erro
@@ -23,12 +23,13 @@
 | 2º | 18 de 18 | 65 | 65 | 0 | 0 |
 | 3º | 12 de 12 | 33 | 33 | 0 | 0 |
 | 4º | 32 de 32 | 63 | 63 | 0 | 0 |
-| 5º | 24 de 24 | 152 | 148 | 0 | 4 |
+| 5º | 24 de 24 | 153 | 149 | 0 | 4 |
 
 ## Últimas entregas
 
 | Hora | Quem | Trabalho | Resultado |
 |---|---|---|---|
+| 17:01 | Marina (5º) | Ronda de saúde do sistema — nível dificil | ✅ concluída |
 | 16:32 | Marcos (2º) | Projeto Segmentação — TREINO_rfm_20261101_192416_56067 | ✅ concluída |
 | 16:31 | Ícaro (5º) | Testar se o último backup volta — nível dificil | ✅ concluída |
 | 16:31 | Heloísa (5º) | Conferir se o projeto está pronto para servidor — nível profissional | ✅ concluída |
@@ -38,7 +39,6 @@
 | 16:01 | Marina (5º) | Conferir se o projeto está pronto para servidor — nível dificil | ✅ concluída |
 | 16:01 | Xavier (5º) | Testar se o último backup volta — nível dificil | ✅ concluída |
 | 16:01 | Elisa (5º) | Medir a saúde do PostgreSQL — nível dificil | ✅ concluída |
-| 16:01 | Silas (5º) | Testar se o último backup volta — nível dificil | ✅ concluída |
 
 ## Dificuldade (todo o histórico)
 
@@ -46,7 +46,7 @@
 |---|--:|--:|--:|--:|--:|
 | basico | 261 | 239 | 0 | 22 | 92% |
 | medio | 458 | 451 | 0 | 7 | 98% |
-| dificil | 945 | 925 | 1 | 19 | 98% |
+| dificil | 946 | 926 | 1 | 19 | 98% |
 | profissional | 430 | 426 | 1 | 3 | 99% |
 
 ## Cada funcionário
@@ -74,7 +74,7 @@
 | Rafael | Engenheiro de Dados Pleno | trabalho do papel | Conferir no PostgreSQL os lotes da fábrica — nível medio (✅ concluída) | 3 |
 | Rita | Recepção | trabalho do papel | Conferir no PostgreSQL os lotes da fábrica — nível dificil (✅ concluída) | 3 |
 | Saulo | Supervisor de Planilhas | trabalho do papel | Conferir no PostgreSQL os lotes da fábrica — nível dificil (✅ concluída) | 3 |
-| Théo | Estagiário de Engenharia de Dados | estagiário: observa (regra do dono) — Observei Gustavo (Gerente de TI e Infraestrutura) fa |   | 0 |
+| Théo | Estagiário de Engenharia de Dados | estagiário: observa (regra do dono) — Observei Marina (Arquiteta de Cloud (AWS)) fazendo " |   | 0 |
 | Tina | Contatos e NPS | trabalho do papel | Diagnosticar a planilha original da fábrica — nível medio (✅ concluída) | 3 |
 
 ### 2º andar
@@ -105,7 +105,7 @@
 | Quem | Cargo | Situação | Último trabalho | Hoje |
 |---|---|---|---|--:|
 | Bárbara | Especialista Sênior em Power BI | trabalho do papel | Calcular a média de uma métrica da base sintética — nível di (✅ concluída) | 3 |
-| Enzo | Estagiário da Sala Excel | estagiário: observa (regra do dono) — Observei Gustavo (Gerente de TI e Infraestrutura) fa |   | 0 |
+| Enzo | Estagiário da Sala Excel | estagiário: observa (regra do dono) — Observei Marina (Arquiteta de Cloud (AWS)) fazendo " |   | 0 |
 | Felipe | Head de BI e Excel | trabalho do papel | Situação do andar agora — nível profissional (✅ concluída) | 3 |
 | Gabriel | Especialista em Tabelas Dinâmicas e Dash | trabalho do papel | Segmentação da base sintética — nível dificil (✅ concluída) | 3 |
 | Heitor | Analista Pleno de BI | trabalho do papel | Calcular a média de uma métrica da base sintética — nível me (✅ concluída) | 3 |
@@ -132,7 +132,7 @@
 | Isadora | Analista Pleno de Distribuição de Demand | trabalho do papel na rotina demandas |   | 0 |
 | Joana | Analista Júnior de Dados Sintéticos | trabalho do papel na rotina fabrica |   | 0 |
 | Juliana | Head de Gente e Gestão | trabalho do papel | Situação das contratações — nível profissional (✅ concluída) | 3 |
-| Lara | Estagiária de Documentação de Dados | estagiário: observa (regra do dono) — Observei André (Head de Infraestrutura e Segurança)  |   | 0 |
+| Lara | Estagiária de Documentação de Dados | estagiário: observa (regra do dono) |   | 0 |
 | Lorena | Estagiária de RH | estagiário: observa (regra do dono) |   | 0 |
 | Lívia | Designer de Casos | trabalho do papel | Revisar um caso de treino feito por outro designer — nível d (✅ concluída) | 3 |
 | Marta | Diretora de Pessoas e Cultura (CHRO) | trabalho do papel | Situação das contratações — nível profissional (✅ concluída) | 3 |
@@ -162,17 +162,17 @@
 | André | Head de Infraestrutura e Segurança | trabalho do papel | Procurar segredos no repositório público — nível profissiona (✅ concluída) | 6 |
 | Bianca | Engenheira de Dados Pleno | trabalho do papel | Medir a saúde do PostgreSQL — nível medio (✅ concluída) | 6 |
 | Caetano | Especialista em Orquestração de Dados (A | trabalho do papel | Medir a saúde do PostgreSQL — nível dificil (✅ concluída) | 6 |
-| Caíque | Estagiário de DevOps | estagiário: observa (regra do dono) — Observei Gustavo (Gerente de TI e Infraestrutura) fa |   | 0 |
+| Caíque | Estagiário de DevOps | estagiário: observa (regra do dono) — Observei Marina (Arquiteta de Cloud (AWS)) fazendo " |   | 0 |
 | Diego | Desenvolvedor Python Pleno | trabalho do papel | Exercício de SQL no PostgreSQL com os dados da fábrica — nív (✅ concluída) | 6 |
 | Elisa | Especialista em PyYAML (configuração) | trabalho do papel | Medir a saúde do PostgreSQL — nível dificil (✅ concluída) | 6 |
 | Fernanda | Coordenadora de DevOps e Confiabilidade  | trabalho do papel | Procurar segredos no repositório público — nível dificil (✅ concluída) | 6 |
-| Gael | Estagiário de Engenharia de Dados (Airfl | estagiário: observa (regra do dono) — Observei Gustavo (Gerente de TI e Infraestrutura) fa |   | 0 |
+| Gael | Estagiário de Engenharia de Dados (Airfl | estagiário: observa (regra do dono) — Observei Marina (Arquiteta de Cloud (AWS)) fazendo " |   | 0 |
 | Gustavo | Gerente de TI e Infraestrutura | trabalho do papel | Testar se o último backup volta — nível profissional (✅ concluída) | 6 |
 | Heloísa | Head de AWS, Arquitetura e Governança de | trabalho do papel | Conferir se o projeto está pronto para servidor — nível prof (✅ concluída) | 12 |
 | Henrique | Head de Engenharia Python | trabalho do papel | Procurar segredos no repositório público — nível profissiona (✅ concluída) | 6 |
 | Jonas | Engenheiro de MLOps e Plataforma de Mode | trabalho do papel | Medir a saúde do PostgreSQL — nível dificil (✅ concluída) | 6 |
 | Letícia | Desenvolvedora Júnior | trabalho do papel | Procurar segredos no repositório público (✅ concluída) | 6 |
-| Marina | Arquiteta de Cloud (AWS) | trabalho do papel | Conferir se o projeto está pronto para servidor — nível difi (✅ concluída) | 13 |
+| Marina | Arquiteta de Cloud (AWS) | trabalho do papel | Ronda de saúde do sistema — nível dificil (✅ concluída) | 14 |
 | Nicolas | Especialista em numpy | trabalho do papel | Testar se o último backup volta — nível dificil (✅ concluída) | 6 |
 | Olívia | Especialista em openpyxl (Excel) | trabalho do papel | Testar se o último backup volta — nível dificil (✅ concluída) | 6 |
 | Pietro | Especialista em psycopg (PostgreSQL) | trabalho do papel | Conferir no PostgreSQL os lotes da fábrica — nível dificil (✅ concluída) | 6 |
