@@ -1,6 +1,6 @@
 # Empresa ao vivo
 
-**Boletim das 02/11 15:30** (horário de Brasília) · trabalhando
+**Boletim das 02/11 15:36** (horário de Brasília) · trabalhando
 
 > Atualiza a cada 5 minutos enquanto a empresa trabalha. Recarregue a página para ver o mais novo.
 
@@ -298,7 +298,7 @@ Pacote gerado pelo produto (`python -m robo entregar`) a partir de um projeto ap
 
 ## Banco de dados
 
-Levantamento das 02/11 14:49: **78 de 97** tabelas com dados (579.469 linhas contadas uma a uma).
+Levantamento das 02/11 15:33: **78 de 97** tabelas com dados (586.032 linhas contadas uma a uma).
 
 
 | Onde | Tabelas | Com dados |
