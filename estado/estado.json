@@ -1,11 +1,11 @@
 {
  "versao": 1,
- "gerado_em": "2026-11-02T07:13:39",
+ "gerado_em": "2026-11-02T07:18:57",
  "turno": {
   "estado": "trabalhando",
   "inicio": "2026-11-02T06:57:18",
   "fim_previsto": "2026-11-02T07:37:18",
-  "voltas": 61,
+  "voltas": 81,
   "planilhas": 3
  },
  "funcionarios": 105,
@@ -18,7 +18,7 @@
    "concluidas": 18,
    "parciais": 0,
    "falhas": 0,
-   "treino": 245,
+   "treino": 248,
    "acertos": 51
   },
   {
@@ -29,7 +29,7 @@
    "concluidas": 23,
    "parciais": 0,
    "falhas": 0,
-   "treino": 231,
+   "treino": 233,
    "acertos": 61
   },
   {
@@ -40,7 +40,7 @@
    "concluidas": 11,
    "parciais": 0,
    "falhas": 0,
-   "treino": 155,
+   "treino": 156,
    "acertos": 49
   },
   {
@@ -51,23 +51,63 @@
    "concluidas": 21,
    "parciais": 0,
    "falhas": 0,
-   "treino": 324,
+   "treino": 330,
    "acertos": 83
   },
   {
    "andar": 5,
    "pessoas": 24,
    "trabalharam_hoje": 24,
-   "demandas": 62,
-   "concluidas": 61,
+   "demandas": 67,
+   "concluidas": 66,
    "parciais": 0,
    "falhas": 1,
-   "treino": 301,
+   "treino": 309,
    "acertos": 60
   }
  ],
  "agora": [],
  "ultimos": [
+  {
+   "quando": "2026-11-02T07:16:37",
+   "funcionario": "Ícaro",
+   "cargo": "Sênior de AWS, Linux e Ubuntu",
+   "andar": 5,
+   "trabalho": "Ronda de saúde do sistema — nível dificil",
+   "estado": "concluida"
+  },
+  {
+   "quando": "2026-11-02T07:16:36",
+   "funcionario": "Elisa",
+   "cargo": "Especialista em PyYAML (configuração)",
+   "andar": 5,
+   "trabalho": "Ronda de saúde do sistema — nível dificil",
+   "estado": "concluida"
+  },
+  {
+   "quando": "2026-11-02T07:16:34",
+   "funcionario": "Pietro",
+   "cargo": "Especialista em psycopg (PostgreSQL)",
+   "andar": 5,
+   "trabalho": "Procurar segredos no repositório público — nível dificil",
+   "estado": "concluida"
+  },
+  {
+   "quando": "2026-11-02T07:16:34",
+   "funcionario": "Silas",
+   "cargo": "Especialista em sqlite3 (memória da empresa)",
+   "andar": 5,
+   "trabalho": "SLA das rotinas — nível dificil",
+   "estado": "concluida"
+  },
+  {
+   "quando": "2026-11-02T07:16:34",
+   "funcionario": "Xavier",
+   "cargo": "Especialista em xlrd (.xls antigo)",
+   "andar": 5,
+   "trabalho": "SLA das rotinas — nível dificil",
+   "estado": "concluida"
+  },
   {
    "quando": "2026-11-02T06:46:40",
    "funcionario": "Marcos",
@@ -107,46 +147,6 @@
    "andar": 5,
    "trabalho": "SLA das rotinas — nível dificil",
    "estado": "concluida"
-  },
-  {
-   "quando": "2026-11-02T06:46:33",
-   "funcionario": "Olívia",
-   "cargo": "Especialista em openpyxl (Excel)",
-   "andar": 5,
-   "trabalho": "SLA das rotinas — nível dificil",
-   "estado": "concluida"
-  },
-  {
-   "quando": "2026-11-02T06:46:33",
-   "funcionario": "Sofia",
-   "cargo": "Especialista em pandas",
-   "andar": 5,
-   "trabalho": "Procurar segredos no repositório público — nível dificil",
-   "estado": "concluida"
-  },
-  {
-   "quando": "2026-11-02T06:14:31",
-   "funcionario": "Alexandre",
-   "cargo": "Diretor de Tecnologia (CTO)",
-   "andar": 5,
-   "trabalho": "Ronda de saúde do sistema — nível profissional",
-   "estado": "concluida"
-  },
-  {
-   "quando": "2026-11-02T06:14:31",
-   "funcionario": "Ícaro",
-   "cargo": "Sênior de AWS, Linux e Ubuntu",
-   "andar": 5,
-   "trabalho": "Medir a saúde do PostgreSQL — nível dificil",
-   "estado": "concluida"
-  },
-  {
-   "quando": "2026-11-02T06:14:30",
-   "funcionario": "Fernanda",
-   "cargo": "Coordenadora de DevOps e Confiabilidade (SRE)",
-   "andar": 5,
-   "trabalho": "Diagnosticar a planilha original da fábrica — nível dificil",
-   "estado": "concluida"
   }
  ],
  "sql": {
@@ -168,7 +168,7 @@
    "rotina": "demandas",
    "execucoes_24h": 47,
    "erros_24h": 0,
-   "ultima": "2026-11-02T06:46:42"
+   "ultima": "2026-11-02T07:16:37"
   },
   {
    "rotina": "dialogo",
@@ -196,9 +196,9 @@
   },
   {
    "rotina": "laboratorio",
-   "execucoes_24h": 130,
+   "execucoes_24h": 131,
    "erros_24h": 0,
-   "ultima": "2026-11-02T07:07:31"
+   "ultima": "2026-11-02T07:17:39"
   },
   {
    "rotina": "licoes",
@@ -226,9 +226,9 @@
   },
   {
    "rotina": "registro",
-   "execucoes_24h": 594,
+   "execucoes_24h": 595,
    "erros_24h": 0,
-   "ultima": "2026-11-02T07:12:38"
+   "ultima": "2026-11-02T07:18:41"
   },
   {
    "rotina": "reuniao",
@@ -244,22 +244,22 @@
   },
   {
    "rotina": "ronda_ti",
-   "execucoes_24h": 98,
+   "execucoes_24h": 97,
    "erros_24h": 0,
    "ultima": "2026-11-02T06:56:51"
   },
   {
    "rotina": "treino",
-   "execucoes_24h": 620,
+   "execucoes_24h": 621,
    "erros_24h": 0,
-   "ultima": "2026-11-02T07:12:04"
+   "ultima": "2026-11-02T07:18:26"
   }
  ],
  "totais": {
-  "demandas": 2371,
-  "tentativas_treino": 22453,
-  "conversas": 6576,
-  "trabalhos_com_prova": 14520
+  "demandas": 2376,
+  "tentativas_treino": 22473,
+  "conversas": 6579,
+  "trabalhos_com_prova": 14538
  },
  "banco": {
   "levantamento": "2026-11-02T06:43:16",
@@ -629,7 +629,7 @@
    "ultimo": "",
    "quando": "",
    "estado": "",
-   "situacao": "estagiário: observa (regra do dono) — Observei Olívia (Especialista em openpyxl (Excel)) fazendo \"SLA das rotinas\" no nível dificil: terminou concluida."
+   "situacao": "estagiário: observa (regra do dono) — Observei Pietro (Especialista em psycopg (PostgreSQL)) fazendo \"Procurar segredos no repositório público\" no nível dific"
   },
   {
    "nome": "Tina",
@@ -860,7 +860,7 @@
    "ultimo": "",
    "quando": "",
    "estado": "",
-   "situacao": "estagiário: observa (regra do dono) — Observei Olívia (Especialista em openpyxl (Excel)) fazendo \"SLA das rotinas\" no nível dificil: terminou concluida."
+   "situacao": "estagiário: observa (regra do dono) — Observei Pietro (Especialista em psycopg (PostgreSQL)) fazendo \"Procurar segredos no repositório público\" no nível dific"
   },
   {
    "nome": "Felipe",
@@ -1102,7 +1102,7 @@
    "ultimo": "",
    "quando": "",
    "estado": "",
-   "situacao": "estagiário: observa (regra do dono)"
+   "situacao": "estagiário: observa (regra do dono) — Observei Elisa (Especialista em PyYAML (configuração)) fazendo \"Ronda de saúde do sistema\" no nível dificil: terminou co"
   },
   {
    "nome": "Lorena",
@@ -1377,7 +1377,7 @@
    "ultimo": "",
    "quando": "",
    "estado": "",
-   "situacao": "estagiário: observa (regra do dono) — Observei Olívia (Especialista em openpyxl (Excel)) fazendo \"SLA das rotinas\" no nível dificil: terminou concluida."
+   "situacao": "estagiário: observa (regra do dono) — Observei Pietro (Especialista em psycopg (PostgreSQL)) fazendo \"Procurar segredos no repositório público\" no nível dific"
   },
   {
    "nome": "Diego",
@@ -1395,9 +1395,9 @@
    "andar": 5,
    "cargo": "Especialista em PyYAML (configuração)",
    "area": "Governança e Privacidade",
-   "demandas_hoje": 2,
-   "ultimo": "Revisão da biblioteca sob sua responsabilidade — nível dificil",
-   "quando": "2026-11-02T04:09:27",
+   "demandas_hoje": 3,
+   "ultimo": "Ronda de saúde do sistema — nível dificil",
+   "quando": "2026-11-02T07:16:34",
    "estado": "concluida",
    "situacao": "trabalho do papel"
   },
@@ -1421,7 +1421,7 @@
    "ultimo": "",
    "quando": "",
    "estado": "",
-   "situacao": "estagiário: observa (regra do dono) — Observei Olívia (Especialista em openpyxl (Excel)) fazendo \"SLA das rotinas\" no nível dificil: terminou concluida."
+   "situacao": "estagiário: observa (regra do dono) — Observei Pietro (Especialista em psycopg (PostgreSQL)) fazendo \"Procurar segredos no repositório público\" no nível dific"
   },
   {
    "nome": "Gustavo",
@@ -1516,9 +1516,9 @@
    "andar": 5,
    "cargo": "Especialista em psycopg (PostgreSQL)",
    "area": "Engenharia de Dados",
-   "demandas_hoje": 2,
-   "ultimo": "Medir a saúde do PostgreSQL — nível dificil",
-   "quando": "2026-11-02T04:09:17",
+   "demandas_hoje": 3,
+   "ultimo": "Procurar segredos no repositório público — nível dificil",
+   "quando": "2026-11-02T07:16:33",
    "estado": "concluida",
    "situacao": "trabalho do papel"
   },
@@ -1538,9 +1538,9 @@
    "andar": 5,
    "cargo": "Especialista em sqlite3 (memória da empresa)",
    "area": "Engenharia de Dados",
-   "demandas_hoje": 2,
-   "ultimo": "Ronda de saúde do sistema — nível dificil",
-   "quando": "2026-11-02T04:09:20",
+   "demandas_hoje": 3,
+   "ultimo": "SLA das rotinas — nível dificil",
+   "quando": "2026-11-02T07:16:34",
    "estado": "concluida",
    "situacao": "trabalho do papel"
   },
@@ -1571,9 +1571,9 @@
    "andar": 5,
    "cargo": "Especialista em xlrd (.xls antigo)",
    "area": "Engenharia de Dados",
-   "demandas_hoje": 2,
-   "ultimo": "Ronda de saúde do sistema — nível dificil",
-   "quando": "2026-11-02T04:09:22",
+   "demandas_hoje": 3,
+   "ultimo": "SLA das rotinas — nível dificil",
+   "quando": "2026-11-02T07:16:34",
    "estado": "concluida",
    "situacao": "trabalho do papel"
   },
@@ -1582,9 +1582,9 @@
    "andar": 5,
    "cargo": "Sênior de AWS, Linux e Ubuntu",
    "area": "Engenharia de Dados",
-   "demandas_hoje": 5,
-   "ultimo": "Medir a saúde do PostgreSQL — nível dificil",
-   "quando": "2026-11-02T06:14:31",
+   "demandas_hoje": 6,
+   "ultimo": "Ronda de saúde do sistema — nível dificil",
+   "quando": "2026-11-02T07:16:36",
    "estado": "concluida",
    "situacao": "trabalho do papel"
   }
@@ -2121,7 +2121,7 @@
  ],
  "modelos": {
   "finalidade": "risco_demanda",
-  "rotuladas_agora": 2328,
+  "rotuladas_agora": 2333,
   "minimo_para_treinar": 60,
   "datasets": 77,
   "maior_dataset": 2328,
@@ -2555,8 +2555,8 @@
   },
   {
    "nivel": "dificil",
-   "demandas": 1066,
-   "concluidas": 1046,
+   "demandas": 1071,
+   "concluidas": 1051,
    "parciais": 1,
    "falhas": 19
   },
