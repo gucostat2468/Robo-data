@@ -1,11 +1,11 @@
 {
  "versao": 1,
- "gerado_em": "2026-11-02T19:53:46",
+ "gerado_em": "2026-11-02T19:59:28",
  "turno": {
   "estado": "trabalhando",
   "inicio": "2026-11-02T19:32:33",
   "fim_previsto": "2026-11-02T20:12:33",
-  "voltas": 81,
+  "voltas": 101,
   "planilhas": 2
  },
  "funcionarios": 105,
@@ -18,7 +18,7 @@
    "concluidas": 54,
    "parciais": 0,
    "falhas": 0,
-   "treino": 672,
+   "treino": 674,
    "acertos": 105
   },
   {
@@ -40,7 +40,7 @@
    "concluidas": 33,
    "parciais": 0,
    "falhas": 0,
-   "treino": 422,
+   "treino": 425,
    "acertos": 94
   },
   {
@@ -51,23 +51,47 @@
    "concluidas": 63,
    "parciais": 0,
    "falhas": 0,
-   "treino": 872,
+   "treino": 880,
    "acertos": 175
   },
   {
    "andar": 5,
    "pessoas": 24,
    "trabalharam_hoje": 24,
-   "demandas": 168,
-   "concluidas": 163,
+   "demandas": 171,
+   "concluidas": 166,
    "parciais": 0,
    "falhas": 5,
-   "treino": 829,
+   "treino": 832,
    "acertos": 116
   }
  ],
  "agora": [],
  "ultimos": [
+  {
+   "quando": "2026-11-02T19:55:52",
+   "funcionario": "André",
+   "cargo": "Head de Infraestrutura e Segurança",
+   "andar": 5,
+   "trabalho": "Testar se o último backup volta — nível profissional",
+   "estado": "concluida"
+  },
+  {
+   "quando": "2026-11-02T19:55:50",
+   "funcionario": "Gustavo",
+   "cargo": "Gerente de TI e Infraestrutura",
+   "andar": 5,
+   "trabalho": "Procurar segredos no repositório público — nível profissional",
+   "estado": "concluida"
+  },
+  {
+   "quando": "2026-11-02T19:55:50",
+   "funcionario": "Henrique",
+   "cargo": "Head de Engenharia Python",
+   "andar": 5,
+   "trabalho": "Medir a saúde do PostgreSQL — nível profissional",
+   "estado": "concluida"
+  },
   {
    "quando": "2026-11-02T19:25:54",
    "funcionario": "Marcos",
@@ -123,30 +147,6 @@
    "andar": 5,
    "trabalho": "Revisão da biblioteca sob sua responsabilidade — nível dificil",
    "estado": "concluida"
-  },
-  {
-   "quando": "2026-11-02T19:25:50",
-   "funcionario": "Xavier",
-   "cargo": "Especialista em xlrd (.xls antigo)",
-   "andar": 5,
-   "trabalho": "Revisão da biblioteca sob sua responsabilidade — nível dificil",
-   "estado": "concluida"
-  },
-  {
-   "quando": "2026-11-02T18:55:47",
-   "funcionario": "Sofia",
-   "cargo": "Especialista em pandas",
-   "andar": 5,
-   "trabalho": "Ronda de saúde do sistema — nível dificil",
-   "estado": "concluida"
-  },
-  {
-   "quando": "2026-11-02T18:55:47",
-   "funcionario": "Jonas",
-   "cargo": "Engenheiro de MLOps e Plataforma de Modelos",
-   "andar": 5,
-   "trabalho": "Procurar segredos no repositório público — nível dificil",
-   "estado": "concluida"
   }
  ],
  "sql": {
@@ -166,9 +166,9 @@
   },
   {
    "rotina": "demandas",
-   "execucoes_24h": 47,
+   "execucoes_24h": 48,
    "erros_24h": 0,
-   "ultima": "2026-11-02T19:25:56"
+   "ultima": "2026-11-02T19:55:52"
   },
   {
    "rotina": "dialogo",
@@ -226,9 +226,9 @@
   },
   {
    "rotina": "registro",
-   "execucoes_24h": 595,
+   "execucoes_24h": 596,
    "erros_24h": 0,
-   "ultima": "2026-11-02T19:53:31"
+   "ultima": "2026-11-02T19:56:07"
   },
   {
    "rotina": "reuniao",
@@ -252,14 +252,14 @@
    "rotina": "treino",
    "execucoes_24h": 593,
    "erros_24h": 0,
-   "ultima": "2026-11-02T19:53:15"
+   "ultima": "2026-11-02T19:59:28"
   }
  ],
  "totais": {
-  "demandas": 2620,
-  "tentativas_treino": 24625,
+  "demandas": 2623,
+  "tentativas_treino": 24641,
   "conversas": 6851,
-  "trabalhos_com_prova": 16290
+  "trabalhos_com_prova": 16302
  },
  "banco": {
   "levantamento": "2026-11-02T19:17:59",
@@ -629,7 +629,7 @@
    "ultimo": "",
    "quando": "",
    "estado": "",
-   "situacao": "estagiário: observa (regra do dono) — Observei Pietro (Especialista em psycopg (PostgreSQL)) fazendo \"Conferir no PostgreSQL os lotes da fábrica\" no nível dif"
+   "situacao": "estagiário: observa (regra do dono) — Observei Gustavo (Gerente de TI e Infraestrutura) fazendo \"Procurar segredos no repositório público\" no nível profission"
   },
   {
    "nome": "Tina",
@@ -860,7 +860,7 @@
    "ultimo": "",
    "quando": "",
    "estado": "",
-   "situacao": "estagiário: observa (regra do dono) — Observei Pietro (Especialista em psycopg (PostgreSQL)) fazendo \"Conferir no PostgreSQL os lotes da fábrica\" no nível dif"
+   "situacao": "estagiário: observa (regra do dono) — Observei Gustavo (Gerente de TI e Infraestrutura) fazendo \"Procurar segredos no repositório público\" no nível profission"
   },
   {
    "nome": "Felipe",
@@ -1102,7 +1102,7 @@
    "ultimo": "",
    "quando": "",
    "estado": "",
-   "situacao": "estagiário: observa (regra do dono) — Observei Elisa (Especialista em PyYAML (configuração)) fazendo \"Testar se o último backup volta\" no nível dificil: termi"
+   "situacao": "estagiário: observa (regra do dono) — Observei André (Head de Infraestrutura e Segurança) fazendo \"Testar se o último backup volta\" no nível profissional: ter"
   },
   {
    "nome": "Lorena",
@@ -1340,9 +1340,9 @@
    "andar": 5,
    "cargo": "Head de Infraestrutura e Segurança",
    "area": "Governança e Privacidade",
-   "demandas_hoje": 6,
-   "ultimo": "Procurar segredos no repositório público — nível profissional",
-   "quando": "2026-11-02T16:55:39",
+   "demandas_hoje": 7,
+   "ultimo": "Testar se o último backup volta — nível profissional",
+   "quando": "2026-11-02T19:55:50",
    "estado": "concluida",
    "situacao": "trabalho do papel"
   },
@@ -1377,7 +1377,7 @@
    "ultimo": "",
    "quando": "",
    "estado": "",
-   "situacao": "estagiário: observa (regra do dono) — Observei Pietro (Especialista em psycopg (PostgreSQL)) fazendo \"Conferir no PostgreSQL os lotes da fábrica\" no nível dif"
+   "situacao": "estagiário: observa (regra do dono) — Observei Gustavo (Gerente de TI e Infraestrutura) fazendo \"Procurar segredos no repositório público\" no nível profission"
   },
   {
    "nome": "Diego",
@@ -1421,16 +1421,16 @@
    "ultimo": "",
    "quando": "",
    "estado": "",
-   "situacao": "estagiário: observa (regra do dono) — Observei Pietro (Especialista em psycopg (PostgreSQL)) fazendo \"Conferir no PostgreSQL os lotes da fábrica\" no nível dif"
+   "situacao": "estagiário: observa (regra do dono) — Observei Gustavo (Gerente de TI e Infraestrutura) fazendo \"Procurar segredos no repositório público\" no nível profission"
   },
   {
    "nome": "Gustavo",
    "andar": 5,
    "cargo": "Gerente de TI e Infraestrutura",
    "area": "Engenharia de Dados",
-   "demandas_hoje": 6,
-   "ultimo": "Medir a saúde do PostgreSQL — nível profissional",
-   "quando": "2026-11-02T16:55:38",
+   "demandas_hoje": 7,
+   "ultimo": "Procurar segredos no repositório público — nível profissional",
+   "quando": "2026-11-02T19:55:49",
    "estado": "concluida",
    "situacao": "trabalho do papel"
   },
@@ -1450,9 +1450,9 @@
    "andar": 5,
    "cargo": "Head de Engenharia Python",
    "area": "Engenharia de Dados",
-   "demandas_hoje": 6,
-   "ultimo": "SLA das rotinas — nível profissional",
-   "quando": "2026-11-02T16:55:39",
+   "demandas_hoje": 7,
+   "ultimo": "Medir a saúde do PostgreSQL — nível profissional",
+   "quando": "2026-11-02T19:55:50",
    "estado": "concluida",
    "situacao": "trabalho do papel"
   },
@@ -2125,7 +2125,7 @@
  ],
  "modelos": {
   "finalidade": "risco_demanda",
-  "rotuladas_agora": 2577,
+  "rotuladas_agora": 2580,
   "minimo_para_treinar": 60,
   "datasets": 85,
   "maior_dataset": 2565,
@@ -2606,8 +2606,8 @@
   },
   {
    "nivel": "profissional",
-   "demandas": 556,
-   "concluidas": 551,
+   "demandas": 559,
+   "concluidas": 554,
    "parciais": 1,
    "falhas": 4
   }
