@@ -1,11 +1,11 @@
 {
  "versao": 1,
- "gerado_em": "2026-11-02T00:00:32",
+ "gerado_em": "2026-11-02T00:07:01",
  "turno": {
   "estado": "trabalhando",
   "inicio": "2026-11-01T23:33:47",
   "fim_previsto": "2026-11-02T00:13:47",
-  "voltas": 101,
+  "voltas": 114,
   "planilhas": 3
  },
  "funcionarios": 105,
@@ -13,13 +13,13 @@
   {
    "andar": 1,
    "pessoas": 19,
-   "trabalharam_hoje": 0,
+   "trabalharam_hoje": 2,
    "demandas": 0,
    "concluidas": 0,
    "parciais": 0,
    "falhas": 0,
-   "treino": 0,
-   "acertos": 0
+   "treino": 2,
+   "acertos": 2
   },
   {
    "andar": 2,
@@ -35,35 +35,35 @@
   {
    "andar": 3,
    "pessoas": 12,
-   "trabalharam_hoje": 0,
+   "trabalharam_hoje": 1,
    "demandas": 0,
    "concluidas": 0,
    "parciais": 0,
    "falhas": 0,
-   "treino": 0,
-   "acertos": 0
+   "treino": 1,
+   "acertos": 1
   },
   {
    "andar": 4,
    "pessoas": 32,
-   "trabalharam_hoje": 0,
+   "trabalharam_hoje": 2,
    "demandas": 0,
    "concluidas": 0,
    "parciais": 0,
    "falhas": 0,
-   "treino": 0,
-   "acertos": 0
+   "treino": 2,
+   "acertos": 2
   },
   {
    "andar": 5,
    "pessoas": 24,
-   "trabalharam_hoje": 0,
+   "trabalharam_hoje": 3,
    "demandas": 0,
    "concluidas": 0,
    "parciais": 0,
    "falhas": 0,
-   "treino": 0,
-   "acertos": 0
+   "treino": 3,
+   "acertos": 3
   }
  ],
  "agora": [],
@@ -220,9 +220,9 @@
   },
   {
    "rotina": "memoria_pg",
-   "execucoes_24h": 29,
+   "execucoes_24h": 30,
    "erros_24h": 0,
-   "ultima": "2026-11-01T23:22:36"
+   "ultima": "2026-11-02T00:06:57"
   },
   {
    "rotina": "modelos",
@@ -238,9 +238,9 @@
   },
   {
    "rotina": "registro",
-   "execucoes_24h": 528,
+   "execucoes_24h": 530,
    "erros_24h": 0,
-   "ultima": "2026-11-02T00:00:32"
+   "ultima": "2026-11-02T00:03:53"
   },
   {
    "rotina": "rh_desempenho",
@@ -250,30 +250,30 @@
   },
   {
    "rotina": "ronda_ti",
-   "execucoes_24h": 88,
+   "execucoes_24h": 89,
    "erros_24h": 0,
-   "ultima": "2026-11-01T23:33:29"
+   "ultima": "2026-11-02T00:03:37"
   },
   {
    "rotina": "treino",
-   "execucoes_24h": 576,
+   "execucoes_24h": 577,
    "erros_24h": 0,
-   "ultima": "2026-11-01T23:59:59"
+   "ultima": "2026-11-02T00:02:05"
   }
  ],
  "totais": {
   "demandas": 2236,
-  "tentativas_treino": 21197,
-  "conversas": 6170,
-  "trabalhos_com_prova": 13465
+  "tentativas_treino": 21205,
+  "conversas": 6171,
+  "trabalhos_com_prova": 13471
  },
  "banco": {
-  "levantamento": "2026-11-01T23:20:01",
+  "levantamento": "2026-11-02T00:03:53",
   "postgres_conferido": true,
   "erro_postgres": null,
-  "tabelas": 97,
-  "com_dados": 78,
-  "linhas": 511079,
+  "tabelas": 99,
+  "com_dados": 80,
+  "linhas": 520550,
   "resumo": {
    "sqlite": {
     "tabelas": 81,
@@ -283,8 +283,8 @@
     }
    },
    "postgres.laboratorio": {
-    "tabelas": 2,
-    "com_dados": 2,
+    "tabelas": 3,
+    "com_dados": 3,
     "vazias": {}
    },
    "postgres.robo": {
@@ -295,8 +295,8 @@
     }
    },
    "postgres.treino": {
-    "tabelas": 9,
-    "com_dados": 9,
+    "tabelas": 10,
+    "com_dados": 10,
     "vazias": {}
    },
    "postgres.bruto": {
