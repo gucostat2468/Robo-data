@@ -1,6 +1,6 @@
 # Empresa ao vivo
 
-**Boletim das 02/11 08:05** (horário de Brasília) · trabalhando
+**Boletim das 02/11 08:11** (horário de Brasília) · trabalhando
 
 > Atualiza a cada 5 minutos enquanto a empresa trabalha. Recarregue a página para ver o mais novo.
 
@@ -9,7 +9,7 @@
 - **237** demandas, **235** concluídas (99%), 0 parciais, 2 com falha
 - **105** de 105 funcionários já trabalharam
 - SQL: 26 exercícios, 26 conferidos com o gabarito
-- Fábrica: 61 planilhas, 61 conferidas sem erro
+- Fábrica: 62 planilhas, 61 conferidas sem erro
 
 ## Trabalhando agora
 
@@ -292,7 +292,7 @@ Pacote gerado pelo produto (`python -m robo entregar`) a partir de um projeto ap
 
 ## Banco de dados
 
-Levantamento das 02/11 07:24: **82 de 101** tabelas com dados (567.419 linhas contadas uma a uma).
+Levantamento das 02/11 08:08: **82 de 101** tabelas com dados (570.065 linhas contadas uma a uma).
 
 
 | Onde | Tabelas | Com dados |
