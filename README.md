@@ -1,6 +1,6 @@
 # Empresa ao vivo
 
-**Boletim das 02/11 03:55** (horário de Brasília) · entre turnos: memória salva; o próximo turno começa em poucos minutos
+**Boletim das 02/11 03:57** (horário de Brasília) · trabalhando
 
 > Atualiza a cada 5 minutos enquanto a empresa trabalha. Recarregue a página para ver o mais novo.
 
@@ -9,7 +9,7 @@
 - **135** demandas, **134** concluídas (99%), 0 parciais, 1 com falha
 - **105** de 105 funcionários já trabalharam
 - SQL: 19 exercícios, 19 conferidos com o gabarito
-- Fábrica: 38 planilhas, 38 conferidas sem erro
+- Fábrica: 40 planilhas, 38 conferidas sem erro
 
 ## Trabalhando agora
 
@@ -284,13 +284,14 @@ Pacote gerado pelo produto (`python -m robo entregar`) a partir de um projeto ap
 - risco_demanda-v74: **reprovado** (treinado por ml_engenheiro)
 - risco_demanda-v75: **reprovado** (treinado por ml_engenheiro)
 - risco_demanda-v76: **reprovado** (treinado por ml_engenheiro)
-- Última avaliação independente (ml_avaliador): risco_demanda-v76 reprovado — log loss 0.046 contra baseline 0.031; motivos: não bate o baseline (log loss 0.0463 ≥ 0.0310)
-- Referência em sombra: risco_demanda-v48; 1862 previsões em sombra
+- risco_demanda-v77: **reprovado** (treinado por ml_engenheiro)
+- Última avaliação independente (ml_avaliador): risco_demanda-v77 reprovado — log loss 0.042 contra baseline 0.022; motivos: não bate o baseline (log loss 0.0424 ≥ 0.0223)
+- Referência em sombra: risco_demanda-v48; 1865 previsões em sombra
 - Uso operacional: desligado: o modelo só roda em sombra até o dono decidir usá-lo em alguma escolha da empresa
 
 ## Banco de dados
 
-Levantamento das 02/11 03:52: **82 de 101** tabelas com dados (549.593 linhas contadas uma a uma).
+Levantamento das 02/11 03:43: **82 de 101** tabelas com dados (548.874 linhas contadas uma a uma).
 
 
 | Onde | Tabelas | Com dados |
