@@ -1,11 +1,11 @@
 {
  "versao": 1,
- "gerado_em": "2026-11-02T06:13:09",
+ "gerado_em": "2026-11-02T06:18:22",
  "turno": {
   "estado": "trabalhando",
   "inicio": "2026-11-02T06:13:09",
   "fim_previsto": "2026-11-02T06:53:09",
-  "voltas": 0,
+  "voltas": 21,
   "planilhas": 2
  },
  "funcionarios": 105,
@@ -18,7 +18,7 @@
    "concluidas": 18,
    "parciais": 0,
    "falhas": 0,
-   "treino": 210,
+   "treino": 219,
    "acertos": 38
   },
   {
@@ -29,7 +29,7 @@
    "concluidas": 22,
    "parciais": 0,
    "falhas": 0,
-   "treino": 197,
+   "treino": 201,
    "acertos": 48
   },
   {
@@ -40,7 +40,7 @@
    "concluidas": 11,
    "parciais": 0,
    "falhas": 0,
-   "treino": 132,
+   "treino": 135,
    "acertos": 41
   },
   {
@@ -51,23 +51,63 @@
    "concluidas": 21,
    "parciais": 0,
    "falhas": 0,
-   "treino": 281,
+   "treino": 284,
    "acertos": 70
   },
   {
    "andar": 5,
    "pessoas": 24,
    "trabalharam_hoje": 24,
-   "demandas": 51,
-   "concluidas": 50,
+   "demandas": 56,
+   "concluidas": 55,
    "parciais": 0,
    "falhas": 1,
-   "treino": 263,
+   "treino": 265,
    "acertos": 51
   }
  ],
  "agora": [],
  "ultimos": [
+  {
+   "quando": "2026-11-02T06:14:31",
+   "funcionario": "Alexandre",
+   "cargo": "Diretor de Tecnologia (CTO)",
+   "andar": 5,
+   "trabalho": "Ronda de saúde do sistema — nível profissional",
+   "estado": "concluida"
+  },
+  {
+   "quando": "2026-11-02T06:14:31",
+   "funcionario": "Ícaro",
+   "cargo": "Sênior de AWS, Linux e Ubuntu",
+   "andar": 5,
+   "trabalho": "Medir a saúde do PostgreSQL — nível dificil",
+   "estado": "concluida"
+  },
+  {
+   "quando": "2026-11-02T06:14:30",
+   "funcionario": "Fernanda",
+   "cargo": "Coordenadora de DevOps e Confiabilidade (SRE)",
+   "andar": 5,
+   "trabalho": "Diagnosticar a planilha original da fábrica — nível dificil",
+   "estado": "concluida"
+  },
+  {
+   "quando": "2026-11-02T06:14:30",
+   "funcionario": "Letícia",
+   "cargo": "Desenvolvedora Júnior",
+   "andar": 5,
+   "trabalho": "SLA das rotinas",
+   "estado": "concluida"
+  },
+  {
+   "quando": "2026-11-02T06:14:30",
+   "funcionario": "Diego",
+   "cargo": "Desenvolvedor Python Pleno",
+   "andar": 5,
+   "trabalho": "Medir a saúde do PostgreSQL",
+   "estado": "concluida"
+  },
   {
    "quando": "2026-11-02T05:44:30",
    "funcionario": "Marcos",
@@ -107,46 +147,6 @@
    "andar": 5,
    "trabalho": "Exercício de SQL no PostgreSQL com os dados da fábrica — nível dificil",
    "estado": "concluida"
-  },
-  {
-   "quando": "2026-11-02T05:44:23",
-   "funcionario": "Caetano",
-   "cargo": "Especialista em Orquestração de Dados (Apache Airflow)",
-   "andar": 5,
-   "trabalho": "Ronda de saúde do sistema — nível dificil",
-   "estado": "concluida"
-  },
-  {
-   "quando": "2026-11-02T05:44:22",
-   "funcionario": "Rodrigo",
-   "cargo": "Analista de Infraestrutura Pleno",
-   "andar": 5,
-   "trabalho": "Ronda de saúde do sistema — nível medio",
-   "estado": "concluida"
-  },
-  {
-   "quando": "2026-11-02T05:14:18",
-   "funcionario": "Ícaro",
-   "cargo": "Sênior de AWS, Linux e Ubuntu",
-   "andar": 5,
-   "trabalho": "Testar se o último backup volta — nível dificil",
-   "estado": "concluida"
-  },
-  {
-   "quando": "2026-11-02T04:44:25",
-   "funcionario": "Marcos",
-   "cargo": "Coordenador de Análise e Ciência de Dados",
-   "andar": 2,
-   "trabalho": "Projeto NPS — TREINO_nps_20261102_044400_40360",
-   "estado": "concluida"
-  },
-  {
-   "quando": "2026-11-02T04:44:19",
-   "funcionario": "André",
-   "cargo": "Head de Infraestrutura e Segurança",
-   "andar": 5,
-   "trabalho": "Ronda de saúde do sistema — nível profissional",
-   "estado": "concluida"
   }
  ],
  "sql": {
@@ -155,7 +155,7 @@
  },
  "fabrica": {
   "lotes_hoje": 36,
-  "conferidos_ok_hoje": 34
+  "conferidos_ok_hoje": 36
  },
  "rotinas": [
   {
@@ -168,19 +168,19 @@
    "rotina": "demandas",
    "execucoes_24h": 47,
    "erros_24h": 0,
-   "ultima": "2026-11-02T05:44:31"
+   "ultima": "2026-11-02T06:14:31"
   },
   {
    "rotina": "dialogo",
-   "execucoes_24h": 21,
+   "execucoes_24h": 20,
    "erros_24h": 0,
    "ultima": "2026-11-02T06:12:58"
   },
   {
    "rotina": "fabrica",
-   "execucoes_24h": 141,
+   "execucoes_24h": 142,
    "erros_24h": 0,
-   "ultima": "2026-11-02T06:02:09"
+   "ultima": "2026-11-02T06:13:13"
   },
   {
    "rotina": "ideias",
@@ -198,7 +198,7 @@
    "rotina": "laboratorio",
    "execucoes_24h": 130,
    "erros_24h": 0,
-   "ultima": "2026-11-02T06:02:08"
+   "ultima": "2026-11-02T06:13:13"
   },
   {
    "rotina": "licoes",
@@ -226,9 +226,9 @@
   },
   {
    "rotina": "registro",
-   "execucoes_24h": 594,
+   "execucoes_24h": 593,
    "erros_24h": 0,
-   "ultima": "2026-11-02T06:07:45"
+   "ultima": "2026-11-02T06:17:36"
   },
   {
    "rotina": "reuniao",
@@ -250,16 +250,16 @@
   },
   {
    "rotina": "treino",
-   "execucoes_24h": 616,
+   "execucoes_24h": 617,
    "erros_24h": 0,
-   "ultima": "2026-11-02T06:06:16"
+   "ultima": "2026-11-02T06:17:21"
   }
  ],
  "totais": {
-  "demandas": 2359,
-  "tentativas_treino": 22280,
-  "conversas": 6558,
-  "trabalhos_com_prova": 14378
+  "demandas": 2364,
+  "tentativas_treino": 22301,
+  "conversas": 6559,
+  "trabalhos_com_prova": 14400
  },
  "banco": {
   "levantamento": "2026-11-02T05:58:22",
@@ -629,7 +629,7 @@
    "ultimo": "",
    "quando": "",
    "estado": "",
-   "situacao": "estagiário: observa (regra do dono) — Observei Rodrigo (Analista de Infraestrutura Pleno) fazendo \"Ronda de saúde do sistema\" no nível medio: terminou conclui"
+   "situacao": "estagiário: observa (regra do dono) — Observei Fernanda (Coordenadora de DevOps e Confiabilidade (SRE)) fazendo \"Diagnosticar a planilha original da fábrica\" "
   },
   {
    "nome": "Tina",
@@ -860,7 +860,7 @@
    "ultimo": "",
    "quando": "",
    "estado": "",
-   "situacao": "estagiário: observa (regra do dono) — Observei Rodrigo (Analista de Infraestrutura Pleno) fazendo \"Ronda de saúde do sistema\" no nível medio: terminou conclui"
+   "situacao": "estagiário: observa (regra do dono) — Observei Fernanda (Coordenadora de DevOps e Confiabilidade (SRE)) fazendo \"Diagnosticar a planilha original da fábrica\" "
   },
   {
    "nome": "Felipe",
@@ -1102,7 +1102,7 @@
    "ultimo": "",
    "quando": "",
    "estado": "",
-   "situacao": "estagiário: observa (regra do dono) — Observei Wagner (Especialista Sênior em Segurança da Informação) fazendo \"Verificar dados pessoais (LGPD) na base sintét"
+   "situacao": "estagiário: observa (regra do dono)"
   },
   {
    "nome": "Lorena",
@@ -1329,9 +1329,9 @@
    "andar": 5,
    "cargo": "Diretor de Tecnologia (CTO)",
    "area": "Engenharia de Dados",
-   "demandas_hoje": 2,
-   "ultimo": "Scorecard da área — nível profissional",
-   "quando": "2026-11-02T03:09:18",
+   "demandas_hoje": 3,
+   "ultimo": "Ronda de saúde do sistema — nível profissional",
+   "quando": "2026-11-02T06:14:30",
    "estado": "concluida",
    "situacao": "trabalho do papel"
   },
@@ -1377,17 +1377,17 @@
    "ultimo": "",
    "quando": "",
    "estado": "",
-   "situacao": "estagiário: observa (regra do dono) — Observei Rodrigo (Analista de Infraestrutura Pleno) fazendo \"Ronda de saúde do sistema\" no nível medio: terminou conclui"
+   "situacao": "estagiário: observa (regra do dono) — Observei Fernanda (Coordenadora de DevOps e Confiabilidade (SRE)) fazendo \"Diagnosticar a planilha original da fábrica\" "
   },
   {
    "nome": "Diego",
    "andar": 5,
    "cargo": "Desenvolvedor Python Pleno",
    "area": "Engenharia de Dados",
-   "demandas_hoje": 2,
-   "ultimo": "SLA das rotinas — nível medio",
-   "quando": "2026-11-02T03:09:16",
-   "estado": "falhou",
+   "demandas_hoje": 3,
+   "ultimo": "Medir a saúde do PostgreSQL",
+   "quando": "2026-11-02T06:14:30",
+   "estado": "concluida",
    "situacao": "trabalho do papel"
   },
   {
@@ -1406,9 +1406,9 @@
    "andar": 5,
    "cargo": "Coordenadora de DevOps e Confiabilidade (SRE)",
    "area": "Engenharia de Dados",
-   "demandas_hoje": 2,
-   "ultimo": "Exercício de SQL no PostgreSQL com os dados da fábrica — nível dificil",
-   "quando": "2026-11-02T03:09:10",
+   "demandas_hoje": 3,
+   "ultimo": "Diagnosticar a planilha original da fábrica — nível dificil",
+   "quando": "2026-11-02T06:14:30",
    "estado": "concluida",
    "situacao": "trabalho do papel"
   },
@@ -1421,7 +1421,7 @@
    "ultimo": "",
    "quando": "",
    "estado": "",
-   "situacao": "estagiário: observa (regra do dono) — Observei Rodrigo (Analista de Infraestrutura Pleno) fazendo \"Ronda de saúde do sistema\" no nível medio: terminou conclui"
+   "situacao": "estagiário: observa (regra do dono) — Observei Fernanda (Coordenadora de DevOps e Confiabilidade (SRE)) fazendo \"Diagnosticar a planilha original da fábrica\" "
   },
   {
    "nome": "Gustavo",
@@ -1472,9 +1472,9 @@
    "andar": 5,
    "cargo": "Desenvolvedora Júnior",
    "area": "Engenharia de Dados",
-   "demandas_hoje": 2,
-   "ultimo": "Ronda de saúde do sistema",
-   "quando": "2026-11-02T03:09:12",
+   "demandas_hoje": 3,
+   "ultimo": "SLA das rotinas",
+   "quando": "2026-11-02T06:14:30",
    "estado": "concluida",
    "situacao": "trabalho do papel"
   },
@@ -1582,9 +1582,9 @@
    "andar": 5,
    "cargo": "Sênior de AWS, Linux e Ubuntu",
    "area": "Engenharia de Dados",
-   "demandas_hoje": 4,
-   "ultimo": "Testar se o último backup volta — nível dificil",
-   "quando": "2026-11-02T05:14:16",
+   "demandas_hoje": 5,
+   "ultimo": "Medir a saúde do PostgreSQL — nível dificil",
+   "quando": "2026-11-02T06:14:31",
    "estado": "concluida",
    "situacao": "trabalho do papel"
   }
@@ -2125,7 +2125,7 @@
  ],
  "modelos": {
   "finalidade": "risco_demanda",
-  "rotuladas_agora": 2316,
+  "rotuladas_agora": 2321,
   "minimo_para_treinar": 60,
   "datasets": 76,
   "maior_dataset": 2299,
@@ -2540,8 +2540,8 @@
  "niveis": [
   {
    "nivel": "basico",
-   "demandas": 268,
-   "concluidas": 246,
+   "demandas": 270,
+   "concluidas": 248,
    "parciais": 0,
    "falhas": 22
   },
@@ -2554,15 +2554,15 @@
   },
   {
    "nivel": "dificil",
-   "demandas": 1059,
-   "concluidas": 1039,
+   "demandas": 1061,
+   "concluidas": 1041,
    "parciais": 1,
    "falhas": 19
   },
   {
    "nivel": "profissional",
-   "demandas": 488,
-   "concluidas": 484,
+   "demandas": 489,
+   "concluidas": 485,
    "parciais": 1,
    "falhas": 3
   }
