@@ -1,11 +1,11 @@
 {
  "versao": 1,
- "gerado_em": "2026-11-02T08:14:19",
+ "gerado_em": "2026-11-02T08:19:34",
  "turno": {
   "estado": "trabalhando",
   "inicio": "2026-11-02T07:41:10",
   "fim_previsto": "2026-11-02T08:21:10",
-  "voltas": 110,
+  "voltas": 130,
   "planilhas": 4
  },
  "funcionarios": 105,
@@ -18,7 +18,7 @@
    "concluidas": 18,
    "parciais": 0,
    "falhas": 0,
-   "treino": 283,
+   "treino": 285,
    "acertos": 51
   },
   {
@@ -29,7 +29,7 @@
    "concluidas": 24,
    "parciais": 0,
    "falhas": 0,
-   "treino": 266,
+   "treino": 268,
    "acertos": 63
   },
   {
@@ -40,7 +40,7 @@
    "concluidas": 11,
    "parciais": 0,
    "falhas": 0,
-   "treino": 179,
+   "treino": 180,
    "acertos": 56
   },
   {
@@ -51,23 +51,31 @@
    "concluidas": 21,
    "parciais": 0,
    "falhas": 0,
-   "treino": 372,
+   "treino": 375,
    "acertos": 87
   },
   {
    "andar": 5,
    "pessoas": 24,
    "trabalharam_hoje": 24,
-   "demandas": 72,
+   "demandas": 73,
    "concluidas": 71,
    "parciais": 0,
-   "falhas": 1,
-   "treino": 344,
+   "falhas": 2,
+   "treino": 352,
    "acertos": 61
   }
  ],
  "agora": [],
  "ultimos": [
+  {
+   "quando": "2026-11-02T08:17:30",
+   "funcionario": "Ícaro",
+   "cargo": "Sênior de AWS, Linux e Ubuntu",
+   "andar": 5,
+   "trabalho": "SLA das rotinas — nível dificil",
+   "estado": "falhou"
+  },
   {
    "quando": "2026-11-02T07:47:28",
    "funcionario": "Marcos",
@@ -139,14 +147,6 @@
    "andar": 5,
    "trabalho": "Procurar segredos no repositório público — nível dificil",
    "estado": "concluida"
-  },
-  {
-   "quando": "2026-11-02T07:16:34",
-   "funcionario": "Silas",
-   "cargo": "Especialista em sqlite3 (memória da empresa)",
-   "andar": 5,
-   "trabalho": "SLA das rotinas — nível dificil",
-   "estado": "concluida"
   }
  ],
  "sql": {
@@ -168,7 +168,7 @@
    "rotina": "demandas",
    "execucoes_24h": 47,
    "erros_24h": 0,
-   "ultima": "2026-11-02T07:47:29"
+   "ultima": "2026-11-02T08:17:30"
   },
   {
    "rotina": "dialogo",
@@ -196,7 +196,7 @@
   },
   {
    "rotina": "laboratorio",
-   "execucoes_24h": 131,
+   "execucoes_24h": 130,
    "erros_24h": 0,
    "ultima": "2026-11-02T08:14:00"
   },
@@ -228,7 +228,7 @@
    "rotina": "registro",
    "execucoes_24h": 595,
    "erros_24h": 0,
-   "ultima": "2026-11-02T08:14:18"
+   "ultima": "2026-11-02T08:17:45"
   },
   {
    "rotina": "reuniao",
@@ -250,16 +250,16 @@
   },
   {
    "rotina": "treino",
-   "execucoes_24h": 621,
+   "execucoes_24h": 620,
    "erros_24h": 0,
-   "ultima": "2026-11-02T08:13:59"
+   "ultima": "2026-11-02T08:18:17"
   }
  ],
  "totais": {
-  "demandas": 2382,
-  "tentativas_treino": 22641,
-  "conversas": 6599,
-  "trabalhos_com_prova": 14658
+  "demandas": 2383,
+  "tentativas_treino": 22657,
+  "conversas": 6600,
+  "trabalhos_com_prova": 14667
  },
  "banco": {
   "levantamento": "2026-11-02T08:11:20",
@@ -629,7 +629,7 @@
    "ultimo": "",
    "quando": "",
    "estado": "",
-   "situacao": "estagiário: observa (regra do dono) — Observei Gustavo (Gerente de TI e Infraestrutura) fazendo \"Situação do andar agora\" no nível profissional: terminou conc"
+   "situacao": "estagiário: observa (regra do dono)"
   },
   {
    "nome": "Tina",
@@ -860,7 +860,7 @@
    "ultimo": "",
    "quando": "",
    "estado": "",
-   "situacao": "estagiário: observa (regra do dono) — Observei Gustavo (Gerente de TI e Infraestrutura) fazendo \"Situação do andar agora\" no nível profissional: terminou conc"
+   "situacao": "estagiário: observa (regra do dono)"
   },
   {
    "nome": "Felipe",
@@ -1102,7 +1102,7 @@
    "ultimo": "",
    "quando": "",
    "estado": "",
-   "situacao": "estagiário: observa (regra do dono) — Observei André (Head de Infraestrutura e Segurança) fazendo \"Situação do andar agora\" no nível profissional: terminou co"
+   "situacao": "estagiário: observa (regra do dono)"
   },
   {
    "nome": "Lorena",
@@ -1377,7 +1377,7 @@
    "ultimo": "",
    "quando": "",
    "estado": "",
-   "situacao": "estagiário: observa (regra do dono) — Observei Gustavo (Gerente de TI e Infraestrutura) fazendo \"Situação do andar agora\" no nível profissional: terminou conc"
+   "situacao": "estagiário: observa (regra do dono)"
   },
   {
    "nome": "Diego",
@@ -1421,7 +1421,7 @@
    "ultimo": "",
    "quando": "",
    "estado": "",
-   "situacao": "estagiário: observa (regra do dono) — Observei Gustavo (Gerente de TI e Infraestrutura) fazendo \"Situação do andar agora\" no nível profissional: terminou conc"
+   "situacao": "estagiário: observa (regra do dono)"
   },
   {
    "nome": "Gustavo",
@@ -1582,10 +1582,10 @@
    "andar": 5,
    "cargo": "Sênior de AWS, Linux e Ubuntu",
    "area": "Engenharia de Dados",
-   "demandas_hoje": 6,
-   "ultimo": "Ronda de saúde do sistema — nível dificil",
-   "quando": "2026-11-02T07:16:36",
-   "estado": "concluida",
+   "demandas_hoje": 7,
+   "ultimo": "SLA das rotinas — nível dificil",
+   "quando": "2026-11-02T08:17:29",
+   "estado": "falhou",
    "situacao": "trabalho do papel"
   }
  ],
@@ -2127,7 +2127,7 @@
  ],
  "modelos": {
   "finalidade": "risco_demanda",
-  "rotuladas_agora": 2339,
+  "rotuladas_agora": 2340,
   "minimo_para_treinar": 60,
   "datasets": 77,
   "maior_dataset": 2328,
@@ -2561,10 +2561,10 @@
   },
   {
    "nivel": "dificil",
-   "demandas": 1072,
+   "demandas": 1073,
    "concluidas": 1052,
    "parciais": 1,
-   "falhas": 19
+   "falhas": 20
   },
   {
    "nivel": "profissional",
