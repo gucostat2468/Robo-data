@@ -1,11 +1,11 @@
 {
  "versao": 1,
- "gerado_em": "2026-11-02T13:50:53",
+ "gerado_em": "2026-11-02T13:56:10",
  "turno": {
   "estado": "trabalhando",
   "inicio": "2026-11-02T13:34:47",
   "fim_previsto": "2026-11-02T14:14:47",
-  "voltas": 61,
+  "voltas": 81,
   "planilhas": 3
  },
  "funcionarios": 105,
@@ -18,7 +18,7 @@
    "concluidas": 36,
    "parciais": 0,
    "falhas": 0,
-   "treino": 466,
+   "treino": 469,
    "acertos": 72
   },
   {
@@ -29,7 +29,7 @@
    "concluidas": 45,
    "parciais": 0,
    "falhas": 0,
-   "treino": 436,
+   "treino": 438,
    "acertos": 93
   },
   {
@@ -40,7 +40,7 @@
    "concluidas": 22,
    "parciais": 0,
    "falhas": 0,
-   "treino": 291,
+   "treino": 295,
    "acertos": 79
   },
   {
@@ -51,23 +51,63 @@
    "concluidas": 42,
    "parciais": 0,
    "falhas": 0,
-   "treino": 607,
+   "treino": 611,
    "acertos": 133
   },
   {
    "andar": 5,
    "pessoas": 24,
    "trabalharam_hoje": 24,
-   "demandas": 118,
-   "concluidas": 116,
+   "demandas": 123,
+   "concluidas": 121,
    "parciais": 0,
    "falhas": 2,
-   "treino": 574,
+   "treino": 580,
    "acertos": 90
   }
  ],
  "agora": [],
  "ultimos": [
+  {
+   "quando": "2026-11-02T13:54:38",
+   "funcionario": "Marina",
+   "cargo": "Arquiteta de Cloud (AWS)",
+   "andar": 5,
+   "trabalho": "Conferir se o projeto está pronto para servidor — nível dificil",
+   "estado": "concluida"
+  },
+  {
+   "quando": "2026-11-02T13:54:38",
+   "funcionario": "Ícaro",
+   "cargo": "Sênior de AWS, Linux e Ubuntu",
+   "andar": 5,
+   "trabalho": "Medir a saúde do PostgreSQL — nível dificil",
+   "estado": "concluida"
+  },
+  {
+   "quando": "2026-11-02T13:54:37",
+   "funcionario": "Henrique",
+   "cargo": "Head de Engenharia Python",
+   "andar": 5,
+   "trabalho": "Ronda de saúde do sistema — nível profissional",
+   "estado": "concluida"
+  },
+  {
+   "quando": "2026-11-02T13:54:37",
+   "funcionario": "André",
+   "cargo": "Head de Infraestrutura e Segurança",
+   "andar": 5,
+   "trabalho": "Medir a saúde do PostgreSQL — nível profissional",
+   "estado": "concluida"
+  },
+  {
+   "quando": "2026-11-02T13:54:36",
+   "funcionario": "Gustavo",
+   "cargo": "Gerente de TI e Infraestrutura",
+   "andar": 5,
+   "trabalho": "SLA das rotinas — nível profissional",
+   "estado": "concluida"
+  },
   {
    "quando": "2026-11-02T13:24:34",
    "funcionario": "Marcos",
@@ -107,46 +147,6 @@
    "andar": 5,
    "trabalho": "Exercício de SQL no PostgreSQL com os dados da fábrica — nível dificil",
    "estado": "concluida"
-  },
-  {
-   "quando": "2026-11-02T13:24:28",
-   "funcionario": "Silas",
-   "cargo": "Especialista em sqlite3 (memória da empresa)",
-   "andar": 5,
-   "trabalho": "Procurar segredos no repositório público — nível dificil",
-   "estado": "concluida"
-  },
-  {
-   "quando": "2026-11-02T12:53:28",
-   "funcionario": "Ícaro",
-   "cargo": "Sênior de AWS, Linux e Ubuntu",
-   "andar": 5,
-   "trabalho": "Testar se o último backup volta — nível dificil",
-   "estado": "concluida"
-  },
-  {
-   "quando": "2026-11-02T12:53:27",
-   "funcionario": "Marina",
-   "cargo": "Arquiteta de Cloud (AWS)",
-   "andar": 5,
-   "trabalho": "Testar se o último backup volta — nível dificil",
-   "estado": "concluida"
-  },
-  {
-   "quando": "2026-11-02T12:53:25",
-   "funcionario": "Olívia",
-   "cargo": "Especialista em openpyxl (Excel)",
-   "andar": 5,
-   "trabalho": "Procurar segredos no repositório público — nível dificil",
-   "estado": "concluida"
-  },
-  {
-   "quando": "2026-11-02T12:53:25",
-   "funcionario": "Sofia",
-   "cargo": "Especialista em pandas",
-   "andar": 5,
-   "trabalho": "Exercício de SQL no PostgreSQL com os dados da fábrica — nível dificil",
-   "estado": "concluida"
   }
  ],
  "sql": {
@@ -168,7 +168,7 @@
    "rotina": "demandas",
    "execucoes_24h": 47,
    "erros_24h": 0,
-   "ultima": "2026-11-02T13:24:37"
+   "ultima": "2026-11-02T13:54:38"
   },
   {
    "rotina": "dialogo",
@@ -196,9 +196,9 @@
   },
   {
    "rotina": "laboratorio",
-   "execucoes_24h": 130,
+   "execucoes_24h": 131,
    "erros_24h": 0,
-   "ultima": "2026-11-02T13:44:54"
+   "ultima": "2026-11-02T13:55:09"
   },
   {
    "rotina": "licoes",
@@ -226,9 +226,9 @@
   },
   {
    "rotina": "registro",
-   "execucoes_24h": 599,
+   "execucoes_24h": 600,
    "erros_24h": 0,
-   "ultima": "2026-11-02T13:50:07"
+   "ultima": "2026-11-02T13:56:10"
   },
   {
    "rotina": "reuniao",
@@ -244,22 +244,22 @@
   },
   {
    "rotina": "ronda_ti",
-   "execucoes_24h": 98,
+   "execucoes_24h": 97,
    "erros_24h": 0,
    "ultima": "2026-11-02T13:34:21"
   },
   {
    "rotina": "treino",
-   "execucoes_24h": 613,
+   "execucoes_24h": 615,
    "erros_24h": 0,
-   "ultima": "2026-11-02T13:49:20"
+   "ultima": "2026-11-02T13:55:55"
   }
  ],
  "totais": {
-  "demandas": 2499,
-  "tentativas_treino": 23571,
-  "conversas": 6705,
-  "trabalhos_com_prova": 15467
+  "demandas": 2504,
+  "tentativas_treino": 23590,
+  "conversas": 6710,
+  "trabalhos_com_prova": 15488
  },
  "banco": {
   "levantamento": "2026-11-02T13:21:09",
@@ -629,7 +629,7 @@
    "ultimo": "",
    "quando": "",
    "estado": "",
-   "situacao": "estagiário: observa (regra do dono) — Observei Pietro (Especialista em psycopg (PostgreSQL)) fazendo \"Exercício de SQL no PostgreSQL com os dados da fábrica\" "
+   "situacao": "estagiário: observa (regra do dono) — Observei Gustavo (Gerente de TI e Infraestrutura) fazendo \"SLA das rotinas\" no nível profissional: terminou concluida."
   },
   {
    "nome": "Tina",
@@ -860,7 +860,7 @@
    "ultimo": "",
    "quando": "",
    "estado": "",
-   "situacao": "estagiário: observa (regra do dono) — Observei Pietro (Especialista em psycopg (PostgreSQL)) fazendo \"Exercício de SQL no PostgreSQL com os dados da fábrica\" "
+   "situacao": "estagiário: observa (regra do dono) — Observei Gustavo (Gerente de TI e Infraestrutura) fazendo \"SLA das rotinas\" no nível profissional: terminou concluida."
   },
   {
    "nome": "Felipe",
@@ -1102,7 +1102,7 @@
    "ultimo": "",
    "quando": "",
    "estado": "",
-   "situacao": "estagiário: observa (regra do dono) — Observei Elisa (Especialista em PyYAML (configuração)) fazendo \"Medir a saúde do PostgreSQL\" no nível dificil: terminou "
+   "situacao": "estagiário: observa (regra do dono) — Observei André (Head de Infraestrutura e Segurança) fazendo \"Medir a saúde do PostgreSQL\" no nível profissional: termino"
   },
   {
    "nome": "Lorena",
@@ -1340,9 +1340,9 @@
    "andar": 5,
    "cargo": "Head de Infraestrutura e Segurança",
    "area": "Governança e Privacidade",
-   "demandas_hoje": 4,
-   "ultimo": "SLA das rotinas — nível profissional",
-   "quando": "2026-11-02T10:48:19",
+   "demandas_hoje": 5,
+   "ultimo": "Medir a saúde do PostgreSQL — nível profissional",
+   "quando": "2026-11-02T13:54:37",
    "estado": "concluida",
    "situacao": "trabalho do papel"
   },
@@ -1377,7 +1377,7 @@
    "ultimo": "",
    "quando": "",
    "estado": "",
-   "situacao": "estagiário: observa (regra do dono) — Observei Pietro (Especialista em psycopg (PostgreSQL)) fazendo \"Exercício de SQL no PostgreSQL com os dados da fábrica\" "
+   "situacao": "estagiário: observa (regra do dono) — Observei Gustavo (Gerente de TI e Infraestrutura) fazendo \"SLA das rotinas\" no nível profissional: terminou concluida."
   },
   {
    "nome": "Diego",
@@ -1421,16 +1421,16 @@
    "ultimo": "",
    "quando": "",
    "estado": "",
-   "situacao": "estagiário: observa (regra do dono) — Observei Pietro (Especialista em psycopg (PostgreSQL)) fazendo \"Exercício de SQL no PostgreSQL com os dados da fábrica\" "
+   "situacao": "estagiário: observa (regra do dono) — Observei Gustavo (Gerente de TI e Infraestrutura) fazendo \"SLA das rotinas\" no nível profissional: terminou concluida."
   },
   {
    "nome": "Gustavo",
    "andar": 5,
    "cargo": "Gerente de TI e Infraestrutura",
    "area": "Engenharia de Dados",
-   "demandas_hoje": 4,
-   "ultimo": "Ronda de saúde do sistema — nível profissional",
-   "quando": "2026-11-02T10:48:16",
+   "demandas_hoje": 5,
+   "ultimo": "SLA das rotinas — nível profissional",
+   "quando": "2026-11-02T13:54:35",
    "estado": "concluida",
    "situacao": "trabalho do papel"
   },
@@ -1450,9 +1450,9 @@
    "andar": 5,
    "cargo": "Head de Engenharia Python",
    "area": "Engenharia de Dados",
-   "demandas_hoje": 4,
-   "ultimo": "Situação do andar agora — nível profissional",
-   "quando": "2026-11-02T10:48:19",
+   "demandas_hoje": 5,
+   "ultimo": "Ronda de saúde do sistema — nível profissional",
+   "quando": "2026-11-02T13:54:36",
    "estado": "concluida",
    "situacao": "trabalho do papel"
   },
@@ -1483,9 +1483,9 @@
    "andar": 5,
    "cargo": "Arquiteta de Cloud (AWS)",
    "area": "Engenharia de Dados",
-   "demandas_hoje": 9,
-   "ultimo": "Testar se o último backup volta — nível dificil",
-   "quando": "2026-11-02T12:53:25",
+   "demandas_hoje": 10,
+   "ultimo": "Conferir se o projeto está pronto para servidor — nível dificil",
+   "quando": "2026-11-02T13:54:38",
    "estado": "concluida",
    "situacao": "trabalho do papel"
   },
@@ -1582,9 +1582,9 @@
    "andar": 5,
    "cargo": "Sênior de AWS, Linux e Ubuntu",
    "area": "Engenharia de Dados",
-   "demandas_hoje": 10,
-   "ultimo": "Testar se o último backup volta — nível dificil",
-   "quando": "2026-11-02T12:53:27",
+   "demandas_hoje": 11,
+   "ultimo": "Medir a saúde do PostgreSQL — nível dificil",
+   "quando": "2026-11-02T13:54:38",
    "estado": "concluida",
    "situacao": "trabalho do papel"
   }
@@ -2121,7 +2121,7 @@
  ],
  "modelos": {
   "finalidade": "risco_demanda",
-  "rotuladas_agora": 2456,
+  "rotuladas_agora": 2461,
   "minimo_para_treinar": 60,
   "datasets": 81,
   "maior_dataset": 2444,
@@ -2575,15 +2575,15 @@
   },
   {
    "nivel": "dificil",
-   "demandas": 1132,
-   "concluidas": 1111,
+   "demandas": 1134,
+   "concluidas": 1113,
    "parciais": 1,
    "falhas": 20
   },
   {
    "nivel": "profissional",
-   "demandas": 525,
-   "concluidas": 521,
+   "demandas": 528,
+   "concluidas": 524,
    "parciais": 1,
    "falhas": 3
   }
