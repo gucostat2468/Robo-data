@@ -1,11 +1,11 @@
 {
  "versao": 1,
- "gerado_em": "2026-11-02T14:47:25",
+ "gerado_em": "2026-11-02T14:53:21",
  "turno": {
   "estado": "trabalhando",
   "inicio": "2026-11-02T14:19:47",
   "fim_previsto": "2026-11-02T14:59:47",
-  "voltas": 100,
+  "voltas": 109,
   "planilhas": 3
  },
  "funcionarios": 105,
@@ -18,7 +18,7 @@
    "concluidas": 36,
    "parciais": 0,
    "falhas": 0,
-   "treino": 498,
+   "treino": 501,
    "acertos": 72
   },
   {
@@ -51,7 +51,7 @@
    "concluidas": 42,
    "parciais": 0,
    "falhas": 0,
-   "treino": 649,
+   "treino": 650,
    "acertos": 134
   },
   {
@@ -62,7 +62,7 @@
    "concluidas": 122,
    "parciais": 0,
    "falhas": 2,
-   "treino": 611,
+   "treino": 615,
    "acertos": 90
   }
  ],
@@ -208,9 +208,9 @@
   },
   {
    "rotina": "memoria_pg",
-   "execucoes_24h": 32,
+   "execucoes_24h": 33,
    "erros_24h": 0,
-   "ultima": "2026-11-02T14:08:10"
+   "ultima": "2026-11-02T14:53:16"
   },
   {
    "rotina": "modelos",
@@ -228,7 +228,7 @@
    "rotina": "registro",
    "execucoes_24h": 604,
    "erros_24h": 0,
-   "ultima": "2026-11-02T14:47:25"
+   "ultima": "2026-11-02T14:49:34"
   },
   {
    "rotina": "reuniao",
@@ -244,30 +244,30 @@
   },
   {
    "rotina": "ronda_ti",
-   "execucoes_24h": 96,
+   "execucoes_24h": 97,
    "erros_24h": 0,
-   "ultima": "2026-11-02T14:19:17"
+   "ultima": "2026-11-02T14:49:18"
   },
   {
    "rotina": "treino",
-   "execucoes_24h": 612,
+   "execucoes_24h": 610,
    "erros_24h": 0,
-   "ultima": "2026-11-02T14:47:10"
+   "ultima": "2026-11-02T14:49:17"
   }
  ],
  "totais": {
   "demandas": 2506,
-  "tentativas_treino": 23734,
+  "tentativas_treino": 23742,
   "conversas": 6733,
-  "trabalhos_com_prova": 15590
+  "trabalhos_com_prova": 15595
  },
  "banco": {
-  "levantamento": "2026-11-02T14:05:02",
+  "levantamento": "2026-11-02T14:49:49",
   "postgres_conferido": true,
   "erro_postgres": null,
-  "tabelas": 101,
-  "com_dados": 82,
-  "linhas": 580239,
+  "tabelas": 99,
+  "com_dados": 80,
+  "linhas": 573464,
   "resumo": {
    "sqlite": {
     "tabelas": 81,
@@ -277,8 +277,8 @@
     }
    },
    "postgres.laboratorio": {
-    "tabelas": 4,
-    "com_dados": 4,
+    "tabelas": 3,
+    "com_dados": 3,
     "vazias": {}
    },
    "postgres.robo": {
@@ -289,8 +289,8 @@
     }
    },
    "postgres.treino": {
-    "tabelas": 11,
-    "com_dados": 11,
+    "tabelas": 10,
+    "com_dados": 10,
     "vazias": {}
    },
    "postgres.bruto": {
