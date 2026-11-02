@@ -1,11 +1,11 @@
 {
  "versao": 1,
- "gerado_em": "2026-11-02T00:34:24",
+ "gerado_em": "2026-11-02T00:39:39",
  "turno": {
   "estado": "trabalhando",
   "inicio": "2026-11-02T00:18:28",
   "fim_previsto": "2026-11-02T00:58:28",
-  "voltas": 59,
+  "voltas": 79,
   "planilhas": 4
  },
  "funcionarios": 105,
@@ -35,39 +35,87 @@
   {
    "andar": 3,
    "pessoas": 12,
-   "trabalharam_hoje": 10,
+   "trabalharam_hoje": 12,
    "demandas": 0,
    "concluidas": 0,
    "parciais": 0,
    "falhas": 0,
-   "treino": 10,
-   "acertos": 6
+   "treino": 12,
+   "acertos": 8
   },
   {
    "andar": 4,
    "pessoas": 32,
-   "trabalharam_hoje": 17,
+   "trabalharam_hoje": 23,
    "demandas": 0,
    "concluidas": 0,
    "parciais": 0,
    "falhas": 0,
-   "treino": 17,
-   "acertos": 8
+   "treino": 23,
+   "acertos": 11
   },
   {
    "andar": 5,
    "pessoas": 24,
-   "trabalharam_hoje": 19,
-   "demandas": 5,
-   "concluidas": 5,
+   "trabalharam_hoje": 22,
+   "demandas": 11,
+   "concluidas": 11,
    "parciais": 0,
    "falhas": 0,
-   "treino": 18,
-   "acertos": 10
+   "treino": 21,
+   "acertos": 12
   }
  ],
  "agora": [],
  "ultimos": [
+  {
+   "quando": "2026-11-02T00:37:48",
+   "funcionario": "Jonas",
+   "cargo": "Engenheiro de MLOps e Plataforma de Modelos",
+   "andar": 5,
+   "trabalho": "Testar se o último backup volta — nível dificil",
+   "estado": "concluida"
+  },
+  {
+   "quando": "2026-11-02T00:37:48",
+   "funcionario": "Ícaro",
+   "cargo": "Sênior de AWS, Linux e Ubuntu",
+   "andar": 5,
+   "trabalho": "SLA das rotinas — nível dificil",
+   "estado": "concluida"
+  },
+  {
+   "quando": "2026-11-02T00:37:48",
+   "funcionario": "Marina",
+   "cargo": "Arquiteta de Cloud (AWS)",
+   "andar": 5,
+   "trabalho": "Procurar segredos no repositório público — nível dificil",
+   "estado": "concluida"
+  },
+  {
+   "quando": "2026-11-02T00:37:46",
+   "funcionario": "Nicolas",
+   "cargo": "Especialista em numpy",
+   "andar": 5,
+   "trabalho": "Revisão da biblioteca sob sua responsabilidade — nível dificil",
+   "estado": "concluida"
+  },
+  {
+   "quando": "2026-11-02T00:37:46",
+   "funcionario": "Olívia",
+   "cargo": "Especialista em openpyxl (Excel)",
+   "andar": 5,
+   "trabalho": "Revisão da biblioteca sob sua responsabilidade — nível dificil",
+   "estado": "concluida"
+  },
+  {
+   "quando": "2026-11-02T00:37:46",
+   "funcionario": "Sofia",
+   "cargo": "Especialista em pandas",
+   "andar": 5,
+   "trabalho": "SLA das rotinas — nível dificil",
+   "estado": "concluida"
+  },
   {
    "quando": "2026-11-02T00:07:48",
    "funcionario": "Marcos",
@@ -99,54 +147,6 @@
    "andar": 5,
    "trabalho": "Medir a saúde do PostgreSQL — nível profissional",
    "estado": "concluida"
-  },
-  {
-   "quando": "2026-11-02T00:07:44",
-   "funcionario": "Fernanda",
-   "cargo": "Coordenadora de DevOps e Confiabilidade (SRE)",
-   "andar": 5,
-   "trabalho": "Estratégia Python — nível dificil",
-   "estado": "concluida"
-  },
-  {
-   "quando": "2026-11-02T00:07:44",
-   "funcionario": "Letícia",
-   "cargo": "Desenvolvedora Júnior",
-   "andar": 5,
-   "trabalho": "Exercício de SQL no PostgreSQL com os dados da fábrica",
-   "estado": "concluida"
-  },
-  {
-   "quando": "2026-11-01T23:35:57",
-   "funcionario": "Ícaro",
-   "cargo": "Sênior de AWS, Linux e Ubuntu",
-   "andar": 5,
-   "trabalho": "Ronda de saúde do sistema — nível dificil",
-   "estado": "concluida"
-  },
-  {
-   "quando": "2026-11-01T23:35:57",
-   "funcionario": "Marina",
-   "cargo": "Arquiteta de Cloud (AWS)",
-   "andar": 5,
-   "trabalho": "Medir a saúde do PostgreSQL — nível dificil",
-   "estado": "concluida"
-  },
-  {
-   "quando": "2026-11-01T23:35:56",
-   "funcionario": "Bianca",
-   "cargo": "Engenheira de Dados Pleno",
-   "andar": 5,
-   "trabalho": "Testar se o último backup volta — nível medio",
-   "estado": "concluida"
-  },
-  {
-   "quando": "2026-11-01T23:35:56",
-   "funcionario": "Wagner",
-   "cargo": "Especialista Sênior em Segurança da Informação",
-   "andar": 5,
-   "trabalho": "Procurar segredos no repositório público — nível dificil",
-   "estado": "concluida"
   }
  ],
  "sql": {
@@ -172,9 +172,9 @@
   },
   {
    "rotina": "demandas",
-   "execucoes_24h": 44,
+   "execucoes_24h": 45,
    "erros_24h": 0,
-   "ultima": "2026-11-02T00:07:50"
+   "ultima": "2026-11-02T00:37:49"
   },
   {
    "rotina": "dialogo",
@@ -208,9 +208,9 @@
   },
   {
    "rotina": "laboratorio",
-   "execucoes_24h": 122,
+   "execucoes_24h": 123,
    "erros_24h": 0,
-   "ultima": "2026-11-02T00:28:43"
+   "ultima": "2026-11-02T00:38:53"
   },
   {
    "rotina": "licoes",
@@ -238,9 +238,9 @@
   },
   {
    "rotina": "registro",
-   "execucoes_24h": 541,
+   "execucoes_24h": 545,
    "erros_24h": 0,
-   "ultima": "2026-11-02T00:33:51"
+   "ultima": "2026-11-02T00:39:08"
   },
   {
    "rotina": "reuniao",
@@ -262,16 +262,16 @@
   },
   {
    "rotina": "treino",
-   "execucoes_24h": 589,
+   "execucoes_24h": 591,
    "erros_24h": 0,
-   "ultima": "2026-11-02T00:33:52"
+   "ultima": "2026-11-02T00:38:06"
   }
  ],
  "totais": {
-  "demandas": 2242,
-  "tentativas_treino": 21276,
-  "conversas": 6187,
-  "trabalhos_com_prova": 13545
+  "demandas": 2248,
+  "tentativas_treino": 21287,
+  "conversas": 6189,
+  "trabalhos_com_prova": 13563
  },
  "banco": {
   "levantamento": "2026-11-02T00:03:53",
@@ -641,7 +641,7 @@
    "ultimo": "",
    "quando": "",
    "estado": "",
-   "situacao": "estagiário: observa (regra do dono) — Observei Fernanda (Coordenadora de DevOps e Confiabilidade (SRE)) fazendo \"Estratégia Python\" no nível dificil: terminou"
+   "situacao": "estagiário: observa (regra do dono) — Observei Olívia (Especialista em openpyxl (Excel)) fazendo \"Revisão da biblioteca sob sua responsabilidade\" no nível dif"
   },
   {
    "nome": "Tina",
@@ -872,7 +872,7 @@
    "ultimo": "",
    "quando": "",
    "estado": "",
-   "situacao": "estagiário: observa (regra do dono) — Observei Fernanda (Coordenadora de DevOps e Confiabilidade (SRE)) fazendo \"Estratégia Python\" no nível dificil: terminou"
+   "situacao": "estagiário: observa (regra do dono) — Observei Olívia (Especialista em openpyxl (Excel)) fazendo \"Revisão da biblioteca sob sua responsabilidade\" no nível dif"
   },
   {
    "nome": "Felipe",
@@ -1389,7 +1389,7 @@
    "ultimo": "",
    "quando": "",
    "estado": "",
-   "situacao": "estagiário: observa (regra do dono) — Observei Fernanda (Coordenadora de DevOps e Confiabilidade (SRE)) fazendo \"Estratégia Python\" no nível dificil: terminou"
+   "situacao": "estagiário: observa (regra do dono) — Observei Olívia (Especialista em openpyxl (Excel)) fazendo \"Revisão da biblioteca sob sua responsabilidade\" no nível dif"
   },
   {
    "nome": "Diego",
@@ -1433,7 +1433,7 @@
    "ultimo": "",
    "quando": "",
    "estado": "",
-   "situacao": "estagiário: observa (regra do dono) — Observei Fernanda (Coordenadora de DevOps e Confiabilidade (SRE)) fazendo \"Estratégia Python\" no nível dificil: terminou"
+   "situacao": "estagiário: observa (regra do dono) — Observei Olívia (Especialista em openpyxl (Excel)) fazendo \"Revisão da biblioteca sob sua responsabilidade\" no nível dif"
   },
   {
    "nome": "Gustavo",
@@ -1473,9 +1473,9 @@
    "andar": 5,
    "cargo": "Engenheiro de MLOps e Plataforma de Modelos",
    "area": "Engenharia de Dados",
-   "demandas_hoje": 0,
-   "ultimo": "Procurar segredos no repositório público — nível dificil",
-   "quando": "2026-11-01T21:32:41",
+   "demandas_hoje": 1,
+   "ultimo": "Testar se o último backup volta — nível dificil",
+   "quando": "2026-11-02T00:37:47",
    "estado": "concluida",
    "situacao": "trabalho do papel"
   },
@@ -1495,9 +1495,9 @@
    "andar": 5,
    "cargo": "Arquiteta de Cloud (AWS)",
    "area": "Engenharia de Dados",
-   "demandas_hoje": 0,
-   "ultimo": "Medir a saúde do PostgreSQL — nível dificil",
-   "quando": "2026-11-01T23:35:57",
+   "demandas_hoje": 1,
+   "ultimo": "Procurar segredos no repositório público — nível dificil",
+   "quando": "2026-11-02T00:37:48",
    "estado": "concluida",
    "situacao": "trabalho do papel"
   },
@@ -1506,9 +1506,9 @@
    "andar": 5,
    "cargo": "Especialista em numpy",
    "area": "Estatística",
-   "demandas_hoje": 0,
-   "ultimo": "Exercício de SQL no PostgreSQL com os dados da fábrica — nível dificil",
-   "quando": "2026-11-01T21:32:33",
+   "demandas_hoje": 1,
+   "ultimo": "Revisão da biblioteca sob sua responsabilidade — nível dificil",
+   "quando": "2026-11-02T00:37:46",
    "estado": "concluida",
    "situacao": "trabalho do papel"
   },
@@ -1517,9 +1517,9 @@
    "andar": 5,
    "cargo": "Especialista em openpyxl (Excel)",
    "area": "Engenharia de Dados",
-   "demandas_hoje": 0,
-   "ultimo": "Exercício de SQL no PostgreSQL com os dados da fábrica — nível dificil",
-   "quando": "2026-11-01T21:32:35",
+   "demandas_hoje": 1,
+   "ultimo": "Revisão da biblioteca sob sua responsabilidade — nível dificil",
+   "quando": "2026-11-02T00:37:46",
    "estado": "concluida",
    "situacao": "trabalho do papel"
   },
@@ -1561,9 +1561,9 @@
    "andar": 5,
    "cargo": "Especialista em pandas",
    "area": "Engenharia de Dados",
-   "demandas_hoje": 0,
-   "ultimo": "Calcular a média de uma métrica da base sintética — nível dificil",
-   "quando": "2026-11-01T21:32:37",
+   "demandas_hoje": 1,
+   "ultimo": "SLA das rotinas — nível dificil",
+   "quando": "2026-11-02T00:37:46",
    "estado": "concluida",
    "situacao": "trabalho do papel"
   },
@@ -1594,9 +1594,9 @@
    "andar": 5,
    "cargo": "Sênior de AWS, Linux e Ubuntu",
    "area": "Engenharia de Dados",
-   "demandas_hoje": 0,
-   "ultimo": "Ronda de saúde do sistema — nível dificil",
-   "quando": "2026-11-01T23:35:56",
+   "demandas_hoje": 1,
+   "ultimo": "SLA das rotinas — nível dificil",
+   "quando": "2026-11-02T00:37:48",
    "estado": "concluida",
    "situacao": "trabalho do papel"
   }
@@ -2131,7 +2131,7 @@
  ],
  "modelos": {
   "finalidade": "risco_demanda",
-  "rotuladas_agora": 2199,
+  "rotuladas_agora": 2205,
   "minimo_para_treinar": 60,
   "datasets": 72,
   "maior_dataset": 2185,
@@ -2540,8 +2540,8 @@
   },
   {
    "nivel": "dificil",
-   "demandas": 997,
-   "concluidas": 977,
+   "demandas": 1003,
+   "concluidas": 983,
    "parciais": 1,
    "falhas": 19
   },
