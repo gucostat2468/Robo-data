@@ -1,6 +1,6 @@
 # Empresa ao vivo
 
-**Boletim das 02/11 19:12** (horário de Brasília) · trabalhando
+**Boletim das 02/11 19:18** (horário de Brasília) · trabalhando · SEM BANCO (memória guardada no arquivo do GitHub; o banco é alcançado quando voltar)
 
 > Atualiza a cada 5 minutos enquanto a empresa trabalha. Recarregue a página para ver o mais novo.
 
@@ -300,7 +300,7 @@ Pacote gerado pelo produto (`python -m robo entregar`) a partir de um projeto ap
 
 ## Banco de dados
 
-Levantamento das 02/11 18:31: **78 de 97** tabelas com dados (595.764 linhas contadas uma a uma).
+Levantamento das 02/11 19:15: **78 de 97** tabelas com dados (598.010 linhas contadas uma a uma).
 
 
 | Onde | Tabelas | Com dados |

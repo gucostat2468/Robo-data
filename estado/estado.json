@@ -1,11 +1,11 @@
 {
  "versao": 1,
- "gerado_em": "2026-11-02T22:12:49",
+ "gerado_em": "2026-11-02T22:18:00",
  "turno": {
-  "estado": "trabalhando",
+  "estado": "trabalhando · SEM BANCO (memória guardada no arquivo do GitHub; o banco é alcançado quando voltar)",
   "inicio": "2026-11-02T21:45:18",
   "fim_previsto": "2026-11-02T22:25:18",
-  "voltas": 99,
+  "voltas": 118,
   "planilhas": 2
  },
  "funcionarios": 105,
@@ -18,7 +18,7 @@
    "concluidas": 66,
    "parciais": 0,
    "falhas": 0,
-   "treino": 748,
+   "treino": 750,
    "acertos": 129
   },
   {
@@ -29,7 +29,7 @@
    "concluidas": 80,
    "parciais": 0,
    "falhas": 0,
-   "treino": 702,
+   "treino": 704,
    "acertos": 140
   },
   {
@@ -40,7 +40,7 @@
    "concluidas": 44,
    "parciais": 0,
    "falhas": 0,
-   "treino": 470,
+   "treino": 473,
    "acertos": 112
   },
   {
@@ -51,7 +51,7 @@
    "concluidas": 76,
    "parciais": 0,
    "falhas": 0,
-   "treino": 972,
+   "treino": 979,
    "acertos": 203
   },
   {
@@ -62,7 +62,7 @@
    "concluidas": 181,
    "parciais": 0,
    "falhas": 5,
-   "treino": 925,
+   "treino": 927,
    "acertos": 147
   }
  ],
@@ -198,7 +198,7 @@
    "rotina": "laboratorio",
    "execucoes_24h": 130,
    "erros_24h": 0,
-   "ultima": "2026-11-02T22:05:33"
+   "ultima": "2026-11-02T22:15:55"
   },
   {
    "rotina": "licoes",
@@ -226,9 +226,9 @@
   },
   {
    "rotina": "registro",
-   "execucoes_24h": 592,
+   "execucoes_24h": 594,
    "erros_24h": 0,
-   "ultima": "2026-11-02T22:10:12"
+   "ultima": "2026-11-02T22:16:27"
   },
   {
    "rotina": "reuniao",
@@ -244,30 +244,30 @@
   },
   {
    "rotina": "ronda_ti",
-   "execucoes_24h": 96,
+   "execucoes_24h": 97,
    "erros_24h": 0,
-   "ultima": "2026-11-02T21:44:42"
+   "ultima": "2026-11-02T22:14:58"
   },
   {
    "rotina": "treino",
    "execucoes_24h": 594,
    "erros_24h": 0,
-   "ultima": "2026-11-02T22:12:03"
+   "ultima": "2026-11-02T22:16:12"
   }
  ],
  "totais": {
   "demandas": 2688,
-  "tentativas_treino": 25014,
-  "conversas": 6894,
-  "trabalhos_com_prova": 16608
+  "tentativas_treino": 25030,
+  "conversas": 6897,
+  "trabalhos_com_prova": 16619
  },
  "banco": {
-  "levantamento": "2026-11-02T21:31:14",
+  "levantamento": "2026-11-02T22:15:29",
   "postgres_conferido": true,
   "erro_postgres": null,
   "tabelas": 97,
   "com_dados": 78,
-  "linhas": 595764,
+  "linhas": 598010,
   "resumo": {
    "sqlite": {
     "tabelas": 81,
