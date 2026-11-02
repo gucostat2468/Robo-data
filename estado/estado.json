@@ -1,12 +1,12 @@
 {
  "versao": 1,
- "gerado_em": "2026-11-02T00:59:57",
+ "gerado_em": "2026-11-02T01:02:01",
  "turno": {
-  "estado": "entre turnos: memória salva; o próximo turno começa em poucos minutos",
-  "inicio": "2026-11-02T00:18:28",
-  "fim_previsto": "2026-11-02T00:58:28",
-  "voltas": 134,
-  "planilhas": 5
+  "estado": "trabalhando",
+  "inicio": "2026-11-02T01:02:01",
+  "fim_previsto": "2026-11-02T01:42:01",
+  "voltas": 0,
+  "planilhas": 2
  },
  "funcionarios": 105,
  "andares": [
@@ -154,7 +154,7 @@
   "concluidos_hoje": 1
  },
  "fabrica": {
-  "lotes_hoje": 6,
+  "lotes_hoje": 8,
   "conferidos_ok_hoje": 6
  },
  "rotinas": [
@@ -166,9 +166,9 @@
   },
   {
    "rotina": "caixa_dono",
-   "execucoes_24h": 31,
+   "execucoes_24h": 32,
    "erros_24h": 0,
-   "ultima": "2026-11-02T00:18:03"
+   "ultima": "2026-11-02T01:01:49"
   },
   {
    "rotina": "demandas",
@@ -178,9 +178,9 @@
   },
   {
    "rotina": "dialogo",
-   "execucoes_24h": 17,
+   "execucoes_24h": 18,
    "erros_24h": 0,
-   "ultima": "2026-11-02T00:18:03"
+   "ultima": "2026-11-02T01:01:49"
   },
   {
    "rotina": "estudo",
@@ -202,9 +202,9 @@
   },
   {
    "rotina": "jornada",
-   "execucoes_24h": 31,
+   "execucoes_24h": 32,
    "erros_24h": 0,
-   "ultima": "2026-11-02T00:18:03"
+   "ultima": "2026-11-02T01:01:49"
   },
   {
    "rotina": "laboratorio",
@@ -220,21 +220,21 @@
   },
   {
    "rotina": "memoria_pg",
-   "execucoes_24h": 32,
+   "execucoes_24h": 31,
    "erros_24h": 0,
-   "ultima": "2026-11-02T00:59:54"
+   "ultima": "2026-11-02T00:50:55"
   },
   {
    "rotina": "modelos",
-   "execucoes_24h": 31,
+   "execucoes_24h": 32,
    "erros_24h": 0,
-   "ultima": "2026-11-02T00:18:19"
+   "ultima": "2026-11-02T01:01:57"
   },
   {
    "rotina": "paineis",
-   "execucoes_24h": 31,
+   "execucoes_24h": 32,
    "erros_24h": 0,
-   "ultima": "2026-11-02T00:18:15"
+   "ultima": "2026-11-02T01:01:54"
   },
   {
    "rotina": "registro",
@@ -256,9 +256,9 @@
   },
   {
    "rotina": "ronda_ti",
-   "execucoes_24h": 93,
+   "execucoes_24h": 94,
    "erros_24h": 0,
-   "ultima": "2026-11-02T00:57:40"
+   "ultima": "2026-11-02T01:01:41"
   },
   {
    "rotina": "treino",
@@ -270,16 +270,16 @@
  "totais": {
   "demandas": 2248,
   "tentativas_treino": 21340,
-  "conversas": 6193,
-  "trabalhos_com_prova": 13595
+  "conversas": 6207,
+  "trabalhos_com_prova": 13604
  },
  "banco": {
-  "levantamento": "2026-11-02T00:57:41",
+  "levantamento": "2026-11-02T00:48:40",
   "postgres_conferido": true,
   "erro_postgres": null,
   "tabelas": 103,
   "com_dados": 84,
-  "linhas": 538301,
+  "linhas": 537940,
   "resumo": {
    "sqlite": {
     "tabelas": 81,
@@ -2133,8 +2133,8 @@
   "finalidade": "risco_demanda",
   "rotuladas_agora": 2205,
   "minimo_para_treinar": 60,
-  "datasets": 72,
-  "maior_dataset": 2185,
+  "datasets": 73,
+  "maior_dataset": 2205,
   "modelos": [
    {
     "id": "risco_demanda-v1",
@@ -2495,31 +2495,36 @@
     "id": "risco_demanda-v72",
     "estado": "reprovado",
     "criado_por": "ml_engenheiro"
+   },
+   {
+    "id": "risco_demanda-v73",
+    "estado": "reprovado",
+    "criado_por": "ml_engenheiro"
    }
   ],
   "referencia": "risco_demanda-v48",
-  "inferencias_sombra": 1736,
+  "inferencias_sombra": 1742,
   "uso_operacional": "desligado: o modelo só roda em sombra até o dono decidir usá-lo em alguma escolha da empresa",
   "ultima_avaliacao": {
-   "modelo": "risco_demanda-v72",
+   "modelo": "risco_demanda-v73",
    "resultado": "avaliado_reprovado",
    "quem": "ml_avaliador",
    "candidato": {
-    "n": 328,
-    "taxa_real": 0.006098,
-    "log_loss": 0.04481,
-    "brier": 0.00776,
-    "auc": 0.993865
+    "n": 331,
+    "taxa_real": 0.006042,
+    "log_loss": 0.058304,
+    "brier": 0.011845,
+    "auc": 0.989362
    },
    "baseline": {
-    "n": 328,
-    "taxa_real": 0.006098,
-    "log_loss": 0.029095,
-    "brier": 0.007453,
-    "auc": 0.965491
+    "n": 331,
+    "taxa_real": 0.006042,
+    "log_loss": 0.034337,
+    "brier": 0.009263,
+    "auc": 0.957447
    },
    "motivos": [
-    "não bate o baseline (log loss 0.0448 ≥ 0.0291)"
+    "não bate o baseline (log loss 0.0583 ≥ 0.0343)"
    ]
   }
  },
