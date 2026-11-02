@@ -1,12 +1,12 @@
 {
  "versao": 1,
- "gerado_em": "2026-11-02T15:47:10",
+ "gerado_em": "2026-11-02T15:49:48",
  "turno": {
-  "estado": "entre turnos: memória salva; o próximo turno começa em poucos minutos",
-  "inicio": "2026-11-02T15:05:11",
-  "fim_previsto": "2026-11-02T15:45:11",
-  "voltas": 128,
-  "planilhas": 4
+  "estado": "trabalhando",
+  "inicio": "2026-11-02T15:49:48",
+  "fim_previsto": "2026-11-02T16:29:48",
+  "voltas": 0,
+  "planilhas": 2
  },
  "funcionarios": 105,
  "andares": [
@@ -154,15 +154,15 @@
   "concluidos_hoje": 40
  },
  "fabrica": {
-  "lotes_hoje": 86,
+  "lotes_hoje": 88,
   "conferidos_ok_hoje": 86
  },
  "rotinas": [
   {
    "rotina": "caixa_dono",
-   "execucoes_24h": 32,
+   "execucoes_24h": 33,
    "erros_24h": 0,
-   "ultima": "2026-11-02T15:04:47"
+   "ultima": "2026-11-02T15:49:26"
   },
   {
    "rotina": "demandas",
@@ -190,13 +190,13 @@
   },
   {
    "rotina": "jornada",
-   "execucoes_24h": 32,
+   "execucoes_24h": 33,
    "erros_24h": 0,
-   "ultima": "2026-11-02T15:04:47"
+   "ultima": "2026-11-02T15:49:26"
   },
   {
    "rotina": "laboratorio",
-   "execucoes_24h": 130,
+   "execucoes_24h": 129,
    "erros_24h": 0,
    "ultima": "2026-11-02T15:39:08"
   },
@@ -208,25 +208,25 @@
   },
   {
    "rotina": "memoria_pg",
-   "execucoes_24h": 34,
+   "execucoes_24h": 33,
    "erros_24h": 0,
-   "ultima": "2026-11-02T15:47:07"
+   "ultima": "2026-11-02T15:38:04"
   },
   {
    "rotina": "modelos",
-   "execucoes_24h": 32,
+   "execucoes_24h": 33,
    "erros_24h": 0,
-   "ultima": "2026-11-02T15:05:02"
+   "ultima": "2026-11-02T15:49:38"
   },
   {
    "rotina": "paineis",
-   "execucoes_24h": 32,
+   "execucoes_24h": 33,
    "erros_24h": 0,
-   "ultima": "2026-11-02T15:04:56"
+   "ultima": "2026-11-02T15:49:34"
   },
   {
    "rotina": "registro",
-   "execucoes_24h": 605,
+   "execucoes_24h": 604,
    "erros_24h": 0,
    "ultima": "2026-11-02T15:44:20"
   },
@@ -244,13 +244,13 @@
   },
   {
    "rotina": "ronda_ti",
-   "execucoes_24h": 98,
+   "execucoes_24h": 99,
    "erros_24h": 0,
-   "ultima": "2026-11-02T15:44:20"
+   "ultima": "2026-11-02T15:49:16"
   },
   {
    "rotina": "treino",
-   "execucoes_24h": 604,
+   "execucoes_24h": 603,
    "erros_24h": 0,
    "ultima": "2026-11-02T15:43:22"
   }
@@ -259,15 +259,15 @@
   "demandas": 2547,
   "tentativas_treino": 23899,
   "conversas": 6757,
-  "trabalhos_com_prova": 15747
+  "trabalhos_com_prova": 15755
  },
  "banco": {
-  "levantamento": "2026-11-02T15:44:21",
+  "levantamento": "2026-11-02T15:35:15",
   "postgres_conferido": true,
   "erro_postgres": null,
-  "tabelas": 101,
-  "com_dados": 82,
-  "linhas": 588953,
+  "tabelas": 99,
+  "com_dados": 80,
+  "linhas": 582999,
   "resumo": {
    "sqlite": {
     "tabelas": 81,
@@ -277,8 +277,8 @@
     }
    },
    "postgres.laboratorio": {
-    "tabelas": 4,
-    "com_dados": 4,
+    "tabelas": 3,
+    "com_dados": 3,
     "vazias": {}
    },
    "postgres.robo": {
@@ -289,8 +289,8 @@
     }
    },
    "postgres.treino": {
-    "tabelas": 11,
-    "com_dados": 11,
+    "tabelas": 10,
+    "com_dados": 10,
     "vazias": {}
    },
    "postgres.bruto": {
@@ -2123,8 +2123,8 @@
   "finalidade": "risco_demanda",
   "rotuladas_agora": 2504,
   "minimo_para_treinar": 60,
-  "datasets": 82,
-  "maior_dataset": 2483,
+  "datasets": 83,
+  "maior_dataset": 2504,
   "modelos": [
    {
     "id": "risco_demanda-v1",
@@ -2535,31 +2535,36 @@
     "id": "risco_demanda-v82",
     "estado": "reprovado",
     "criado_por": "ml_engenheiro"
+   },
+   {
+    "id": "risco_demanda-v83",
+    "estado": "reprovado",
+    "criado_por": "ml_engenheiro"
    }
   ],
   "referencia": "risco_demanda-v48",
-  "inferencias_sombra": 2020,
+  "inferencias_sombra": 2041,
   "uso_operacional": "desligado: o modelo só roda em sombra até o dono decidir usá-lo em alguma escolha da empresa",
   "ultima_avaliacao": {
-   "modelo": "risco_demanda-v82",
+   "modelo": "risco_demanda-v83",
    "resultado": "avaliado_reprovado",
    "quem": "ml_avaliador",
    "candidato": {
-    "n": 373,
-    "taxa_real": 0.005362,
-    "log_loss": 0.04594,
-    "brier": 0.00829,
-    "auc": 0.987871
+    "n": 376,
+    "taxa_real": 0.005319,
+    "log_loss": 0.046219,
+    "brier": 0.008271,
+    "auc": 0.987968
    },
    "baseline": {
-    "n": 373,
-    "taxa_real": 0.005362,
-    "log_loss": 0.0288,
-    "brier": 0.007887,
-    "auc": 0.966981
+    "n": 376,
+    "taxa_real": 0.005319,
+    "log_loss": 0.029715,
+    "brier": 0.008065,
+    "auc": 0.965241
    },
    "motivos": [
-    "não bate o baseline (log loss 0.0459 ≥ 0.0288)"
+    "não bate o baseline (log loss 0.0462 ≥ 0.0297)"
    ]
   }
  },
