@@ -1,15 +1,15 @@
 # Empresa ao vivo
 
-**Boletim das 03/11 08:39** (horário de Brasília) · entre turnos: memória salva; o próximo turno começa em poucos minutos · SEM BANCO (memória guardada no arquivo do GitHub; o banco é alcançado quando voltar)
+**Boletim das 03/11 08:41** (horário de Brasília) · trabalhando · SEM BANCO (memória guardada no arquivo do GitHub; o banco é alcançado quando voltar)
 
 > Atualiza a cada 5 minutos enquanto a empresa trabalha. Recarregue a página para ver o mais novo.
 
 ## Hoje
 
-- **1616** demandas, **1616** concluídas (100%), 0 parciais, 0 com falha
+- **1626** demandas, **1626** concluídas (100%), 0 parciais, 0 com falha
 - **105** de 105 funcionários já trabalharam
 - SQL: 132 exercícios, 132 conferidos com o gabarito
-- Fábrica: 65 planilhas, 62 conferidas sem erro
+- Fábrica: 67 planilhas, 62 conferidas sem erro
 
 ## Trabalhando agora
 
@@ -20,38 +20,38 @@
 | Andar | Trabalharam | Demandas | Concluídas | Parciais | Falhas |
 |---|--:|--:|--:|--:|--:|
 | 1º | 19 de 19 | 202 | 202 | 0 | 0 |
-| 2º | 18 de 18 | 432 | 432 | 0 | 0 |
-| 3º | 12 de 12 | 160 | 160 | 0 | 0 |
-| 4º | 32 de 32 | 250 | 250 | 0 | 0 |
+| 2º | 18 de 18 | 434 | 434 | 0 | 0 |
+| 3º | 12 de 12 | 166 | 166 | 0 | 0 |
+| 4º | 32 de 32 | 252 | 252 | 0 | 0 |
 | 5º | 24 de 24 | 572 | 572 | 0 | 0 |
 
 ## Últimas entregas
 
 | Hora | Quem | Trabalho | Resultado |
 |---|---|---|---|
-| 08:35 | Ícaro (5º) | SLA das rotinas — nível dificil | ✅ concluída |
-| 08:35 | Heloísa (5º) | Conferir se o projeto está pronto para servidor — nível profissional | ✅ concluída |
-| 08:35 | Marina (5º) | Testar se o último backup volta — nível dificil | ✅ concluída |
-| 08:35 | Olívia (5º) | Testar se o último backup volta — nível dificil | ✅ concluída |
-| 08:35 | Sofia (5º) | Medir a saúde do PostgreSQL — nível dificil | ✅ concluída |
-| 08:35 | Rodrigo (5º) | SLA das rotinas — nível medio | ✅ concluída |
-| 08:35 | Wagner (5º) | SLA das rotinas — nível dificil | ✅ concluída |
-| 08:35 | Jonas (5º) | Medir a saúde do PostgreSQL — nível dificil | ✅ concluída |
-| 08:35 | Nicolas (5º) | Testar se o último backup volta — nível dificil | ✅ concluída |
-| 08:35 | Alexandre (5º) | Procurar segredos no repositório público — nível profissional | ✅ concluída |
+| 08:41 | Marcos (2º) | Projeto Segmentação — TREINO_churn_20261103_114134_94866 | ✅ concluída |
+| 08:41 | Marcos (2º) | Projeto NPS — TREINO_nps_20261103_114131_91242 | ✅ concluída |
+| 08:41 | Gabriel (3º) | Segmentação da base sintética — nível dificil | ✅ concluída |
+| 08:41 | Hugo (3º) | Calcular a média de uma métrica da base sintética — nível medio | ✅ concluída |
+| 08:41 | Paula (3º) | Perfil e indicadores da base sintética | ✅ concluída |
+| 08:41 | Tânia (3º) | Calcular a média de uma métrica da base sintética — nível dificil | ✅ concluída |
+| 08:41 | Nina (4º) | Calcular a média de uma métrica da base sintética — nível medio | ✅ concluída |
+| 08:41 | Pedro (3º) | Calcular a média de uma métrica da base sintética — nível dificil | ✅ concluída |
+| 08:41 | Vitor (4º) | Diagnosticar a planilha original da fábrica — nível medio | ✅ concluída |
+| 08:41 | Lúcia (3º) | Calcular a média de uma métrica da base sintética — nível dificil | ✅ concluída |
 
 ## Dificuldade (todo o histórico)
 
 | Nível | Demandas | Concluídas | Parciais | Falhas | Acerto |
 |---|--:|--:|--:|--:|--:|
-| basico | 333 | 311 | 0 | 22 | 93% |
-| medio | 844 | 836 | 0 | 8 | 99% |
-| dificil | 2042 | 2019 | 1 | 22 | 99% |
-| profissional | 1211 | 1206 | 1 | 4 | 100% |
+| basico | 334 | 312 | 0 | 22 | 93% |
+| medio | 847 | 839 | 0 | 8 | 99% |
+| dificil | 2046 | 2023 | 1 | 22 | 99% |
+| profissional | 1213 | 1208 | 1 | 4 | 100% |
 
 ## Cada funcionário
 
-96 de 105 no trabalho do papel, observando (estagiário) ou na rotina própria da equipe; 9 precisam de atenção.
+104 de 105 no trabalho do papel, observando (estagiário) ou na rotina própria da equipe; 1 precisam de atenção.
 
 ### 1º andar
 
@@ -92,7 +92,7 @@
 | Leandro | Engenheiro de Machine Learning Sênior | trabalho do papel | Treinar o modelo de risco de demanda — nível dificil (✅ concluída) | 11 |
 | Lucas | Cientista de Dados Júnior | trabalho do papel | Conferir no PostgreSQL os lotes da fábrica — nível medio (✅ concluída) | 11 |
 | Manu | Estagiária de Análise de Dados | estagiário: observa (regra do dono) |   | 0 |
-| Marcos | Coordenador de Análise e Ciência de Dado | trabalho FORA do papel | Projeto Segmentação — TREINO_educacao_20261103_104806_86888 (✅ concluída) | 252 |
+| Marcos | Coordenador de Análise e Ciência de Dado | trabalho FORA do papel | Projeto Segmentação — TREINO_churn_20261103_114134_94866 (✅ concluída) | 254 |
 | Natália | Head de Ciência de Dados | trabalho do papel | Conferir no PostgreSQL os lotes da fábrica — nível profissio (✅ concluída) | 11 |
 | Patrícia | Gerente de Analytics e Customer Insights | trabalho do papel | Conferir no PostgreSQL os lotes da fábrica — nível profissio (✅ concluída) | 11 |
 | Rebeca | Líder de Engenharia de IA e Machine Lear | trabalho do papel | Conferir no PostgreSQL os lotes da fábrica — nível profissio (✅ concluída) | 11 |
@@ -107,15 +107,15 @@
 | Bárbara | Especialista Sênior em Power BI | trabalho do papel | Conferir no PostgreSQL os lotes da fábrica — nível dificil (✅ concluída) | 12 |
 | Enzo | Estagiário da Sala Excel | estagiário: observa (regra do dono) — Observei Lúcia (Especialista em Fórmulas e Power Que |   | 0 |
 | Felipe | Head de BI e Excel | trabalho do papel | Auditoria por amostragem — nível profissional (✅ concluída) | 12 |
-| Gabriel | Especialista em Tabelas Dinâmicas e Dash | estudo (trabalho do papel bloqueado: ainda não há planilha sintética tratada (Bases-Tratad | Consultar o conhecimento da área (✅ concluída) | 13 |
+| Gabriel | Especialista em Tabelas Dinâmicas e Dash | trabalho do papel | Segmentação da base sintética — nível dificil (✅ concluída) | 14 |
 | Heitor | Analista Pleno de BI | trabalho do papel | Conferir no PostgreSQL os lotes da fábrica — nível medio (✅ concluída) | 11 |
-| Hugo | Analista de Excel Pleno | estudo (trabalho do papel bloqueado: nenhum lote da fábrica conferido está no PostgreSQL a | Consultar o conhecimento da área (✅ concluída) | 18 |
-| Lúcia | Especialista em Fórmulas e Power Query | estudo (trabalho do papel bloqueado: nenhum lote da fábrica conferido está no PostgreSQL a | Consultar o conhecimento da área (✅ concluída) | 18 |
-| Paula | Analista de Excel Júnior | estudo (trabalho do papel bloqueado: ainda não há planilha sintética tratada (Bases-Tratad | Consultar o conhecimento da área (✅ concluída) | 18 |
-| Pedro | Especialista em Pesquisa de Mercado | estudo (trabalho do papel bloqueado: nenhum lote da fábrica conferido está no PostgreSQL a | Consultar o conhecimento da área (✅ concluída) | 18 |
+| Hugo | Analista de Excel Pleno | trabalho do papel | Calcular a média de uma métrica da base sintética — nível me (✅ concluída) | 19 |
+| Lúcia | Especialista em Fórmulas e Power Query | trabalho do papel | Calcular a média de uma métrica da base sintética — nível di (✅ concluída) | 19 |
+| Paula | Analista de Excel Júnior | trabalho do papel | Perfil e indicadores da base sintética (✅ concluída) | 19 |
+| Pedro | Especialista em Pesquisa de Mercado | trabalho do papel | Calcular a média de uma métrica da base sintética — nível di (✅ concluída) | 19 |
 | Ricardo | Gerente da Sala Excel | trabalho do papel | Situação do andar agora — nível profissional (✅ concluída) | 11 |
 | Sílvia | Coordenadora da Sala Excel | trabalho do papel | Situação do andar agora — nível dificil (✅ concluída) | 11 |
-| Tânia | Especialista em Trade Marketing | estudo (trabalho do papel bloqueado: nenhum lote da fábrica conferido está no PostgreSQL a | Consultar o conhecimento da área (✅ concluída) | 18 |
+| Tânia | Especialista em Trade Marketing | trabalho do papel | Calcular a média de uma métrica da base sintética — nível di (✅ concluída) | 19 |
 
 ### 4º andar
 
@@ -138,7 +138,7 @@
 | Marta | Diretora de Pessoas e Cultura (CHRO) | trabalho do papel | Situação das contratações — nível profissional (✅ concluída) | 11 |
 | Mauro | Analista de Desempenho Sênior | trabalho do papel | Planos de desenvolvimento 70-20-10 — nível dificil (✅ concluída) | 11 |
 | Murilo | Designer de Casos | trabalho do papel | Revisar um caso de treino feito por outro designer — nível d (✅ concluída) | 11 |
-| Nina | Assistente do canal | estudo (trabalho do papel bloqueado: ainda não há planilha sintética tratada (Bases-Tratad | Consultar o conhecimento da área (✅ concluída) | 18 |
+| Nina | Assistente do canal | trabalho do papel | Calcular a média de uma métrica da base sintética — nível me (✅ concluída) | 19 |
 | Otávio | Head da Sala de Casos | trabalho do papel | Revisar um caso de treino feito por outro designer — nível p (✅ concluída) | 12 |
 | Priscila | Analista de Recrutamento e Seleção Pleno | trabalho do papel | Indicadores de pessoas — nível medio (✅ concluída) | 11 |
 | Raquel | Designer de Casos | trabalho do papel | Revisar um caso de treino feito por outro designer — nível d (✅ concluída) | 12 |
@@ -151,7 +151,7 @@
 | Tiago | Analista de People Analytics Pleno | trabalho do papel | Planos de desenvolvimento 70-20-10 — nível medio (✅ concluída) | 11 |
 | Valéria | Revisora Independente de Casos | trabalho do papel | Revisar um caso de treino feito por outro designer — nível d (✅ concluída) | 12 |
 | Vicente | Analista Sênior de Geração de Demandas | trabalho do papel na rotina demandas |   | 0 |
-| Vitor | Analista de Governança Pleno | estudo (trabalho do papel bloqueado: ainda não há planilha sintética tratada (Bases-Tratad | Consultar o conhecimento da área (✅ concluída) | 18 |
+| Vitor | Analista de Governança Pleno | trabalho do papel | Diagnosticar a planilha original da fábrica — nível medio (✅ concluída) | 19 |
 | Yasmin | Planejadora de Treino | trabalho do papel | Revisar um caso de treino feito por outro designer — nível d (✅ concluída) | 12 |
 
 ### 5º andar
@@ -194,15 +194,16 @@
 
 ## Projetos entre andares (várias pessoas, uma etapa depende da outra)
 
+- Projeto Segmentação — TREINO_churn_20261103_114134_94866: **✅ concluída** — 1. eng_junior_espacos (concluida); 2. analise_estatistica (concluida); 3. cd_pleno_segmentos (concluida); 4. analise_monitoramento (concluida); 5. sec_senior (concluida); 6. canal_nina (concluida)
+- Projeto NPS — TREINO_nps_20261103_114131_91242: **✅ concluída** — 1. eng_junior_auditoria (concluida); 2. analise_perfil (concluida); 3. head_ciencia (concluida); 4. gov_pleno_lgpd (concluida); 5. canal_iara (concluida)
 - Projeto Segmentação — TREINO_educacao_20261103_104806_86888: **✅ concluída** — 1. dir_dados (concluida); 2. analise_monitoramento (concluida); 3. ana_pleno_base (concluida); 4. cd_junior_anomalias (concluida); 5. sec_senior (concluida); 6. analise_relator (concluida)
-- Projeto NPS — TREINO_nps_20261103_101759_79414: **✅ concluída** — 1. dba (concluida); 2. analise_indicadores (concluida); 3. cd_senior_drivers (concluida); 4. gov_pleno_lgpd (concluida); 5. canal_nina (concluida)
-- Projeto Segmentação — TREINO_educacao_20261103_104806_86888: **✅ concluída** — 1. coord_engenharia (concluida); 2. analise_estatistica (concluida); 3. ana_junior_faixas (concluida); 4. cd_junior_anomalias (concluida); 5. sec_senior (concluida); 6. canal_iara (concluida)
 
-## Última entrega da empresa (TREINO_educacao_20261103_104806_86888.xlsx, 03/11 07:53)
+## Última entrega da empresa (TREINO_churn_20261103_114134_94866.xlsx, 03/11 08:41)
 
 Pacote gerado pelo produto (`python -m robo entregar`) a partir de um projeto aprovado:
 
-1. Entender a diferença em **evadiu = Não**: Média de frequencia 82,79 contra 70,66 no restante (diferença real, n=2275).
+1. Entender a diferença em **plano = Premium**: Média de mensalidade 150,74 contra 64,83 no restante (diferença real, n=378).
+2. **Valores suspeitos:** 378 apontado(s) (idade impossível (fora de 0 a 120): 378). Estão na aba suspeitos do indicadores.xlsx com a chave de cada linha: confira na origem.
 
 ## Inteligência própria (modelo de risco das demandas)
 
@@ -315,13 +316,14 @@ Pacote gerado pelo produto (`python -m robo entregar`) a partir de um projeto ap
 - risco_demanda-v107: **reprovado** (treinado por ml_engenheiro)
 - risco_demanda-v108: **reprovado** (treinado por ml_engenheiro)
 - risco_demanda-v109: **reprovado** (treinado por ml_engenheiro)
-- Última avaliação independente (ml_avaliador): risco_demanda-v109 reprovado — log loss 0.016 contra baseline 0.014; motivos: o teste tem uma classe só: não dá para medir separação; não bate o baseline (log loss 0.0156 ≥ 0.0143)
-- Referência em sombra: risco_demanda-v48; 3862 previsões em sombra
+- risco_demanda-v110: **reprovado** (treinado por ml_engenheiro)
+- Última avaliação independente (ml_avaliador): risco_demanda-v110 reprovado — log loss 0.015 contra baseline 0.016; motivos: o teste tem uma classe só: não dá para medir separação
+- Referência em sombra: risco_demanda-v48; 3967 previsões em sombra
 - Uso operacional: desligado: o modelo só roda em sombra até o dono decidir usá-lo em alguma escolha da empresa
 
 ## Banco de dados
 
-Levantamento das 03/11 08:39: **73 de 92** tabelas com dados (729.281 linhas contadas uma a uma).
+Levantamento das 03/11 08:30: **73 de 92** tabelas com dados (728.090 linhas contadas uma a uma).
 
 
 | Onde | Tabelas | Com dados |
