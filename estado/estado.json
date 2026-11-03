@@ -1,11 +1,11 @@
 {
  "versao": 1,
- "gerado_em": "2026-11-03T20:05:02",
+ "gerado_em": "2026-11-03T20:08:09",
  "turno": {
-  "estado": "entre turnos: memória salva; o próximo turno começa em poucos minutos · SEM BANCO (memória guardada no arquivo do GitHub; o banco é alcançado quando voltar)",
-  "inicio": "2026-11-03T19:27:21",
-  "fim_previsto": "2026-11-03T20:07:21",
-  "voltas": 107,
+  "estado": "trabalhando · SEM BANCO (memória guardada no arquivo do GitHub; o banco é alcançado quando voltar)",
+  "inicio": "2026-11-03T20:08:09",
+  "fim_previsto": "2026-11-03T20:48:09",
+  "voltas": 0,
   "planilhas": 2
  },
  "funcionarios": 105,
@@ -154,15 +154,15 @@
   "concluidos_hoje": 239
  },
  "fabrica": {
-  "lotes_hoje": 104,
+  "lotes_hoje": 106,
   "conferidos_ok_hoje": 101
  },
  "rotinas": [
   {
    "rotina": "caixa_dono",
-   "execucoes_24h": 34,
+   "execucoes_24h": 35,
    "erros_24h": 0,
-   "ultima": "2026-11-03T19:25:13"
+   "ultima": "2026-11-03T20:07:43"
   },
   {
    "rotina": "demandas",
@@ -196,13 +196,13 @@
   },
   {
    "rotina": "jornada",
-   "execucoes_24h": 34,
+   "execucoes_24h": 35,
    "erros_24h": 0,
-   "ultima": "2026-11-03T19:25:13"
+   "ultima": "2026-11-03T20:07:43"
   },
   {
    "rotina": "laboratorio",
-   "execucoes_24h": 137,
+   "execucoes_24h": 136,
    "erros_24h": 0,
    "ultima": "2026-11-03T19:58:31"
   },
@@ -220,19 +220,19 @@
   },
   {
    "rotina": "modelos",
-   "execucoes_24h": 34,
+   "execucoes_24h": 35,
    "erros_24h": 0,
-   "ultima": "2026-11-03T19:25:47"
+   "ultima": "2026-11-03T20:08:03"
   },
   {
    "rotina": "paineis",
-   "execucoes_24h": 34,
+   "execucoes_24h": 35,
    "erros_24h": 0,
-   "ultima": "2026-11-03T19:25:25"
+   "ultima": "2026-11-03T20:07:49"
   },
   {
    "rotina": "registro",
-   "execucoes_24h": 685,
+   "execucoes_24h": 683,
    "erros_24h": 0,
    "ultima": "2026-11-03T20:04:51"
   },
@@ -244,13 +244,13 @@
   },
   {
    "rotina": "ronda_ti",
-   "execucoes_24h": 103,
+   "execucoes_24h": 104,
    "erros_24h": 0,
-   "ultima": "2026-11-03T20:04:51"
+   "ultima": "2026-11-03T20:07:33"
   },
   {
    "rotina": "treino",
-   "execucoes_24h": 635,
+   "execucoes_24h": 634,
    "erros_24h": 0,
    "ultima": "2026-11-03T20:02:48"
   }
@@ -259,15 +259,15 @@
   "demandas": 5659,
   "tentativas_treino": 29075,
   "conversas": 7522,
-  "trabalhos_com_prova": 22917
+  "trabalhos_com_prova": 22926
  },
  "banco": {
-  "levantamento": "2026-11-03T20:04:52",
+  "levantamento": "2026-11-03T19:59:10",
   "postgres_conferido": true,
   "erro_postgres": null,
   "tabelas": 97,
   "com_dados": 78,
-  "linhas": 798809,
+  "linhas": 797595,
   "resumo": {
    "sqlite": {
     "tabelas": 81,
@@ -2129,8 +2129,8 @@
   "finalidade": "risco_demanda",
   "rotuladas_agora": 5558,
   "minimo_para_treinar": 60,
-  "datasets": 122,
-  "maior_dataset": 5429,
+  "datasets": 123,
+  "maior_dataset": 5558,
   "modelos": [
    {
     "id": "risco_demanda-v1",
@@ -2739,30 +2739,35 @@
    },
    {
     "id": "risco_demanda-v122",
+    "estado": "substituido",
+    "criado_por": "ml_engenheiro"
+   },
+   {
+    "id": "risco_demanda-v123",
     "estado": "referencia",
     "criado_por": "ml_engenheiro"
    }
   ],
-  "referencia": "risco_demanda-v122",
-  "inferencias_sombra": 4966,
+  "referencia": "risco_demanda-v123",
+  "inferencias_sombra": 5095,
   "uso_operacional": "desligado: o modelo só roda em sombra até o dono decidir usá-lo em alguma escolha da empresa",
   "ultima_avaliacao": {
-   "modelo": "risco_demanda-v122",
+   "modelo": "risco_demanda-v123",
    "resultado": "avaliado_aprovado",
    "quem": "ml_avaliador",
    "candidato": {
-    "n": 815,
-    "taxa_real": 0.008589,
-    "log_loss": 0.049027,
-    "brier": 0.008511,
-    "auc": 0.699257
+    "n": 834,
+    "taxa_real": 0.008393,
+    "log_loss": 0.048048,
+    "brier": 0.008317,
+    "auc": 0.698394
    },
    "baseline": {
-    "n": 815,
-    "taxa_real": 0.008589,
-    "log_loss": 0.050485,
-    "brier": 0.011015,
-    "auc": 0.924505
+    "n": 834,
+    "taxa_real": 0.008393,
+    "log_loss": 0.048827,
+    "brier": 0.010571,
+    "auc": 0.923994
    },
    "motivos": []
   }

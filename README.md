@@ -1,6 +1,6 @@
 # Empresa ao vivo
 
-**Boletim das 03/11 17:05** (horário de Brasília) · entre turnos: memória salva; o próximo turno começa em poucos minutos · SEM BANCO (memória guardada no arquivo do GitHub; o banco é alcançado quando voltar)
+**Boletim das 03/11 17:08** (horário de Brasília) · trabalhando · SEM BANCO (memória guardada no arquivo do GitHub; o banco é alcançado quando voltar)
 
 > Atualiza a cada 5 minutos enquanto a empresa trabalha. Recarregue a página para ver o mais novo.
 
@@ -9,7 +9,7 @@
 - **2744** demandas, **2734** concluídas (100%), 7 parciais, 3 com falha
 - **105** de 105 funcionários já trabalharam
 - SQL: 239 exercícios, 239 conferidos com o gabarito
-- Fábrica: 104 planilhas, 101 conferidas sem erro
+- Fábrica: 106 planilhas, 101 conferidas sem erro
 
 ## Trabalhando agora
 
@@ -329,14 +329,15 @@ Pacote gerado pelo produto (`python -m robo entregar`) a partir de um projeto ap
 - risco_demanda-v119: **substituido** (treinado por ml_engenheiro)
 - risco_demanda-v120: **aprovado** (treinado por ml_engenheiro)
 - risco_demanda-v121: **substituido** (treinado por ml_engenheiro)
-- risco_demanda-v122: **referencia** (treinado por ml_engenheiro)
-- Última avaliação independente (ml_avaliador): risco_demanda-v122 aprovado — log loss 0.049 contra baseline 0.050
-- Referência em sombra: risco_demanda-v122; 4966 previsões em sombra
+- risco_demanda-v122: **substituido** (treinado por ml_engenheiro)
+- risco_demanda-v123: **referencia** (treinado por ml_engenheiro)
+- Última avaliação independente (ml_avaliador): risco_demanda-v123 aprovado — log loss 0.048 contra baseline 0.049
+- Referência em sombra: risco_demanda-v123; 5095 previsões em sombra
 - Uso operacional: desligado: o modelo só roda em sombra até o dono decidir usá-lo em alguma escolha da empresa
 
 ## Banco de dados
 
-Levantamento das 03/11 17:04: **78 de 97** tabelas com dados (798.809 linhas contadas uma a uma).
+Levantamento das 03/11 16:59: **78 de 97** tabelas com dados (797.595 linhas contadas uma a uma).
 
 
 | Onde | Tabelas | Com dados |
