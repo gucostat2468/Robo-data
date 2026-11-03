@@ -1,15 +1,15 @@
 # Empresa ao vivo
 
-**Boletim das 03/11 06:06** (horário de Brasília) · trabalhando · SEM BANCO (memória guardada no arquivo do GitHub; o banco é alcançado quando voltar)
+**Boletim das 03/11 06:11** (horário de Brasília) · trabalhando · SEM BANCO (memória guardada no arquivo do GitHub; o banco é alcançado quando voltar)
 
 > Atualiza a cada 5 minutos enquanto a empresa trabalha. Recarregue a página para ver o mais novo.
 
 ## Hoje
 
-- **1251** demandas, **1251** concluídas (100%), 0 parciais, 0 com falha
+- **1253** demandas, **1253** concluídas (100%), 0 parciais, 0 com falha
 - **105** de 105 funcionários já trabalharam
 - SQL: 108 exercícios, 108 conferidos com o gabarito
-- Fábrica: 52 planilhas, 52 conferidas sem erro
+- Fábrica: 53 planilhas, 53 conferidas sem erro
 
 ## Trabalhando agora
 
@@ -20,7 +20,7 @@
 | Andar | Trabalharam | Demandas | Concluídas | Parciais | Falhas |
 |---|--:|--:|--:|--:|--:|
 | 1º | 19 de 19 | 162 | 162 | 0 | 0 |
-| 2º | 18 de 18 | 354 | 354 | 0 | 0 |
+| 2º | 18 de 18 | 356 | 356 | 0 | 0 |
 | 3º | 12 de 12 | 99 | 99 | 0 | 0 |
 | 4º | 32 de 32 | 189 | 189 | 0 | 0 |
 | 5º | 24 de 24 | 447 | 447 | 0 | 0 |
@@ -29,6 +29,8 @@
 
 | Hora | Quem | Trabalho | Resultado |
 |---|---|---|---|
+| 06:09 | Marcos (2º) | Projeto Segmentação — TREINO_rfm_20261103_090914_54933 | ✅ concluída |
+| 06:09 | Marcos (2º) | Projeto NPS — TREINO_nps_20261103_085400_40731 | ✅ concluída |
 | 06:04 | Marcos (2º) | Projeto Segmentação — TREINO_churn_20261103_085404_44566 | ✅ concluída |
 | 06:04 | Marcos (2º) | Projeto NPS — TREINO_nps_20261103_085400_40731 | ✅ concluída |
 | 05:59 | Marcos (2º) | Projeto Segmentação — TREINO_churn_20261103_085404_44566 | ✅ concluída |
@@ -37,8 +39,6 @@
 | 05:59 | Ícaro (5º) | Procurar segredos no repositório público — nível dificil | ✅ concluída |
 | 05:59 | Jonas (5º) | Testar se o último backup volta — nível dificil | ✅ concluída |
 | 05:59 | Marina (5º) | SLA das rotinas — nível dificil | ✅ concluída |
-| 05:59 | Alexandre (5º) | Scorecard da área — nível profissional | ✅ concluída |
-| 05:59 | Nicolas (5º) | Revisão da biblioteca sob sua responsabilidade — nível dificil | ✅ concluída |
 
 ## Dificuldade (todo o histórico)
 
@@ -47,7 +47,7 @@
 | basico | 325 | 303 | 0 | 22 | 93% |
 | medio | 800 | 792 | 0 | 8 | 99% |
 | dificil | 1891 | 1868 | 1 | 22 | 99% |
-| profissional | 1107 | 1102 | 1 | 4 | 100% |
+| profissional | 1109 | 1104 | 1 | 4 | 100% |
 
 ## Cada funcionário
 
@@ -92,7 +92,7 @@
 | Leandro | Engenheiro de Machine Learning Sênior | trabalho do papel | Conferir no PostgreSQL os lotes da fábrica — nível dificil (✅ concluída) | 9 |
 | Lucas | Cientista de Dados Júnior | trabalho do papel | Calcular a média de uma métrica da base sintética — nível me (✅ concluída) | 9 |
 | Manu | Estagiária de Análise de Dados | estagiário: observa (regra do dono) |   | 0 |
-| Marcos | Coordenador de Análise e Ciência de Dado | trabalho FORA do papel | Projeto Segmentação — TREINO_churn_20261103_085404_44566 (✅ concluída) | 210 |
+| Marcos | Coordenador de Análise e Ciência de Dado | trabalho FORA do papel | Projeto Segmentação — TREINO_rfm_20261103_090914_54933 (✅ concluída) | 212 |
 | Natália | Head de Ciência de Dados | trabalho do papel | Situação do andar agora — nível profissional (✅ concluída) | 9 |
 | Patrícia | Gerente de Analytics e Customer Insights | trabalho do papel | Situação do andar agora — nível profissional (✅ concluída) | 9 |
 | Rebeca | Líder de Engenharia de IA e Machine Lear | trabalho do papel | Perfil e indicadores da base sintética — nível profissional (✅ concluída) | 9 |
@@ -194,16 +194,16 @@
 
 ## Projetos entre andares (várias pessoas, uma etapa depende da outra)
 
+- Projeto Segmentação — TREINO_rfm_20261103_090914_54933: **✅ concluída** — 1. validacao (concluida); 2. analise_monitoramento (concluida); 3. cd_pleno_segmentos (concluida); 4. cd_junior_anomalias (concluida); 5. sec_senior (concluida); 6. canal_nina (concluida)
+- Projeto NPS — TREINO_nps_20261103_085400_40731: **✅ concluída** — 1. tina_contatos (concluida); 2. analise_indicadores (concluida); 3. cd_senior_drivers (concluida); 4. gov_pleno_lgpd (concluida); 5. canal_iara (concluida)
 - Projeto Segmentação — TREINO_churn_20261103_085404_44566: **✅ concluída** — 1. supervisor (concluida); 2. analise_estatistica (concluida); 3. ana_pleno_base (concluida); 4. cd_junior_anomalias (concluida); 5. sec_senior (concluida); 6. analise_relator (concluida)
-- Projeto NPS — TREINO_nps_20261103_085400_40731: **✅ concluída** — 1. recepcao (concluida); 2. analise_perfil (concluida); 3. head_ciencia (concluida); 4. gov_pleno_lgpd (concluida); 5. canal_nina (concluida)
-- Projeto Segmentação — TREINO_churn_20261103_085404_44566: **✅ concluída** — 1. publicacao (concluida); 2. analise_indicadores (concluida); 3. ana_junior_faixas (concluida); 4. analise_monitoramento (concluida); 5. sec_senior (concluida); 6. canal_iara (concluida)
 
-## Última entrega da empresa (TREINO_churn_20261103_085404_44566.xlsx, 03/11 06:04)
+## Última entrega da empresa (TREINO_rfm_20261103_090914_54933.xlsx, 03/11 06:09)
 
 Pacote gerado pelo produto (`python -m robo entregar`) a partir de um projeto aprovado:
 
-1. Entender a diferença em **plano = Premium**: Média de mensalidade 149,18 contra 64,86 no restante (diferença real, n=250).
-2. **Valores suspeitos:** 250 apontado(s) (idade impossível (fora de 0 a 120): 250). Estão na aba suspeitos do indicadores.xlsx com a chave de cada linha: confira na origem.
+1. Conferir 56 valor(es) fora do padrão em **valor_total** (2,0% da base): podem ser erro de digitação ou casos reais que merecem olhar.
+2. Entender a diferença em **canal = Atacado**: Média de frequencia_pedidos 15,05 contra 6,04 no restante (diferença real, n=622).
 
 ## Inteligência própria (modelo de risco das demandas)
 
