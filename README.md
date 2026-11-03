@@ -1,15 +1,15 @@
 # Empresa ao vivo
 
-**Boletim das 03/11 12:23** (horário de Brasília) · trabalhando · SEM BANCO (memória guardada no arquivo do GitHub; o banco é alcançado quando voltar)
+**Boletim das 03/11 12:29** (horário de Brasília) · trabalhando · SEM BANCO (memória guardada no arquivo do GitHub; o banco é alcançado quando voltar)
 
 > Atualiza a cada 5 minutos enquanto a empresa trabalha. Recarregue a página para ver o mais novo.
 
 ## Hoje
 
-- **2126** demandas, **2122** concluídas (100%), 3 parciais, 1 com falha
+- **2128** demandas, **2124** concluídas (100%), 3 parciais, 1 com falha
 - **105** de 105 funcionários já trabalharam
 - SQL: 180 exercícios, 180 conferidos com o gabarito
-- Fábrica: 87 planilhas, 84 conferidas sem erro
+- Fábrica: 88 planilhas, 85 conferidas sem erro
 
 ## Trabalhando agora
 
@@ -20,7 +20,7 @@
 | Andar | Trabalharam | Demandas | Concluídas | Parciais | Falhas |
 |---|--:|--:|--:|--:|--:|
 | 1º | 19 de 19 | 270 | 270 | 0 | 0 |
-| 2º | 18 de 18 | 578 | 576 | 2 | 0 |
+| 2º | 18 de 18 | 580 | 578 | 2 | 0 |
 | 3º | 12 de 12 | 202 | 200 | 1 | 1 |
 | 4º | 32 de 32 | 329 | 329 | 0 | 0 |
 | 5º | 24 de 24 | 747 | 747 | 0 | 0 |
@@ -29,6 +29,8 @@
 
 | Hora | Quem | Trabalho | Resultado |
 |---|---|---|---|
+| 12:28 | Marcos (2º) | Projeto Segmentação — TREINO_estoque_20261103_152724_44638 | ✅ concluída |
+| 12:28 | Marcos (2º) | Projeto NPS — TREINO_nps_20261103_151220_40025 | ✅ concluída |
 | 12:22 | Marcos (2º) | Projeto Segmentação — TREINO_ponto_20261103_151223_43921 | ✅ concluída |
 | 12:22 | Marcos (2º) | Projeto NPS — TREINO_nps_20261103_151220_40025 | ✅ concluída |
 | 12:18 | Marcos (2º) | Projeto Segmentação — TREINO_ponto_20261103_151223_43921 | ✅ concluída |
@@ -37,8 +39,6 @@
 | 12:17 | Marina (5º) | Testar se o último backup volta — nível dificil | ✅ concluída |
 | 12:17 | Ícaro (5º) | Procurar segredos no repositório público — nível dificil | ✅ concluída |
 | 12:17 | Wagner (5º) | Verificar dados pessoais (LGPD) na base sintética — nível dificil | ✅ concluída |
-| 12:17 | Jonas (5º) | Medir a saúde do PostgreSQL — nível dificil | ✅ concluída |
-| 12:17 | Olívia (5º) | Testar se o último backup volta — nível dificil | ✅ concluída |
 
 ## Dificuldade (todo o histórico)
 
@@ -47,7 +47,7 @@
 | basico | 350 | 328 | 0 | 22 | 94% |
 | medio | 927 | 918 | 0 | 9 | 99% |
 | dificil | 2266 | 2241 | 3 | 22 | 99% |
-| profissional | 1397 | 1391 | 2 | 4 | 100% |
+| profissional | 1399 | 1393 | 2 | 4 | 100% |
 
 ## Cada funcionário
 
@@ -92,7 +92,7 @@
 | Leandro | Engenheiro de Machine Learning Sênior | trabalho do papel | Conferir no PostgreSQL os lotes da fábrica — nível dificil (✅ concluída) | 15 |
 | Lucas | Cientista de Dados Júnior | trabalho do papel | Calcular a média de uma métrica da base sintética — nível me (✅ concluída) | 15 |
 | Manu | Estagiária de Análise de Dados | estagiário: observa (regra do dono) |   | 0 |
-| Marcos | Coordenador de Análise e Ciência de Dado | trabalho FORA do papel | Projeto Segmentação — TREINO_ponto_20261103_151223_43921 (✅ concluída) | 338 |
+| Marcos | Coordenador de Análise e Ciência de Dado | trabalho FORA do papel | Projeto Segmentação — TREINO_estoque_20261103_152724_44638 (✅ concluída) | 340 |
 | Natália | Head de Ciência de Dados | trabalho do papel | Segmentação da base sintética — nível profissional (✅ concluída) | 15 |
 | Patrícia | Gerente de Analytics e Customer Insights | trabalho do papel | Situação do andar agora — nível profissional (✅ concluída) | 15 |
 | Rebeca | Líder de Engenharia de IA e Machine Lear | trabalho do papel | Anomalias na base sintética — nível profissional (✅ concluída) | 15 |
@@ -194,15 +194,17 @@
 
 ## Projetos entre andares (várias pessoas, uma etapa depende da outra)
 
+- Projeto Segmentação — TREINO_estoque_20261103_152724_44638: **✅ concluída** — 1. coord_engenharia (concluida); 2. analise_estatistica (concluida); 3. ana_junior_faixas (concluida); 4. cd_junior_anomalias (concluida); 5. sec_senior (concluida); 6. canal_iara (concluida)
+- Projeto NPS — TREINO_nps_20261103_151220_40025: **✅ concluída** — 1. banco (concluida); 2. analise_perfil (concluida); 3. cd_senior_drivers (concluida); 4. gov_pleno_lgpd (concluida); 5. analise_relator (concluida)
 - Projeto Segmentação — TREINO_ponto_20261103_151223_43921: **✅ concluída** — 1. validacao (concluida); 2. analise_indicadores (concluida); 3. cd_pleno_segmentos (concluida); 4. analise_monitoramento (concluida); 5. sec_senior (concluida); 6. canal_nina (concluida)
-- Projeto NPS — TREINO_nps_20261103_151220_40025: **✅ concluída** — 1. tina_contatos (concluida); 2. analise_estatistica (concluida); 3. head_ciencia (concluida); 4. gov_pleno_lgpd (concluida); 5. canal_iara (concluida)
-- Projeto Segmentação — TREINO_ponto_20261103_151223_43921: **✅ concluída** — 1. supervisor (concluida); 2. analise_perfil (concluida); 3. ana_pleno_base (concluida); 4. cd_junior_anomalias (concluida); 5. sec_senior (concluida); 6. analise_relator (concluida)
 
-## Última entrega da empresa (TREINO_ponto_20261103_151223_43921.xlsx, 03/11 12:22)
+## Última entrega da empresa (TREINO_estoque_20261103_152724_44638.xlsx, 03/11 12:28)
 
 Pacote gerado pelo produto (`python -m robo entregar`) a partir de um projeto aprovado:
 
-1. Conferir 54 valor(es) fora do padrão em **atraso_min** (2,2% da base): podem ser erro de digitação ou casos reais que merecem olhar.
+1. Conferir 21 valor(es) fora do padrão em **estoque_un** (0,8% da base): podem ser erro de digitação ou casos reais que merecem olhar.
+2. Conferir 14 valor(es) fora do padrão em **demanda_diaria_un** (0,5% da base): podem ser erro de digitação ou casos reais que merecem olhar.
+3. Entender a diferença em **em_ruptura = Não**: Média de estoque_un 109,15 contra 0,00 no restante (diferença real, n=2502).
 
 ## Inteligência própria (modelo de risco das demandas)
 
