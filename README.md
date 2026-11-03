@@ -1,12 +1,12 @@
 # Empresa ao vivo
 
-**Boletim das 03/11 11:22** (horário de Brasília) · trabalhando · SEM BANCO (memória guardada no arquivo do GitHub; o banco é alcançado quando voltar)
+**Boletim das 03/11 11:26** (horário de Brasília) · entre turnos: memória salva; o próximo turno começa em poucos minutos · SEM BANCO (memória guardada no arquivo do GitHub; o banco é alcançado quando voltar)
 
 > Atualiza a cada 5 minutos enquanto a empresa trabalha. Recarregue a página para ver o mais novo.
 
 ## Hoje
 
-- **1986** demandas, **1983** concluídas (100%), 2 parciais, 1 com falha
+- **1988** demandas, **1985** concluídas (100%), 2 parciais, 1 com falha
 - **105** de 105 funcionários já trabalharam
 - SQL: 173 exercícios, 173 conferidos com o gabarito
 - Fábrica: 81 planilhas, 78 conferidas sem erro
@@ -20,7 +20,7 @@
 | Andar | Trabalharam | Demandas | Concluídas | Parciais | Falhas |
 |---|--:|--:|--:|--:|--:|
 | 1º | 19 de 19 | 252 | 252 | 0 | 0 |
-| 2º | 18 de 18 | 538 | 537 | 1 | 0 |
+| 2º | 18 de 18 | 540 | 539 | 1 | 0 |
 | 3º | 12 de 12 | 191 | 189 | 1 | 1 |
 | 4º | 32 de 32 | 308 | 308 | 0 | 0 |
 | 5º | 24 de 24 | 697 | 697 | 0 | 0 |
@@ -29,6 +29,8 @@
 
 | Hora | Quem | Trabalho | Resultado |
 |---|---|---|---|
+| 11:24 | Marcos (2º) | Projeto Segmentação — TREINO_csat_ces_20261103_141750_70832 | ✅ concluída |
+| 11:24 | Marcos (2º) | Projeto NPS — TREINO_csat_ces_20261103_141750_70832 | ✅ concluída |
 | 11:19 | Marcos (2º) | Projeto Segmentação — TREINO_csat_ces_20261103_141750_70832 | ✅ concluída |
 | 11:18 | Marcos (2º) | Projeto NPS — TREINO_csat_ces_20261103_141750_70832 | ✅ concluída |
 | 11:14 | Marcos (2º) | Projeto Segmentação — TREINO_nps_20261103_140248_68631 | ✅ concluída |
@@ -37,8 +39,6 @@
 | 11:13 | Ícaro (5º) | Medir a saúde do PostgreSQL — nível dificil | ✅ concluída |
 | 11:13 | Heloísa (5º) | Medir a saúde do PostgreSQL — nível profissional | ✅ concluída |
 | 11:13 | Wagner (5º) | Ronda de saúde do sistema — nível dificil | ✅ concluída |
-| 11:13 | Jonas (5º) | Ronda de saúde do sistema — nível dificil | ✅ concluída |
-| 11:13 | Sofia (5º) | Ronda de saúde do sistema — nível dificil | ✅ concluída |
 
 ## Dificuldade (todo o histórico)
 
@@ -47,7 +47,7 @@
 | basico | 346 | 324 | 0 | 22 | 94% |
 | medio | 905 | 896 | 0 | 9 | 99% |
 | dificil | 2203 | 2179 | 2 | 22 | 99% |
-| profissional | 1346 | 1340 | 2 | 4 | 100% |
+| profissional | 1348 | 1342 | 2 | 4 | 100% |
 
 ## Cada funcionário
 
@@ -92,7 +92,7 @@
 | Leandro | Engenheiro de Machine Learning Sênior | trabalho do papel | Perfil e indicadores da base sintética — nível dificil (✅ concluída) | 14 |
 | Lucas | Cientista de Dados Júnior | trabalho do papel | Perfil e indicadores da base sintética — nível medio (✅ concluída) | 14 |
 | Manu | Estagiária de Análise de Dados | estagiário: observa (regra do dono) |   | 0 |
-| Marcos | Coordenador de Análise e Ciência de Dado | trabalho FORA do papel | Projeto Segmentação — TREINO_csat_ces_20261103_141750_70832 (✅ concluída) | 314 |
+| Marcos | Coordenador de Análise e Ciência de Dado | trabalho FORA do papel | Projeto Segmentação — TREINO_csat_ces_20261103_141750_70832 (✅ concluída) | 316 |
 | Natália | Head de Ciência de Dados | trabalho do papel | Calcular a média de uma métrica da base sintética — nível pr (✅ concluída) | 14 |
 | Patrícia | Gerente de Analytics e Customer Insights | trabalho do papel | Calcular a média de uma métrica da base sintética — nível pr (✅ concluída) | 14 |
 | Rebeca | Líder de Engenharia de IA e Machine Lear | trabalho do papel | Calcular a média de uma métrica da base sintética — nível pr (✅ concluída) | 14 |
@@ -186,19 +186,19 @@
 
 ## Tempo do último turno (medido)
 
-- 13:04–13:44 (40 min, 116 voltas; cobertura do cronômetro 100%)
-- **Entregas aprovadas na revisão independente: 121 (181.3 por hora)** — o indicador principal
-- operacional 11% · estudo 2% · revisao 4% · coordenacao 0% · manutencao 12% · erro 0% · parado 72% · sem_medicao 0%
-- Bloqueios: 9; etapas esperando dependência: 0
-- Turnos anteriores (entregas/hora): 100.3, 133.4, 157.4, 89.9, 136.4
+- 13:46–14:26 (40 min, 120 voltas; cobertura do cronômetro 100%)
+- **Entregas aprovadas na revisão independente: 92 (137.9 por hora)** — o indicador principal
+- operacional 8% · estudo 2% · revisao 3% · coordenacao 0% · manutencao 13% · erro 0% · parado 75% · sem_medicao 0%
+- Bloqueios: 1; etapas esperando dependência: 0
+- Turnos anteriores (entregas/hora): 181.3, 100.3, 133.4, 157.4, 89.9
 
 ## Projetos entre andares (várias pessoas, uma etapa depende da outra)
 
+- Projeto Segmentação — TREINO_csat_ces_20261103_141750_70832: **✅ concluída** — 1. publicacao (concluida); 2. analise_perfil (concluida); 3. ana_junior_faixas (concluida); 4. cd_junior_anomalias (concluida); 5. sec_senior (concluida); 6. canal_iara (concluida)
+- Projeto NPS — TREINO_csat_ces_20261103_141750_70832: **✅ concluída** — 1. modelagem (concluida); 2. analise_indicadores (concluida); 3. cd_senior_drivers (concluida); 4. gov_pleno_lgpd (concluida); 5. analise_relator (concluida)
 - Projeto Segmentação — TREINO_csat_ces_20261103_141750_70832: **✅ concluída** — 1. limpeza (concluida); 2. analise_estatistica (concluida); 3. cd_pleno_segmentos (concluida); 4. analise_monitoramento (concluida); 5. sec_senior (concluida); 6. canal_nina (concluida)
-- Projeto NPS — TREINO_csat_ces_20261103_141750_70832: **✅ concluída** — 1. leitura (concluida); 2. analise_perfil (concluida); 3. head_ciencia (concluida); 4. gov_pleno_lgpd (concluida); 5. canal_iara (concluida)
-- Projeto Segmentação — TREINO_nps_20261103_140248_68631: **✅ concluída** — 1. head_engenharia (concluida); 2. analise_monitoramento (concluida); 3. ana_pleno_base (concluida); 4. cd_junior_anomalias (concluida); 5. sec_senior (concluida); 6. analise_relator (concluida)
 
-## Última entrega da empresa (TREINO_csat_ces_20261103_141750_70832.xlsx, 03/11 11:19)
+## Última entrega da empresa (TREINO_csat_ces_20261103_141750_70832.xlsx, 03/11 11:24)
 
 Pacote gerado pelo produto (`python -m robo entregar`) a partir de um projeto aprovado:
 
@@ -325,7 +325,7 @@ Pacote gerado pelo produto (`python -m robo entregar`) a partir de um projeto ap
 
 ## Banco de dados
 
-Levantamento das 03/11 11:18: **80 de 99** tabelas com dados (757.643 linhas contadas uma a uma).
+Levantamento das 03/11 11:26: **80 de 99** tabelas com dados (758.543 linhas contadas uma a uma).
 
 
 | Onde | Tabelas | Com dados |
