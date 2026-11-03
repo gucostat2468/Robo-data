@@ -1,15 +1,15 @@
 # Empresa ao vivo
 
-**Boletim das 03/11 01:54** (horário de Brasília) · trabalhando · SEM BANCO (memória guardada no arquivo do GitHub; o banco é alcançado quando voltar)
+**Boletim das 03/11 02:00** (horário de Brasília) · trabalhando · SEM BANCO (memória guardada no arquivo do GitHub; o banco é alcançado quando voltar)
 
 > Atualiza a cada 5 minutos enquanto a empresa trabalha. Recarregue a página para ver o mais novo.
 
 ## Hoje
 
-- **691** demandas, **691** concluídas (100%), 0 parciais, 0 com falha
+- **693** demandas, **693** concluídas (100%), 0 parciais, 0 com falha
 - **105** de 105 funcionários já trabalharam
 - SQL: 62 exercícios, 62 conferidos com o gabarito
-- Fábrica: 28 planilhas, 28 conferidas sem erro
+- Fábrica: 29 planilhas, 29 conferidas sem erro
 
 ## Trabalhando agora
 
@@ -20,7 +20,7 @@
 | Andar | Trabalharam | Demandas | Concluídas | Parciais | Falhas |
 |---|--:|--:|--:|--:|--:|
 | 1º | 19 de 19 | 90 | 90 | 0 | 0 |
-| 2º | 18 de 18 | 194 | 194 | 0 | 0 |
+| 2º | 18 de 18 | 196 | 196 | 0 | 0 |
 | 3º | 12 de 12 | 55 | 55 | 0 | 0 |
 | 4º | 32 de 32 | 105 | 105 | 0 | 0 |
 | 5º | 24 de 24 | 247 | 247 | 0 | 0 |
@@ -29,6 +29,8 @@
 
 | Hora | Quem | Trabalho | Resultado |
 |---|---|---|---|
+| 01:58 | Marcos (2º) | Projeto Segmentação — TREINO_logistica_20261103_045812_92399 | ✅ concluída |
+| 01:58 | Marcos (2º) | Projeto NPS — TREINO_nps_20261103_044256_76223 | ✅ concluída |
 | 01:53 | Marcos (2º) | Projeto Segmentação — TREINO_estoque_20261103_044259_79827 | ✅ concluída |
 | 01:53 | Marcos (2º) | Projeto NPS — TREINO_nps_20261103_044256_76223 | ✅ concluída |
 | 01:48 | Marcos (2º) | Projeto Segmentação — TREINO_estoque_20261103_044259_79827 | ✅ concluída |
@@ -37,8 +39,6 @@
 | 01:48 | Jonas (5º) | Procurar segredos no repositório público — nível dificil | ✅ concluída |
 | 01:48 | Marina (5º) | Exercício de SQL no PostgreSQL com os dados da fábrica — nível dificil | ✅ concluída |
 | 01:48 | Ícaro (5º) | Exercício de SQL no PostgreSQL com os dados da fábrica — nível dificil | ✅ concluída |
-| 01:48 | Wagner (5º) | Verificar dados pessoais (LGPD) na base sintética — nível dificil | ✅ concluída |
-| 01:48 | Olívia (5º) | Exercício de SQL no PostgreSQL com os dados da fábrica — nível dificil | ✅ concluída |
 
 ## Dificuldade (todo o histórico)
 
@@ -47,7 +47,7 @@
 | basico | 309 | 287 | 0 | 22 | 93% |
 | medio | 712 | 704 | 0 | 8 | 99% |
 | dificil | 1639 | 1616 | 1 | 22 | 99% |
-| profissional | 903 | 898 | 1 | 4 | 99% |
+| profissional | 905 | 900 | 1 | 4 | 99% |
 
 ## Cada funcionário
 
@@ -92,7 +92,7 @@
 | Leandro | Engenheiro de Machine Learning Sênior | trabalho do papel | Drivers do indicador na base sintética — nível dificil (✅ concluída) | 5 |
 | Lucas | Cientista de Dados Júnior | trabalho do papel | Conferir no PostgreSQL os lotes da fábrica — nível medio (✅ concluída) | 5 |
 | Manu | Estagiária de Análise de Dados | estagiário: observa (regra do dono) |   | 0 |
-| Marcos | Coordenador de Análise e Ciência de Dado | trabalho FORA do papel | Projeto Segmentação — TREINO_estoque_20261103_044259_79827 (✅ concluída) | 114 |
+| Marcos | Coordenador de Análise e Ciência de Dado | trabalho FORA do papel | Projeto Segmentação — TREINO_logistica_20261103_045812_92399 (✅ concluída) | 116 |
 | Natália | Head de Ciência de Dados | trabalho do papel | Calcular a média de uma métrica da base sintética — nível pr (✅ concluída) | 5 |
 | Patrícia | Gerente de Analytics e Customer Insights | trabalho do papel | Segmentação da base sintética — nível profissional (✅ concluída) | 5 |
 | Rebeca | Líder de Engenharia de IA e Machine Lear | trabalho do papel | Programa de modelos: backlog e critérios — nível profissiona (✅ concluída) | 5 |
@@ -194,15 +194,17 @@
 
 ## Projetos entre andares (várias pessoas, uma etapa depende da outra)
 
+- Projeto Segmentação — TREINO_logistica_20261103_045812_92399: **✅ concluída** — 1. limpeza (concluida); 2. analise_perfil (concluida); 3. cd_pleno_segmentos (concluida); 4. cd_junior_anomalias (concluida); 5. sec_senior (concluida); 6. canal_nina (concluida)
+- Projeto NPS — TREINO_nps_20261103_044256_76223: **✅ concluída** — 1. leitura (concluida); 2. analise_indicadores (concluida); 3. cd_senior_drivers (concluida); 4. gov_pleno_lgpd (concluida); 5. canal_iara (concluida)
 - Projeto Segmentação — TREINO_estoque_20261103_044259_79827: **✅ concluída** — 1. head_engenharia (concluida); 2. analise_estatistica (concluida); 3. ana_pleno_base (concluida); 4. analise_monitoramento (concluida); 5. sec_senior (concluida); 6. analise_relator (concluida)
-- Projeto NPS — TREINO_nps_20261103_044256_76223: **✅ concluída** — 1. ger_engenharia (concluida); 2. analise_perfil (concluida); 3. head_ciencia (concluida); 4. gov_pleno_lgpd (concluida); 5. canal_nina (concluida)
-- Projeto Segmentação — TREINO_estoque_20261103_044259_79827: **✅ concluída** — 1. eng_pleno_tipos (concluida); 2. analise_monitoramento (concluida); 3. ana_junior_faixas (concluida); 4. cd_junior_anomalias (concluida); 5. sec_senior (concluida); 6. canal_iara (concluida)
 
-## Última entrega da empresa (TREINO_estoque_20261103_044259_79827.xlsx, 03/11 01:53)
+## Última entrega da empresa (TREINO_logistica_20261103_045812_92399.xlsx, 03/11 01:58)
 
 Pacote gerado pelo produto (`python -m robo entregar`) a partir de um projeto aprovado:
 
-1. Conferir 9 valor(es) fora do padrão em **estoque_un** (0,8% da base): podem ser erro de digitação ou casos reais que merecem olhar.
+1. Entender a diferença em **transportadora = Econômica**: Média de atraso_dias 2,50 contra 1,14 no restante (diferença real, n=965).
+2. Abrir conversa de SLA com **Econômica** (transportadora): 0,6% no prazo, abaixo do restante de forma significativa (n=965).
+3. Abrir conversa de SLA com **SP** (regiao): 0,5% no prazo, abaixo do restante de forma significativa (n=383).
 
 ## Inteligência própria (modelo de risco das demandas)
 
