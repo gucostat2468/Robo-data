@@ -1,12 +1,12 @@
 # Empresa ao vivo
 
-**Boletim das 03/11 08:16** (horário de Brasília) · trabalhando · SEM BANCO (memória guardada no arquivo do GitHub; o banco é alcançado quando voltar)
+**Boletim das 03/11 08:21** (horário de Brasília) · trabalhando · SEM BANCO (memória guardada no arquivo do GitHub; o banco é alcançado quando voltar)
 
 > Atualiza a cada 5 minutos enquanto a empresa trabalha. Recarregue a página para ver o mais novo.
 
 ## Hoje
 
-- **1546** demandas, **1546** concluídas (100%), 0 parciais, 0 com falha
+- **1556** demandas, **1556** concluídas (100%), 0 parciais, 0 com falha
 - **105** de 105 funcionários já trabalharam
 - SQL: 132 exercícios, 132 conferidos com o gabarito
 - Fábrica: 65 planilhas, 62 conferidas sem erro
@@ -21,24 +21,24 @@
 |---|--:|--:|--:|--:|--:|
 | 1º | 19 de 19 | 198 | 198 | 0 | 0 |
 | 2º | 18 de 18 | 428 | 428 | 0 | 0 |
-| 3º | 12 de 12 | 136 | 136 | 0 | 0 |
-| 4º | 32 de 32 | 237 | 237 | 0 | 0 |
-| 5º | 24 de 24 | 547 | 547 | 0 | 0 |
+| 3º | 12 de 12 | 141 | 141 | 0 | 0 |
+| 4º | 32 de 32 | 239 | 239 | 0 | 0 |
+| 5º | 24 de 24 | 550 | 550 | 0 | 0 |
 
 ## Últimas entregas
 
 | Hora | Quem | Trabalho | Resultado |
 |---|---|---|---|
-| 08:15 | Tânia (3º) | Consultar o conhecimento da área | ✅ concluída |
-| 08:15 | Paula (3º) | Consultar o conhecimento da área | ✅ concluída |
-| 08:15 | Hugo (3º) | Consultar o conhecimento da área | ✅ concluída |
-| 08:15 | Lúcia (3º) | Consultar o conhecimento da área | ✅ concluída |
-| 08:15 | Vitor (4º) | Consultar o conhecimento da área | ✅ concluída |
-| 08:15 | Pedro (3º) | Consultar o conhecimento da área | ✅ concluída |
-| 08:15 | Nina (4º) | Consultar o conhecimento da área | ✅ concluída |
-| 08:10 | Tânia (3º) | Consultar o conhecimento da área | ✅ concluída |
-| 08:10 | Paula (3º) | Consultar o conhecimento da área | ✅ concluída |
-| 08:10 | Hugo (3º) | Consultar o conhecimento da área | ✅ concluída |
+| 08:20 | Heloísa (5º) | Testar se o último backup volta — nível profissional | ✅ concluída |
+| 08:20 | Paula (3º) | Consultar o conhecimento da área | ✅ concluída |
+| 08:20 | Hugo (3º) | Consultar o conhecimento da área | ✅ concluída |
+| 08:20 | Ícaro (5º) | Ronda de saúde do sistema — nível dificil | ✅ concluída |
+| 08:20 | Tânia (3º) | Consultar o conhecimento da área | ✅ concluída |
+| 08:20 | Pedro (3º) | Consultar o conhecimento da área | ✅ concluída |
+| 08:20 | Nina (4º) | Consultar o conhecimento da área | ✅ concluída |
+| 08:20 | Lúcia (3º) | Consultar o conhecimento da área | ✅ concluída |
+| 08:20 | Vitor (4º) | Consultar o conhecimento da área | ✅ concluída |
+| 08:20 | Marina (5º) | Procurar segredos no repositório público — nível dificil | ✅ concluída |
 
 ## Dificuldade (todo o histórico)
 
@@ -46,8 +46,8 @@
 |---|--:|--:|--:|--:|--:|
 | basico | 332 | 310 | 0 | 22 | 93% |
 | medio | 841 | 833 | 0 | 8 | 99% |
-| dificil | 2014 | 1991 | 1 | 22 | 99% |
-| profissional | 1203 | 1198 | 1 | 4 | 100% |
+| dificil | 2016 | 1993 | 1 | 22 | 99% |
+| profissional | 1204 | 1199 | 1 | 4 | 100% |
 
 ## Cada funcionário
 
@@ -109,13 +109,13 @@
 | Felipe | Head de BI e Excel | trabalho do papel | Segmentação da base sintética — nível profissional (✅ concluída) | 11 |
 | Gabriel | Especialista em Tabelas Dinâmicas e Dash | trabalho do papel | Perfil e indicadores da base sintética — nível dificil (✅ concluída) | 11 |
 | Heitor | Analista Pleno de BI | trabalho do papel | Conferir no PostgreSQL os lotes da fábrica — nível medio (✅ concluída) | 11 |
-| Hugo | Analista de Excel Pleno | estudo (trabalho do papel bloqueado: nenhum lote da fábrica conferido está no PostgreSQL a | Consultar o conhecimento da área (✅ concluída) | 14 |
-| Lúcia | Especialista em Fórmulas e Power Query | estudo (trabalho do papel bloqueado: nenhum lote da fábrica conferido está no PostgreSQL a | Consultar o conhecimento da área (✅ concluída) | 14 |
-| Paula | Analista de Excel Júnior | estudo (trabalho do papel bloqueado: ainda não há planilha sintética tratada (Bases-Tratad | Consultar o conhecimento da área (✅ concluída) | 14 |
-| Pedro | Especialista em Pesquisa de Mercado | estudo (trabalho do papel bloqueado: nenhum lote da fábrica conferido está no PostgreSQL a | Consultar o conhecimento da área (✅ concluída) | 14 |
+| Hugo | Analista de Excel Pleno | estudo (trabalho do papel bloqueado: nenhum lote da fábrica conferido está no PostgreSQL a | Consultar o conhecimento da área (✅ concluída) | 15 |
+| Lúcia | Especialista em Fórmulas e Power Query | estudo (trabalho do papel bloqueado: nenhum lote da fábrica conferido está no PostgreSQL a | Consultar o conhecimento da área (✅ concluída) | 15 |
+| Paula | Analista de Excel Júnior | estudo (trabalho do papel bloqueado: ainda não há planilha sintética tratada (Bases-Tratad | Consultar o conhecimento da área (✅ concluída) | 15 |
+| Pedro | Especialista em Pesquisa de Mercado | estudo (trabalho do papel bloqueado: nenhum lote da fábrica conferido está no PostgreSQL a | Consultar o conhecimento da área (✅ concluída) | 15 |
 | Ricardo | Gerente da Sala Excel | trabalho do papel | Situação do andar agora — nível profissional (✅ concluída) | 11 |
 | Sílvia | Coordenadora da Sala Excel | trabalho do papel | Situação do andar agora — nível dificil (✅ concluída) | 11 |
-| Tânia | Especialista em Trade Marketing | estudo (trabalho do papel bloqueado: nenhum lote da fábrica conferido está no PostgreSQL a | Consultar o conhecimento da área (✅ concluída) | 14 |
+| Tânia | Especialista em Trade Marketing | estudo (trabalho do papel bloqueado: nenhum lote da fábrica conferido está no PostgreSQL a | Consultar o conhecimento da área (✅ concluída) | 15 |
 
 ### 4º andar
 
@@ -138,7 +138,7 @@
 | Marta | Diretora de Pessoas e Cultura (CHRO) | trabalho do papel | Situação das contratações — nível profissional (✅ concluída) | 11 |
 | Mauro | Analista de Desempenho Sênior | trabalho do papel | Planos de desenvolvimento 70-20-10 — nível dificil (✅ concluída) | 11 |
 | Murilo | Designer de Casos | trabalho do papel | Revisar um caso de treino feito por outro designer — nível d (✅ concluída) | 11 |
-| Nina | Assistente do canal | estudo (trabalho do papel bloqueado: ainda não há planilha sintética tratada (Bases-Tratad | Consultar o conhecimento da área (✅ concluída) | 14 |
+| Nina | Assistente do canal | estudo (trabalho do papel bloqueado: ainda não há planilha sintética tratada (Bases-Tratad | Consultar o conhecimento da área (✅ concluída) | 15 |
 | Otávio | Head da Sala de Casos | trabalho do papel | Revisar um caso de treino feito por outro designer — nível p (✅ concluída) | 11 |
 | Priscila | Analista de Recrutamento e Seleção Pleno | trabalho do papel | Indicadores de pessoas — nível medio (✅ concluída) | 11 |
 | Raquel | Designer de Casos | trabalho do papel | Revisar um caso de treino feito por outro designer — nível d (✅ concluída) | 11 |
@@ -151,7 +151,7 @@
 | Tiago | Analista de People Analytics Pleno | trabalho do papel | Planos de desenvolvimento 70-20-10 — nível medio (✅ concluída) | 11 |
 | Valéria | Revisora Independente de Casos | trabalho do papel | Revisar um caso de treino feito por outro designer — nível d (✅ concluída) | 11 |
 | Vicente | Analista Sênior de Geração de Demandas | trabalho do papel na rotina demandas |   | 0 |
-| Vitor | Analista de Governança Pleno | estudo (trabalho do papel bloqueado: ainda não há planilha sintética tratada (Bases-Tratad | Consultar o conhecimento da área (✅ concluída) | 14 |
+| Vitor | Analista de Governança Pleno | estudo (trabalho do papel bloqueado: ainda não há planilha sintética tratada (Bases-Tratad | Consultar o conhecimento da área (✅ concluída) | 15 |
 | Yasmin | Planejadora de Treino | trabalho do papel | Revisar um caso de treino feito por outro designer — nível d (✅ concluída) | 11 |
 
 ### 5º andar
@@ -168,11 +168,11 @@
 | Fernanda | Coordenadora de DevOps e Confiabilidade  | trabalho do papel | SLA das rotinas — nível dificil (✅ concluída) | 22 |
 | Gael | Estagiário de Engenharia de Dados (Airfl | estagiário: observa (regra do dono) — Observei Lúcia (Especialista em Fórmulas e Power Que |   | 0 |
 | Gustavo | Gerente de TI e Infraestrutura | trabalho do papel | SLA das rotinas — nível profissional (✅ concluída) | 22 |
-| Heloísa | Head de AWS, Arquitetura e Governança de | trabalho do papel | Procurar segredos no repositório público — nível profissiona (✅ concluída) | 43 |
+| Heloísa | Head de AWS, Arquitetura e Governança de | trabalho do papel | Testar se o último backup volta — nível profissional (✅ concluída) | 44 |
 | Henrique | Head de Engenharia Python | trabalho do papel | Ronda de saúde do sistema — nível profissional (✅ concluída) | 22 |
 | Jonas | Engenheiro de MLOps e Plataforma de Mode | trabalho do papel | SLA das rotinas — nível dificil (✅ concluída) | 22 |
 | Letícia | Desenvolvedora Júnior | trabalho do papel | SLA das rotinas (✅ concluída) | 22 |
-| Marina | Arquiteta de Cloud (AWS) | trabalho do papel | Medir a saúde do PostgreSQL — nível dificil (✅ concluída) | 43 |
+| Marina | Arquiteta de Cloud (AWS) | trabalho do papel | Procurar segredos no repositório público — nível dificil (✅ concluída) | 44 |
 | Nicolas | Especialista em numpy | trabalho do papel | Procurar segredos no repositório público — nível dificil (✅ concluída) | 22 |
 | Olívia | Especialista em openpyxl (Excel) | trabalho do papel | Procurar segredos no repositório público — nível dificil (✅ concluída) | 22 |
 | Pietro | Especialista em psycopg (PostgreSQL) | trabalho do papel | Ronda de saúde do sistema — nível dificil (✅ concluída) | 22 |
@@ -181,7 +181,7 @@
 | Sofia | Especialista em pandas | trabalho do papel | SLA das rotinas — nível dificil (✅ concluída) | 22 |
 | Wagner | Especialista Sênior em Segurança da Info | trabalho do papel | Ronda de saúde do sistema — nível dificil (✅ concluída) | 22 |
 | Xavier | Especialista em xlrd (.xls antigo) | trabalho do papel | Procurar segredos no repositório público — nível dificil (✅ concluída) | 22 |
-| Ícaro | Sênior de AWS, Linux e Ubuntu | trabalho do papel | Medir a saúde do PostgreSQL — nível dificil (✅ concluída) | 43 |
+| Ícaro | Sênior de AWS, Linux e Ubuntu | trabalho do papel | Ronda de saúde do sistema — nível dificil (✅ concluída) | 44 |
 
 
 ## Tempo do último turno (medido)
