@@ -1,11 +1,11 @@
 {
  "versao": 1,
- "gerado_em": "2026-11-03T22:11:44",
+ "gerado_em": "2026-11-03T22:15:20",
  "turno": {
-  "estado": "entre turnos: memória salva; o próximo turno começa em poucos minutos · SEM BANCO (memória guardada no arquivo do GitHub; o banco é alcançado quando voltar)",
-  "inicio": "2026-11-03T21:33:35",
-  "fim_previsto": "2026-11-03T22:13:35",
-  "voltas": 117,
+  "estado": "trabalhando · SEM BANCO (memória guardada no arquivo do GitHub; o banco é alcançado quando voltar)",
+  "inicio": "2026-11-03T22:15:20",
+  "fim_previsto": "2026-11-03T22:55:20",
+  "voltas": 0,
   "planilhas": 2
  },
  "funcionarios": 105,
@@ -25,8 +25,8 @@
    "andar": 2,
    "pessoas": 18,
    "trabalharam_hoje": 18,
-   "demandas": 832,
-   "concluidas": 828,
+   "demandas": 834,
+   "concluidas": 830,
    "parciais": 3,
    "falhas": 1,
    "treino": 754,
@@ -58,8 +58,8 @@
    "andar": 5,
    "pessoas": 24,
    "trabalharam_hoje": 24,
-   "demandas": 1071,
-   "concluidas": 1071,
+   "demandas": 1072,
+   "concluidas": 1072,
    "parciais": 0,
    "falhas": 0,
    "treino": 999,
@@ -68,6 +68,30 @@
  ],
  "agora": [],
  "ultimos": [
+  {
+   "quando": "2026-11-03T22:15:17",
+   "funcionario": "Marcos",
+   "cargo": "Coordenador de Análise e Ciência de Dados",
+   "andar": 2,
+   "trabalho": "Projeto Segmentação — TREINO_churn_20261103_221454_94381",
+   "estado": "concluida"
+  },
+  {
+   "quando": "2026-11-03T22:15:08",
+   "funcionario": "Marcos",
+   "cargo": "Coordenador de Análise e Ciência de Dados",
+   "andar": 2,
+   "trabalho": "Projeto NPS — TREINO_nps_20261103_221446_86746",
+   "estado": "concluida"
+  },
+  {
+   "quando": "2026-11-03T22:15:00",
+   "funcionario": "Heloísa",
+   "cargo": "Head de AWS, Arquitetura e Governança de Nuvem",
+   "andar": 5,
+   "trabalho": "Testar se o último backup volta — nível profissional",
+   "estado": "concluida"
+  },
   {
    "quando": "2026-11-03T22:09:22",
    "funcionario": "Marcos",
@@ -123,30 +147,6 @@
    "andar": 5,
    "trabalho": "Revisão da biblioteca sob sua responsabilidade — nível dificil",
    "estado": "concluida"
-  },
-  {
-   "quando": "2026-11-03T22:09:12",
-   "funcionario": "Rodrigo",
-   "cargo": "Analista de Infraestrutura Pleno",
-   "andar": 5,
-   "trabalho": "Procurar segredos no repositório público — nível medio",
-   "estado": "concluida"
-  },
-  {
-   "quando": "2026-11-03T22:09:12",
-   "funcionario": "Wagner",
-   "cargo": "Especialista Sênior em Segurança da Informação",
-   "andar": 5,
-   "trabalho": "Medir a saúde do PostgreSQL — nível dificil",
-   "estado": "concluida"
-  },
-  {
-   "quando": "2026-11-03T22:09:11",
-   "funcionario": "Nicolas",
-   "cargo": "Especialista em numpy",
-   "andar": 5,
-   "trabalho": "Procurar segredos no repositório público — nível dificil",
-   "estado": "concluida"
   }
  ],
  "sql": {
@@ -154,21 +154,21 @@
   "concluidos_hoje": 255
  },
  "fabrica": {
-  "lotes_hoje": 110,
+  "lotes_hoje": 112,
   "conferidos_ok_hoje": 107
  },
  "rotinas": [
   {
    "rotina": "caixa_dono",
-   "execucoes_24h": 34,
+   "execucoes_24h": 35,
    "erros_24h": 0,
-   "ultima": "2026-11-03T21:31:55"
+   "ultima": "2026-11-03T22:14:08"
   },
   {
    "rotina": "demandas",
-   "execucoes_24h": 272,
+   "execucoes_24h": 273,
    "erros_24h": 0,
-   "ultima": "2026-11-03T22:09:24"
+   "ultima": "2026-11-03T22:15:20"
   },
   {
    "rotina": "dialogo",
@@ -196,9 +196,9 @@
   },
   {
    "rotina": "jornada",
-   "execucoes_24h": 34,
+   "execucoes_24h": 35,
    "erros_24h": 0,
-   "ultima": "2026-11-03T21:31:55"
+   "ultima": "2026-11-03T22:14:08"
   },
   {
    "rotina": "laboratorio",
@@ -208,25 +208,25 @@
   },
   {
    "rotina": "licoes",
-   "execucoes_24h": 17,
+   "execucoes_24h": 18,
    "erros_24h": 0,
-   "ultima": "2026-11-03T20:49:46"
+   "ultima": "2026-11-03T22:14:07"
   },
   {
    "rotina": "modelos",
-   "execucoes_24h": 34,
+   "execucoes_24h": 35,
    "erros_24h": 0,
-   "ultima": "2026-11-03T21:32:34"
+   "ultima": "2026-11-03T22:14:46"
   },
   {
    "rotina": "paineis",
-   "execucoes_24h": 34,
+   "execucoes_24h": 35,
    "erros_24h": 0,
-   "ultima": "2026-11-03T21:32:07"
+   "ultima": "2026-11-03T22:14:19"
   },
   {
    "rotina": "registro",
-   "execucoes_24h": 693,
+   "execucoes_24h": 692,
    "erros_24h": 0,
    "ultima": "2026-11-03T22:11:33"
   },
@@ -240,28 +240,28 @@
    "rotina": "ronda_ti",
    "execucoes_24h": 104,
    "erros_24h": 0,
-   "ultima": "2026-11-03T22:11:33"
+   "ultima": "2026-11-03T22:13:53"
   },
   {
    "rotina": "treino",
-   "execucoes_24h": 635,
+   "execucoes_24h": 633,
    "erros_24h": 0,
    "ultima": "2026-11-03T22:09:59"
   }
  ],
  "totais": {
-  "demandas": 5938,
+  "demandas": 5941,
   "tentativas_treino": 29463,
   "conversas": 7557,
-  "trabalhos_com_prova": 23476
+  "trabalhos_com_prova": 23491
  },
  "banco": {
-  "levantamento": "2026-11-03T22:11:34",
+  "levantamento": "2026-11-03T22:04:01",
   "postgres_conferido": true,
   "erro_postgres": null,
   "tabelas": 95,
   "com_dados": 76,
-  "linhas": 813476,
+  "linhas": 812218,
   "resumo": {
    "sqlite": {
     "tabelas": 81,
@@ -623,7 +623,7 @@
    "ultimo": "",
    "quando": "",
    "estado": "",
-   "situacao": "estagiário: observa (regra do dono) — Observei Lúcia (Especialista em Fórmulas e Power Query) fazendo \"Segmentação da base sintética\" no nível dificil: termin"
+   "situacao": "estagiário: observa (regra do dono) — Observei Heloísa (Head de AWS, Arquitetura e Governança de Nuvem) fazendo \"Testar se o último backup volta\" no nível pro"
   },
   {
    "nome": "Tina",
@@ -762,9 +762,9 @@
    "andar": 2,
    "cargo": "Coordenador de Análise e Ciência de Dados",
    "area": "Análise de Dados",
-   "demandas_hoje": 492,
-   "ultimo": "Projeto Segmentação — TREINO_nps_20261103_213238_58705",
-   "quando": "2026-11-03T22:09:18",
+   "demandas_hoje": 494,
+   "ultimo": "Projeto Segmentação — TREINO_churn_20261103_221454_94381",
+   "quando": "2026-11-03T22:15:13",
    "estado": "concluida",
    "situacao": "trabalho FORA do papel"
   },
@@ -854,7 +854,7 @@
    "ultimo": "",
    "quando": "",
    "estado": "",
-   "situacao": "estagiário: observa (regra do dono) — Observei Lúcia (Especialista em Fórmulas e Power Query) fazendo \"Segmentação da base sintética\" no nível dificil: termin"
+   "situacao": "estagiário: observa (regra do dono) — Observei Heloísa (Head de AWS, Arquitetura e Governança de Nuvem) fazendo \"Testar se o último backup volta\" no nível pro"
   },
   {
    "nome": "Felipe",
@@ -1096,7 +1096,7 @@
    "ultimo": "",
    "quando": "",
    "estado": "",
-   "situacao": "estagiário: observa (regra do dono) — Observei Vitor (Analista de Governança Pleno) fazendo \"Diagnosticar a planilha original da fábrica\" no nível medio: term"
+   "situacao": "estagiário: observa (regra do dono)"
   },
   {
    "nome": "Lorena",
@@ -1107,7 +1107,7 @@
    "ultimo": "",
    "quando": "",
    "estado": "",
-   "situacao": "estagiário: observa (regra do dono) — Observei Vitor (Analista de Governança Pleno) fazendo \"Diagnosticar a planilha original da fábrica\" no nível medio: term"
+   "situacao": "estagiário: observa (regra do dono)"
   },
   {
    "nome": "Lívia",
@@ -1371,7 +1371,7 @@
    "ultimo": "",
    "quando": "",
    "estado": "",
-   "situacao": "estagiário: observa (regra do dono) — Observei Lúcia (Especialista em Fórmulas e Power Query) fazendo \"Segmentação da base sintética\" no nível dificil: termin"
+   "situacao": "estagiário: observa (regra do dono) — Observei Heloísa (Head de AWS, Arquitetura e Governança de Nuvem) fazendo \"Testar se o último backup volta\" no nível pro"
   },
   {
    "nome": "Diego",
@@ -1415,7 +1415,7 @@
    "ultimo": "",
    "quando": "",
    "estado": "",
-   "situacao": "estagiário: observa (regra do dono) — Observei Lúcia (Especialista em Fórmulas e Power Query) fazendo \"Segmentação da base sintética\" no nível dificil: termin"
+   "situacao": "estagiário: observa (regra do dono) — Observei Heloísa (Head de AWS, Arquitetura e Governança de Nuvem) fazendo \"Testar se o último backup volta\" no nível pro"
   },
   {
    "nome": "Gustavo",
@@ -1433,9 +1433,9 @@
    "andar": 5,
    "cargo": "Head de AWS, Arquitetura e Governança de Nuvem",
    "area": "Engenharia de Dados",
-   "demandas_hoje": 84,
-   "ultimo": "Procurar segredos no repositório público — nível profissional",
-   "quando": "2026-11-03T21:58:33",
+   "demandas_hoje": 85,
+   "ultimo": "Testar se o último backup volta — nível profissional",
+   "quando": "2026-11-03T22:14:57",
    "estado": "concluida",
    "situacao": "trabalho do papel"
   },
@@ -1585,6 +1585,88 @@
  ],
  "projetos": [
   {
+   "id": "TAR-20261103-d36578",
+   "titulo": "Projeto Segmentação — TREINO_churn_20261103_221454_94381",
+   "estado": "concluida",
+   "criada_em": "2026-11-03T22:15:13",
+   "etapas": [
+    {
+     "ordem": 1,
+     "titulo": "Diagnóstico da planilha original (o que barraria a produção)",
+     "funcionario": "limpeza",
+     "estado": "concluida"
+    },
+    {
+     "ordem": 2,
+     "titulo": "Perfil da base (colunas, indicadores e margem de erro)",
+     "funcionario": "analise_estatistica",
+     "estado": "concluida"
+    },
+    {
+     "ordem": 3,
+     "titulo": "Segmentação de clientes (k-means com silhueta)",
+     "funcionario": "cd_pleno_segmentos",
+     "estado": "concluida"
+    },
+    {
+     "ordem": 4,
+     "titulo": "Anomalias (valores fora do padrão, com a linha)",
+     "funcionario": "analise_monitoramento",
+     "estado": "concluida"
+    },
+    {
+     "ordem": 5,
+     "titulo": "Dados pessoais na base (LGPD)",
+     "funcionario": "sec_senior",
+     "estado": "concluida"
+    },
+    {
+     "ordem": 6,
+     "titulo": "Resumo executivo do projeto (.md)",
+     "funcionario": "canal_nina",
+     "estado": "concluida"
+    }
+   ]
+  },
+  {
+   "id": "TAR-20261103-cce407",
+   "titulo": "Projeto NPS — TREINO_nps_20261103_221446_86746",
+   "estado": "concluida",
+   "criada_em": "2026-11-03T22:15:01",
+   "etapas": [
+    {
+     "ordem": 1,
+     "titulo": "Diagnóstico da planilha original (o que barraria a produção)",
+     "funcionario": "leitura",
+     "estado": "concluida"
+    },
+    {
+     "ordem": 2,
+     "titulo": "Perfil e indicadores (NPS com margem de erro)",
+     "funcionario": "analise_perfil",
+     "estado": "concluida"
+    },
+    {
+     "ordem": 3,
+     "titulo": "Drivers do NPS (o que mais pesa na nota)",
+     "funcionario": "head_ciencia",
+     "estado": "concluida"
+    },
+    {
+     "ordem": 4,
+     "titulo": "Dados pessoais na base (LGPD)",
+     "funcionario": "gov_pleno_lgpd",
+     "estado": "concluida"
+    },
+    {
+     "ordem": 5,
+     "titulo": "Resumo executivo do projeto (.md)",
+     "funcionario": "canal_iara",
+     "estado": "concluida"
+    }
+   ]
+  },
+  {
    "id": "TAR-20261103-6791a7",
    "titulo": "Projeto Segmentação — TREINO_nps_20261103_213238_58705",
    "estado": "concluida",
@@ -1627,102 +1709,19 @@
      "estado": "concluida"
     }
    ]
-  },
-  {
-   "id": "TAR-20261103-7794fa",
-   "titulo": "Projeto NPS — TREINO_nps_20261103_213238_58705",
-   "estado": "concluida",
-   "criada_em": "2026-11-03T22:09:14",
-   "etapas": [
-    {
-     "ordem": 1,
-     "titulo": "Diagnóstico da planilha original (o que barraria a produção)",
-     "funcionario": "ger_engenharia",
-     "estado": "concluida"
-    },
-    {
-     "ordem": 2,
-     "titulo": "Perfil e indicadores (NPS com margem de erro)",
-     "funcionario": "analise_indicadores",
-     "estado": "concluida"
-    },
-    {
-     "ordem": 3,
-     "titulo": "Drivers do NPS (o que mais pesa na nota)",
-     "funcionario": "cd_senior_drivers",
-     "estado": "concluida"
-    },
-    {
-     "ordem": 4,
-     "titulo": "Dados pessoais na base (LGPD)",
-     "funcionario": "gov_pleno_lgpd",
-     "estado": "concluida"
-    },
-    {
-     "ordem": 5,
-     "titulo": "Resumo executivo do projeto (.md)",
-     "funcionario": "canal_nina",
-     "estado": "concluida"
-    }
-   ]
-  },
-  {
-   "id": "TAR-20261103-6695a7",
-   "titulo": "Projeto Segmentação — TREINO_nps_20261103_213238_58705",
-   "estado": "concluida",
-   "criada_em": "2026-11-03T22:03:54",
-   "etapas": [
-    {
-     "ordem": 1,
-     "titulo": "Diagnóstico da planilha original (o que barraria a produção)",
-     "funcionario": "eng_pleno_tipos",
-     "estado": "concluida"
-    },
-    {
-     "ordem": 2,
-     "titulo": "Perfil da base (colunas, indicadores e margem de erro)",
-     "funcionario": "analise_estatistica",
-     "estado": "concluida"
-    },
-    {
-     "ordem": 3,
-     "titulo": "Segmentação de clientes (k-means com silhueta)",
-     "funcionario": "ana_junior_faixas",
-     "estado": "concluida"
-    },
-    {
-     "ordem": 4,
-     "titulo": "Anomalias (valores fora do padrão, com a linha)",
-     "funcionario": "cd_junior_anomalias",
-     "estado": "concluida"
-    },
-    {
-     "ordem": 5,
-     "titulo": "Dados pessoais na base (LGPD)",
-     "funcionario": "sec_senior",
-     "estado": "concluida"
-    },
-    {
-     "ordem": 6,
-     "titulo": "Resumo executivo do projeto (.md)",
-     "funcionario": "canal_iara",
-     "estado": "concluida"
-    }
-   ]
   }
  ],
  "entregas": [
   {
-   "id": 568,
-   "data_hora": "2026-11-03T22:09:24",
-   "projeto": "TAR-20261103-6791a7",
-   "base": "TREINO_nps_20261103_213238_58705.xlsx",
-   "pasta": "/home/runner/work/_temp/empresa/logs/entregas/Entrega_TREINO_nps_20261103_213238_58705_20261103_220923",
+   "id": 570,
+   "data_hora": "2026-11-03T22:15:20",
+   "projeto": "TAR-20261103-d36578",
+   "base": "TREINO_churn_20261103_221454_94381.xlsx",
+   "pasta": "/home/runner/work/_temp/empresa/logs/entregas/Entrega_TREINO_churn_20261103_221454_94381_20261103_221518",
    "ok": 1,
    "recomendacoes": [
-    "Priorizar **nota_conteudo**: os atributos têm notas parecidas (média ~7,4 de 10), então o maior ganho vem de melhorar o que mais pesa na nota (correlação 0,55).",
-    "Investigar **curso = Enfermagem**: NPS -42 contra 7 no restante — diferença real (não é acaso; n=254).",
-    "Investigar **curso = Engenharia**: NPS -18 contra 3 no restante — diferença real (não é acaso; n=286)."
+    "Entender a diferença em **plano = Premium**: Média de mensalidade 149,98 contra 65,20 no restante (diferença real, n=436).",
+    "**Valores suspeitos:** 436 apontado(s) (idade impossível (fora de 0 a 120): 436). Estão na aba suspeitos do indicadores.xlsx com a chave de cada linha: confira na origem."
    ],
    "arquivos": "[\"modelo_powerbi.xlsx\", \"medidas_dax.txt\", \"base_tratada.xlsx\", \"indicadores.xlsx\", \"relatorio.html\", \"manifesto.json\"]"
   }
@@ -2121,10 +2120,10 @@
  ],
  "modelos": {
   "finalidade": "risco_demanda",
-  "rotuladas_agora": 5837,
+  "rotuladas_agora": 5840,
   "minimo_para_treinar": 60,
-  "datasets": 125,
-  "maior_dataset": 5709,
+  "datasets": 126,
+  "maior_dataset": 5837,
   "modelos": [
    {
     "id": "risco_demanda-v1",
@@ -2748,30 +2747,35 @@
    },
    {
     "id": "risco_demanda-v125",
+    "estado": "substituido",
+    "criado_por": "ml_engenheiro"
+   },
+   {
+    "id": "risco_demanda-v126",
     "estado": "referencia",
     "criado_por": "ml_engenheiro"
    }
   ],
-  "referencia": "risco_demanda-v125",
-  "inferencias_sombra": 5579,
+  "referencia": "risco_demanda-v126",
+  "inferencias_sombra": 5707,
   "uso_operacional": "desligado: o modelo só roda em sombra até o dono decidir usá-lo em alguma escolha da empresa",
   "ultima_avaliacao": {
-   "modelo": "risco_demanda-v125",
+   "modelo": "risco_demanda-v126",
    "resultado": "avaliado_aprovado",
    "quem": "ml_avaliador",
    "candidato": {
-    "n": 857,
-    "taxa_real": 0.007001,
-    "log_loss": 0.041648,
-    "brier": 0.006953,
-    "auc": 0.70329
+    "n": 876,
+    "taxa_real": 0.006849,
+    "log_loss": 0.040886,
+    "brier": 0.006803,
+    "auc": 0.701149
    },
    "baseline": {
-    "n": 857,
-    "taxa_real": 0.007001,
-    "log_loss": 0.042347,
-    "brier": 0.009011,
-    "auc": 0.925088
+    "n": 876,
+    "taxa_real": 0.006849,
+    "log_loss": 0.041357,
+    "brier": 0.008752,
+    "auc": 0.92433
    },
    "motivos": []
   }
@@ -2800,8 +2804,8 @@
   },
   {
    "nivel": "profissional",
-   "demandas": 1720,
-   "concluidas": 1713,
+   "demandas": 1723,
+   "concluidas": 1716,
    "parciais": 3,
    "falhas": 4
   }
