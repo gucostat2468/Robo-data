@@ -1,6 +1,6 @@
 # Empresa ao vivo
 
-**Boletim das 04/11 05:44** (horário de Brasília) · entre turnos: memória salva; o próximo turno começa em poucos minutos · SEM BANCO (memória guardada no arquivo do GitHub; o banco é alcançado quando voltar)
+**Boletim das 04/11 05:46** (horário de Brasília) · trabalhando · SEM BANCO (memória guardada no arquivo do GitHub; o banco é alcançado quando voltar)
 
 > Atualiza a cada 5 minutos enquanto a empresa trabalha. Recarregue a página para ver o mais novo.
 
@@ -9,7 +9,7 @@
 - **1169** demandas, **1167** concluídas (100%), 2 parciais, 0 com falha
 - **105** de 105 funcionários já trabalharam
 - SQL: 102 exercícios, 102 conferidos com o gabarito
-- Fábrica: 50 planilhas, 50 conferidas sem erro
+- Fábrica: 52 planilhas, 50 conferidas sem erro
 
 ## Trabalhando agora
 
@@ -347,14 +347,15 @@ Pacote gerado pelo produto (`python -m robo entregar`) a partir de um projeto ap
 - risco_demanda-v139: **substituido** (treinado por ml_engenheiro)
 - risco_demanda-v140: **substituido** (treinado por ml_engenheiro)
 - risco_demanda-v141: **substituido** (treinado por ml_engenheiro)
-- risco_demanda-v142: **referencia** (treinado por ml_engenheiro)
-- Última avaliação independente (ml_avaliador): risco_demanda-v142 aprovado — log loss 0.016 contra baseline 0.017
-- Referência em sombra: risco_demanda-v142; 7213 previsões em sombra
+- risco_demanda-v142: **substituido** (treinado por ml_engenheiro)
+- risco_demanda-v143: **referencia** (treinado por ml_engenheiro)
+- Última avaliação independente (ml_avaliador): risco_demanda-v143 aprovado — log loss 0.015 contra baseline 0.017
+- Referência em sombra: risco_demanda-v143; 7276 previsões em sombra
 - Uso operacional: desligado: o modelo só roda em sombra até o dono decidir usá-lo em alguma escolha da empresa
 
 ## Banco de dados
 
-Levantamento das 04/11 05:43: **82 de 101** tabelas com dados (930.451 linhas contadas uma a uma).
+Levantamento das 04/11 05:37: **82 de 101** tabelas com dados (929.155 linhas contadas uma a uma).
 
 
 | Onde | Tabelas | Com dados |
