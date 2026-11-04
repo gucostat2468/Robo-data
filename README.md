@@ -1,15 +1,15 @@
 # Empresa ao vivo
 
-**Boletim das 04/11 02:13** (horário de Brasília) · entre turnos: memória salva; o próximo turno começa em poucos minutos · SEM BANCO (memória guardada no arquivo do GitHub; o banco é alcançado quando voltar)
+**Boletim das 04/11 02:17** (horário de Brasília) · trabalhando · SEM BANCO (memória guardada no arquivo do GitHub; o banco é alcançado quando voltar)
 
 > Atualiza a cada 5 minutos enquanto a empresa trabalha. Recarregue a página para ver o mais novo.
 
 ## Hoje
 
-- **696** demandas, **694** concluídas (100%), 2 parciais, 0 com falha
+- **698** demandas, **696** concluídas (100%), 2 parciais, 0 com falha
 - **105** de 105 funcionários já trabalharam
 - SQL: 62 exercícios, 62 conferidos com o gabarito
-- Fábrica: 30 planilhas, 30 conferidas sem erro
+- Fábrica: 32 planilhas, 30 conferidas sem erro
 
 ## Trabalhando agora
 
@@ -20,7 +20,7 @@
 | Andar | Trabalharam | Demandas | Concluídas | Parciais | Falhas |
 |---|--:|--:|--:|--:|--:|
 | 1º | 19 de 19 | 90 | 89 | 1 | 0 |
-| 2º | 18 de 18 | 198 | 198 | 0 | 0 |
+| 2º | 18 de 18 | 200 | 200 | 0 | 0 |
 | 3º | 12 de 12 | 55 | 55 | 0 | 0 |
 | 4º | 32 de 32 | 105 | 104 | 1 | 0 |
 | 5º | 24 de 24 | 248 | 248 | 0 | 0 |
@@ -29,6 +29,8 @@
 
 | Hora | Quem | Trabalho | Resultado |
 |---|---|---|---|
+| 02:17 | Marcos (2º) | Projeto Segmentação — TREINO_estoque_20261104_051643_03461 | ✅ concluída |
+| 02:16 | Marcos (2º) | Projeto NPS — TREINO_nps_20261104_051636_96812 | ✅ concluída |
 | 02:10 | Marcos (2º) | Projeto Segmentação — TREINO_folha_20261104_050436_76885 | ✅ concluída |
 | 02:10 | Marcos (2º) | Projeto NPS — TREINO_nps_20261104_043418_58678 | ✅ concluída |
 | 02:05 | Marcos (2º) | Projeto Segmentação — TREINO_folha_20261104_050436_76885 | ✅ concluída |
@@ -37,8 +39,6 @@
 | 02:05 | Marina (5º) | Exercício de SQL no PostgreSQL com os dados da fábrica — nível dificil | ✅ concluída |
 | 02:05 | Ícaro (5º) | SLA das rotinas — nível dificil | ✅ concluída |
 | 02:00 | Marcos (2º) | Projeto Segmentação — TREINO_funil_20261104_044932_72123 | ✅ concluída |
-| 02:00 | Marcos (2º) | Projeto NPS — TREINO_nps_20261104_043418_58678 | ✅ concluída |
-| 02:00 | Jonas (5º) | Ronda de saúde do sistema — nível dificil | ✅ concluída |
 
 ## Dificuldade (todo o histórico)
 
@@ -47,7 +47,7 @@
 | basico | 406 | 384 | 0 | 22 | 95% |
 | medio | 1209 | 1198 | 0 | 11 | 99% |
 | dificil | 3085 | 3055 | 8 | 22 | 99% |
-| profissional | 2062 | 2055 | 3 | 4 | 100% |
+| profissional | 2064 | 2057 | 3 | 4 | 100% |
 
 ## Cada funcionário
 
@@ -92,7 +92,7 @@
 | Leandro | Engenheiro de Machine Learning Sênior | trabalho do papel | Perfil e indicadores da base sintética — nível dificil (✅ concluída) | 5 |
 | Lucas | Cientista de Dados Júnior | trabalho do papel | Exercício de SQL no PostgreSQL com os dados da fábrica — nív (✅ concluída) | 5 |
 | Manu | Estagiária de Análise de Dados | estagiário: observa (regra do dono) |   | 0 |
-| Marcos | Coordenador de Análise e Ciência de Dado | trabalho FORA do papel | Projeto Segmentação — TREINO_folha_20261104_050436_76885 (✅ concluída) | 118 |
+| Marcos | Coordenador de Análise e Ciência de Dado | trabalho FORA do papel | Projeto Segmentação — TREINO_estoque_20261104_051643_03461 (✅ concluída) | 120 |
 | Natália | Head de Ciência de Dados | trabalho do papel | Perfil e indicadores da base sintética — nível profissional (✅ concluída) | 5 |
 | Patrícia | Gerente de Analytics e Customer Insights | trabalho do papel | Calcular a média de uma métrica da base sintética — nível pr (✅ concluída) | 5 |
 | Rebeca | Líder de Engenharia de IA e Machine Lear | trabalho do papel | Calcular a média de uma métrica da base sintética — nível pr (✅ concluída) | 5 |
@@ -194,17 +194,16 @@
 
 ## Projetos entre andares (várias pessoas, uma etapa depende da outra)
 
+- Projeto Segmentação — TREINO_estoque_20261104_051643_03461: **✅ concluída** — 1. head_engenharia (concluida); 2. analise_estatistica (concluida); 3. ana_pleno_base (concluida); 4. analise_monitoramento (concluida); 5. sec_senior (concluida); 6. analise_relator (concluida)
+- Projeto NPS — TREINO_nps_20261104_051636_96812: **✅ concluída** — 1. ger_engenharia (concluida); 2. analise_perfil (concluida); 3. head_ciencia (concluida); 4. gov_pleno_lgpd (concluida); 5. canal_nina (concluida)
 - Projeto Segmentação — TREINO_folha_20261104_050436_76885: **✅ concluída** — 1. eng_pleno_tipos (concluida); 2. analise_monitoramento (concluida); 3. ana_junior_faixas (concluida); 4. cd_junior_anomalias (concluida); 5. sec_senior (concluida); 6. canal_iara (concluida)
-- Projeto NPS — TREINO_nps_20261104_043418_58678: **✅ concluída** — 1. eng_pleno_releitura (concluida); 2. analise_indicadores (concluida); 3. cd_senior_drivers (concluida); 4. gov_pleno_lgpd (concluida); 5. analise_relator (concluida)
-- Projeto Segmentação — TREINO_folha_20261104_050436_76885: **✅ concluída** — 1. eng_junior_espacos (concluida); 2. analise_estatistica (concluida); 3. cd_pleno_segmentos (concluida); 4. cd_junior_anomalias (concluida); 5. sec_senior (concluida); 6. canal_nina (concluida)
 
-## Última entrega da empresa (TREINO_folha_20261104_050436_76885.xlsx, 04/11 02:11)
+## Última entrega da empresa (TREINO_estoque_20261104_051643_03461.xlsx, 04/11 02:17)
 
 Pacote gerado pelo produto (`python -m robo entregar`) a partir de um projeto aprovado:
 
-1. Conferir 104 valor(es) fora do padrão em **salario_base** (3,0% da base): podem ser erro de digitação ou casos reais que merecem olhar.
-2. Conferir 25 valor(es) fora do padrão em **horas_extras** (0,7% da base): podem ser erro de digitação ou casos reais que merecem olhar.
-3. Entender a diferença em **cargo = Gerente**: Média de salario_base 16.922,34 contra 5.526,85 no restante (diferença real, n=262).
+1. Conferir 34 valor(es) fora do padrão em **estoque_un** (0,8% da base): podem ser erro de digitação ou casos reais que merecem olhar.
+2. Entender a diferença em **em_ruptura = Não**: Média de estoque_un 108,83 contra 0,00 no restante (diferença real, n=4397).
 
 ## Inteligência própria (modelo de risco das demandas)
 
@@ -339,18 +338,19 @@ Pacote gerado pelo produto (`python -m robo entregar`) a partir de um projeto ap
 - risco_demanda-v129: **reprovado** (treinado por ml_engenheiro)
 - risco_demanda-v130: **reprovado** (treinado por ml_engenheiro)
 - risco_demanda-v131: **reprovado** (treinado por ml_engenheiro)
-- risco_demanda-v132: **referencia** (treinado por ml_engenheiro)
+- risco_demanda-v132: **substituido** (treinado por ml_engenheiro)
 - risco_demanda-v133: **substituido** (treinado por ml_engenheiro)
 - risco_demanda-v134: **reprovado** (treinado por ml_engenheiro)
 - risco_demanda-v135: **reprovado** (treinado por ml_engenheiro)
 - risco_demanda-v136: **reprovado** (treinado por ml_engenheiro)
-- Última avaliação independente (ml_avaliador): risco_demanda-v136 reprovado — log loss 0.019 contra baseline 0.019; motivos: não bate a referência atual risco_demanda-v132 (log loss 0.0185 ≥ 0.0185)
-- Referência em sombra: risco_demanda-v132; 6737 previsões em sombra
+- risco_demanda-v137: **referencia** (treinado por ml_engenheiro)
+- Última avaliação independente (ml_avaliador): risco_demanda-v137 aprovado — log loss 0.016 contra baseline 0.018
+- Referência em sombra: risco_demanda-v137; 6824 previsões em sombra
 - Uso operacional: desligado: o modelo só roda em sombra até o dono decidir usá-lo em alguma escolha da empresa
 
 ## Banco de dados
 
-Levantamento das 04/11 02:13: **82 de 101** tabelas com dados (900.417 linhas contadas uma a uma).
+Levantamento das 04/11 02:04: **82 de 101** tabelas com dados (899.443 linhas contadas uma a uma).
 
 
 | Onde | Tabelas | Com dados |
