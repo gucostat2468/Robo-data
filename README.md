@@ -1,15 +1,15 @@
 # Empresa ao vivo
 
-**Boletim das 04/11 02:45** (horário de Brasília) · trabalhando · SEM BANCO (memória guardada no arquivo do GitHub; o banco é alcançado quando voltar)
+**Boletim das 04/11 02:51** (horário de Brasília) · trabalhando · SEM BANCO (memória guardada no arquivo do GitHub; o banco é alcançado quando voltar)
 
 > Atualiza a cada 5 minutos enquanto a empresa trabalha. Recarregue a página para ver o mais novo.
 
 ## Hoje
 
-- **756** demandas, **754** concluídas (100%), 2 parciais, 0 com falha
+- **758** demandas, **756** concluídas (100%), 2 parciais, 0 com falha
 - **105** de 105 funcionários já trabalharam
 - SQL: 68 exercícios, 68 conferidos com o gabarito
-- Fábrica: 33 planilhas, 33 conferidas sem erro
+- Fábrica: 34 planilhas, 34 conferidas sem erro
 
 ## Trabalhando agora
 
@@ -20,7 +20,7 @@
 | Andar | Trabalharam | Demandas | Concluídas | Parciais | Falhas |
 |---|--:|--:|--:|--:|--:|
 | 1º | 19 de 19 | 94 | 93 | 1 | 0 |
-| 2º | 18 de 18 | 214 | 214 | 0 | 0 |
+| 2º | 18 de 18 | 216 | 216 | 0 | 0 |
 | 3º | 12 de 12 | 63 | 63 | 0 | 0 |
 | 4º | 32 de 32 | 112 | 111 | 1 | 0 |
 | 5º | 24 de 24 | 273 | 273 | 0 | 0 |
@@ -29,6 +29,8 @@
 
 | Hora | Quem | Trabalho | Resultado |
 |---|---|---|---|
+| 02:48 | Marcos (2º) | Projeto Segmentação — TREINO_financeiro_20261104_054658_18503 | ✅ concluída |
+| 02:47 | Marcos (2º) | Projeto NPS — TREINO_nps_20261104_051636_96812 | ✅ concluída |
 | 02:42 | Marcos (2º) | Projeto Segmentação — TREINO_logistica_20261104_053146_06014 | ✅ concluída |
 | 02:42 | Marcos (2º) | Projeto NPS — TREINO_nps_20261104_051636_96812 | ✅ concluída |
 | 02:37 | Marcos (2º) | Projeto Segmentação — TREINO_logistica_20261104_053146_06014 | ✅ concluída |
@@ -37,8 +39,6 @@
 | 02:37 | Ícaro (5º) | Testar se o último backup volta — nível dificil | ✅ concluída |
 | 02:37 | Marina (5º) | Procurar segredos no repositório público — nível dificil | ✅ concluída |
 | 02:33 | Marcos (2º) | Projeto Segmentação — TREINO_logistica_20261104_053146_06014 | ✅ concluída |
-| 02:32 | Marcos (2º) | Projeto NPS — TREINO_nps_20261104_051636_96812 | ✅ concluída |
-| 02:32 | Wagner (5º) | Testar se o último backup volta — nível dificil | ✅ concluída |
 
 ## Dificuldade (todo o histórico)
 
@@ -47,7 +47,7 @@
 | basico | 408 | 386 | 0 | 22 | 95% |
 | medio | 1215 | 1204 | 0 | 11 | 99% |
 | dificil | 3117 | 3087 | 8 | 22 | 99% |
-| profissional | 2082 | 2075 | 3 | 4 | 100% |
+| profissional | 2084 | 2077 | 3 | 4 | 100% |
 
 ## Cada funcionário
 
@@ -92,7 +92,7 @@
 | Leandro | Engenheiro de Machine Learning Sênior | trabalho do papel | Perfil e indicadores da base sintética — nível dificil (✅ concluída) | 5 |
 | Lucas | Cientista de Dados Júnior | trabalho do papel | Exercício de SQL no PostgreSQL com os dados da fábrica — nív (✅ concluída) | 5 |
 | Manu | Estagiária de Análise de Dados | estagiário: observa (regra do dono) |   | 0 |
-| Marcos | Coordenador de Análise e Ciência de Dado | trabalho FORA do papel | Projeto Segmentação — TREINO_logistica_20261104_053146_06014 (✅ concluída) | 130 |
+| Marcos | Coordenador de Análise e Ciência de Dado | trabalho FORA do papel | Projeto Segmentação — TREINO_financeiro_20261104_054658_1850 (✅ concluída) | 132 |
 | Natália | Head de Ciência de Dados | trabalho do papel | Perfil e indicadores da base sintética — nível profissional (✅ concluída) | 5 |
 | Patrícia | Gerente de Analytics e Customer Insights | trabalho do papel | Calcular a média de uma métrica da base sintética — nível pr (✅ concluída) | 5 |
 | Rebeca | Líder de Engenharia de IA e Machine Lear | trabalho do papel | Calcular a média de uma métrica da base sintética — nível pr (✅ concluída) | 5 |
@@ -194,17 +194,16 @@
 
 ## Projetos entre andares (várias pessoas, uma etapa depende da outra)
 
+- Projeto Segmentação — TREINO_financeiro_20261104_054658_18503: **✅ concluída** — 1. dir_dados (concluida); 2. analise_perfil (concluida); 3. ana_pleno_base (concluida); 4. cd_junior_anomalias (concluida); 5. sec_senior (concluida); 6. analise_relator (concluida)
+- Projeto NPS — TREINO_nps_20261104_051636_96812: **✅ concluída** — 1. dba (concluida); 2. analise_indicadores (concluida); 3. head_ciencia (concluida); 4. gov_pleno_lgpd (concluida); 5. canal_nina (concluida)
 - Projeto Segmentação — TREINO_logistica_20261104_053146_06014: **✅ concluída** — 1. coord_engenharia (concluida); 2. analise_estatistica (concluida); 3. ana_junior_faixas (concluida); 4. analise_monitoramento (concluida); 5. sec_senior (concluida); 6. canal_iara (concluida)
-- Projeto NPS — TREINO_nps_20261104_051636_96812: **✅ concluída** — 1. banco (concluida); 2. analise_perfil (concluida); 3. cd_senior_drivers (concluida); 4. gov_pleno_lgpd (concluida); 5. analise_relator (concluida)
-- Projeto Segmentação — TREINO_logistica_20261104_053146_06014: **✅ concluída** — 1. validacao (concluida); 2. analise_monitoramento (concluida); 3. cd_pleno_segmentos (concluida); 4. cd_junior_anomalias (concluida); 5. sec_senior (concluida); 6. canal_nina (concluida)
 
-## Última entrega da empresa (TREINO_logistica_20261104_053146_06014.xlsx, 04/11 02:42)
+## Última entrega da empresa (TREINO_financeiro_20261104_054658_18503.xlsx, 04/11 02:48)
 
 Pacote gerado pelo produto (`python -m robo entregar`) a partir de um projeto aprovado:
 
-1. Entender a diferença em **transportadora = Econômica**: Média de atraso_dias 2,56 contra 1,15 no restante (diferença real, n=582).
-2. Abrir conversa de SLA com **Econômica** (transportadora): 0,2% no prazo, abaixo do restante de forma significativa (n=582).
-3. Abrir conversa de SLA com **SP** (regiao): 0,4% no prazo, abaixo do restante de forma significativa (n=227).
+1. Queda no último mês (2026-10): soma de valor_do_titulo 33,7% abaixo da média dos 3 meses anteriores. Confirme se o mês está completo antes de concluir.
+2. Conferir 68 valor(es) fora do padrão em **valor_do_titulo** (3,7% da base): podem ser erro de digitação ou casos reais que merecem olhar.
 
 ## Inteligência própria (modelo de risco das demandas)
 
@@ -351,7 +350,7 @@ Pacote gerado pelo produto (`python -m robo entregar`) a partir de um projeto ap
 
 ## Banco de dados
 
-Levantamento das 04/11 02:04: **82 de 101** tabelas com dados (899.443 linhas contadas uma a uma).
+Levantamento das 04/11 02:47: **82 de 101** tabelas com dados (902.479 linhas contadas uma a uma).
 
 
 | Onde | Tabelas | Com dados |
