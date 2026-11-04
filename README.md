@@ -1,6 +1,6 @@
 # Empresa ao vivo
 
-**Boletim das 04/11 19:11** (horário de Brasília) · entre turnos: memória salva; o próximo turno começa em poucos minutos · SEM BANCO (memória guardada no arquivo do GitHub; o banco é alcançado quando voltar)
+**Boletim das 04/11 19:14** (horário de Brasília) · trabalhando · SEM BANCO (memória guardada no arquivo do GitHub; o banco é alcançado quando voltar)
 
 > Atualiza a cada 5 minutos enquanto a empresa trabalha. Recarregue a página para ver o mais novo.
 
@@ -9,7 +9,7 @@
 - **2927** demandas, **2917** concluídas (100%), 7 parciais, 3 com falha
 - **105** de 105 funcionários já trabalharam
 - SQL: 266 exercícios, 266 conferidos com o gabarito
-- Fábrica: 110 planilhas, 110 conferidas sem erro
+- Fábrica: 112 planilhas, 110 conferidas sem erro
 
 ## Trabalhando agora
 
@@ -368,13 +368,14 @@ Pacote gerado pelo produto (`python -m robo entregar`) a partir de um projeto ap
 - risco_demanda-v160: **reprovado** (treinado por ml_engenheiro)
 - risco_demanda-v161: **reprovado** (treinado por ml_engenheiro)
 - risco_demanda-v162: **reprovado** (treinado por ml_engenheiro)
-- Última avaliação independente (ml_avaliador): risco_demanda-v162 reprovado — log loss 0.035 contra baseline 0.028; motivos: não bate o baseline (log loss 0.0345 ≥ 0.0276)
-- Referência em sombra: risco_demanda-v144; 8928 previsões em sombra
+- risco_demanda-v163: **reprovado** (treinado por ml_engenheiro)
+- Última avaliação independente (ml_avaliador): risco_demanda-v163 reprovado — log loss 0.034 contra baseline 0.027; motivos: não bate o baseline (log loss 0.0341 ≥ 0.0268)
+- Referência em sombra: risco_demanda-v144; 9034 previsões em sombra
 - Uso operacional: desligado: o modelo só roda em sombra até o dono decidir usá-lo em alguma escolha da empresa
 
 ## Banco de dados
 
-Levantamento das 04/11 19:10: **78 de 97** tabelas com dados (1.037.486 linhas contadas uma a uma).
+Levantamento das 04/11 19:04: **78 de 97** tabelas com dados (1.036.360 linhas contadas uma a uma).
 
 
 | Onde | Tabelas | Com dados |
