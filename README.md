@@ -1,15 +1,15 @@
 # Empresa ao vivo
 
-**Boletim das 04/11 00:06** (horário de Brasília) · entre turnos: memória salva; o próximo turno começa em poucos minutos · SEM BANCO (memória guardada no arquivo do GitHub; o banco é alcançado quando voltar)
+**Boletim das 04/11 00:10** (horário de Brasília) · trabalhando · SEM BANCO (memória guardada no arquivo do GitHub; o banco é alcançado quando voltar)
 
 > Atualiza a cada 5 minutos enquanto a empresa trabalha. Recarregue a página para ver o mais novo.
 
 ## Hoje
 
-- **416** demandas, **414** concluídas (100%), 2 parciais, 0 com falha
+- **418** demandas, **416** concluídas (100%), 2 parciais, 0 com falha
 - **105** de 105 funcionários já trabalharam
 - SQL: 40 exercícios, 40 conferidos com o gabarito
-- Fábrica: 18 planilhas, 18 conferidas sem erro
+- Fábrica: 20 planilhas, 18 conferidas sem erro
 
 ## Trabalhando agora
 
@@ -20,7 +20,7 @@
 | Andar | Trabalharam | Demandas | Concluídas | Parciais | Falhas |
 |---|--:|--:|--:|--:|--:|
 | 1º | 19 de 19 | 54 | 53 | 1 | 0 |
-| 2º | 18 de 18 | 118 | 118 | 0 | 0 |
+| 2º | 18 de 18 | 120 | 120 | 0 | 0 |
 | 3º | 12 de 12 | 33 | 33 | 0 | 0 |
 | 4º | 32 de 32 | 63 | 62 | 1 | 0 |
 | 5º | 24 de 24 | 148 | 148 | 0 | 0 |
@@ -29,6 +29,8 @@
 
 | Hora | Quem | Trabalho | Resultado |
 |---|---|---|---|
+| 00:10 | Marcos (2º) | Projeto Segmentação — TREINO_leads_20261104_030957_97821 | ✅ concluída |
+| 00:10 | Marcos (2º) | Projeto NPS — TREINO_nps_20261104_030951_91089 | ✅ concluída |
 | 00:03 | Marcos (2º) | Projeto Segmentação — TREINO_logistica_20261104_025759_79353 | ✅ concluída |
 | 00:03 | Marcos (2º) | Projeto NPS — TREINO_nps_20261104_022736_56826 | ✅ concluída |
 | 23:58 | Marcos (2º) | Projeto Segmentação — TREINO_logistica_20261104_025759_79353 | ✅ concluída |
@@ -37,8 +39,6 @@
 | 23:58 | Ícaro (5º) | Medir a saúde do PostgreSQL — nível dificil | ✅ concluída |
 | 23:58 | Marina (5º) | SLA das rotinas — nível dificil | ✅ concluída |
 | 23:53 | Marcos (2º) | Projeto Segmentação — TREINO_estoque_20261104_024249_69419 | ✅ concluída |
-| 23:53 | Marcos (2º) | Projeto NPS — TREINO_nps_20261104_022736_56826 | ✅ concluída |
-| 23:53 | Wagner (5º) | Ronda de saúde do sistema — nível dificil | ✅ concluída |
 
 ## Dificuldade (todo o histórico)
 
@@ -47,7 +47,7 @@
 | basico | 398 | 376 | 0 | 22 | 94% |
 | medio | 1165 | 1154 | 0 | 11 | 99% |
 | dificil | 2959 | 2929 | 8 | 22 | 99% |
-| profissional | 1960 | 1953 | 3 | 4 | 100% |
+| profissional | 1962 | 1955 | 3 | 4 | 100% |
 
 ## Cada funcionário
 
@@ -92,7 +92,7 @@
 | Leandro | Engenheiro de Machine Learning Sênior | trabalho do papel | Anomalias na base sintética — nível dificil (✅ concluída) | 3 |
 | Lucas | Cientista de Dados Júnior | trabalho do papel | Perfil e indicadores da base sintética — nível medio (✅ concluída) | 3 |
 | Manu | Estagiária de Análise de Dados | estagiário: observa (regra do dono) |   | 0 |
-| Marcos | Coordenador de Análise e Ciência de Dado | trabalho FORA do papel | Projeto Segmentação — TREINO_logistica_20261104_025759_79353 (✅ concluída) | 70 |
+| Marcos | Coordenador de Análise e Ciência de Dado | trabalho FORA do papel | Projeto Segmentação — TREINO_leads_20261104_030957_97821 (✅ concluída) | 72 |
 | Natália | Head de Ciência de Dados | trabalho do papel | Drivers do indicador na base sintética — nível profissional (✅ concluída) | 3 |
 | Patrícia | Gerente de Analytics e Customer Insights | trabalho do papel | Perfil e indicadores da base sintética — nível profissional (✅ concluída) | 3 |
 | Rebeca | Líder de Engenharia de IA e Machine Lear | trabalho do papel | Exercício de SQL no PostgreSQL com os dados da fábrica — nív (✅ concluída) | 3 |
@@ -194,16 +194,15 @@
 
 ## Projetos entre andares (várias pessoas, uma etapa depende da outra)
 
+- Projeto Segmentação — TREINO_leads_20261104_030957_97821: **✅ concluída** — 1. supervisor (concluida); 2. analise_perfil (concluida); 3. ana_pleno_base (concluida); 4. cd_junior_anomalias (concluida); 5. sec_senior (concluida); 6. analise_relator (concluida)
+- Projeto NPS — TREINO_nps_20261104_030951_91089: **✅ concluída** — 1. recepcao (concluida); 2. analise_indicadores (concluida); 3. head_ciencia (concluida); 4. gov_pleno_lgpd (concluida); 5. canal_nina (concluida)
 - Projeto Segmentação — TREINO_logistica_20261104_025759_79353: **✅ concluída** — 1. publicacao (concluida); 2. analise_estatistica (concluida); 3. ana_junior_faixas (concluida); 4. analise_monitoramento (concluida); 5. sec_senior (concluida); 6. canal_iara (concluida)
-- Projeto NPS — TREINO_nps_20261104_022736_56826: **✅ concluída** — 1. modelagem (concluida); 2. analise_perfil (concluida); 3. cd_senior_drivers (concluida); 4. gov_pleno_lgpd (concluida); 5. analise_relator (concluida)
-- Projeto Segmentação — TREINO_logistica_20261104_025759_79353: **✅ concluída** — 1. limpeza (concluida); 2. analise_monitoramento (concluida); 3. cd_pleno_segmentos (concluida); 4. cd_junior_anomalias (concluida); 5. sec_senior (concluida); 6. canal_nina (concluida)
 
-## Última entrega da empresa (TREINO_logistica_20261104_025759_79353.xlsx, 04/11 00:03)
+## Última entrega da empresa (TREINO_leads_20261104_030957_97821.xlsx, 04/11 00:10)
 
 Pacote gerado pelo produto (`python -m robo entregar`) a partir de um projeto aprovado:
 
-1. Entender a diferença em **transportadora = Econômica**: Média de atraso_dias 2,59 contra 1,14 no restante (diferença real, n=351).
-2. Abrir conversa de SLA com **Econômica** (transportadora): 0,0% no prazo, abaixo do restante de forma significativa (n=351).
+1. Nenhuma ação se destaca com segurança estatística nesta base. Comunique os indicadores gerais e evite ranking entre grupos.
 
 ## Inteligência própria (modelo de risco das demandas)
 
@@ -338,15 +337,16 @@ Pacote gerado pelo produto (`python -m robo entregar`) a partir de um projeto ap
 - risco_demanda-v129: **reprovado** (treinado por ml_engenheiro)
 - risco_demanda-v130: **reprovado** (treinado por ml_engenheiro)
 - risco_demanda-v131: **reprovado** (treinado por ml_engenheiro)
-- risco_demanda-v132: **aprovado** (treinado por ml_engenheiro)
-- risco_demanda-v133: **referencia** (treinado por ml_engenheiro)
-- Última avaliação independente (ml_avaliador): risco_demanda-v133 aprovado — log loss 0.019 contra baseline 0.020
-- Referência em sombra: risco_demanda-v133; 6265 previsões em sombra
+- risco_demanda-v132: **referencia** (treinado por ml_engenheiro)
+- risco_demanda-v133: **substituido** (treinado por ml_engenheiro)
+- risco_demanda-v134: **reprovado** (treinado por ml_engenheiro)
+- Última avaliação independente (ml_avaliador): risco_demanda-v134 reprovado — log loss 0.019 contra baseline 0.019; motivos: não bate o baseline (log loss 0.0190 ≥ 0.0187); não bate a referência atual risco_demanda-v133 (log loss 0.0190 ≥ 0.0189)
+- Referência em sombra: risco_demanda-v132; 6352 previsões em sombra
 - Uso operacional: desligado: o modelo só roda em sombra até o dono decidir usá-lo em alguma escolha da empresa
 
 ## Banco de dados
 
-Levantamento das 04/11 00:06: **82 de 101** tabelas com dados (869.710 linhas contadas uma a uma).
+Levantamento das 03/11 23:58: **82 de 101** tabelas com dados (868.713 linhas contadas uma a uma).
 
 
 | Onde | Tabelas | Com dados |
