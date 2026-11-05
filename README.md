@@ -1,12 +1,12 @@
 # Empresa ao vivo
 
-**Boletim das 05/11 04:36** (horário de Brasília) · trabalhando · SEM BANCO (memória guardada no arquivo do GitHub; o banco é alcançado quando voltar)
+**Boletim das 05/11 04:42** (horário de Brasília) · trabalhando · SEM BANCO (memória guardada no arquivo do GitHub; o banco é alcançado quando voltar)
 
 > Atualiza a cada 5 minutos enquanto a empresa trabalha. Recarregue a página para ver o mais novo.
 
 ## Hoje
 
-- **1003** demandas, **999** concluídas (100%), 4 parciais, 0 com falha
+- **1005** demandas, **1001** concluídas (100%), 4 parciais, 0 com falha
 - **105** de 105 funcionários já trabalharam
 - SQL: 88 exercícios, 88 conferidos com o gabarito
 - Fábrica: 44 planilhas, 44 conferidas sem erro
@@ -20,7 +20,7 @@
 | Andar | Trabalharam | Demandas | Concluídas | Parciais | Falhas |
 |---|--:|--:|--:|--:|--:|
 | 1º | 19 de 19 | 135 | 134 | 1 | 0 |
-| 2º | 18 de 18 | 285 | 283 | 2 | 0 |
+| 2º | 18 de 18 | 287 | 285 | 2 | 0 |
 | 3º | 12 de 12 | 77 | 76 | 1 | 0 |
 | 4º | 32 de 32 | 156 | 156 | 0 | 0 |
 | 5º | 24 de 24 | 350 | 350 | 0 | 0 |
@@ -29,6 +29,8 @@
 
 | Hora | Quem | Trabalho | Resultado |
 |---|---|---|---|
+| 04:39 | Marcos (2º) | Projeto Segmentação — TREINO_csat_ces_20261105_072846_26387 | ✅ concluída |
+| 04:39 | Marcos (2º) | Projeto NPS — TREINO_csat_ces_20261105_072846_26387 | ✅ concluída |
 | 04:33 | Marcos (2º) | Projeto Segmentação — TREINO_csat_ces_20261105_072846_26387 | ✅ concluída |
 | 04:33 | Marcos (2º) | Projeto NPS — TREINO_csat_ces_20261105_072846_26387 | ✅ concluída |
 | 04:30 | Marcos (2º) | Projeto Segmentação — TREINO_csat_ces_20261105_072846_26387 | ✅ concluída |
@@ -37,8 +39,6 @@
 | 04:30 | Lívia (4º) | Revisar um caso de treino feito por outro designer — nível dificil | ✅ concluída |
 | 04:30 | Lia (1º) | Perfil e indicadores da base sintética — nível dificil | ✅ concluída |
 | 04:30 | Renata (4º) | Situação do andar agora — nível profissional | ✅ concluída |
-| 04:30 | Rafael (1º) | Anomalias na base sintética — nível medio | ✅ concluída |
-| 04:30 | Marta (4º) | Situação das contratações — nível profissional | ✅ concluída |
 
 ## Dificuldade (todo o histórico)
 
@@ -47,7 +47,7 @@
 | basico | 511 | 489 | 0 | 22 | 96% |
 | medio | 1750 | 1736 | 0 | 14 | 99% |
 | dificil | 4645 | 4609 | 14 | 22 | 99% |
-| profissional | 3315 | 3305 | 6 | 4 | 100% |
+| profissional | 3317 | 3307 | 6 | 4 | 100% |
 
 ## Cada funcionário
 
@@ -92,7 +92,7 @@
 | Leandro | Engenheiro de Machine Learning Sênior | trabalho do papel | Treinar o modelo de risco de demanda — nível dificil (✅ concluída) | 7 |
 | Lucas | Cientista de Dados Júnior | trabalho do papel | Conferir no PostgreSQL os lotes da fábrica — nível medio (✅ concluída) | 8 |
 | Manu | Estagiária de Análise de Dados | estagiário: observa (regra do dono) |   | 0 |
-| Marcos | Coordenador de Análise e Ciência de Dado | trabalho FORA do papel | Projeto Segmentação — TREINO_csat_ces_20261105_072846_26387 (✅ concluída) | 166 |
+| Marcos | Coordenador de Análise e Ciência de Dado | trabalho FORA do papel | Projeto Segmentação — TREINO_csat_ces_20261105_072846_26387 (✅ concluída) | 168 |
 | Natália | Head de Ciência de Dados | trabalho do papel | Drivers do indicador na base sintética — nível profissional (✅ concluída) | 7 |
 | Patrícia | Gerente de Analytics e Customer Insights | trabalho do papel | Perfil e indicadores da base sintética — nível profissional (✅ concluída) | 8 |
 | Rebeca | Líder de Engenharia de IA e Machine Lear | trabalho do papel | Programa de modelos: backlog e critérios — nível profissiona (✅ concluída) | 8 |
@@ -194,11 +194,11 @@
 
 ## Projetos entre andares (várias pessoas, uma etapa depende da outra)
 
+- Projeto Segmentação — TREINO_csat_ces_20261105_072846_26387: **✅ concluída** — 1. validacao (concluida); 2. analise_indicadores (concluida); 3. cd_pleno_segmentos (concluida); 4. analise_monitoramento (concluida); 5. sec_senior (concluida); 6. canal_nina (concluida)
+- Projeto NPS — TREINO_csat_ces_20261105_072846_26387: **✅ concluída** — 1. tina_contatos (concluida); 2. analise_estatistica (concluida); 3. head_ciencia (concluida); 4. gov_pleno_lgpd (concluida); 5. canal_iara (concluida)
 - Projeto Segmentação — TREINO_csat_ces_20261105_072846_26387: **✅ concluída** — 1. supervisor (concluida); 2. analise_perfil (concluida); 3. ana_pleno_base (concluida); 4. cd_junior_anomalias (concluida); 5. sec_senior (concluida); 6. analise_relator (concluida)
-- Projeto NPS — TREINO_csat_ces_20261105_072846_26387: **✅ concluída** — 1. recepcao (concluida); 2. analise_indicadores (concluida); 3. cd_senior_drivers (concluida); 4. gov_pleno_lgpd (concluida); 5. canal_nina (concluida)
-- Projeto Segmentação — TREINO_csat_ces_20261105_072846_26387: **✅ concluída** — 1. publicacao (concluida); 2. analise_estatistica (concluida); 3. ana_junior_faixas (concluida); 4. analise_monitoramento (concluida); 5. sec_senior (concluida); 6. canal_iara (concluida)
 
-## Última entrega da empresa (TREINO_csat_ces_20261105_072846_26387.xlsx, 05/11 04:33)
+## Última entrega da empresa (TREINO_csat_ces_20261105_072846_26387.xlsx, 05/11 04:39)
 
 Pacote gerado pelo produto (`python -m robo entregar`) a partir de um projeto aprovado:
 
