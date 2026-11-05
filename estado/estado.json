@@ -1,11 +1,11 @@
 {
  "versao": 1,
- "gerado_em": "2026-11-05T05:14:18",
+ "gerado_em": "2026-11-05T05:15:50",
  "turno": {
-  "estado": "trabalhando · SEM BANCO (memória guardada no arquivo do GitHub; o banco é alcançado quando voltar)",
+  "estado": "entre turnos: memória salva; o próximo turno começa em poucos minutos · SEM BANCO (memória guardada no arquivo do GitHub; o banco é alcançado quando voltar)",
   "inicio": "2026-11-05T04:37:58",
   "fim_previsto": "2026-11-05T05:17:58",
-  "voltas": 103,
+  "voltas": 105,
   "planilhas": 4
  },
  "funcionarios": 105,
@@ -25,8 +25,8 @@
    "andar": 2,
    "pessoas": 18,
    "trabalharam_hoje": 18,
-   "demandas": 191,
-   "concluidas": 189,
+   "demandas": 193,
+   "concluidas": 191,
    "parciais": 2,
    "falhas": 0,
    "treino": 172,
@@ -58,8 +58,8 @@
    "andar": 5,
    "pessoas": 24,
    "trabalharam_hoje": 24,
-   "demandas": 247,
-   "concluidas": 247,
+   "demandas": 250,
+   "concluidas": 250,
    "parciais": 0,
    "falhas": 0,
    "treino": 223,
@@ -68,6 +68,46 @@
  ],
  "agora": [],
  "ultimos": [
+  {
+   "quando": "2026-11-05T05:15:09",
+   "funcionario": "Marcos",
+   "cargo": "Coordenador de Análise e Ciência de Dados",
+   "andar": 2,
+   "trabalho": "Projeto Segmentação — TREINO_churn_20261105_050932_72842",
+   "estado": "concluida"
+  },
+  {
+   "quando": "2026-11-05T05:15:01",
+   "funcionario": "Marcos",
+   "cargo": "Coordenador de Análise e Ciência de Dados",
+   "andar": 2,
+   "trabalho": "Projeto NPS — TREINO_csat_ces_20261105_045257_77381",
+   "estado": "concluida"
+  },
+  {
+   "quando": "2026-11-05T05:14:57",
+   "funcionario": "Heloísa",
+   "cargo": "Head de AWS, Arquitetura e Governança de Nuvem",
+   "andar": 5,
+   "trabalho": "Medir a saúde do PostgreSQL — nível profissional",
+   "estado": "concluida"
+  },
+  {
+   "quando": "2026-11-05T05:14:56",
+   "funcionario": "Ícaro",
+   "cargo": "Sênior de AWS, Linux e Ubuntu",
+   "andar": 5,
+   "trabalho": "SLA das rotinas — nível dificil",
+   "estado": "concluida"
+  },
+  {
+   "quando": "2026-11-05T05:14:56",
+   "funcionario": "Marina",
+   "cargo": "Arquiteta de Cloud (AWS)",
+   "andar": 5,
+   "trabalho": "SLA das rotinas — nível dificil",
+   "estado": "concluida"
+  },
   {
    "quando": "2026-11-05T05:09:47",
    "funcionario": "Marcos",
@@ -107,46 +147,6 @@
    "andar": 5,
    "trabalho": "Procurar segredos no repositório público — nível dificil",
    "estado": "concluida"
-  },
-  {
-   "quando": "2026-11-05T05:03:22",
-   "funcionario": "Wagner",
-   "cargo": "Especialista Sênior em Segurança da Informação",
-   "andar": 5,
-   "trabalho": "SLA das rotinas — nível dificil",
-   "estado": "concluida"
-  },
-  {
-   "quando": "2026-11-05T05:03:21",
-   "funcionario": "Sofia",
-   "cargo": "Especialista em pandas",
-   "andar": 5,
-   "trabalho": "Calcular a média de uma métrica da base sintética — nível dificil",
-   "estado": "concluida"
-  },
-  {
-   "quando": "2026-11-05T05:03:21",
-   "funcionario": "Rodrigo",
-   "cargo": "Analista de Infraestrutura Pleno",
-   "andar": 5,
-   "trabalho": "SLA das rotinas — nível medio",
-   "estado": "concluida"
-  },
-  {
-   "quando": "2026-11-05T05:03:19",
-   "funcionario": "Nicolas",
-   "cargo": "Especialista em numpy",
-   "andar": 5,
-   "trabalho": "Exercício de SQL no PostgreSQL com os dados da fábrica — nível dificil",
-   "estado": "concluida"
-  },
-  {
-   "quando": "2026-11-05T05:03:19",
-   "funcionario": "Olívia",
-   "cargo": "Especialista em openpyxl (Excel)",
-   "andar": 5,
-   "trabalho": "Exercício de SQL no PostgreSQL com os dados da fábrica — nível dificil",
-   "estado": "concluida"
   }
  ],
  "sql": {
@@ -166,9 +166,9 @@
   },
   {
    "rotina": "demandas",
-   "execucoes_24h": 267,
+   "execucoes_24h": 268,
    "erros_24h": 0,
-   "ultima": "2026-11-05T05:09:51"
+   "ultima": "2026-11-05T05:15:12"
   },
   {
    "rotina": "dialogo",
@@ -196,7 +196,7 @@
   },
   {
    "rotina": "jornada",
-   "execucoes_24h": 34,
+   "execucoes_24h": 33,
    "erros_24h": 0,
    "ultima": "2026-11-05T04:36:05"
   },
@@ -208,7 +208,7 @@
   },
   {
    "rotina": "licoes",
-   "execucoes_24h": 17,
+   "execucoes_24h": 16,
    "erros_24h": 0,
    "ultima": "2026-11-05T04:36:04"
   },
@@ -226,9 +226,9 @@
   },
   {
    "rotina": "registro",
-   "execucoes_24h": 641,
+   "execucoes_24h": 643,
    "erros_24h": 0,
-   "ultima": "2026-11-05T05:10:25"
+   "ultima": "2026-11-05T05:15:34"
   },
   {
    "rotina": "rh_desempenho",
@@ -240,7 +240,7 @@
    "rotina": "ronda_ti",
    "execucoes_24h": 101,
    "erros_24h": 0,
-   "ultima": "2026-11-05T05:05:50"
+   "ultima": "2026-11-05T05:15:32"
   },
   {
    "rotina": "treino",
@@ -250,18 +250,18 @@
   }
  ],
  "totais": {
-  "demandas": 9994,
+  "demandas": 9999,
   "tentativas_treino": 34933,
   "conversas": 8521,
-  "trabalhos_com_prova": 31948
+  "trabalhos_com_prova": 31958
  },
  "banco": {
-  "levantamento": "2026-11-05T05:09:52",
+  "levantamento": "2026-11-05T05:15:34",
   "postgres_conferido": true,
   "erro_postgres": null,
   "tabelas": 99,
   "com_dados": 80,
-  "linhas": 1113084,
+  "linhas": 1113676,
   "resumo": {
    "sqlite": {
     "tabelas": 81,
@@ -623,7 +623,7 @@
    "ultimo": "",
    "quando": "",
    "estado": "",
-   "situacao": "estagiário: observa (regra do dono)"
+   "situacao": "estagiário: observa (regra do dono) — Observei Ícaro (Sênior de AWS, Linux e Ubuntu) fazendo \"SLA das rotinas\" no nível dificil: terminou concluida."
   },
   {
    "nome": "Tina",
@@ -762,9 +762,9 @@
    "andar": 2,
    "cargo": "Coordenador de Análise e Ciência de Dados",
    "area": "Análise de Dados",
-   "demandas_hoje": 116,
+   "demandas_hoje": 118,
    "ultimo": "Projeto Segmentação — TREINO_churn_20261105_050932_72842",
-   "quando": "2026-11-05T05:09:42",
+   "quando": "2026-11-05T05:15:03",
    "estado": "concluida",
    "situacao": "trabalho FORA do papel"
   },
@@ -854,7 +854,7 @@
    "ultimo": "",
    "quando": "",
    "estado": "",
-   "situacao": "estagiário: observa (regra do dono)"
+   "situacao": "estagiário: observa (regra do dono) — Observei Ícaro (Sênior de AWS, Linux e Ubuntu) fazendo \"SLA das rotinas\" no nível dificil: terminou concluida."
   },
   {
    "nome": "Felipe",
@@ -1371,7 +1371,7 @@
    "ultimo": "",
    "quando": "",
    "estado": "",
-   "situacao": "estagiário: observa (regra do dono)"
+   "situacao": "estagiário: observa (regra do dono) — Observei Ícaro (Sênior de AWS, Linux e Ubuntu) fazendo \"SLA das rotinas\" no nível dificil: terminou concluida."
   },
   {
    "nome": "Diego",
@@ -1415,7 +1415,7 @@
    "ultimo": "",
    "quando": "",
    "estado": "",
-   "situacao": "estagiário: observa (regra do dono)"
+   "situacao": "estagiário: observa (regra do dono) — Observei Ícaro (Sênior de AWS, Linux e Ubuntu) fazendo \"SLA das rotinas\" no nível dificil: terminou concluida."
   },
   {
    "nome": "Gustavo",
@@ -1433,9 +1433,9 @@
    "andar": 5,
    "cargo": "Head de AWS, Arquitetura e Governança de Nuvem",
    "area": "Engenharia de Dados",
-   "demandas_hoje": 19,
-   "ultimo": "SLA das rotinas — nível profissional",
-   "quando": "2026-11-05T04:58:09",
+   "demandas_hoje": 20,
+   "ultimo": "Medir a saúde do PostgreSQL — nível profissional",
+   "quando": "2026-11-05T05:14:56",
    "estado": "concluida",
    "situacao": "trabalho do papel"
   },
@@ -1477,9 +1477,9 @@
    "andar": 5,
    "cargo": "Arquiteta de Cloud (AWS)",
    "area": "Engenharia de Dados",
-   "demandas_hoje": 19,
-   "ultimo": "Ronda de saúde do sistema — nível dificil",
-   "quando": "2026-11-05T04:58:05",
+   "demandas_hoje": 20,
+   "ultimo": "SLA das rotinas — nível dificil",
+   "quando": "2026-11-05T05:14:56",
    "estado": "concluida",
    "situacao": "trabalho do papel"
   },
@@ -1576,14 +1576,96 @@
    "andar": 5,
    "cargo": "Sênior de AWS, Linux e Ubuntu",
    "area": "Engenharia de Dados",
-   "demandas_hoje": 19,
-   "ultimo": "Ronda de saúde do sistema — nível dificil",
-   "quando": "2026-11-05T04:58:01",
+   "demandas_hoje": 20,
+   "ultimo": "SLA das rotinas — nível dificil",
+   "quando": "2026-11-05T05:14:56",
    "estado": "concluida",
    "situacao": "trabalho do papel"
   }
  ],
  "projetos": [
+  {
+   "id": "TAR-20261105-1ab679",
+   "titulo": "Projeto Segmentação — TREINO_churn_20261105_050932_72842",
+   "estado": "concluida",
+   "criada_em": "2026-11-05T05:15:03",
+   "etapas": [
+    {
+     "ordem": 1,
+     "titulo": "Diagnóstico da planilha original (o que barraria a produção)",
+     "funcionario": "dir_dados",
+     "estado": "concluida"
+    },
+    {
+     "ordem": 2,
+     "titulo": "Perfil da base (colunas, indicadores e margem de erro)",
+     "funcionario": "analise_indicadores",
+     "estado": "concluida"
+    },
+    {
+     "ordem": 3,
+     "titulo": "Segmentação de clientes (k-means com silhueta)",
+     "funcionario": "ana_pleno_base",
+     "estado": "concluida"
+    },
+    {
+     "ordem": 4,
+     "titulo": "Anomalias (valores fora do padrão, com a linha)",
+     "funcionario": "analise_monitoramento",
+     "estado": "concluida"
+    },
+    {
+     "ordem": 5,
+     "titulo": "Dados pessoais na base (LGPD)",
+     "funcionario": "sec_senior",
+     "estado": "concluida"
+    },
+    {
+     "ordem": 6,
+     "titulo": "Resumo executivo do projeto (.md)",
+     "funcionario": "analise_relator",
+     "estado": "concluida"
+    }
+   ]
+  },
+  {
+   "id": "TAR-20261105-445c7d",
+   "titulo": "Projeto NPS — TREINO_csat_ces_20261105_045257_77381",
+   "estado": "concluida",
+   "criada_em": "2026-11-05T05:14:58",
+   "etapas": [
+    {
+     "ordem": 1,
+     "titulo": "Diagnóstico da planilha original (o que barraria a produção)",
+     "funcionario": "dba",
+     "estado": "concluida"
+    },
+    {
+     "ordem": 2,
+     "titulo": "Perfil e indicadores (NPS com margem de erro)",
+     "funcionario": "analise_estatistica",
+     "estado": "concluida"
+    },
+    {
+     "ordem": 3,
+     "titulo": "Drivers do NPS (o que mais pesa na nota)",
+     "funcionario": "cd_senior_drivers",
+     "estado": "concluida"
+    },
+    {
+     "ordem": 4,
+     "titulo": "Dados pessoais na base (LGPD)",
+     "funcionario": "gov_pleno_lgpd",
+     "estado": "concluida"
+    },
+    {
+     "ordem": 5,
+     "titulo": "Resumo executivo do projeto (.md)",
+     "funcionario": "canal_nina",
+     "estado": "concluida"
+    }
+   ]
+  },
   {
    "id": "TAR-20261105-7b3b5b",
    "titulo": "Projeto Segmentação — TREINO_churn_20261105_050932_72842",
@@ -1627,97 +1709,15 @@
      "estado": "concluida"
     }
    ]
-  },
-  {
-   "id": "TAR-20261105-005b21",
-   "titulo": "Projeto NPS — TREINO_csat_ces_20261105_045257_77381",
-   "estado": "concluida",
-   "criada_em": "2026-11-05T05:09:37",
-   "etapas": [
-    {
-     "ordem": 1,
-     "titulo": "Diagnóstico da planilha original (o que barraria a produção)",
-     "funcionario": "banco",
-     "estado": "concluida"
-    },
-    {
-     "ordem": 2,
-     "titulo": "Perfil e indicadores (NPS com margem de erro)",
-     "funcionario": "analise_indicadores",
-     "estado": "concluida"
-    },
-    {
-     "ordem": 3,
-     "titulo": "Drivers do NPS (o que mais pesa na nota)",
-     "funcionario": "head_ciencia",
-     "estado": "concluida"
-    },
-    {
-     "ordem": 4,
-     "titulo": "Dados pessoais na base (LGPD)",
-     "funcionario": "gov_pleno_lgpd",
-     "estado": "concluida"
-    },
-    {
-     "ordem": 5,
-     "titulo": "Resumo executivo do projeto (.md)",
-     "funcionario": "analise_relator",
-     "estado": "concluida"
-    }
-   ]
-  },
-  {
-   "id": "TAR-20261105-2b83d5",
-   "titulo": "Projeto Segmentação — TREINO_csat_ces_20261105_045257_77381",
-   "estado": "concluida",
-   "criada_em": "2026-11-05T05:03:27",
-   "etapas": [
-    {
-     "ordem": 1,
-     "titulo": "Diagnóstico da planilha original (o que barraria a produção)",
-     "funcionario": "validacao",
-     "estado": "concluida"
-    },
-    {
-     "ordem": 2,
-     "titulo": "Perfil da base (colunas, indicadores e margem de erro)",
-     "funcionario": "analise_estatistica",
-     "estado": "concluida"
-    },
-    {
-     "ordem": 3,
-     "titulo": "Segmentação de clientes (k-means com silhueta)",
-     "funcionario": "cd_pleno_segmentos",
-     "estado": "concluida"
-    },
-    {
-     "ordem": 4,
-     "titulo": "Anomalias (valores fora do padrão, com a linha)",
-     "funcionario": "analise_monitoramento",
-     "estado": "concluida"
-    },
-    {
-     "ordem": 5,
-     "titulo": "Dados pessoais na base (LGPD)",
-     "funcionario": "sec_senior",
-     "estado": "concluida"
-    },
-    {
-     "ordem": 6,
-     "titulo": "Resumo executivo do projeto (.md)",
-     "funcionario": "canal_nina",
-     "estado": "concluida"
-    }
-   ]
   }
  ],
  "entregas": [
   {
-   "id": 1262,
-   "data_hora": "2026-11-05T05:09:50",
-   "projeto": "TAR-20261105-7b3b5b",
+   "id": 1264,
+   "data_hora": "2026-11-05T05:15:12",
+   "projeto": "TAR-20261105-1ab679",
    "base": "TREINO_churn_20261105_050932_72842.xlsx",
-   "pasta": "/home/runner/work/_temp/empresa/logs/entregas/Entrega_TREINO_churn_20261105_050932_72842_20261105_050948",
+   "pasta": "/home/runner/work/_temp/empresa/logs/entregas/Entrega_TREINO_churn_20261105_050932_72842_20261105_051510",
    "ok": 1,
    "recomendacoes": [
     "Entender a diferença em **plano = Premium**: Média de mensalidade 150,12 contra 69,41 no restante (diferença real, n=522).",
@@ -1727,6 +1727,71 @@
   }
  ],
  "tempo_turnos": [
+  {
+   "id": 150,
+   "inicio": "2026-11-05T04:35:29",
+   "fim": "2026-11-05T05:15:32",
+   "segundos": 2403.6,
+   "voltas": 105,
+   "por_natureza": {
+    "operacional": 217.9,
+    "estudo": 30.3,
+    "revisao": 48.2,
+    "coordenacao": 2.9,
+    "manutencao": 541.9,
+    "erro": 0.0,
+    "parado": 1560.5,
+    "sem_medicao": 1.8
+   },
+   "por_chamada": {
+    "pausa": 1560.52,
+    "boletim": 341.27,
+    "demandas": 157.15,
+    "registro": 142.17,
+    "modelos": 74.34,
+    "treino": 27.36,
+    "esteira": 17.89,
+    "salvar": 17.53,
+    "backup": 15.7,
+    "inicio": 15.29,
+    "paineis": 12.98,
+    "ronda_ti": 7.63,
+    "fabrica": 3.71,
+    "estrategia": 2.27,
+    "laboratorio": 1.6,
+    "licoes": 1.37,
+    "canal": 1.0,
+    "jornada": 0.71,
+    "telegram": 0.61,
+    "dialogo": 0.53,
+    "caixa_dono": 0.07,
+    "pdca": 0.03,
+    "alcadas": 0.02,
+    "rh_desempenho": 0.02,
+    "auditoria": 0.01,
+    "ideias": 0.01,
+    "reuniao": 0.01,
+    "estudo": 0.01
+   },
+   "contagens": {
+    "demandas_executadas": 67,
+    "bloqueios": 0,
+    "etapas_esperando_dependencia": 0
+   },
+   "entregas_aprovadas": 67,
+   "entregas_por_hora": 100.35,
+   "cobertura": 0.999,
+   "percentual": {
+    "operacional": 9.1,
+    "estudo": 1.3,
+    "revisao": 2.0,
+    "coordenacao": 0.1,
+    "manutencao": 22.5,
+    "erro": 0.0,
+    "parado": 64.9,
+    "sem_medicao": 0.1
+   }
+  },
   {
    "id": 149,
    "inicio": "2026-11-05T03:52:45",
@@ -2051,76 +2116,11 @@
     "parado": 62.4,
     "sem_medicao": 0.1
    }
-  },
-  {
-   "id": 144,
-   "inicio": "2026-11-05T00:19:41",
-   "fim": "2026-11-05T00:59:44",
-   "segundos": 2403.3,
-   "voltas": 105,
-   "por_natureza": {
-    "operacional": 241.9,
-    "estudo": 26.0,
-    "revisao": 75.1,
-    "coordenacao": 2.7,
-    "manutencao": 489.4,
-    "erro": 0.0,
-    "parado": 1566.4,
-    "sem_medicao": 1.7
-   },
-   "por_chamada": {
-    "pausa": 1566.37,
-    "boletim": 306.56,
-    "demandas": 224.11,
-    "registro": 128.27,
-    "modelos": 62.17,
-    "treino": 23.07,
-    "salvar": 16.38,
-    "esteira": 14.71,
-    "backup": 14.63,
-    "inicio": 14.28,
-    "paineis": 12.63,
-    "ronda_ti": 7.25,
-    "fabrica": 3.41,
-    "estrategia": 2.21,
-    "laboratorio": 1.58,
-    "licoes": 1.35,
-    "canal": 0.96,
-    "telegram": 0.62,
-    "jornada": 0.49,
-    "dialogo": 0.39,
-    "caixa_dono": 0.07,
-    "pdca": 0.02,
-    "alcadas": 0.02,
-    "rh_desempenho": 0.01,
-    "auditoria": 0.01,
-    "ideias": 0.01,
-    "reuniao": 0.01,
-    "estudo": 0.01
-   },
-   "contagens": {
-    "demandas_executadas": 67,
-    "bloqueios": 0,
-    "etapas_esperando_dependencia": 0
-   },
-   "entregas_aprovadas": 67,
-   "entregas_por_hora": 100.36,
-   "cobertura": 0.999,
-   "percentual": {
-    "operacional": 10.1,
-    "estudo": 1.1,
-    "revisao": 3.1,
-    "coordenacao": 0.1,
-    "manutencao": 20.4,
-    "erro": 0.0,
-    "parado": 65.2,
-    "sem_medicao": 0.1
-   }
   }
  ],
  "modelos": {
   "finalidade": "risco_demanda",
-  "rotuladas_agora": 9893,
+  "rotuladas_agora": 9898,
   "minimo_para_treinar": 60,
   "datasets": 173,
   "maior_dataset": 9831,
@@ -3034,15 +3034,15 @@
   },
   {
    "nivel": "dificil",
-   "demandas": 4501,
-   "concluidas": 4465,
+   "demandas": 4503,
+   "concluidas": 4467,
    "parciais": 14,
    "falhas": 22
   },
   {
    "nivel": "profissional",
-   "demandas": 3197,
-   "concluidas": 3187,
+   "demandas": 3200,
+   "concluidas": 3190,
    "parciais": 6,
    "falhas": 4
   }
