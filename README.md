@@ -1,15 +1,15 @@
 # Empresa ao vivo
 
-**Boletim das 05/11 02:58** (horário de Brasília) · entre turnos: memória salva; o próximo turno começa em poucos minutos · SEM BANCO (memória guardada no arquivo do GitHub; o banco é alcançado quando voltar)
+**Boletim das 05/11 03:02** (horário de Brasília) · trabalhando · SEM BANCO (memória guardada no arquivo do GitHub; o banco é alcançado quando voltar)
 
 > Atualiza a cada 5 minutos enquanto a empresa trabalha. Recarregue a página para ver o mais novo.
 
 ## Hoje
 
-- **785** demandas, **781** concluídas (99%), 4 parciais, 0 com falha
+- **787** demandas, **783** concluídas (99%), 4 parciais, 0 com falha
 - **105** de 105 funcionários já trabalharam
 - SQL: 75 exercícios, 75 conferidos com o gabarito
-- Fábrica: 34 planilhas, 34 conferidas sem erro
+- Fábrica: 36 planilhas, 34 conferidas sem erro
 
 ## Trabalhando agora
 
@@ -20,7 +20,7 @@
 | Andar | Trabalharam | Demandas | Concluídas | Parciais | Falhas |
 |---|--:|--:|--:|--:|--:|
 | 1º | 19 de 19 | 103 | 102 | 1 | 0 |
-| 2º | 18 de 18 | 223 | 221 | 2 | 0 |
+| 2º | 18 de 18 | 225 | 223 | 2 | 0 |
 | 3º | 12 de 12 | 63 | 62 | 1 | 0 |
 | 4º | 32 de 32 | 121 | 121 | 0 | 0 |
 | 5º | 24 de 24 | 275 | 275 | 0 | 0 |
@@ -29,6 +29,8 @@
 
 | Hora | Quem | Trabalho | Resultado |
 |---|---|---|---|
+| 03:02 | Marcos (2º) | Projeto Segmentação — TREINO_estoque_20261105_060148_08591 | ✅ concluída |
+| 03:01 | Marcos (2º) | Projeto NPS — TREINO_nps_20261105_060145_05025 | ✅ concluída |
 | 02:54 | Marcos (2º) | Projeto Segmentação — TREINO_folha_20261105_054952_92902 | ✅ concluída |
 | 02:54 | Marcos (2º) | Projeto NPS — TREINO_nps_20261105_051933_73327 | ✅ concluída |
 | 02:48 | Marcos (2º) | Projeto Segmentação — TREINO_funil_20261105_053447_87635 | ✅ concluída |
@@ -37,8 +39,6 @@
 | 02:48 | Paula (3º) | Segmentação da base sintética | ✅ concluída |
 | 02:48 | Nina (4º) | Calcular a média de uma métrica da base sintética — nível medio | ✅ concluída |
 | 02:48 | Tânia (3º) | Calcular a média de uma métrica da base sintética — nível dificil | ✅ concluída |
-| 02:48 | Pedro (3º) | Calcular a média de uma métrica da base sintética — nível dificil | ✅ concluída |
-| 02:48 | Vitor (4º) | Diagnosticar a planilha original da fábrica — nível medio | ✅ concluída |
 
 ## Dificuldade (todo o histórico)
 
@@ -47,7 +47,7 @@
 | basico | 505 | 483 | 0 | 22 | 96% |
 | medio | 1712 | 1698 | 0 | 14 | 99% |
 | dificil | 4551 | 4515 | 14 | 22 | 99% |
-| profissional | 3235 | 3225 | 6 | 4 | 100% |
+| profissional | 3237 | 3227 | 6 | 4 | 100% |
 
 ## Cada funcionário
 
@@ -92,7 +92,7 @@
 | Leandro | Engenheiro de Machine Learning Sênior | trabalho do papel | Calcular a média de uma métrica da base sintética — nível di (✅ concluída) | 5 |
 | Lucas | Cientista de Dados Júnior | trabalho do papel | Calcular a média de uma métrica da base sintética — nível me (✅ concluída) | 6 |
 | Manu | Estagiária de Análise de Dados | estagiário: observa (regra do dono) |   | 0 |
-| Marcos | Coordenador de Análise e Ciência de Dado | trabalho FORA do papel | Projeto Segmentação — TREINO_folha_20261105_054952_92902 (✅ concluída) | 132 |
+| Marcos | Coordenador de Análise e Ciência de Dado | trabalho FORA do papel | Projeto Segmentação — TREINO_estoque_20261105_060148_08591 (✅ concluída) | 134 |
 | Natália | Head de Ciência de Dados | trabalho do papel | Exercício de SQL no PostgreSQL com os dados da fábrica — nív (✅ concluída) | 5 |
 | Patrícia | Gerente de Analytics e Customer Insights | trabalho do papel | Drivers do indicador na base sintética — nível profissional (✅ concluída) | 6 |
 | Rebeca | Líder de Engenharia de IA e Machine Lear | trabalho do papel | Perfil e indicadores da base sintética — nível profissional (✅ concluída) | 6 |
@@ -194,18 +194,17 @@
 
 ## Projetos entre andares (várias pessoas, uma etapa depende da outra)
 
+- Projeto Segmentação — TREINO_estoque_20261105_060148_08591: **✅ concluída** — 1. coord_engenharia (concluida); 2. analise_estatistica (concluida); 3. ana_junior_faixas (concluida); 4. analise_monitoramento (concluida); 5. sec_senior (concluida); 6. canal_iara (concluida)
+- Projeto NPS — TREINO_nps_20261105_060145_05025: **✅ concluída** — 1. banco (concluida); 2. analise_perfil (concluida); 3. cd_senior_drivers (concluida); 4. gov_pleno_lgpd (concluida); 5. analise_relator (concluida)
 - Projeto Segmentação — TREINO_folha_20261105_054952_92902: **✅ concluída** — 1. validacao (concluida); 2. analise_monitoramento (concluida); 3. cd_pleno_segmentos (concluida); 4. cd_junior_anomalias (concluida); 5. sec_senior (concluida); 6. canal_nina (concluida)
-- Projeto NPS — TREINO_nps_20261105_051933_73327: **✅ concluída** — 1. tina_contatos (concluida); 2. analise_indicadores (concluida); 3. head_ciencia (concluida); 4. gov_pleno_lgpd (concluida); 5. canal_iara (concluida)
-- Projeto Segmentação — TREINO_funil_20261105_053447_87635: **✅ concluída** — 1. supervisor (concluida); 2. analise_estatistica (concluida); 3. ana_pleno_base (concluida); 4. cd_junior_anomalias (concluida); 5. sec_senior (concluida); 6. analise_relator (concluida)
 
-## Última entrega da empresa (TREINO_folha_20261105_054952_92902.xlsx, 05/11 02:54)
+## Última entrega da empresa (TREINO_estoque_20261105_060148_08591.xlsx, 05/11 03:02)
 
 Pacote gerado pelo produto (`python -m robo entregar`) a partir de um projeto aprovado:
 
-1. Alta no último mês (2025-08): soma de salario_base 40,7% acima da média dos 3 meses anteriores. Confirme se o mês está completo antes de concluir.
-2. Conferir 73 valor(es) fora do padrão em **salario_base** (2,1% da base): podem ser erro de digitação ou casos reais que merecem olhar.
-3. Conferir 37 valor(es) fora do padrão em **horas_extras** (1,1% da base): podem ser erro de digitação ou casos reais que merecem olhar.
-4. Entender a diferença em **cargo = Gerente**: Média de salario_base 16.765,10 contra 5.579,78 no restante (diferença real, n=232).
+1. Conferir 42 valor(es) fora do padrão em **estoque_un** (1,2% da base): podem ser erro de digitação ou casos reais que merecem olhar.
+2. Conferir 25 valor(es) fora do padrão em **demanda_diaria_un** (0,7% da base): podem ser erro de digitação ou casos reais que merecem olhar.
+3. Entender a diferença em **em_ruptura = Não**: Média de estoque_un 110,73 contra 0,00 no restante (diferença real, n=3505).
 
 ## Inteligência própria (modelo de risco das demandas)
 
@@ -383,13 +382,14 @@ Pacote gerado pelo produto (`python -m robo entregar`) a partir de um projeto ap
 - risco_demanda-v172: **reprovado** (treinado por ml_engenheiro)
 - risco_demanda-v173: **reprovado** (treinado por ml_engenheiro)
 - risco_demanda-v174: **reprovado** (treinado por ml_engenheiro)
-- Última avaliação independente (ml_avaliador): risco_demanda-v174 reprovado — log loss 0.037 contra baseline 0.030; motivos: não bate o baseline (log loss 0.0375 ≥ 0.0298)
-- Referência em sombra: risco_demanda-v144; 9939 previsões em sombra
+- risco_demanda-v175: **reprovado** (treinado por ml_engenheiro)
+- Última avaliação independente (ml_avaliador): risco_demanda-v175 reprovado — log loss 0.037 contra baseline 0.029; motivos: não bate o baseline (log loss 0.0372 ≥ 0.0295)
+- Referência em sombra: risco_demanda-v144; 10044 previsões em sombra
 - Uso operacional: desligado: o modelo só roda em sombra até o dono decidir usá-lo em alguma escolha da empresa
 
 ## Banco de dados
 
-Levantamento das 05/11 02:58: **82 de 101** tabelas com dados (1.126.144 linhas contadas uma a uma).
+Levantamento das 05/11 02:49: **82 de 101** tabelas com dados (1.125.553 linhas contadas uma a uma).
 
 
 | Onde | Tabelas | Com dados |
