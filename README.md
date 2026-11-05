@@ -1,6 +1,6 @@
 # Empresa ao vivo
 
-**Boletim das 05/11 12:11** (horário de Brasília) · entre turnos: memória salva; o próximo turno começa em poucos minutos · SEM BANCO (memória guardada no arquivo do GitHub; o banco é alcançado quando voltar)
+**Boletim das 05/11 12:15** (horário de Brasília) · trabalhando · SEM BANCO (memória guardada no arquivo do GitHub; o banco é alcançado quando voltar)
 
 > Atualiza a cada 5 minutos enquanto a empresa trabalha. Recarregue a página para ver o mais novo.
 
@@ -9,7 +9,7 @@
 - **1981** demandas, **1970** concluídas (99%), 8 parciais, 3 com falha
 - **105** de 105 funcionários já trabalharam
 - SQL: 184 exercícios, 184 conferidos com o gabarito
-- Fábrica: 86 planilhas, 86 conferidas sem erro
+- Fábrica: 88 planilhas, 86 conferidas sem erro
 
 ## Trabalhando agora
 
@@ -395,13 +395,14 @@ Pacote gerado pelo produto (`python -m robo entregar`) a partir de um projeto ap
 - risco_demanda-v187: **reprovado** (treinado por ml_engenheiro)
 - risco_demanda-v188: **reprovado** (treinado por ml_engenheiro)
 - risco_demanda-v189: **reprovado** (treinado por ml_engenheiro)
-- Última avaliação independente (ml_avaliador): risco_demanda-v189 reprovado — log loss 0.036 contra baseline 0.031; motivos: não bate o baseline (log loss 0.0362 ≥ 0.0313)
-- Referência em sombra: risco_demanda-v144; 11153 previsões em sombra
+- risco_demanda-v190: **reprovado** (treinado por ml_engenheiro)
+- Última avaliação independente (ml_avaliador): risco_demanda-v190 reprovado — log loss 0.036 contra baseline 0.031; motivos: não bate o baseline (log loss 0.0361 ≥ 0.0313)
+- Referência em sombra: risco_demanda-v144; 11240 previsões em sombra
 - Uso operacional: desligado: o modelo só roda em sombra até o dono decidir usá-lo em alguma escolha da empresa
 
 ## Banco de dados
 
-Levantamento das 05/11 12:11: **82 de 101** tabelas com dados (1.198.151 linhas contadas uma a uma).
+Levantamento das 05/11 12:05: **82 de 101** tabelas com dados (1.197.536 linhas contadas uma a uma).
 
 
 | Onde | Tabelas | Com dados |
