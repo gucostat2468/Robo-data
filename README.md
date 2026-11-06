@@ -1,15 +1,15 @@
 # Empresa ao vivo
 
-**Boletim das 05/11 22:29** (horário de Brasília) · trabalhando · SEM BANCO (memória guardada no arquivo do GitHub; o banco é alcançado quando voltar)
+**Boletim das 05/11 22:35** (horário de Brasília) · trabalhando · SEM BANCO (memória guardada no arquivo do GitHub; o banco é alcançado quando voltar)
 
 > Atualiza a cada 5 minutos enquanto a empresa trabalha. Recarregue a página para ver o mais novo.
 
 ## Hoje
 
-- **166** demandas, **162** concluídas (98%), 3 parciais, 1 com falha
+- **168** demandas, **164** concluídas (98%), 3 parciais, 1 com falha
 - **105** de 105 funcionários já trabalharam
 - SQL: 15 exercícios, 15 conferidos com o gabarito
-- Fábrica: 8 planilhas, 8 conferidas sem erro
+- Fábrica: 9 planilhas, 9 conferidas sem erro
 
 ## Trabalhando agora
 
@@ -20,7 +20,7 @@
 | Andar | Trabalharam | Demandas | Concluídas | Parciais | Falhas |
 |---|--:|--:|--:|--:|--:|
 | 1º | 19 de 19 | 18 | 18 | 0 | 0 |
-| 2º | 18 de 18 | 46 | 45 | 1 | 0 |
+| 2º | 18 de 18 | 48 | 47 | 1 | 0 |
 | 3º | 12 de 12 | 11 | 9 | 2 | 0 |
 | 4º | 32 de 32 | 21 | 20 | 0 | 1 |
 | 5º | 24 de 24 | 70 | 70 | 0 | 0 |
@@ -29,6 +29,8 @@
 
 | Hora | Quem | Trabalho | Resultado |
 |---|---|---|---|
+| 22:32 | Marcos (2º) | Projeto Segmentação — TREINO_ponto_20261106_013209_29707 | ✅ concluída |
+| 22:32 | Marcos (2º) | Projeto NPS — TREINO_nps_20261106_011657_17015 | ✅ concluída |
 | 22:27 | Marcos (2º) | Projeto Segmentação — TREINO_folha_20261106_011700_20486 | ✅ concluída |
 | 22:27 | Marcos (2º) | Projeto NPS — TREINO_nps_20261106_011657_17015 | ✅ concluída |
 | 22:22 | Marcos (2º) | Projeto Segmentação — TREINO_folha_20261106_011700_20486 | ✅ concluída |
@@ -37,8 +39,6 @@
 | 22:22 | Marina (5º) | Medir a saúde do PostgreSQL — nível dificil | ✅ concluída |
 | 22:22 | Ícaro (5º) | SLA das rotinas — nível dificil | ✅ concluída |
 | 22:17 | Marcos (2º) | Projeto Segmentação — TREINO_folha_20261106_011700_20486 | ✅ concluída |
-| 22:17 | Marcos (2º) | Projeto NPS — TREINO_nps_20261106_011657_17015 | ✅ concluída |
-| 22:17 | Wagner (5º) | Verificar dados pessoais (LGPD) na base sintética — nível dificil | ✅ concluída |
 
 ## Dificuldade (todo o histórico)
 
@@ -47,7 +47,7 @@
 | basico | 587 | 564 | 0 | 23 | 96% |
 | medio | 2098 | 2078 | 0 | 20 | 99% |
 | dificil | 5679 | 5633 | 24 | 22 | 99% |
-| profissional | 4124 | 4114 | 6 | 4 | 100% |
+| profissional | 4126 | 4116 | 6 | 4 | 100% |
 
 ## Cada funcionário
 
@@ -92,7 +92,7 @@
 | Leandro | Engenheiro de Machine Learning Sênior | trabalho do papel | Perfil e indicadores da base sintética — nível dificil (✅ concluída) | 1 |
 | Lucas | Cientista de Dados Júnior | trabalho do papel | Calcular a média de uma métrica da base sintética — nível me (✅ concluída) | 1 |
 | Manu | Estagiária de Análise de Dados | estagiário: observa (regra do dono) |   | 0 |
-| Marcos | Coordenador de Análise e Ciência de Dado | trabalho FORA do papel | Projeto Segmentação — TREINO_folha_20261106_011700_20486 (✅ concluída) | 30 |
+| Marcos | Coordenador de Análise e Ciência de Dado | trabalho FORA do papel | Projeto Segmentação — TREINO_ponto_20261106_013209_29707 (✅ concluída) | 32 |
 | Natália | Head de Ciência de Dados | trabalho do papel | Exercício de SQL no PostgreSQL com os dados da fábrica — nív (✅ concluída) | 1 |
 | Patrícia | Gerente de Analytics e Customer Insights | trabalho do papel | Calcular a média de uma métrica da base sintética — nível pr (✅ concluída) | 1 |
 | Rebeca | Líder de Engenharia de IA e Machine Lear | trabalho do papel | Calcular a média de uma métrica da base sintética — nível pr (✅ concluída) | 1 |
@@ -194,18 +194,15 @@
 
 ## Projetos entre andares (várias pessoas, uma etapa depende da outra)
 
+- Projeto Segmentação — TREINO_ponto_20261106_013209_29707: **✅ concluída** — 1. limpeza (concluida); 2. analise_estatistica (concluida); 3. cd_pleno_segmentos (concluida); 4. cd_junior_anomalias (concluida); 5. sec_senior (concluida); 6. canal_nina (concluida)
+- Projeto NPS — TREINO_nps_20261106_011657_17015: **✅ concluída** — 1. leitura (concluida); 2. analise_perfil (concluida); 3. head_ciencia (concluida); 4. gov_pleno_lgpd (concluida); 5. canal_iara (concluida)
 - Projeto Segmentação — TREINO_folha_20261106_011700_20486: **✅ concluída** — 1. head_engenharia (concluida); 2. analise_indicadores (concluida); 3. ana_pleno_base (concluida); 4. analise_monitoramento (concluida); 5. sec_senior (concluida); 6. analise_relator (concluida)
-- Projeto NPS — TREINO_nps_20261106_011657_17015: **✅ concluída** — 1. ger_engenharia (concluida); 2. analise_estatistica (concluida); 3. cd_senior_drivers (concluida); 4. gov_pleno_lgpd (concluida); 5. canal_nina (concluida)
-- Projeto Segmentação — TREINO_folha_20261106_011700_20486: **✅ concluída** — 1. eng_pleno_tipos (concluida); 2. analise_perfil (concluida); 3. ana_junior_faixas (concluida); 4. cd_junior_anomalias (concluida); 5. sec_senior (concluida); 6. canal_iara (concluida)
 
-## Última entrega da empresa (TREINO_folha_20261106_011700_20486.xlsx, 05/11 22:27)
+## Última entrega da empresa (TREINO_ponto_20261106_013209_29707.xlsx, 05/11 22:32)
 
 Pacote gerado pelo produto (`python -m robo entregar`) a partir de um projeto aprovado:
 
-1. Alta no último mês (2025-08): soma de salario_base 16,4% acima da média dos 3 meses anteriores. Confirme se o mês está completo antes de concluir.
-2. Conferir 121 valor(es) fora do padrão em **salario_base** (2,6% da base): podem ser erro de digitação ou casos reais que merecem olhar.
-3. Conferir 41 valor(es) fora do padrão em **horas_extras** (0,9% da base): podem ser erro de digitação ou casos reais que merecem olhar.
-4. Entender a diferença em **cargo = Gerente**: Média de salario_base 16.751,42 contra 5.533,10 no restante (diferença real, n=287).
+1. Conferir 34 valor(es) fora do padrão em **atraso_min** (1,8% da base): podem ser erro de digitação ou casos reais que merecem olhar.
 
 ## Inteligência própria (modelo de risco das demandas)
 
