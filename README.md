@@ -1,12 +1,12 @@
 # Empresa ao vivo
 
-**Boletim das 06/11 19:57** (horário de Brasília) · trabalhando · SEM BANCO (memória guardada no arquivo do GitHub; o banco é alcançado quando voltar)
+**Boletim das 06/11 20:03** (horário de Brasília) · trabalhando · SEM BANCO (memória guardada no arquivo do GitHub; o banco é alcançado quando voltar)
 
 > Atualiza a cada 5 minutos enquanto a empresa trabalha. Recarregue a página para ver o mais novo.
 
 ## Hoje
 
-- **2854** demandas, **2841** concluídas (100%), 7 parciais, 6 com falha
+- **2856** demandas, **2843** concluídas (100%), 7 parciais, 6 com falha
 - **105** de 105 funcionários já trabalharam
 - SQL: 258 exercícios, 258 conferidos com o gabarito
 - Fábrica: 112 planilhas, 112 conferidas sem erro
@@ -20,7 +20,7 @@
 | Andar | Trabalharam | Demandas | Concluídas | Parciais | Falhas |
 |---|--:|--:|--:|--:|--:|
 | 1º | 19 de 19 | 378 | 378 | 0 | 0 |
-| 2º | 18 de 18 | 796 | 793 | 2 | 1 |
+| 2º | 18 de 18 | 798 | 795 | 2 | 1 |
 | 3º | 12 de 12 | 231 | 225 | 4 | 2 |
 | 4º | 32 de 32 | 441 | 438 | 0 | 3 |
 | 5º | 24 de 24 | 1008 | 1007 | 1 | 0 |
@@ -29,6 +29,8 @@
 
 | Hora | Quem | Trabalho | Resultado |
 |---|---|---|---|
+| 20:00 | Marcos (2º) | Projeto Segmentação — TREINO_funil_20261106_224932_72069 | ✅ concluída |
+| 20:00 | Marcos (2º) | Projeto NPS — TREINO_nps_20261106_224925_65834 | ✅ concluída |
 | 19:55 | Marcos (2º) | Projeto Segmentação — TREINO_funil_20261106_224932_72069 | ✅ concluída |
 | 19:54 | Marcos (2º) | Projeto NPS — TREINO_nps_20261106_224925_65834 | ✅ concluída |
 | 19:50 | Marcos (2º) | Projeto Segmentação — TREINO_funil_20261106_224932_72069 | ✅ concluída |
@@ -37,8 +39,6 @@
 | 19:50 | Marina (5º) | Testar se o último backup volta — nível dificil | ✅ concluída |
 | 19:50 | Wagner (5º) | Procurar segredos no repositório público — nível dificil | ✅ concluída |
 | 19:50 | Ícaro (5º) | SLA das rotinas — nível dificil | ✅ concluída |
-| 19:50 | Rodrigo (5º) | Testar se o último backup volta — nível medio | ✅ concluída |
-| 19:50 | Jonas (5º) | SLA das rotinas — nível dificil | ✅ concluída |
 
 ## Dificuldade (todo o histórico)
 
@@ -47,7 +47,7 @@
 | basico | 669 | 645 | 0 | 24 | 96% |
 | medio | 2528 | 2504 | 0 | 24 | 99% |
 | dificil | 6901 | 6852 | 27 | 22 | 99% |
-| profissional | 5078 | 5067 | 7 | 4 | 100% |
+| profissional | 5080 | 5069 | 7 | 4 | 100% |
 
 ## Cada funcionário
 
@@ -92,7 +92,7 @@
 | Leandro | Engenheiro de Machine Learning Sênior | trabalho do papel | Treinar o modelo de risco de demanda — nível dificil (✅ concluída) | 21 |
 | Lucas | Cientista de Dados Júnior | trabalho do papel | Conferir no PostgreSQL os lotes da fábrica — nível medio (✅ concluída) | 21 |
 | Manu | Estagiária de Análise de Dados | estagiário: observa (regra do dono) |   | 0 |
-| Marcos | Coordenador de Análise e Ciência de Dado | trabalho FORA do papel | Projeto Segmentação — TREINO_funil_20261106_224932_72069 (✅ concluída) | 460 |
+| Marcos | Coordenador de Análise e Ciência de Dado | trabalho FORA do papel | Projeto Segmentação — TREINO_funil_20261106_224932_72069 (✅ concluída) | 462 |
 | Natália | Head de Ciência de Dados | trabalho do papel | Drivers do indicador na base sintética — nível profissional (✅ concluída) | 21 |
 | Patrícia | Gerente de Analytics e Customer Insights | trabalho do papel | Segmentação da base sintética — nível profissional (✅ concluída) | 21 |
 | Rebeca | Líder de Engenharia de IA e Machine Lear | trabalho do papel | Calcular a média de uma métrica da base sintética — nível pr (🟡 parcial) | 21 |
@@ -194,11 +194,11 @@
 
 ## Projetos entre andares (várias pessoas, uma etapa depende da outra)
 
+- Projeto Segmentação — TREINO_funil_20261106_224932_72069: **✅ concluída** — 1. head_engenharia (concluida); 2. analise_estatistica (concluida); 3. ana_pleno_base (concluida); 4. cd_junior_anomalias (concluida); 5. sec_senior (concluida); 6. analise_relator (concluida)
+- Projeto NPS — TREINO_nps_20261106_224925_65834: **✅ concluída** — 1. ger_engenharia (concluida); 2. analise_perfil (concluida); 3. cd_senior_drivers (concluida); 4. gov_pleno_lgpd (concluida); 5. canal_nina (concluida)
 - Projeto Segmentação — TREINO_funil_20261106_224932_72069: **✅ concluída** — 1. eng_pleno_tipos (concluida); 2. analise_indicadores (concluida); 3. ana_junior_faixas (concluida); 4. analise_monitoramento (concluida); 5. sec_senior (concluida); 6. canal_iara (concluida)
-- Projeto NPS — TREINO_nps_20261106_224925_65834: **✅ concluída** — 1. eng_pleno_releitura (concluida); 2. analise_estatistica (concluida); 3. head_ciencia (concluida); 4. gov_pleno_lgpd (concluida); 5. analise_relator (concluida)
-- Projeto Segmentação — TREINO_funil_20261106_224932_72069: **✅ concluída** — 1. eng_junior_espacos (concluida); 2. analise_perfil (concluida); 3. cd_pleno_segmentos (concluida); 4. cd_junior_anomalias (concluida); 5. sec_senior (concluida); 6. canal_nina (concluida)
 
-## Última entrega da empresa (TREINO_funil_20261106_224932_72069.xlsx, 06/11 19:55)
+## Última entrega da empresa (TREINO_funil_20261106_224932_72069.xlsx, 06/11 20:00)
 
 Pacote gerado pelo produto (`python -m robo entregar`) a partir de um projeto aprovado:
 
