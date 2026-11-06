@@ -1,15 +1,15 @@
 # Empresa ao vivo
 
-**Boletim das 06/11 00:39** (horário de Brasília) · trabalhando · SEM BANCO (memória guardada no arquivo do GitHub; o banco é alcançado quando voltar)
+**Boletim das 06/11 00:44** (horário de Brasília) · trabalhando · SEM BANCO (memória guardada no arquivo do GitHub; o banco é alcançado quando voltar)
 
 > Atualiza a cada 5 minutos enquanto a empresa trabalha. Recarregue a página para ver o mais novo.
 
 ## Hoje
 
-- **444** demandas, **440** concluídas (99%), 3 parciais, 1 com falha
+- **446** demandas, **442** concluídas (99%), 3 parciais, 1 com falha
 - **105** de 105 funcionários já trabalharam
 - SQL: 42 exercícios, 42 conferidos com o gabarito
-- Fábrica: 20 planilhas, 20 conferidas sem erro
+- Fábrica: 21 planilhas, 21 conferidas sem erro
 
 ## Trabalhando agora
 
@@ -20,7 +20,7 @@
 | Andar | Trabalharam | Demandas | Concluídas | Parciais | Falhas |
 |---|--:|--:|--:|--:|--:|
 | 1º | 19 de 19 | 54 | 54 | 0 | 0 |
-| 2º | 18 de 18 | 124 | 123 | 1 | 0 |
+| 2º | 18 de 18 | 126 | 125 | 1 | 0 |
 | 3º | 12 de 12 | 33 | 31 | 2 | 0 |
 | 4º | 32 de 32 | 63 | 62 | 0 | 1 |
 | 5º | 24 de 24 | 170 | 170 | 0 | 0 |
@@ -29,6 +29,8 @@
 
 | Hora | Quem | Trabalho | Resultado |
 |---|---|---|---|
+| 00:42 | Marcos (2º) | Projeto Segmentação — TREINO_curva_abc_20261106_034119_79766 | ✅ concluída |
+| 00:41 | Marcos (2º) | Projeto NPS — TREINO_nps_20261106_032608_68079 | ✅ concluída |
 | 00:36 | Marcos (2º) | Projeto Segmentação — TREINO_rfm_20261106_032611_71225 | ✅ concluída |
 | 00:36 | Marcos (2º) | Projeto NPS — TREINO_nps_20261106_032608_68079 | ✅ concluída |
 | 00:31 | Marcos (2º) | Projeto Segmentação — TREINO_rfm_20261106_032611_71225 | ✅ concluída |
@@ -37,8 +39,6 @@
 | 00:31 | Marina (5º) | Procurar segredos no repositório público — nível dificil | ✅ concluída |
 | 00:31 | Ícaro (5º) | Exercício de SQL no PostgreSQL com os dados da fábrica — nível dificil | ✅ concluída |
 | 00:27 | Marcos (2º) | Projeto Segmentação — TREINO_rfm_20261106_032611_71225 | ✅ concluída |
-| 00:26 | Marcos (2º) | Projeto NPS — TREINO_nps_20261106_032608_68079 | ✅ concluída |
-| 00:26 | Wagner (5º) | Ronda de saúde do sistema — nível dificil | ✅ concluída |
 
 ## Dificuldade (todo o histórico)
 
@@ -47,7 +47,7 @@
 | basico | 597 | 574 | 0 | 23 | 96% |
 | medio | 2140 | 2120 | 0 | 20 | 99% |
 | dificil | 5805 | 5759 | 24 | 22 | 99% |
-| profissional | 4224 | 4214 | 6 | 4 | 100% |
+| profissional | 4226 | 4216 | 6 | 4 | 100% |
 
 ## Cada funcionário
 
@@ -92,7 +92,7 @@
 | Leandro | Engenheiro de Machine Learning Sênior | trabalho do papel | Calcular a média de uma métrica da base sintética — nível di (✅ concluída) | 3 |
 | Lucas | Cientista de Dados Júnior | trabalho do papel | Conferir no PostgreSQL os lotes da fábrica — nível medio (✅ concluída) | 3 |
 | Manu | Estagiária de Análise de Dados | estagiário: observa (regra do dono) |   | 0 |
-| Marcos | Coordenador de Análise e Ciência de Dado | trabalho FORA do papel | Projeto Segmentação — TREINO_rfm_20261106_032611_71225 (✅ concluída) | 76 |
+| Marcos | Coordenador de Análise e Ciência de Dado | trabalho FORA do papel | Projeto Segmentação — TREINO_curva_abc_20261106_034119_79766 (✅ concluída) | 78 |
 | Natália | Head de Ciência de Dados | trabalho do papel | Drivers do indicador na base sintética — nível profissional (✅ concluída) | 3 |
 | Patrícia | Gerente de Analytics e Customer Insights | trabalho do papel | Drivers do indicador na base sintética — nível profissional (✅ concluída) | 3 |
 | Rebeca | Líder de Engenharia de IA e Machine Lear | trabalho do papel | Perfil e indicadores da base sintética — nível profissional (✅ concluída) | 3 |
@@ -194,18 +194,16 @@
 
 ## Projetos entre andares (várias pessoas, uma etapa depende da outra)
 
+- Projeto Segmentação — TREINO_curva_abc_20261106_034119_79766: **✅ concluída** — 1. dir_dados (concluida); 2. analise_perfil (concluida); 3. ana_pleno_base (concluida); 4. cd_junior_anomalias (concluida); 5. sec_senior (concluida); 6. analise_relator (concluida)
+- Projeto NPS — TREINO_nps_20261106_032608_68079: **✅ concluída** — 1. dba (concluida); 2. analise_indicadores (concluida); 3. cd_senior_drivers (concluida); 4. gov_pleno_lgpd (concluida); 5. canal_nina (concluida)
 - Projeto Segmentação — TREINO_rfm_20261106_032611_71225: **✅ concluída** — 1. coord_engenharia (concluida); 2. analise_estatistica (concluida); 3. ana_junior_faixas (concluida); 4. analise_monitoramento (concluida); 5. sec_senior (concluida); 6. canal_iara (concluida)
-- Projeto NPS — TREINO_nps_20261106_032608_68079: **✅ concluída** — 1. banco (concluida); 2. analise_perfil (concluida); 3. head_ciencia (concluida); 4. gov_pleno_lgpd (concluida); 5. analise_relator (concluida)
-- Projeto Segmentação — TREINO_rfm_20261106_032611_71225: **✅ concluída** — 1. validacao (concluida); 2. analise_monitoramento (concluida); 3. cd_pleno_segmentos (concluida); 4. cd_junior_anomalias (concluida); 5. sec_senior (concluida); 6. canal_nina (concluida)
 
-## Última entrega da empresa (TREINO_rfm_20261106_032611_71225.xlsx, 06/11 00:36)
+## Última entrega da empresa (TREINO_curva_abc_20261106_034119_79766.xlsx, 06/11 00:42)
 
 Pacote gerado pelo produto (`python -m robo entregar`) a partir de um projeto aprovado:
 
-1. Queda no último mês (2026-09): soma de valor_total 18,3% abaixo da média dos 3 meses anteriores. Confirme se o mês está completo antes de concluir.
-2. Conferir 30 valor(es) fora do padrão em **frequencia_pedidos** (0,9% da base): podem ser erro de digitação ou casos reais que merecem olhar.
-3. Conferir 47 valor(es) fora do padrão em **valor_total** (1,5% da base): podem ser erro de digitação ou casos reais que merecem olhar.
-4. Entender a diferença em **canal = Atacado**: Média de frequencia_pedidos 14,83 contra 6,04 no restante (diferença real, n=656).
+1. Conferir 239 valor(es) fora do padrão em **faturamento** (6,6% da base): podem ser erro de digitação ou casos reais que merecem olhar.
+2. **Valores suspeitos:** 1 apontado(s) (valor muito acima do padrão (digitação?): 1). Estão na aba suspeitos do indicadores.xlsx com a chave de cada linha: confira na origem.
 
 ## Inteligência própria (modelo de risco das demandas)
 
