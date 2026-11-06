@@ -1,15 +1,15 @@
 # Empresa ao vivo
 
-**Boletim das 05/11 21:29** (horário de Brasília) · entre turnos: memória salva; o próximo turno começa em poucos minutos · SEM BANCO (memória guardada no arquivo do GitHub; o banco é alcançado quando voltar)
+**Boletim das 05/11 21:34** (horário de Brasília) · trabalhando · SEM BANCO (memória guardada no arquivo do GitHub; o banco é alcançado quando voltar)
 
 > Atualiza a cada 5 minutos enquanto a empresa trabalha. Recarregue a página para ver o mais novo.
 
 ## Hoje
 
-- **33** demandas, **33** concluídas (100%), 0 parciais, 0 com falha
-- **93** de 105 funcionários já trabalharam
+- **36** demandas, **36** concluídas (100%), 0 parciais, 0 com falha
+- **94** de 105 funcionários já trabalharam
 - SQL: 4 exercícios, 4 conferidos com o gabarito
-- Fábrica: 2 planilhas, 2 conferidas sem erro
+- Fábrica: 4 planilhas, 2 conferidas sem erro
 
 ## Trabalhando agora
 
@@ -19,16 +19,19 @@
 
 | Andar | Trabalharam | Demandas | Concluídas | Parciais | Falhas |
 |---|--:|--:|--:|--:|--:|
-| 1º | 19 de 19 | 0 | 0 | 0 | 0 |
-| 2º | 17 de 18 | 10 | 10 | 0 | 0 |
+| 1º | 19 de 19 | 1 | 1 | 0 | 0 |
+| 2º | 17 de 18 | 11 | 11 | 0 | 0 |
 | 3º | 10 de 12 | 0 | 0 | 0 | 0 |
-| 4º | 24 de 32 | 0 | 0 | 0 | 0 |
+| 4º | 25 de 32 | 1 | 1 | 0 | 0 |
 | 5º | 23 de 24 | 23 | 23 | 0 | 0 |
 
 ## Últimas entregas
 
 | Hora | Quem | Trabalho | Resultado |
 |---|---|---|---|
+| 21:34 | Simone (4º) | Diagnosticar a planilha original da fábrica — nível profissional | ✅ concluída |
+| 21:34 | Igor (2º) | Conferir no PostgreSQL os lotes da fábrica — nível medio | ✅ concluída |
+| 21:34 | Júlia (1º) | Diagnosticar a planilha original da fábrica — nível medio | ✅ concluída |
 | 21:27 | Marcos (2º) | Projeto Segmentação — TREINO_nps_20261106_002253_73595 | ✅ concluída |
 | 21:27 | Marcos (2º) | Projeto NPS — TREINO_nps_20261106_002253_73595 | ✅ concluída |
 | 21:26 | Heloísa (5º) | SLA das rotinas — nível profissional | ✅ concluída |
@@ -36,18 +39,15 @@
 | 21:26 | Ícaro (5º) | Testar se o último backup volta — nível dificil | ✅ concluída |
 | 21:20 | Marcos (2º) | Projeto Segmentação — TREINO_pesquisa_mercado_20261106_000749_69436 | ✅ concluída |
 | 21:20 | Marcos (2º) | Projeto NPS — TREINO_nps_20261105_235235_55914 | ✅ concluída |
-| 21:14 | Marcos (2º) | Projeto Segmentação — TREINO_pesquisa_mercado_20261106_000749_69436 | ✅ concluída |
-| 21:14 | Marcos (2º) | Projeto NPS — TREINO_nps_20261105_235235_55914 | ✅ concluída |
-| 21:14 | Wagner (5º) | Ronda de saúde do sistema — nível dificil | ✅ concluída |
 
 ## Dificuldade (todo o histórico)
 
 | Nível | Demandas | Concluídas | Parciais | Falhas | Acerto |
 |---|--:|--:|--:|--:|--:|
 | basico | 583 | 560 | 0 | 23 | 96% |
-| medio | 2076 | 2057 | 0 | 19 | 99% |
+| medio | 2078 | 2059 | 0 | 19 | 99% |
 | dificil | 5618 | 5575 | 21 | 22 | 99% |
-| profissional | 4078 | 4068 | 6 | 4 | 100% |
+| profissional | 4079 | 4069 | 6 | 4 | 100% |
 
 ## Cada funcionário
 
@@ -66,7 +66,7 @@
 | Dora | DBA PostgreSQL | trabalho do papel | Anomalias na base sintética — nível dificil (✅ concluída) | 0 |
 | Duda | Publicação e arquivo | trabalho do papel | Conferir no PostgreSQL os lotes da fábrica — nível dificil (✅ concluída) | 0 |
 | Eduardo | Head de Engenharia de Dados | trabalho do papel | Conferir no PostgreSQL os lotes da fábrica — nível profissio (✅ concluída) | 0 |
-| Júlia | Engenheira de Dados Pleno | trabalho do papel | Anomalias na base sintética — nível medio (✅ concluída) | 0 |
+| Júlia | Engenheira de Dados Pleno | trabalho do papel | Diagnosticar a planilha original da fábrica — nível medio (✅ concluída) | 1 |
 | Leo | Leitura (Extração) | trabalho do papel | Anomalias na base sintética — nível dificil (✅ concluída) | 0 |
 | Lia | Limpeza | trabalho do papel | Exercício de SQL no PostgreSQL com os dados da fábrica — nív (✅ concluída) | 0 |
 | Marcelo | Gerente de Engenharia de Dados | trabalho do papel | Exercício de SQL no PostgreSQL com os dados da fábrica — nív (✅ concluída) | 0 |
@@ -87,7 +87,7 @@
 | Davi | Estatística | trabalho do papel | Perfil e indicadores da base sintética — nível dificil (✅ concluída) | 0 |
 | Eva | Monitoramento | trabalho do papel | Anomalias na base sintética — nível dificil (✅ concluída) | 0 |
 | Fábio | Relator | trabalho do papel | Conferir no PostgreSQL os lotes da fábrica — nível dificil (✅ concluída) | 0 |
-| Igor | Analista de Dados Júnior | trabalho do papel | Exercício de SQL no PostgreSQL com os dados da fábrica — nív (✅ concluída) | 0 |
+| Igor | Analista de Dados Júnior | trabalho do papel | Conferir no PostgreSQL os lotes da fábrica — nível medio (✅ concluída) | 1 |
 | Larissa | Analista de Customer Insights Pleno | trabalho do papel | Drivers do indicador na base sintética — nível medio (✅ concluída) | 0 |
 | Leandro | Engenheiro de Machine Learning Sênior | trabalho do papel | Treinar o modelo de risco de demanda — nível dificil (✅ concluída) | 0 |
 | Lucas | Cientista de Dados Júnior | trabalho do papel | Perfil e indicadores da base sintética — nível medio (✅ concluída) | 0 |
@@ -146,7 +146,7 @@
 | Renata | Gerente de Operações e Governança de Dad | trabalho do papel | Diagnosticar a planilha original da fábrica — nível profissi (✅ concluída) | 0 |
 | Roberta | Analista de Treinamento e Desenvolviment | trabalho do papel | Situação das contratações — nível medio (✅ concluída) | 0 |
 | Ruan | Analista Pleno de Qualidade de Dados Sin | trabalho do papel na rotina fabrica |   | 0 |
-| Simone | Head de Governança de Dados | trabalho do papel | Verificar dados pessoais (LGPD) na base sintética — nível pr (✅ concluída) | 0 |
+| Simone | Head de Governança de Dados | trabalho do papel | Diagnosticar a planilha original da fábrica — nível profissi (✅ concluída) | 1 |
 | Teodoro | Coordenador da Fábrica de Planilhas | trabalho do papel na rotina fabrica |   | 0 |
 | Tiago | Analista de People Analytics Pleno | trabalho do papel | Situação das contratações — nível medio (✅ concluída) | 0 |
 | Valéria | Revisora Independente de Casos | trabalho do papel | Revisar um caso de treino feito por outro designer — nível d (✅ concluída) | 0 |
@@ -411,13 +411,14 @@ Pacote gerado pelo produto (`python -m robo entregar`) a partir de um projeto ap
 - risco_demanda-v201: **reprovado** (treinado por ml_engenheiro)
 - risco_demanda-v202: **reprovado** (treinado por ml_engenheiro)
 - risco_demanda-v203: **reprovado** (treinado por ml_engenheiro)
-- Última avaliação independente (ml_avaliador): risco_demanda-v203 reprovado — log loss 0.038 contra baseline 0.032; motivos: não bate o baseline (log loss 0.0375 ≥ 0.0315)
-- Referência em sombra: risco_demanda-v144; 12331 previsões em sombra
+- risco_demanda-v204: **reprovado** (treinado por ml_engenheiro)
+- Última avaliação independente (ml_avaliador): risco_demanda-v204 reprovado — log loss 0.037 contra baseline 0.031; motivos: não bate o baseline (log loss 0.0374 ≥ 0.0313)
+- Referência em sombra: risco_demanda-v144; 12396 previsões em sombra
 - Uso operacional: desligado: o modelo só roda em sombra até o dono decidir usá-lo em alguma escolha da empresa
 
 ## Banco de dados
 
-Levantamento das 05/11 21:29: **80 de 99** tabelas com dados (1.279.164 linhas contadas uma a uma).
+Levantamento das 05/11 21:23: **80 de 99** tabelas com dados (1.278.546 linhas contadas uma a uma).
 
 
 | Onde | Tabelas | Com dados |
