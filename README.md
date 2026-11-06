@@ -1,15 +1,15 @@
 # Empresa ao vivo
 
-**Boletim das 06/11 05:37** (horário de Brasília) · trabalhando · SEM BANCO (memória guardada no arquivo do GitHub; o banco é alcançado quando voltar)
+**Boletim das 06/11 05:44** (horário de Brasília) · trabalhando · SEM BANCO (memória guardada no arquivo do GitHub; o banco é alcançado quando voltar)
 
 > Atualiza a cada 5 minutos enquanto a empresa trabalha. Recarregue a página para ver o mais novo.
 
 ## Hoje
 
-- **1103** demandas, **1099** concluídas (100%), 3 parciais, 1 com falha
+- **1105** demandas, **1101** concluídas (100%), 3 parciais, 1 com falha
 - **105** de 105 funcionários já trabalharam
 - SQL: 99 exercícios, 99 conferidos com o gabarito
-- Fábrica: 48 planilhas, 48 conferidas sem erro
+- Fábrica: 49 planilhas, 49 conferidas sem erro
 
 ## Trabalhando agora
 
@@ -20,7 +20,7 @@
 | Andar | Trabalharam | Demandas | Concluídas | Parciais | Falhas |
 |---|--:|--:|--:|--:|--:|
 | 1º | 19 de 19 | 144 | 144 | 0 | 0 |
-| 2º | 18 de 18 | 308 | 307 | 1 | 0 |
+| 2º | 18 de 18 | 310 | 309 | 1 | 0 |
 | 3º | 12 de 12 | 88 | 86 | 2 | 0 |
 | 4º | 32 de 32 | 168 | 167 | 0 | 1 |
 | 5º | 24 de 24 | 395 | 395 | 0 | 0 |
@@ -29,6 +29,8 @@
 
 | Hora | Quem | Trabalho | Resultado |
 |---|---|---|---|
+| 05:40 | Marcos (2º) | Projeto Segmentação — TREINO_churn_20261106_083944_84645 | ✅ concluída |
+| 05:40 | Marcos (2º) | Projeto NPS — TREINO_csat_ces_20261106_082435_75068 | ✅ concluída |
 | 05:35 | Marcos (2º) | Projeto Segmentação — TREINO_csat_ces_20261106_082435_75068 | ✅ concluída |
 | 05:35 | Marcos (2º) | Projeto NPS — TREINO_csat_ces_20261106_082435_75068 | ✅ concluída |
 | 05:35 | Heloísa (5º) | Medir a saúde do PostgreSQL — nível profissional | ✅ concluída |
@@ -37,8 +39,6 @@
 | 05:30 | Marcos (2º) | Projeto Segmentação — TREINO_csat_ces_20261106_082435_75068 | ✅ concluída |
 | 05:29 | Marcos (2º) | Projeto NPS — TREINO_csat_ces_20261106_082435_75068 | ✅ concluída |
 | 05:25 | Marcos (2º) | Projeto Segmentação — TREINO_csat_ces_20261106_082435_75068 | ✅ concluída |
-| 05:25 | Marcos (2º) | Projeto NPS — TREINO_csat_ces_20261106_082435_75068 | ✅ concluída |
-| 05:25 | Hugo (3º) | Perfil e indicadores da base sintética — nível medio | ✅ concluída |
 
 ## Dificuldade (todo o histórico)
 
@@ -47,7 +47,7 @@
 | basico | 616 | 593 | 0 | 23 | 96% |
 | medio | 2247 | 2227 | 0 | 20 | 99% |
 | dificil | 6105 | 6059 | 24 | 22 | 99% |
-| profissional | 4457 | 4447 | 6 | 4 | 100% |
+| profissional | 4459 | 4449 | 6 | 4 | 100% |
 
 ## Cada funcionário
 
@@ -74,7 +74,7 @@
 | Rafael | Engenheiro de Dados Pleno | trabalho do papel | Diagnosticar a planilha original da fábrica — nível medio (✅ concluída) | 8 |
 | Rita | Recepção | trabalho do papel | Diagnosticar a planilha original da fábrica — nível dificil (✅ concluída) | 8 |
 | Saulo | Supervisor de Planilhas | trabalho do papel | Conferir no PostgreSQL os lotes da fábrica — nível dificil (✅ concluída) | 8 |
-| Théo | Estagiário de Engenharia de Dados | estagiário: observa (regra do dono) — Observei Ícaro (Sênior de AWS, Linux e Ubuntu) fazen |   | 0 |
+| Théo | Estagiário de Engenharia de Dados | estagiário: observa (regra do dono) |   | 0 |
 | Tina | Contatos e NPS | trabalho do papel | Diagnosticar a planilha original da fábrica — nível medio (✅ concluída) | 8 |
 
 ### 2º andar
@@ -92,7 +92,7 @@
 | Leandro | Engenheiro de Machine Learning Sênior | trabalho do papel | Perfil e indicadores da base sintética — nível dificil (✅ concluída) | 8 |
 | Lucas | Cientista de Dados Júnior | trabalho do papel | Exercício de SQL no PostgreSQL com os dados da fábrica — nív (✅ concluída) | 8 |
 | Manu | Estagiária de Análise de Dados | estagiário: observa (regra do dono) |   | 0 |
-| Marcos | Coordenador de Análise e Ciência de Dado | trabalho FORA do papel | Projeto Segmentação — TREINO_csat_ces_20261106_082435_75068 (✅ concluída) | 180 |
+| Marcos | Coordenador de Análise e Ciência de Dado | trabalho FORA do papel | Projeto Segmentação — TREINO_churn_20261106_083944_84645 (✅ concluída) | 182 |
 | Natália | Head de Ciência de Dados | trabalho do papel | Calcular a média de uma métrica da base sintética — nível pr (✅ concluída) | 8 |
 | Patrícia | Gerente de Analytics e Customer Insights | trabalho do papel | Calcular a média de uma métrica da base sintética — nível pr (✅ concluída) | 8 |
 | Rebeca | Líder de Engenharia de IA e Machine Lear | trabalho do papel | Calcular a média de uma métrica da base sintética — nível pr (✅ concluída) | 8 |
@@ -105,7 +105,7 @@
 | Quem | Cargo | Situação | Último trabalho | Hoje |
 |---|---|---|---|--:|
 | Bárbara | Especialista Sênior em Power BI | trabalho do papel | Segmentação da base sintética — nível dificil (✅ concluída) | 8 |
-| Enzo | Estagiário da Sala Excel | estagiário: observa (regra do dono) — Observei Ícaro (Sênior de AWS, Linux e Ubuntu) fazen |   | 0 |
+| Enzo | Estagiário da Sala Excel | estagiário: observa (regra do dono) |   | 0 |
 | Felipe | Head de BI e Excel | trabalho do papel | Auditoria por amostragem — nível profissional (✅ concluída) | 8 |
 | Gabriel | Especialista em Tabelas Dinâmicas e Dash | trabalho do papel | Perfil e indicadores da base sintética — nível dificil (✅ concluída) | 8 |
 | Heitor | Analista Pleno de BI | trabalho do papel | Perfil e indicadores da base sintética — nível medio (✅ concluída) | 8 |
@@ -162,11 +162,11 @@
 | André | Head de Infraestrutura e Segurança | trabalho do papel | Testar se o último backup volta — nível profissional (✅ concluída) | 16 |
 | Bianca | Engenheira de Dados Pleno | trabalho do papel | Procurar segredos no repositório público — nível medio (✅ concluída) | 16 |
 | Caetano | Especialista em Orquestração de Dados (A | trabalho do papel | Procurar segredos no repositório público — nível dificil (✅ concluída) | 16 |
-| Caíque | Estagiário de DevOps | estagiário: observa (regra do dono) — Observei Ícaro (Sênior de AWS, Linux e Ubuntu) fazen |   | 0 |
+| Caíque | Estagiário de DevOps | estagiário: observa (regra do dono) |   | 0 |
 | Diego | Desenvolvedor Python Pleno | trabalho do papel | SLA das rotinas — nível medio (✅ concluída) | 16 |
 | Elisa | Especialista em PyYAML (configuração) | trabalho do papel | Medir a saúde do PostgreSQL — nível dificil (✅ concluída) | 16 |
 | Fernanda | Coordenadora de DevOps e Confiabilidade  | trabalho do papel | Testar se o último backup volta — nível dificil (✅ concluída) | 16 |
-| Gael | Estagiário de Engenharia de Dados (Airfl | estagiário: observa (regra do dono) — Observei Ícaro (Sênior de AWS, Linux e Ubuntu) fazen |   | 0 |
+| Gael | Estagiário de Engenharia de Dados (Airfl | estagiário: observa (regra do dono) |   | 0 |
 | Gustavo | Gerente de TI e Infraestrutura | trabalho do papel | Testar se o último backup volta — nível profissional (✅ concluída) | 16 |
 | Heloísa | Head de AWS, Arquitetura e Governança de | trabalho do papel | Medir a saúde do PostgreSQL — nível profissional (✅ concluída) | 31 |
 | Henrique | Head de Engenharia Python | trabalho do papel | Procurar segredos no repositório público — nível profissiona (✅ concluída) | 16 |
@@ -194,15 +194,16 @@
 
 ## Projetos entre andares (várias pessoas, uma etapa depende da outra)
 
+- Projeto Segmentação — TREINO_churn_20261106_083944_84645: **✅ concluída** — 1. validacao (concluida); 2. analise_estatistica (concluida); 3. cd_pleno_segmentos (concluida); 4. cd_junior_anomalias (concluida); 5. sec_senior (concluida); 6. canal_nina (concluida)
+- Projeto NPS — TREINO_csat_ces_20261106_082435_75068: **✅ concluída** — 1. tina_contatos (concluida); 2. analise_perfil (concluida); 3. cd_senior_drivers (concluida); 4. gov_pleno_lgpd (concluida); 5. canal_iara (concluida)
 - Projeto Segmentação — TREINO_csat_ces_20261106_082435_75068: **✅ concluída** — 1. supervisor (concluida); 2. analise_indicadores (concluida); 3. ana_pleno_base (concluida); 4. analise_monitoramento (concluida); 5. sec_senior (concluida); 6. analise_relator (concluida)
-- Projeto NPS — TREINO_csat_ces_20261106_082435_75068: **✅ concluída** — 1. recepcao (concluida); 2. analise_estatistica (concluida); 3. head_ciencia (concluida); 4. gov_pleno_lgpd (concluida); 5. canal_nina (concluida)
-- Projeto Segmentação — TREINO_csat_ces_20261106_082435_75068: **✅ concluída** — 1. publicacao (concluida); 2. analise_perfil (concluida); 3. ana_junior_faixas (concluida); 4. cd_junior_anomalias (concluida); 5. sec_senior (concluida); 6. canal_iara (concluida)
 
-## Última entrega da empresa (TREINO_csat_ces_20261106_082435_75068.xlsx, 06/11 05:35)
+## Última entrega da empresa (TREINO_churn_20261106_083944_84645.xlsx, 06/11 05:40)
 
 Pacote gerado pelo produto (`python -m robo entregar`) a partir de um projeto aprovado:
 
-1. Priorizar **nota_ces**: os atributos têm notas parecidas (média ~3,0 de 7), então o maior ganho vem de melhorar o que mais pesa na nota (correlação 0,01).
+1. Entender a diferença em **plano = Premium**: Média de mensalidade 149,71 contra 64,91 no restante (diferença real, n=454).
+2. **Valores suspeitos:** 454 apontado(s) (idade impossível (fora de 0 a 120): 454). Estão na aba suspeitos do indicadores.xlsx com a chave de cada linha: confira na origem.
 
 ## Inteligência própria (modelo de risco das demandas)
 
