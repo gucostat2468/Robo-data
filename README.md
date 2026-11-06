@@ -1,12 +1,12 @@
 # Empresa ao vivo
 
-**Boletim das 06/11 18:54** (horário de Brasília) · trabalhando · SEM BANCO (memória guardada no arquivo do GitHub; o banco é alcançado quando voltar)
+**Boletim das 06/11 18:57** (horário de Brasília) · entre turnos: memória salva; o próximo turno começa em poucos minutos · SEM BANCO (memória guardada no arquivo do GitHub; o banco é alcançado quando voltar)
 
 > Atualiza a cada 5 minutos enquanto a empresa trabalha. Recarregue a página para ver o mais novo.
 
 ## Hoje
 
-- **2721** demandas, **2714** concluídas (100%), 4 parciais, 3 com falha
+- **2723** demandas, **2716** concluídas (100%), 4 parciais, 3 com falha
 - **105** de 105 funcionários já trabalharam
 - SQL: 249 exercícios, 249 conferidos com o gabarito
 - Fábrica: 108 planilhas, 108 conferidas sem erro
@@ -20,7 +20,7 @@
 | Andar | Trabalharam | Demandas | Concluídas | Parciais | Falhas |
 |---|--:|--:|--:|--:|--:|
 | 1º | 19 de 19 | 360 | 360 | 0 | 0 |
-| 2º | 18 de 18 | 760 | 759 | 1 | 0 |
+| 2º | 18 de 18 | 762 | 761 | 1 | 0 |
 | 3º | 12 de 12 | 220 | 217 | 2 | 1 |
 | 4º | 32 de 32 | 420 | 418 | 0 | 2 |
 | 5º | 24 de 24 | 961 | 960 | 1 | 0 |
@@ -29,6 +29,8 @@
 
 | Hora | Quem | Trabalho | Resultado |
 |---|---|---|---|
+| 18:56 | Marcos (2º) | Projeto Segmentação — TREINO_csat_ces_20261106_212204_24959 | ✅ concluída |
+| 18:56 | Marcos (2º) | Projeto NPS — TREINO_csat_ces_20261106_212204_24959 | ✅ concluída |
 | 18:49 | Marcos (2º) | Projeto Segmentação — TREINO_csat_ces_20261106_212204_24959 | ✅ concluída |
 | 18:49 | Marcos (2º) | Projeto NPS — TREINO_csat_ces_20261106_212204_24959 | ✅ concluída |
 | 18:44 | Marcos (2º) | Projeto Segmentação — TREINO_csat_ces_20261106_212204_24959 | ✅ concluída |
@@ -37,8 +39,6 @@
 | 18:43 | Marina (5º) | Medir a saúde do PostgreSQL — nível dificil | ✅ concluída |
 | 18:43 | Ícaro (5º) | Medir a saúde do PostgreSQL — nível dificil | ✅ concluída |
 | 18:38 | Marcos (2º) | Projeto Segmentação — TREINO_csat_ces_20261106_212204_24959 | ✅ concluída |
-| 18:38 | Marcos (2º) | Projeto NPS — TREINO_csat_ces_20261106_212204_24959 | ✅ concluída |
-| 18:38 | Wagner (5º) | Verificar dados pessoais (LGPD) na base sintética — nível dificil | ✅ concluída |
 
 ## Dificuldade (todo o histórico)
 
@@ -47,7 +47,7 @@
 | basico | 665 | 641 | 0 | 24 | 96% |
 | medio | 2506 | 2485 | 0 | 21 | 99% |
 | dificil | 6840 | 6793 | 25 | 22 | 99% |
-| profissional | 5032 | 5022 | 6 | 4 | 100% |
+| profissional | 5034 | 5024 | 6 | 4 | 100% |
 
 ## Cada funcionário
 
@@ -92,7 +92,7 @@
 | Leandro | Engenheiro de Machine Learning Sênior | trabalho do papel | Exercício de SQL no PostgreSQL com os dados da fábrica — nív (✅ concluída) | 20 |
 | Lucas | Cientista de Dados Júnior | trabalho do papel | Exercício de SQL no PostgreSQL com os dados da fábrica — nív (✅ concluída) | 20 |
 | Manu | Estagiária de Análise de Dados | estagiário: observa (regra do dono) |   | 0 |
-| Marcos | Coordenador de Análise e Ciência de Dado | trabalho FORA do papel | Projeto Segmentação — TREINO_csat_ces_20261106_212204_24959 (✅ concluída) | 440 |
+| Marcos | Coordenador de Análise e Ciência de Dado | trabalho FORA do papel | Projeto Segmentação — TREINO_csat_ces_20261106_212204_24959 (✅ concluída) | 442 |
 | Natália | Head de Ciência de Dados | trabalho do papel | Exercício de SQL no PostgreSQL com os dados da fábrica — nív (✅ concluída) | 20 |
 | Patrícia | Gerente de Analytics e Customer Insights | trabalho do papel | Exercício de SQL no PostgreSQL com os dados da fábrica — nív (✅ concluída) | 20 |
 | Rebeca | Líder de Engenharia de IA e Machine Lear | trabalho do papel | Drivers do indicador na base sintética — nível profissional (✅ concluída) | 20 |
@@ -186,19 +186,19 @@
 
 ## Tempo do último turno (medido)
 
-- 20:34–21:14 (40 min, 105 voltas; cobertura do cronômetro 100%)
-- **Entregas aprovadas na revisão independente: 87 (130.3 por hora)** — o indicador principal
-- operacional 11% · estudo 1% · revisao 2% · coordenacao 0% · manutencao 21% · erro 0% · parado 65% · sem_medicao 0%
-- Bloqueios: 1; etapas esperando dependência: 0
-- Turnos anteriores (entregas/hora): 182.7, 92.8, 122.8, 157.2, 100.3
+- 21:17–21:57 (40 min, 83 voltas; cobertura do cronômetro 100%)
+- **Entregas aprovadas na revisão independente: 62 (92.8 por hora)** — o indicador principal
+- operacional 16% · estudo 1% · revisao 2% · coordenacao 0% · manutencao 29% · erro 0% · parado 51% · sem_medicao 0%
+- Bloqueios: 0; etapas esperando dependência: 0
+- Turnos anteriores (entregas/hora): 130.3, 182.7, 92.8, 122.8, 157.2
 
 ## Projetos entre andares (várias pessoas, uma etapa depende da outra)
 
+- Projeto Segmentação — TREINO_csat_ces_20261106_212204_24959: **✅ concluída** — 1. eng_pleno_tipos (concluida); 2. analise_estatistica (concluida); 3. ana_junior_faixas (concluida); 4. cd_junior_anomalias (concluida); 5. sec_senior (concluida); 6. canal_iara (concluida)
+- Projeto NPS — TREINO_csat_ces_20261106_212204_24959: **✅ concluída** — 1. eng_pleno_releitura (concluida); 2. analise_perfil (concluida); 3. cd_senior_drivers (concluida); 4. gov_pleno_lgpd (concluida); 5. analise_relator (concluida)
 - Projeto Segmentação — TREINO_csat_ces_20261106_212204_24959: **✅ concluída** — 1. eng_junior_espacos (concluida); 2. analise_indicadores (concluida); 3. cd_pleno_segmentos (concluida); 4. analise_monitoramento (concluida); 5. sec_senior (concluida); 6. canal_nina (concluida)
-- Projeto NPS — TREINO_csat_ces_20261106_212204_24959: **✅ concluída** — 1. eng_junior_auditoria (concluida); 2. analise_estatistica (concluida); 3. head_ciencia (concluida); 4. gov_pleno_lgpd (concluida); 5. canal_iara (concluida)
-- Projeto Segmentação — TREINO_csat_ces_20261106_212204_24959: **✅ concluída** — 1. dir_dados (concluida); 2. analise_perfil (concluida); 3. ana_pleno_base (concluida); 4. cd_junior_anomalias (concluida); 5. sec_senior (concluida); 6. analise_relator (concluida)
 
-## Última entrega da empresa (TREINO_csat_ces_20261106_212204_24959.xlsx, 06/11 18:49)
+## Última entrega da empresa (TREINO_csat_ces_20261106_212204_24959.xlsx, 06/11 18:56)
 
 Pacote gerado pelo produto (`python -m robo entregar`) a partir de um projeto aprovado:
 
@@ -447,7 +447,7 @@ Pacote gerado pelo produto (`python -m robo entregar`) a partir de um projeto ap
 
 ## Banco de dados
 
-Levantamento das 06/11 18:53: **78 de 97** tabelas com dados (1.452.713 linhas contadas uma a uma).
+Levantamento das 06/11 18:57: **78 de 97** tabelas com dados (1.453.239 linhas contadas uma a uma).
 
 
 | Onde | Tabelas | Com dados |
