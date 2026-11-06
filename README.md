@@ -1,12 +1,12 @@
 # Empresa ao vivo
 
-**Boletim das 06/11 02:23** (horário de Brasília) · trabalhando · SEM BANCO (memória guardada no arquivo do GitHub; o banco é alcançado quando voltar)
+**Boletim das 06/11 02:29** (horário de Brasília) · entre turnos: memória salva; o próximo turno começa em poucos minutos · SEM BANCO (memória guardada no arquivo do GitHub; o banco é alcançado quando voltar)
 
 > Atualiza a cada 5 minutos enquanto a empresa trabalha. Recarregue a página para ver o mais novo.
 
 ## Hoje
 
-- **685** demandas, **681** concluídas (99%), 3 parciais, 1 com falha
+- **687** demandas, **683** concluídas (99%), 3 parciais, 1 com falha
 - **105** de 105 funcionários já trabalharam
 - SQL: 61 exercícios, 61 conferidos com o gabarito
 - Fábrica: 30 planilhas, 30 conferidas sem erro
@@ -20,7 +20,7 @@
 | Andar | Trabalharam | Demandas | Concluídas | Parciais | Falhas |
 |---|--:|--:|--:|--:|--:|
 | 1º | 19 de 19 | 90 | 90 | 0 | 0 |
-| 2º | 18 de 18 | 190 | 189 | 1 | 0 |
+| 2º | 18 de 18 | 192 | 191 | 1 | 0 |
 | 3º | 12 de 12 | 55 | 53 | 2 | 0 |
 | 4º | 32 de 32 | 105 | 104 | 0 | 1 |
 | 5º | 24 de 24 | 245 | 245 | 0 | 0 |
@@ -29,6 +29,8 @@
 
 | Hora | Quem | Trabalho | Resultado |
 |---|---|---|---|
+| 02:25 | Marcos (2º) | Projeto Segmentação — TREINO_vendas_20261106_052156_16782 | ✅ concluída |
+| 02:25 | Marcos (2º) | Projeto NPS — TREINO_nps_20261106_045137_97579 | ✅ concluída |
 | 02:18 | Marcos (2º) | Projeto Segmentação — TREINO_educacao_20261106_050642_02872 | ✅ concluída |
 | 02:18 | Marcos (2º) | Projeto NPS — TREINO_nps_20261106_045137_97579 | ✅ concluída |
 | 02:13 | Marcos (2º) | Projeto Segmentação — TREINO_educacao_20261106_050642_02872 | ✅ concluída |
@@ -37,8 +39,6 @@
 | 02:13 | Paula (3º) | Calcular a média de uma métrica da base sintética | ✅ concluída |
 | 02:13 | Nina (4º) | Calcular a média de uma métrica da base sintética — nível medio | ✅ concluída |
 | 02:13 | Tânia (3º) | Segmentação da base sintética — nível dificil | ✅ concluída |
-| 02:13 | Vitor (4º) | Diagnosticar a planilha original da fábrica — nível medio | ✅ concluída |
-| 02:13 | Pedro (3º) | Segmentação da base sintética — nível dificil | ✅ concluída |
 
 ## Dificuldade (todo o histórico)
 
@@ -47,7 +47,7 @@
 | basico | 604 | 581 | 0 | 23 | 96% |
 | medio | 2181 | 2161 | 0 | 20 | 99% |
 | dificil | 5916 | 5870 | 24 | 22 | 99% |
-| profissional | 4306 | 4296 | 6 | 4 | 100% |
+| profissional | 4308 | 4298 | 6 | 4 | 100% |
 
 ## Cada funcionário
 
@@ -92,7 +92,7 @@
 | Leandro | Engenheiro de Machine Learning Sênior | trabalho do papel | Anomalias na base sintética — nível dificil (✅ concluída) | 5 |
 | Lucas | Cientista de Dados Júnior | trabalho do papel | Diagnosticar a planilha original da fábrica — nível medio (✅ concluída) | 5 |
 | Manu | Estagiária de Análise de Dados | estagiário: observa (regra do dono) |   | 0 |
-| Marcos | Coordenador de Análise e Ciência de Dado | trabalho FORA do papel | Projeto Segmentação — TREINO_educacao_20261106_050642_02872 (✅ concluída) | 110 |
+| Marcos | Coordenador de Análise e Ciência de Dado | trabalho FORA do papel | Projeto Segmentação — TREINO_vendas_20261106_052156_16782 (✅ concluída) | 112 |
 | Natália | Head de Ciência de Dados | trabalho do papel | Perfil e indicadores da base sintética — nível profissional (✅ concluída) | 5 |
 | Patrícia | Gerente de Analytics e Customer Insights | trabalho do papel | Conferir no PostgreSQL os lotes da fábrica — nível profissio (✅ concluída) | 5 |
 | Rebeca | Líder de Engenharia de IA e Machine Lear | trabalho do papel | Programa de modelos: backlog e critérios — nível profissiona (✅ concluída) | 5 |
@@ -186,23 +186,23 @@
 
 ## Tempo do último turno (medido)
 
-- 04:05–04:45 (40 min, 96 voltas; cobertura do cronômetro 100%)
-- **Entregas aprovadas na revisão independente: 65 (97.3 por hora)** — o indicador principal
-- operacional 11% · estudo 1% · revisao 2% · coordenacao 0% · manutencao 26% · erro 0% · parado 60% · sem_medicao 0%
-- Bloqueios: 0; etapas esperando dependência: 0
-- Turnos anteriores (entregas/hora): 151.2, 161.7, 95.9, 155.8, 154.3
+- 04:48–05:28 (40 min, 96 voltas; cobertura do cronômetro 100%)
+- **Entregas aprovadas na revisão independente: 105 (157.3 por hora)** — o indicador principal
+- operacional 14% · estudo 1% · revisao 2% · coordenacao 0% · manutencao 24% · erro 0% · parado 60% · sem_medicao 0%
+- Bloqueios: 8; etapas esperando dependência: 0
+- Turnos anteriores (entregas/hora): 97.3, 151.2, 161.7, 95.9, 155.8
 
 ## Projetos entre andares (várias pessoas, uma etapa depende da outra)
 
+- Projeto Segmentação — TREINO_vendas_20261106_052156_16782: **✅ concluída** — 1. coord_engenharia (concluida); 2. analise_estatistica (concluida); 3. ana_junior_faixas (concluida); 4. cd_junior_anomalias (concluida); 5. sec_senior (concluida); 6. canal_iara (concluida)
+- Projeto NPS — TREINO_nps_20261106_045137_97579: **✅ concluída** — 1. banco (concluida); 2. analise_perfil (concluida); 3. head_ciencia (concluida); 4. gov_pleno_lgpd (concluida); 5. analise_relator (concluida)
 - Projeto Segmentação — TREINO_educacao_20261106_050642_02872: **✅ concluída** — 1. validacao (concluida); 2. analise_indicadores (concluida); 3. cd_pleno_segmentos (concluida); 4. analise_monitoramento (concluida); 5. sec_senior (concluida); 6. canal_nina (concluida)
-- Projeto NPS — TREINO_nps_20261106_045137_97579: **✅ concluída** — 1. tina_contatos (concluida); 2. analise_estatistica (concluida); 3. cd_senior_drivers (concluida); 4. gov_pleno_lgpd (concluida); 5. canal_iara (concluida)
-- Projeto Segmentação — TREINO_educacao_20261106_050642_02872: **✅ concluída** — 1. supervisor (concluida); 2. analise_perfil (concluida); 3. ana_pleno_base (concluida); 4. cd_junior_anomalias (concluida); 5. sec_senior (concluida); 6. analise_relator (concluida)
 
-## Última entrega da empresa (TREINO_educacao_20261106_050642_02872.xlsx, 06/11 02:18)
+## Última entrega da empresa (TREINO_vendas_20261106_052156_16782.xlsx, 06/11 02:25)
 
 Pacote gerado pelo produto (`python -m robo entregar`) a partir de um projeto aprovado:
 
-1. Entender a diferença em **evadiu = Não**: Média de frequencia 83,34 contra 69,01 no restante (diferença real, n=2709).
+1. Conferir 37 valor(es) fora do padrão em **valor_da_venda** (1,4% da base): podem ser erro de digitação ou casos reais que merecem olhar.
 
 ## Inteligência própria (modelo de risco das demandas)
 
@@ -422,7 +422,7 @@ Pacote gerado pelo produto (`python -m robo entregar`) a partir de um projeto ap
 
 ## Banco de dados
 
-Levantamento das 06/11 02:23: **82 de 101** tabelas com dados (1.323.670 linhas contadas uma a uma).
+Levantamento das 06/11 02:28: **82 de 101** tabelas com dados (1.324.196 linhas contadas uma a uma).
 
 
 | Onde | Tabelas | Com dados |
