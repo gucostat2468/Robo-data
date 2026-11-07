@@ -1,15 +1,15 @@
 # Empresa ao vivo
 
-**Boletim das 07/11 13:20** (horário de Brasília) · trabalhando · SEM BANCO (memória guardada no arquivo do GitHub; o banco é alcançado quando voltar)
+**Boletim das 07/11 13:27** (horário de Brasília) · trabalhando · SEM BANCO (memória guardada no arquivo do GitHub; o banco é alcançado quando voltar)
 
 > Atualiza a cada 5 minutos enquanto a empresa trabalha. Recarregue a página para ver o mais novo.
 
 ## Hoje
 
-- **1940** demandas, **1935** concluídas (100%), 5 parciais, 0 com falha
+- **1942** demandas, **1937** concluídas (100%), 5 parciais, 0 com falha
 - **105** de 105 funcionários já trabalharam
 - SQL: 176 exercícios, 176 conferidos com o gabarito
-- Fábrica: 88 planilhas, 88 conferidas sem erro
+- Fábrica: 89 planilhas, 89 conferidas sem erro
 
 ## Trabalhando agora
 
@@ -20,7 +20,7 @@
 | Andar | Trabalharam | Demandas | Concluídas | Parciais | Falhas |
 |---|--:|--:|--:|--:|--:|
 | 1º | 19 de 19 | 266 | 266 | 0 | 0 |
-| 2º | 18 de 18 | 526 | 524 | 2 | 0 |
+| 2º | 18 de 18 | 528 | 526 | 2 | 0 |
 | 3º | 12 de 12 | 157 | 156 | 1 | 0 |
 | 4º | 32 de 32 | 308 | 307 | 1 | 0 |
 | 5º | 24 de 24 | 683 | 682 | 1 | 0 |
@@ -29,6 +29,8 @@
 
 | Hora | Quem | Trabalho | Resultado |
 |---|---|---|---|
+| 13:23 | Marcos (2º) | Projeto Segmentação — TREINO_folha_20261107_162236_56548 | ✅ concluída |
+| 13:23 | Marcos (2º) | Projeto NPS — TREINO_nps_20261107_160724_44649 | ✅ concluída |
 | 13:18 | Marcos (2º) | Projeto Segmentação — TREINO_funil_20261107_160728_48512 | ✅ concluída |
 | 13:17 | Marcos (2º) | Projeto NPS — TREINO_nps_20261107_160724_44649 | ✅ concluída |
 | 13:12 | Marcos (2º) | Projeto Segmentação — TREINO_funil_20261107_160728_48512 | ✅ concluída |
@@ -37,8 +39,6 @@
 | 13:08 | Marcos (2º) | Projeto NPS — TREINO_nps_20261107_160724_44649 | ✅ concluída |
 | 13:08 | Ícaro (5º) | Testar se o último backup volta — nível dificil | ✅ concluída |
 | 13:08 | Heloísa (5º) | Testar se o último backup volta — nível profissional | ✅ concluída |
-| 13:08 | Marina (5º) | Procurar segredos no repositório público — nível dificil | ✅ concluída |
-| 13:08 | Jonas (5º) | Procurar segredos no repositório público — nível dificil | ✅ concluída |
 
 ## Dificuldade (todo o histórico)
 
@@ -47,7 +47,7 @@
 | basico | 736 | 712 | 0 | 24 | 97% |
 | medio | 2865 | 2841 | 0 | 24 | 99% |
 | dificil | 7851 | 7799 | 30 | 22 | 99% |
-| profissional | 5802 | 5789 | 9 | 4 | 100% |
+| profissional | 5804 | 5791 | 9 | 4 | 100% |
 
 ## Cada funcionário
 
@@ -92,7 +92,7 @@
 | Leandro | Engenheiro de Machine Learning Sênior | trabalho do papel | Treinar o modelo de risco de demanda — nível dificil (✅ concluída) | 15 |
 | Lucas | Cientista de Dados Júnior | trabalho do papel | Calcular a média de uma métrica da base sintética — nível me (✅ concluída) | 15 |
 | Manu | Estagiária de Análise de Dados | estagiário: observa (regra do dono) |   | 0 |
-| Marcos | Coordenador de Análise e Ciência de Dado | trabalho FORA do papel | Projeto Segmentação — TREINO_funil_20261107_160728_48512 (✅ concluída) | 290 |
+| Marcos | Coordenador de Análise e Ciência de Dado | trabalho FORA do papel | Projeto Segmentação — TREINO_folha_20261107_162236_56548 (✅ concluída) | 292 |
 | Natália | Head de Ciência de Dados | trabalho do papel | Anomalias na base sintética — nível profissional (✅ concluída) | 15 |
 | Patrícia | Gerente de Analytics e Customer Insights | trabalho do papel | Situação do andar agora — nível profissional (✅ concluída) | 15 |
 | Rebeca | Líder de Engenharia de IA e Machine Lear | trabalho do papel | Perfil e indicadores da base sintética — nível profissional (✅ concluída) | 15 |
@@ -194,18 +194,17 @@
 
 ## Projetos entre andares (várias pessoas, uma etapa depende da outra)
 
+- Projeto Segmentação — TREINO_folha_20261107_162236_56548: **✅ concluída** — 1. supervisor (concluida); 2. analise_monitoramento (concluida); 3. ana_pleno_base (concluida); 4. cd_junior_anomalias (concluida); 5. sec_senior (concluida); 6. analise_relator (concluida)
+- Projeto NPS — TREINO_nps_20261107_160724_44649: **✅ concluída** — 1. recepcao (concluida); 2. analise_indicadores (concluida); 3. cd_senior_drivers (concluida); 4. gov_pleno_lgpd (concluida); 5. canal_nina (concluida)
 - Projeto Segmentação — TREINO_funil_20261107_160728_48512: **✅ concluída** — 1. publicacao (concluida); 2. analise_estatistica (concluida); 3. ana_junior_faixas (concluida); 4. cd_junior_anomalias (concluida); 5. sec_senior (concluida); 6. canal_iara (concluida)
-- Projeto NPS — TREINO_nps_20261107_160724_44649: **✅ concluída** — 1. modelagem (concluida); 2. analise_perfil (concluida); 3. head_ciencia (concluida); 4. gov_pleno_lgpd (concluida); 5. analise_relator (concluida)
-- Projeto Segmentação — TREINO_funil_20261107_160728_48512: **✅ concluída** — 1. limpeza (concluida); 2. analise_indicadores (concluida); 3. cd_pleno_segmentos (concluida); 4. analise_monitoramento (concluida); 5. sec_senior (concluida); 6. canal_nina (concluida)
 
-## Última entrega da empresa (TREINO_funil_20261107_160728_48512.xlsx, 07/11 13:18)
+## Última entrega da empresa (TREINO_folha_20261107_162236_56548.xlsx, 07/11 13:23)
 
 Pacote gerado pelo produto (`python -m robo entregar`) a partir de um projeto aprovado:
 
-1. Alta no último mês (2026-09): soma de valor_da_oportunidade 22,1% acima da média dos 3 meses anteriores. Confirme se o mês está completo antes de concluir.
-2. Conferir 14 valor(es) fora do padrão em **valor_da_oportunidade** (1,4% da base): podem ser erro de digitação ou casos reais que merecem olhar.
-3. Entender a diferença em **origem_do_lead = Evento**: Média de valor_da_oportunidade 3.864,15 contra 4.917,29 no restante (diferença real, n=82).
-4. **Valores suspeitos:** 1014 apontado(s) (idade impossível (fora de 0 a 120): 1014). Estão na aba suspeitos do indicadores.xlsx com a chave de cada linha: confira na origem.
+1. Conferir 91 valor(es) fora do padrão em **salario_base** (3,1% da base): podem ser erro de digitação ou casos reais que merecem olhar.
+2. Conferir 34 valor(es) fora do padrão em **horas_extras** (1,1% da base): podem ser erro de digitação ou casos reais que merecem olhar.
+3. Entender a diferença em **cargo = Gerente**: Média de salario_base 17.038,93 contra 5.505,26 no restante (diferença real, n=191).
 
 ## Inteligência própria (modelo de risco das demandas)
 
