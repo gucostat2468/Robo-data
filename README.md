@@ -1,15 +1,15 @@
 # Empresa ao vivo
 
-**Boletim das 07/11 12:53** (horário de Brasília) · trabalhando · SEM BANCO (memória guardada no arquivo do GitHub; o banco é alcançado quando voltar)
+**Boletim das 07/11 12:59** (horário de Brasília) · entre turnos: memória salva; o próximo turno começa em poucos minutos · SEM BANCO (memória guardada no arquivo do GitHub; o banco é alcançado quando voltar)
 
 > Atualiza a cada 5 minutos enquanto a empresa trabalha. Recarregue a página para ver o mais novo.
 
 ## Hoje
 
-- **1910** demandas, **1905** concluídas (100%), 5 parciais, 0 com falha
+- **1912** demandas, **1907** concluídas (100%), 5 parciais, 0 com falha
 - **105** de 105 funcionários já trabalharam
 - SQL: 176 exercícios, 176 conferidos com o gabarito
-- Fábrica: 85 planilhas, 85 conferidas sem erro
+- Fábrica: 86 planilhas, 86 conferidas sem erro
 
 ## Trabalhando agora
 
@@ -20,7 +20,7 @@
 | Andar | Trabalharam | Demandas | Concluídas | Parciais | Falhas |
 |---|--:|--:|--:|--:|--:|
 | 1º | 19 de 19 | 266 | 266 | 0 | 0 |
-| 2º | 18 de 18 | 518 | 516 | 2 | 0 |
+| 2º | 18 de 18 | 520 | 518 | 2 | 0 |
 | 3º | 12 de 12 | 157 | 156 | 1 | 0 |
 | 4º | 32 de 32 | 308 | 307 | 1 | 0 |
 | 5º | 24 de 24 | 661 | 660 | 1 | 0 |
@@ -29,6 +29,8 @@
 
 | Hora | Quem | Trabalho | Resultado |
 |---|---|---|---|
+| 12:55 | Marcos (2º) | Projeto Segmentação — TREINO_rfm_20261107_155521_21659 | ✅ concluída |
+| 12:55 | Marcos (2º) | Projeto NPS — TREINO_csat_ces_20261107_152326_06838 | ✅ concluída |
 | 12:48 | Marcos (2º) | Projeto Segmentação — TREINO_churn_20261107_153835_15980 | ✅ concluída |
 | 12:48 | Marcos (2º) | Projeto NPS — TREINO_csat_ces_20261107_152326_06838 | ✅ concluída |
 | 12:42 | Marcos (2º) | Projeto Segmentação — TREINO_churn_20261107_153835_15980 | ✅ concluída |
@@ -37,8 +39,6 @@
 | 12:42 | Heloísa (5º) | Procurar segredos no repositório público — nível profissional | ✅ concluída |
 | 12:42 | Marina (5º) | Medir a saúde do PostgreSQL — nível dificil | ✅ concluída |
 | 12:35 | Marcos (2º) | Projeto Segmentação — TREINO_csat_ces_20261107_152326_06838 | ✅ concluída |
-| 12:35 | Marcos (2º) | Projeto NPS — TREINO_csat_ces_20261107_152326_06838 | ✅ concluída |
-| 12:29 | Marcos (2º) | Projeto Segmentação — TREINO_csat_ces_20261107_152326_06838 | ✅ concluída |
 
 ## Dificuldade (todo o histórico)
 
@@ -47,7 +47,7 @@
 | basico | 735 | 711 | 0 | 24 | 97% |
 | medio | 2862 | 2838 | 0 | 24 | 99% |
 | dificil | 7838 | 7786 | 30 | 22 | 99% |
-| profissional | 5789 | 5776 | 9 | 4 | 100% |
+| profissional | 5791 | 5778 | 9 | 4 | 100% |
 
 ## Cada funcionário
 
@@ -92,7 +92,7 @@
 | Leandro | Engenheiro de Machine Learning Sênior | trabalho do papel | Treinar o modelo de risco de demanda — nível dificil (✅ concluída) | 15 |
 | Lucas | Cientista de Dados Júnior | trabalho do papel | Calcular a média de uma métrica da base sintética — nível me (✅ concluída) | 15 |
 | Manu | Estagiária de Análise de Dados | estagiário: observa (regra do dono) |   | 0 |
-| Marcos | Coordenador de Análise e Ciência de Dado | trabalho FORA do papel | Projeto Segmentação — TREINO_churn_20261107_153835_15980 (✅ concluída) | 282 |
+| Marcos | Coordenador de Análise e Ciência de Dado | trabalho FORA do papel | Projeto Segmentação — TREINO_rfm_20261107_155521_21659 (✅ concluída) | 284 |
 | Natália | Head de Ciência de Dados | trabalho do papel | Anomalias na base sintética — nível profissional (✅ concluída) | 15 |
 | Patrícia | Gerente de Analytics e Customer Insights | trabalho do papel | Situação do andar agora — nível profissional (✅ concluída) | 15 |
 | Rebeca | Líder de Engenharia de IA e Machine Lear | trabalho do papel | Perfil e indicadores da base sintética — nível profissional (✅ concluída) | 15 |
@@ -186,24 +186,26 @@
 
 ## Tempo do último turno (medido)
 
-- 14:34–15:14 (41 min, 77 voltas; cobertura do cronômetro 100%)
-- **Entregas aprovadas na revisão independente: 37 (54.6 por hora)** — o indicador principal
-- operacional 15% · estudo 1% · revisao 2% · coordenacao 0% · manutencao 35% · erro 0% · parado 47% · sem_medicao 0%
-- Bloqueios: 0; etapas esperando dependência: 0
-- Turnos anteriores (entregas/hora): 161.7, 183.6, 55.4, 161.7, 185.7
+- 15:18–15:58 (40 min, 73 voltas; cobertura do cronômetro 100%)
+- **Entregas aprovadas na revisão independente: 103 (154.0 por hora)** — o indicador principal
+- operacional 19% · estudo 1% · revisao 4% · coordenacao 0% · manutencao 30% · erro 0% · parado 45% · sem_medicao 0%
+- Bloqueios: 1; etapas esperando dependência: 0
+- Turnos anteriores (entregas/hora): 54.6, 161.7, 183.6, 55.4, 161.7
 
 ## Projetos entre andares (várias pessoas, uma etapa depende da outra)
 
+- Projeto Segmentação — TREINO_rfm_20261107_155521_21659: **✅ concluída** — 1. eng_pleno_tipos (concluida); 2. analise_estatistica (concluida); 3. ana_junior_faixas (concluida); 4. analise_monitoramento (concluida); 5. sec_senior (concluida); 6. canal_iara (concluida)
+- Projeto NPS — TREINO_csat_ces_20261107_152326_06838: **✅ concluída** — 1. eng_pleno_releitura (concluida); 2. analise_perfil (concluida); 3. cd_senior_drivers (concluida); 4. gov_pleno_lgpd (concluida); 5. analise_relator (concluida)
 - Projeto Segmentação — TREINO_churn_20261107_153835_15980: **✅ concluída** — 1. eng_junior_espacos (concluida); 2. analise_monitoramento (concluida); 3. cd_pleno_segmentos (concluida); 4. cd_junior_anomalias (concluida); 5. sec_senior (concluida); 6. canal_nina (concluida)
-- Projeto NPS — TREINO_csat_ces_20261107_152326_06838: **✅ concluída** — 1. eng_junior_auditoria (concluida); 2. analise_indicadores (concluida); 3. head_ciencia (concluida); 4. gov_pleno_lgpd (concluida); 5. canal_iara (concluida)
-- Projeto Segmentação — TREINO_churn_20261107_153835_15980: **✅ concluída** — 1. dir_dados (concluida); 2. analise_estatistica (concluida); 3. ana_pleno_base (concluida); 4. cd_junior_anomalias (concluida); 5. sec_senior (concluida); 6. analise_relator (concluida)
 
-## Última entrega da empresa (TREINO_churn_20261107_153835_15980.xlsx, 07/11 12:48)
+## Última entrega da empresa (TREINO_rfm_20261107_155521_21659.xlsx, 07/11 12:55)
 
 Pacote gerado pelo produto (`python -m robo entregar`) a partir de um projeto aprovado:
 
-1. Entender a diferença em **plano = Premium**: Média de mensalidade 150,49 contra 64,22 no restante (diferença real, n=738).
-2. **Valores suspeitos:** 738 apontado(s) (idade impossível (fora de 0 a 120): 738). Estão na aba suspeitos do indicadores.xlsx com a chave de cada linha: confira na origem.
+1. Queda no último mês (2026-09): soma de valor_total 29,2% abaixo da média dos 3 meses anteriores. Confirme se o mês está completo antes de concluir.
+2. Conferir 29 valor(es) fora do padrão em **frequencia_pedidos** (0,7% da base): podem ser erro de digitação ou casos reais que merecem olhar.
+3. Conferir 68 valor(es) fora do padrão em **valor_total** (1,7% da base): podem ser erro de digitação ou casos reais que merecem olhar.
+4. Entender a diferença em **canal = Atacado**: Média de frequencia_pedidos 14,84 contra 6,01 no restante (diferença real, n=825).
 
 ## Inteligência própria (modelo de risco das demandas)
 
@@ -475,7 +477,7 @@ Pacote gerado pelo produto (`python -m robo entregar`) a partir de um projeto ap
 
 ## Banco de dados
 
-Levantamento das 07/11 12:09: **82 de 101** tabelas com dados (1.603.340 linhas contadas uma a uma).
+Levantamento das 07/11 12:59: **82 de 101** tabelas com dados (1.611.772 linhas contadas uma a uma).
 
 
 | Onde | Tabelas | Com dados |
