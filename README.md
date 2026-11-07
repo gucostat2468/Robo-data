@@ -1,15 +1,15 @@
 # Empresa ao vivo
 
-**Boletim das 07/11 10:26** (horário de Brasília) · trabalhando · SEM BANCO (memória guardada no arquivo do GitHub; o banco é alcançado quando voltar)
+**Boletim das 07/11 10:33** (horário de Brasília) · trabalhando · SEM BANCO (memória guardada no arquivo do GitHub; o banco é alcançado quando voltar)
 
 > Atualiza a cada 5 minutos enquanto a empresa trabalha. Recarregue a página para ver o mais novo.
 
 ## Hoje
 
-- **1634** demandas, **1629** concluídas (100%), 5 parciais, 0 com falha
+- **1636** demandas, **1631** concluídas (100%), 5 parciais, 0 com falha
 - **105** de 105 funcionários já trabalharam
 - SQL: 151 exercícios, 151 conferidos com o gabarito
-- Fábrica: 72 planilhas, 72 conferidas sem erro
+- Fábrica: 73 planilhas, 73 conferidas sem erro
 
 ## Trabalhando agora
 
@@ -20,7 +20,7 @@
 | Andar | Trabalharam | Demandas | Concluídas | Parciais | Falhas |
 |---|--:|--:|--:|--:|--:|
 | 1º | 19 de 19 | 230 | 230 | 0 | 0 |
-| 2º | 18 de 18 | 442 | 440 | 2 | 0 |
+| 2º | 18 de 18 | 444 | 442 | 2 | 0 |
 | 3º | 12 de 12 | 135 | 134 | 1 | 0 |
 | 4º | 32 de 32 | 266 | 265 | 1 | 0 |
 | 5º | 24 de 24 | 561 | 560 | 1 | 0 |
@@ -29,6 +29,8 @@
 
 | Hora | Quem | Trabalho | Resultado |
 |---|---|---|---|
+| 10:28 | Marcos (2º) | Projeto Segmentação — TREINO_funil_20261107_132820_00260 | ✅ concluída |
+| 10:28 | Marcos (2º) | Projeto NPS — TREINO_nps_20261107_131119_79616 | ✅ concluída |
 | 10:21 | Marcos (2º) | Projeto Segmentação — TREINO_curva_abc_20261107_131122_82431 | ✅ concluída |
 | 10:21 | Marcos (2º) | Projeto NPS — TREINO_nps_20261107_131119_79616 | ✅ concluída |
 | 10:16 | Marcos (2º) | Projeto Segmentação — TREINO_curva_abc_20261107_131122_82431 | ✅ concluída |
@@ -37,8 +39,6 @@
 | 10:16 | Lívia (4º) | Revisar um caso de treino feito por outro designer — nível dificil | ✅ concluída |
 | 10:16 | Lia (1º) | Exercício de SQL no PostgreSQL com os dados da fábrica — nível dificil | ✅ concluída |
 | 10:13 | Marcos (2º) | Projeto Segmentação — TREINO_curva_abc_20261107_131122_82431 | ✅ concluída |
-| 10:13 | Marcos (2º) | Projeto NPS — TREINO_nps_20261107_131119_79616 | ✅ concluída |
-| 10:13 | Heloísa (5º) | Medir a saúde do PostgreSQL — nível profissional | ✅ concluída |
 
 ## Dificuldade (todo o histórico)
 
@@ -47,7 +47,7 @@
 | basico | 727 | 703 | 0 | 24 | 97% |
 | medio | 2818 | 2794 | 0 | 24 | 99% |
 | dificil | 7712 | 7660 | 30 | 22 | 99% |
-| profissional | 5691 | 5678 | 9 | 4 | 100% |
+| profissional | 5693 | 5680 | 9 | 4 | 100% |
 
 ## Cada funcionário
 
@@ -92,7 +92,7 @@
 | Leandro | Engenheiro de Machine Learning Sênior | trabalho do papel | Conferir no PostgreSQL os lotes da fábrica — nível dificil (✅ concluída) | 13 |
 | Lucas | Cientista de Dados Júnior | trabalho do papel | Diagnosticar a planilha original da fábrica — nível medio (✅ concluída) | 13 |
 | Manu | Estagiária de Análise de Dados | estagiário: observa (regra do dono) |   | 0 |
-| Marcos | Coordenador de Análise e Ciência de Dado | trabalho FORA do papel | Projeto Segmentação — TREINO_curva_abc_20261107_131122_82431 (✅ concluída) | 238 |
+| Marcos | Coordenador de Análise e Ciência de Dado | trabalho FORA do papel | Projeto Segmentação — TREINO_funil_20261107_132820_00260 (✅ concluída) | 240 |
 | Natália | Head de Ciência de Dados | trabalho do papel | Calcular a média de uma métrica da base sintética — nível pr (✅ concluída) | 13 |
 | Patrícia | Gerente de Analytics e Customer Insights | trabalho do papel | Calcular a média de uma métrica da base sintética — nível pr (✅ concluída) | 13 |
 | Rebeca | Líder de Engenharia de IA e Machine Lear | trabalho do papel | Calcular a média de uma métrica da base sintética — nível pr (✅ concluída) | 13 |
@@ -194,16 +194,17 @@
 
 ## Projetos entre andares (várias pessoas, uma etapa depende da outra)
 
+- Projeto Segmentação — TREINO_funil_20261107_132820_00260: **✅ concluída** — 1. validacao (concluida); 2. analise_estatistica (concluida); 3. cd_pleno_segmentos (concluida); 4. cd_junior_anomalias (concluida); 5. sec_senior (concluida); 6. canal_nina (concluida)
+- Projeto NPS — TREINO_nps_20261107_131119_79616: **✅ concluída** — 1. tina_contatos (concluida); 2. analise_perfil (concluida); 3. cd_senior_drivers (concluida); 4. gov_pleno_lgpd (concluida); 5. canal_iara (concluida)
 - Projeto Segmentação — TREINO_curva_abc_20261107_131122_82431: **✅ concluída** — 1. supervisor (concluida); 2. analise_indicadores (concluida); 3. ana_pleno_base (concluida); 4. analise_monitoramento (concluida); 5. sec_senior (concluida); 6. analise_relator (concluida)
-- Projeto NPS — TREINO_nps_20261107_131119_79616: **✅ concluída** — 1. recepcao (concluida); 2. analise_estatistica (concluida); 3. head_ciencia (concluida); 4. gov_pleno_lgpd (concluida); 5. canal_nina (concluida)
-- Projeto Segmentação — TREINO_curva_abc_20261107_131122_82431: **✅ concluída** — 1. publicacao (concluida); 2. analise_perfil (concluida); 3. ana_junior_faixas (concluida); 4. cd_junior_anomalias (concluida); 5. sec_senior (concluida); 6. canal_iara (concluida)
 
-## Última entrega da empresa (TREINO_curva_abc_20261107_131122_82431.xlsx, 07/11 10:21)
+## Última entrega da empresa (TREINO_funil_20261107_132820_00260.xlsx, 07/11 10:28)
 
 Pacote gerado pelo produto (`python -m robo entregar`) a partir de um projeto aprovado:
 
-1. Conferir 119 valor(es) fora do padrão em **faturamento** (8,1% da base): podem ser erro de digitação ou casos reais que merecem olhar.
-2. **Valores suspeitos:** 1 apontado(s) (valor muito acima do padrão (digitação?): 1). Estão na aba suspeitos do indicadores.xlsx com a chave de cada linha: confira na origem.
+1. Conferir 72 valor(es) fora do padrão em **valor_da_oportunidade** (1,7% da base): podem ser erro de digitação ou casos reais que merecem olhar.
+2. **Valores suspeitos:** 4248 apontado(s) (idade impossível (fora de 0 a 120): 4248). Estão na aba suspeitos do indicadores.xlsx com a chave de cada linha: confira na origem.
+3. **Qualidade:** 1 coluna(s) em situação crítica (valor_da_oportunidade): corrija na origem antes de usar em decisão.
 
 ## Inteligência própria (modelo de risco das demandas)
 
