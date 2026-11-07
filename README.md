@@ -1,15 +1,15 @@
 # Empresa ao vivo
 
-**Boletim das 07/11 20:23** (horário de Brasília) · trabalhando · SEM BANCO (memória guardada no arquivo do GitHub; o banco é alcançado quando voltar)
+**Boletim das 07/11 20:29** (horário de Brasília) · trabalhando · SEM BANCO (memória guardada no arquivo do GitHub; o banco é alcançado quando voltar)
 
 > Atualiza a cada 5 minutos enquanto a empresa trabalha. Recarregue a página para ver o mais novo.
 
 ## Hoje
 
-- **2829** demandas, **2824** concluídas (100%), 5 parciais, 0 com falha
+- **2831** demandas, **2826** concluídas (100%), 5 parciais, 0 com falha
 - **105** de 105 funcionários já trabalharam
 - SQL: 264 exercícios, 264 conferidos com o gabarito
-- Fábrica: 112 planilhas, 110 conferidas sem erro
+- Fábrica: 112 planilhas, 112 conferidas sem erro
 
 ## Trabalhando agora
 
@@ -20,7 +20,7 @@
 | Andar | Trabalharam | Demandas | Concluídas | Parciais | Falhas |
 |---|--:|--:|--:|--:|--:|
 | 1º | 19 de 19 | 392 | 392 | 0 | 0 |
-| 2º | 18 de 18 | 768 | 766 | 2 | 0 |
+| 2º | 18 de 18 | 770 | 768 | 2 | 0 |
 | 3º | 12 de 12 | 234 | 233 | 1 | 0 |
 | 4º | 32 de 32 | 455 | 454 | 1 | 0 |
 | 5º | 24 de 24 | 980 | 979 | 1 | 0 |
@@ -29,6 +29,8 @@
 
 | Hora | Quem | Trabalho | Resultado |
 |---|---|---|---|
+| 20:28 | Marcos (2º) | Projeto Segmentação — TREINO_pesquisa_mercado_20261107_232324_04545 | ✅ concluída |
+| 20:28 | Marcos (2º) | Projeto NPS — TREINO_nps_20261107_232320_00183 | ✅ concluída |
 | 20:23 | Marcos (2º) | Projeto Segmentação — TREINO_pesquisa_mercado_20261107_232324_04545 | ✅ concluída |
 | 20:23 | Marcos (2º) | Projeto NPS — TREINO_nps_20261107_232320_00183 | ✅ concluída |
 | 20:14 | Marcos (2º) | Projeto Segmentação — TREINO_educacao_20261107_224033_33484 | ✅ concluída |
@@ -37,8 +39,6 @@
 | 20:14 | Heloísa (5º) | Conferir se o projeto está pronto para servidor — nível profissional | ✅ concluída |
 | 20:14 | Marina (5º) | Testar se o último backup volta — nível dificil | ✅ concluída |
 | 20:14 | Wagner (5º) | Procurar segredos no repositório público — nível dificil | ✅ concluída |
-| 20:14 | Rodrigo (5º) | Testar se o último backup volta — nível medio | ✅ concluída |
-| 20:14 | Jonas (5º) | Exercício de SQL no PostgreSQL com os dados da fábrica — nível dificil | ✅ concluída |
 
 ## Dificuldade (todo o histórico)
 
@@ -47,7 +47,7 @@
 | basico | 762 | 738 | 0 | 24 | 97% |
 | medio | 3013 | 2989 | 0 | 24 | 99% |
 | dificil | 8260 | 8208 | 30 | 22 | 99% |
-| profissional | 6108 | 6095 | 9 | 4 | 100% |
+| profissional | 6110 | 6097 | 9 | 4 | 100% |
 
 ## Cada funcionário
 
@@ -92,7 +92,7 @@
 | Leandro | Engenheiro de Machine Learning Sênior | trabalho do papel | Exercício de SQL no PostgreSQL com os dados da fábrica — nív (✅ concluída) | 22 |
 | Lucas | Cientista de Dados Júnior | trabalho do papel | Exercício de SQL no PostgreSQL com os dados da fábrica — nív (✅ concluída) | 22 |
 | Manu | Estagiária de Análise de Dados | estagiário: observa (regra do dono) |   | 0 |
-| Marcos | Coordenador de Análise e Ciência de Dado | trabalho FORA do papel | Projeto Segmentação — TREINO_pesquisa_mercado_20261107_23232 (✅ concluída) | 420 |
+| Marcos | Coordenador de Análise e Ciência de Dado | trabalho FORA do papel | Projeto Segmentação — TREINO_pesquisa_mercado_20261107_23232 (✅ concluída) | 422 |
 | Natália | Head de Ciência de Dados | trabalho do papel | Calcular a média de uma métrica da base sintética — nível pr (✅ concluída) | 22 |
 | Patrícia | Gerente de Analytics e Customer Insights | trabalho do papel | Exercício de SQL no PostgreSQL com os dados da fábrica — nív (✅ concluída) | 22 |
 | Rebeca | Líder de Engenharia de IA e Machine Lear | trabalho do papel | Perfil e indicadores da base sintética — nível profissional (✅ concluída) | 22 |
@@ -194,11 +194,11 @@
 
 ## Projetos entre andares (várias pessoas, uma etapa depende da outra)
 
+- Projeto Segmentação — TREINO_pesquisa_mercado_20261107_232324_04545: **✅ concluída** — 1. coord_engenharia (concluida); 2. analise_monitoramento (concluida); 3. ana_junior_faixas (concluida); 4. cd_junior_anomalias (concluida); 5. sec_senior (concluida); 6. canal_iara (concluida)
+- Projeto NPS — TREINO_nps_20261107_232320_00183: **✅ concluída** — 1. banco (concluida); 2. analise_indicadores (concluida); 3. head_ciencia (concluida); 4. gov_pleno_lgpd (concluida); 5. analise_relator (concluida)
 - Projeto Segmentação — TREINO_pesquisa_mercado_20261107_232324_04545: **✅ concluída** — 1. validacao (concluida); 2. analise_estatistica (concluida); 3. cd_pleno_segmentos (concluida); 4. cd_junior_anomalias (concluida); 5. sec_senior (concluida); 6. canal_nina (concluida)
-- Projeto NPS — TREINO_nps_20261107_232320_00183: **✅ concluída** — 1. tina_contatos (concluida); 2. analise_perfil (concluida); 3. cd_senior_drivers (concluida); 4. gov_pleno_lgpd (concluida); 5. canal_iara (concluida)
-- Projeto Segmentação — TREINO_educacao_20261107_224033_33484: **✅ concluída** — 1. supervisor (concluida); 2. analise_indicadores (concluida); 3. ana_pleno_base (concluida); 4. analise_monitoramento (concluida); 5. sec_senior (concluida); 6. analise_relator (concluida)
 
-## Última entrega da empresa (TREINO_pesquisa_mercado_20261107_232324_04545.xlsx, 07/11 20:23)
+## Última entrega da empresa (TREINO_pesquisa_mercado_20261107_232324_04545.xlsx, 07/11 20:28)
 
 Pacote gerado pelo produto (`python -m robo entregar`) a partir de um projeto aprovado:
 
