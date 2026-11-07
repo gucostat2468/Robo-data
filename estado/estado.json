@@ -1,11 +1,11 @@
 {
  "versao": 1,
- "gerado_em": "2026-11-07T20:07:18",
+ "gerado_em": "2026-11-07T20:13:19",
  "turno": {
   "estado": "trabalhando · SEM BANCO (memória guardada no arquivo do GitHub; o banco é alcançado quando voltar)",
   "inicio": "2026-11-07T19:46:41",
   "fim_previsto": "2026-11-07T20:26:41",
-  "voltas": 50,
+  "voltas": 66,
   "planilhas": 2
  },
  "funcionarios": 105,
@@ -18,18 +18,18 @@
    "concluidas": 338,
    "parciais": 0,
    "falhas": 0,
-   "treino": 555,
+   "treino": 562,
    "acertos": 116
   },
   {
    "andar": 2,
    "pessoas": 18,
    "trabalharam_hoje": 18,
-   "demandas": 660,
-   "concluidas": 658,
+   "demandas": 662,
+   "concluidas": 660,
    "parciais": 2,
    "falhas": 0,
-   "treino": 520,
+   "treino": 525,
    "acertos": 101
   },
   {
@@ -40,7 +40,7 @@
    "concluidas": 200,
    "parciais": 1,
    "falhas": 0,
-   "treino": 353,
+   "treino": 355,
    "acertos": 80
   },
   {
@@ -51,23 +51,63 @@
    "concluidas": 391,
    "parciais": 1,
    "falhas": 0,
-   "treino": 725,
+   "treino": 732,
    "acertos": 157
   },
   {
    "andar": 5,
    "pessoas": 24,
    "trabalharam_hoje": 24,
-   "demandas": 833,
-   "concluidas": 832,
+   "demandas": 836,
+   "concluidas": 835,
    "parciais": 1,
    "falhas": 0,
-   "treino": 686,
+   "treino": 688,
    "acertos": 159
   }
  ],
  "agora": [],
  "ultimos": [
+  {
+   "quando": "2026-11-07T20:08:44",
+   "funcionario": "Marcos",
+   "cargo": "Coordenador de Análise e Ciência de Dados",
+   "andar": 2,
+   "trabalho": "Projeto Segmentação — TREINO_curva_abc_20261107_194419_59552",
+   "estado": "concluida"
+  },
+  {
+   "quando": "2026-11-07T20:08:37",
+   "funcionario": "Marcos",
+   "cargo": "Coordenador de Análise e Ciência de Dados",
+   "andar": 2,
+   "trabalho": "Projeto NPS — TREINO_nps_20261107_194415_55738",
+   "estado": "concluida"
+  },
+  {
+   "quando": "2026-11-07T20:08:33",
+   "funcionario": "Heloísa",
+   "cargo": "Head de AWS, Arquitetura e Governança de Nuvem",
+   "andar": 5,
+   "trabalho": "Procurar segredos no repositório público — nível profissional",
+   "estado": "concluida"
+  },
+  {
+   "quando": "2026-11-07T20:08:33",
+   "funcionario": "Ícaro",
+   "cargo": "Sênior de AWS, Linux e Ubuntu",
+   "andar": 5,
+   "trabalho": "Exercício de SQL no PostgreSQL com os dados da fábrica — nível dificil",
+   "estado": "concluida"
+  },
+  {
+   "quando": "2026-11-07T20:08:31",
+   "funcionario": "Marina",
+   "cargo": "Arquiteta de Cloud (AWS)",
+   "andar": 5,
+   "trabalho": "Medir a saúde do PostgreSQL — nível dificil",
+   "estado": "concluida"
+  },
   {
    "quando": "2026-11-07T20:02:31",
    "funcionario": "Marcos",
@@ -107,51 +147,11 @@
    "andar": 2,
    "trabalho": "Projeto Segmentação — TREINO_curva_abc_20261107_194419_59552",
    "estado": "concluida"
-  },
-  {
-   "quando": "2026-11-07T19:49:42",
-   "funcionario": "Marcos",
-   "cargo": "Coordenador de Análise e Ciência de Dados",
-   "andar": 2,
-   "trabalho": "Projeto NPS — TREINO_nps_20261107_194415_55738",
-   "estado": "concluida"
-  },
-  {
-   "quando": "2026-11-07T19:49:38",
-   "funcionario": "Ícaro",
-   "cargo": "Sênior de AWS, Linux e Ubuntu",
-   "andar": 5,
-   "trabalho": "Testar se o último backup volta — nível dificil",
-   "estado": "concluida"
-  },
-  {
-   "quando": "2026-11-07T19:49:33",
-   "funcionario": "Heloísa",
-   "cargo": "Head de AWS, Arquitetura e Governança de Nuvem",
-   "andar": 5,
-   "trabalho": "Medir a saúde do PostgreSQL — nível profissional",
-   "estado": "concluida"
-  },
-  {
-   "quando": "2026-11-07T19:49:31",
-   "funcionario": "Marina",
-   "cargo": "Arquiteta de Cloud (AWS)",
-   "andar": 5,
-   "trabalho": "SLA das rotinas — nível dificil",
-   "estado": "concluida"
-  },
-  {
-   "quando": "2026-11-07T19:46:38",
-   "funcionario": "Marcos",
-   "cargo": "Coordenador de Análise e Ciência de Dados",
-   "andar": 2,
-   "trabalho": "Projeto Segmentação — TREINO_curva_abc_20261107_194419_59552",
-   "estado": "concluida"
   }
  ],
  "sql": {
-  "exercicios_hoje": 219,
-  "concluidos_hoje": 219
+  "exercicios_hoje": 220,
+  "concluidos_hoje": 220
  },
  "fabrica": {
   "lotes_hoje": 102,
@@ -168,7 +168,7 @@
    "rotina": "demandas",
    "execucoes_24h": 219,
    "erros_24h": 0,
-   "ultima": "2026-11-07T20:02:34"
+   "ultima": "2026-11-07T20:08:47"
   },
   {
    "rotina": "dialogo",
@@ -198,7 +198,7 @@
    "rotina": "laboratorio",
    "execucoes_24h": 122,
    "erros_24h": 0,
-   "ultima": "2026-11-07T19:59:00"
+   "ultima": "2026-11-07T20:09:04"
   },
   {
    "rotina": "licoes",
@@ -220,9 +220,9 @@
   },
   {
    "rotina": "registro",
-   "execucoes_24h": 496,
+   "execucoes_24h": 497,
    "erros_24h": 0,
-   "ultima": "2026-11-07T20:06:43"
+   "ultima": "2026-11-07T20:10:20"
   },
   {
    "rotina": "rh_desempenho",
@@ -232,22 +232,22 @@
   },
   {
    "rotina": "ronda_ti",
-   "execucoes_24h": 96,
+   "execucoes_24h": 97,
    "erros_24h": 0,
-   "ultima": "2026-11-07T19:39:45"
+   "ultima": "2026-11-07T20:10:03"
   },
   {
    "rotina": "treino",
    "execucoes_24h": 484,
    "erros_24h": 0,
-   "ultima": "2026-11-07T20:06:25"
+   "ultima": "2026-11-07T20:12:44"
   }
  ],
  "totais": {
-  "demandas": 17839,
-  "tentativas_treino": 44482,
-  "conversas": 9780,
-  "trabalhos_com_prova": 47798
+  "demandas": 17844,
+  "tentativas_treino": 44505,
+  "conversas": 9781,
+  "trabalhos_com_prova": 47816
  },
  "banco": {
   "levantamento": "2026-11-07T19:30:40",
@@ -617,7 +617,7 @@
    "ultimo": "",
    "quando": "",
    "estado": "",
-   "situacao": "estagiário: observa (regra do dono)"
+   "situacao": "estagiário: observa (regra do dono) — Observei Marina (Arquiteta de Cloud (AWS)) fazendo \"Medir a saúde do PostgreSQL\" no nível dificil: terminou concluida."
   },
   {
    "nome": "Tina",
@@ -756,9 +756,9 @@
    "andar": 2,
    "cargo": "Coordenador de Análise e Ciência de Dados",
    "area": "Análise de Dados",
-   "demandas_hoje": 360,
+   "demandas_hoje": 362,
    "ultimo": "Projeto Segmentação — TREINO_curva_abc_20261107_194419_59552",
-   "quando": "2026-11-07T20:02:27",
+   "quando": "2026-11-07T20:08:40",
    "estado": "concluida",
    "situacao": "trabalho FORA do papel"
   },
@@ -848,7 +848,7 @@
    "ultimo": "",
    "quando": "",
    "estado": "",
-   "situacao": "estagiário: observa (regra do dono)"
+   "situacao": "estagiário: observa (regra do dono) — Observei Marina (Arquiteta de Cloud (AWS)) fazendo \"Medir a saúde do PostgreSQL\" no nível dificil: terminou concluida."
   },
   {
    "nome": "Felipe",
@@ -1365,7 +1365,7 @@
    "ultimo": "",
    "quando": "",
    "estado": "",
-   "situacao": "estagiário: observa (regra do dono)"
+   "situacao": "estagiário: observa (regra do dono) — Observei Marina (Arquiteta de Cloud (AWS)) fazendo \"Medir a saúde do PostgreSQL\" no nível dificil: terminou concluida."
   },
   {
    "nome": "Diego",
@@ -1409,7 +1409,7 @@
    "ultimo": "",
    "quando": "",
    "estado": "",
-   "situacao": "estagiário: observa (regra do dono)"
+   "situacao": "estagiário: observa (regra do dono) — Observei Marina (Arquiteta de Cloud (AWS)) fazendo \"Medir a saúde do PostgreSQL\" no nível dificil: terminou concluida."
   },
   {
    "nome": "Gustavo",
@@ -1427,9 +1427,9 @@
    "andar": 5,
    "cargo": "Head de AWS, Arquitetura e Governança de Nuvem",
    "area": "Engenharia de Dados",
-   "demandas_hoje": 62,
-   "ultimo": "Medir a saúde do PostgreSQL — nível profissional",
-   "quando": "2026-11-07T19:49:31",
+   "demandas_hoje": 63,
+   "ultimo": "Procurar segredos no repositório público — nível profissional",
+   "quando": "2026-11-07T20:08:31",
    "estado": "concluida",
    "situacao": "trabalho do papel"
   },
@@ -1471,9 +1471,9 @@
    "andar": 5,
    "cargo": "Arquiteta de Cloud (AWS)",
    "area": "Engenharia de Dados",
-   "demandas_hoje": 62,
-   "ultimo": "SLA das rotinas — nível dificil",
-   "quando": "2026-11-07T19:49:31",
+   "demandas_hoje": 63,
+   "ultimo": "Medir a saúde do PostgreSQL — nível dificil",
+   "quando": "2026-11-07T20:08:31",
    "estado": "concluida",
    "situacao": "trabalho do papel"
   },
@@ -1570,14 +1570,96 @@
    "andar": 5,
    "cargo": "Sênior de AWS, Linux e Ubuntu",
    "area": "Engenharia de Dados",
-   "demandas_hoje": 63,
-   "ultimo": "Testar se o último backup volta — nível dificil",
-   "quando": "2026-11-07T19:49:33",
+   "demandas_hoje": 64,
+   "ultimo": "Exercício de SQL no PostgreSQL com os dados da fábrica — nível dificil",
+   "quando": "2026-11-07T20:08:33",
    "estado": "concluida",
    "situacao": "trabalho do papel"
   }
  ],
  "projetos": [
+  {
+   "id": "TAR-20261107-6410d9",
+   "titulo": "Projeto Segmentação — TREINO_curva_abc_20261107_194419_59552",
+   "estado": "concluida",
+   "criada_em": "2026-11-07T20:08:40",
+   "etapas": [
+    {
+     "ordem": 1,
+     "titulo": "Diagnóstico da planilha original (o que barraria a produção)",
+     "funcionario": "publicacao",
+     "estado": "concluida"
+    },
+    {
+     "ordem": 2,
+     "titulo": "Perfil da base (colunas, indicadores e margem de erro)",
+     "funcionario": "analise_monitoramento",
+     "estado": "concluida"
+    },
+    {
+     "ordem": 3,
+     "titulo": "Segmentação de clientes (k-means com silhueta)",
+     "funcionario": "ana_junior_faixas",
+     "estado": "concluida"
+    },
+    {
+     "ordem": 4,
+     "titulo": "Anomalias (valores fora do padrão, com a linha)",
+     "funcionario": "cd_junior_anomalias",
+     "estado": "concluida"
+    },
+    {
+     "ordem": 5,
+     "titulo": "Dados pessoais na base (LGPD)",
+     "funcionario": "sec_senior",
+     "estado": "concluida"
+    },
+    {
+     "ordem": 6,
+     "titulo": "Resumo executivo do projeto (.md)",
+     "funcionario": "canal_iara",
+     "estado": "concluida"
+    }
+   ]
+  },
+  {
+   "id": "TAR-20261107-0e3d26",
+   "titulo": "Projeto NPS — TREINO_nps_20261107_194415_55738",
+   "estado": "concluida",
+   "criada_em": "2026-11-07T20:08:34",
+   "etapas": [
+    {
+     "ordem": 1,
+     "titulo": "Diagnóstico da planilha original (o que barraria a produção)",
+     "funcionario": "modelagem",
+     "estado": "concluida"
+    },
+    {
+     "ordem": 2,
+     "titulo": "Perfil e indicadores (NPS com margem de erro)",
+     "funcionario": "analise_indicadores",
+     "estado": "concluida"
+    },
+    {
+     "ordem": 3,
+     "titulo": "Drivers do NPS (o que mais pesa na nota)",
+     "funcionario": "head_ciencia",
+     "estado": "concluida"
+    },
+    {
+     "ordem": 4,
+     "titulo": "Dados pessoais na base (LGPD)",
+     "funcionario": "gov_pleno_lgpd",
+     "estado": "concluida"
+    },
+    {
+     "ordem": 5,
+     "titulo": "Resumo executivo do projeto (.md)",
+     "funcionario": "analise_relator",
+     "estado": "concluida"
+    }
+   ]
+  },
   {
    "id": "TAR-20261107-f75d82",
    "titulo": "Projeto Segmentação — TREINO_curva_abc_20261107_194419_59552",
@@ -1621,97 +1703,15 @@
      "estado": "concluida"
     }
    ]
-  },
-  {
-   "id": "TAR-20261107-96ec0d",
-   "titulo": "Projeto NPS — TREINO_nps_20261107_194415_55738",
-   "estado": "concluida",
-   "criada_em": "2026-11-07T20:02:21",
-   "etapas": [
-    {
-     "ordem": 1,
-     "titulo": "Diagnóstico da planilha original (o que barraria a produção)",
-     "funcionario": "leitura",
-     "estado": "concluida"
-    },
-    {
-     "ordem": 2,
-     "titulo": "Perfil e indicadores (NPS com margem de erro)",
-     "funcionario": "analise_perfil",
-     "estado": "concluida"
-    },
-    {
-     "ordem": 3,
-     "titulo": "Drivers do NPS (o que mais pesa na nota)",
-     "funcionario": "cd_senior_drivers",
-     "estado": "concluida"
-    },
-    {
-     "ordem": 4,
-     "titulo": "Dados pessoais na base (LGPD)",
-     "funcionario": "gov_pleno_lgpd",
-     "estado": "concluida"
-    },
-    {
-     "ordem": 5,
-     "titulo": "Resumo executivo do projeto (.md)",
-     "funcionario": "canal_iara",
-     "estado": "concluida"
-    }
-   ]
-  },
-  {
-   "id": "TAR-20261107-230727",
-   "titulo": "Projeto Segmentação — TREINO_curva_abc_20261107_194419_59552",
-   "estado": "concluida",
-   "criada_em": "2026-11-07T19:55:21",
-   "etapas": [
-    {
-     "ordem": 1,
-     "titulo": "Diagnóstico da planilha original (o que barraria a produção)",
-     "funcionario": "head_engenharia",
-     "estado": "concluida"
-    },
-    {
-     "ordem": 2,
-     "titulo": "Perfil da base (colunas, indicadores e margem de erro)",
-     "funcionario": "analise_indicadores",
-     "estado": "concluida"
-    },
-    {
-     "ordem": 3,
-     "titulo": "Segmentação de clientes (k-means com silhueta)",
-     "funcionario": "ana_pleno_base",
-     "estado": "concluida"
-    },
-    {
-     "ordem": 4,
-     "titulo": "Anomalias (valores fora do padrão, com a linha)",
-     "funcionario": "analise_monitoramento",
-     "estado": "concluida"
-    },
-    {
-     "ordem": 5,
-     "titulo": "Dados pessoais na base (LGPD)",
-     "funcionario": "sec_senior",
-     "estado": "concluida"
-    },
-    {
-     "ordem": 6,
-     "titulo": "Resumo executivo do projeto (.md)",
-     "funcionario": "analise_relator",
-     "estado": "concluida"
-    }
-   ]
   }
  ],
  "entregas": [
   {
-   "id": 2496,
-   "data_hora": "2026-11-07T20:02:34",
-   "projeto": "TAR-20261107-f75d82",
+   "id": 2498,
+   "data_hora": "2026-11-07T20:08:46",
+   "projeto": "TAR-20261107-6410d9",
    "base": "TREINO_curva_abc_20261107_194419_59552.xlsx",
-   "pasta": "/home/runner/work/_temp/empresa/logs/entregas/Entrega_TREINO_curva_abc_20261107_194419_59552_20261107_200232",
+   "pasta": "/home/runner/work/_temp/empresa/logs/entregas/Entrega_TREINO_curva_abc_20261107_194419_59552_20261107_200845",
    "ok": 1,
    "recomendacoes": [
     "Conferir 160 valor(es) fora do padrão em **faturamento** (6,7% da base): podem ser erro de digitação ou casos reais que merecem olhar."
@@ -2113,7 +2113,7 @@
  ],
  "modelos": {
   "finalidade": "risco_demanda",
-  "rotuladas_agora": 17738,
+  "rotuladas_agora": 17743,
   "minimo_para_treinar": 60,
   "datasets": 268,
   "maior_dataset": 17642,
@@ -3502,15 +3502,15 @@
   },
   {
    "nivel": "dificil",
-   "demandas": 8073,
-   "concluidas": 8021,
+   "demandas": 8075,
+   "concluidas": 8023,
    "parciais": 30,
    "falhas": 22
   },
   {
    "nivel": "profissional",
-   "demandas": 5968,
-   "concluidas": 5955,
+   "demandas": 5971,
+   "concluidas": 5958,
    "parciais": 9,
    "falhas": 4
   }
