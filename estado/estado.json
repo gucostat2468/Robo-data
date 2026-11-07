@@ -1,11 +1,11 @@
 {
  "versao": 1,
- "gerado_em": "2026-11-07T04:40:14",
+ "gerado_em": "2026-11-07T04:47:35",
  "turno": {
   "estado": "trabalhando · SEM BANCO (memória guardada no arquivo do GitHub; o banco é alcançado quando voltar)",
   "inicio": "2026-11-07T04:34:27",
   "fim_previsto": "2026-11-07T05:14:27",
-  "voltas": 17,
+  "voltas": 33,
   "planilhas": 2
  },
  "funcionarios": 105,
@@ -18,18 +18,18 @@
    "concluidas": 86,
    "parciais": 0,
    "falhas": 0,
-   "treino": 144,
+   "treino": 146,
    "acertos": 36
   },
   {
    "andar": 2,
    "pessoas": 18,
    "trabalharam_hoje": 18,
-   "demandas": 166,
-   "concluidas": 165,
+   "demandas": 168,
+   "concluidas": 167,
    "parciais": 1,
    "falhas": 0,
-   "treino": 133,
+   "treino": 136,
    "acertos": 30
   },
   {
@@ -40,7 +40,7 @@
    "concluidas": 46,
    "parciais": 1,
    "falhas": 0,
-   "treino": 92,
+   "treino": 95,
    "acertos": 28
   },
   {
@@ -51,7 +51,7 @@
    "concluidas": 98,
    "parciais": 0,
    "falhas": 0,
-   "treino": 190,
+   "treino": 198,
    "acertos": 48
   },
   {
@@ -62,12 +62,28 @@
    "concluidas": 197,
    "parciais": 1,
    "falhas": 0,
-   "treino": 179,
+   "treino": 183,
    "acertos": 53
   }
  ],
  "agora": [],
  "ultimos": [
+  {
+   "quando": "2026-11-07T04:43:07",
+   "funcionario": "Marcos",
+   "cargo": "Coordenador de Análise e Ciência de Dados",
+   "andar": 2,
+   "trabalho": "Projeto Segmentação — TREINO_curva_abc_20261107_043240_60357",
+   "estado": "concluida"
+  },
+  {
+   "quando": "2026-11-07T04:42:58",
+   "funcionario": "Marcos",
+   "cargo": "Coordenador de Análise e Ciência de Dados",
+   "andar": 2,
+   "trabalho": "Projeto NPS — TREINO_nps_20261107_043235_55534",
+   "estado": "concluida"
+  },
   {
    "quando": "2026-11-07T04:38:07",
    "funcionario": "Marcos",
@@ -131,22 +147,6 @@
    "andar": 4,
    "trabalho": "Quadro por andar e nível — nível profissional",
    "estado": "concluida"
-  },
-  {
-   "quando": "2026-11-07T04:34:05",
-   "funcionario": "Murilo",
-   "cargo": "Designer de Casos",
-   "andar": 4,
-   "trabalho": "Revisar um caso de treino feito por outro designer — nível dificil",
-   "estado": "concluida"
-  },
-  {
-   "quando": "2026-11-07T04:34:05",
-   "funcionario": "Rafael",
-   "cargo": "Engenheiro de Dados Pleno",
-   "andar": 1,
-   "trabalho": "Conferir no PostgreSQL os lotes da fábrica — nível medio",
-   "estado": "concluida"
   }
  ],
  "sql": {
@@ -168,7 +168,7 @@
    "rotina": "demandas",
    "execucoes_24h": 238,
    "erros_24h": 0,
-   "ultima": "2026-11-07T04:38:10"
+   "ultima": "2026-11-07T04:43:10"
   },
   {
    "rotina": "dialogo",
@@ -198,7 +198,7 @@
    "rotina": "laboratorio",
    "execucoes_24h": 132,
    "erros_24h": 0,
-   "ultima": "2026-11-07T04:35:14"
+   "ultima": "2026-11-07T04:45:15"
   },
   {
    "rotina": "licoes",
@@ -220,9 +220,9 @@
   },
   {
    "rotina": "registro",
-   "execucoes_24h": 543,
+   "execucoes_24h": 541,
    "erros_24h": 0,
-   "ultima": "2026-11-07T04:39:40"
+   "ultima": "2026-11-07T04:43:27"
   },
   {
    "rotina": "rh_desempenho",
@@ -232,22 +232,22 @@
   },
   {
    "rotina": "ronda_ti",
-   "execucoes_24h": 101,
+   "execucoes_24h": 100,
    "erros_24h": 0,
    "ultima": "2026-11-07T04:28:54"
   },
   {
    "rotina": "treino",
-   "execucoes_24h": 520,
+   "execucoes_24h": 521,
    "erros_24h": 0,
-   "ultima": "2026-11-07T04:39:22"
+   "ultima": "2026-11-07T04:47:00"
   }
  ],
  "totais": {
-  "demandas": 16010,
-  "tentativas_treino": 42381,
-  "conversas": 9551,
-  "trabalhos_com_prova": 44166
+  "demandas": 16012,
+  "tentativas_treino": 42401,
+  "conversas": 9552,
+  "trabalhos_com_prova": 44179
  },
  "banco": {
   "levantamento": "2026-11-07T04:20:45",
@@ -756,9 +756,9 @@
    "andar": 2,
    "cargo": "Coordenador de Análise e Ciência de Dados",
    "area": "Análise de Dados",
-   "demandas_hoje": 90,
+   "demandas_hoje": 92,
    "ultimo": "Projeto Segmentação — TREINO_curva_abc_20261107_043240_60357",
-   "quando": "2026-11-07T04:38:01",
+   "quando": "2026-11-07T04:43:01",
    "estado": "concluida",
    "situacao": "trabalho FORA do papel"
   },
@@ -1579,6 +1579,88 @@
  ],
  "projetos": [
   {
+   "id": "TAR-20261107-36889f",
+   "titulo": "Projeto Segmentação — TREINO_curva_abc_20261107_043240_60357",
+   "estado": "concluida",
+   "criada_em": "2026-11-07T04:43:01",
+   "etapas": [
+    {
+     "ordem": 1,
+     "titulo": "Diagnóstico da planilha original (o que barraria a produção)",
+     "funcionario": "publicacao",
+     "estado": "concluida"
+    },
+    {
+     "ordem": 2,
+     "titulo": "Perfil da base (colunas, indicadores e margem de erro)",
+     "funcionario": "analise_monitoramento",
+     "estado": "concluida"
+    },
+    {
+     "ordem": 3,
+     "titulo": "Segmentação de clientes (k-means com silhueta)",
+     "funcionario": "ana_junior_faixas",
+     "estado": "concluida"
+    },
+    {
+     "ordem": 4,
+     "titulo": "Anomalias (valores fora do padrão, com a linha)",
+     "funcionario": "cd_junior_anomalias",
+     "estado": "concluida"
+    },
+    {
+     "ordem": 5,
+     "titulo": "Dados pessoais na base (LGPD)",
+     "funcionario": "sec_senior",
+     "estado": "concluida"
+    },
+    {
+     "ordem": 6,
+     "titulo": "Resumo executivo do projeto (.md)",
+     "funcionario": "canal_iara",
+     "estado": "concluida"
+    }
+   ]
+  },
+  {
+   "id": "TAR-20261107-b21592",
+   "titulo": "Projeto NPS — TREINO_nps_20261107_043235_55534",
+   "estado": "concluida",
+   "criada_em": "2026-11-07T04:42:53",
+   "etapas": [
+    {
+     "ordem": 1,
+     "titulo": "Diagnóstico da planilha original (o que barraria a produção)",
+     "funcionario": "modelagem",
+     "estado": "concluida"
+    },
+    {
+     "ordem": 2,
+     "titulo": "Perfil e indicadores (NPS com margem de erro)",
+     "funcionario": "analise_indicadores",
+     "estado": "concluida"
+    },
+    {
+     "ordem": 3,
+     "titulo": "Drivers do NPS (o que mais pesa na nota)",
+     "funcionario": "cd_senior_drivers",
+     "estado": "concluida"
+    },
+    {
+     "ordem": 4,
+     "titulo": "Dados pessoais na base (LGPD)",
+     "funcionario": "gov_pleno_lgpd",
+     "estado": "concluida"
+    },
+    {
+     "ordem": 5,
+     "titulo": "Resumo executivo do projeto (.md)",
+     "funcionario": "analise_relator",
+     "estado": "concluida"
+    }
+   ]
+  },
+  {
    "id": "TAR-20261107-8740ff",
    "titulo": "Projeto Segmentação — TREINO_curva_abc_20261107_043240_60357",
    "estado": "concluida",
@@ -1621,97 +1703,15 @@
      "estado": "concluida"
     }
    ]
-  },
-  {
-   "id": "TAR-20261107-9f56c1",
-   "titulo": "Projeto NPS — TREINO_nps_20261107_043235_55534",
-   "estado": "concluida",
-   "criada_em": "2026-11-07T04:37:53",
-   "etapas": [
-    {
-     "ordem": 1,
-     "titulo": "Diagnóstico da planilha original (o que barraria a produção)",
-     "funcionario": "leitura",
-     "estado": "concluida"
-    },
-    {
-     "ordem": 2,
-     "titulo": "Perfil e indicadores (NPS com margem de erro)",
-     "funcionario": "analise_perfil",
-     "estado": "concluida"
-    },
-    {
-     "ordem": 3,
-     "titulo": "Drivers do NPS (o que mais pesa na nota)",
-     "funcionario": "head_ciencia",
-     "estado": "concluida"
-    },
-    {
-     "ordem": 4,
-     "titulo": "Dados pessoais na base (LGPD)",
-     "funcionario": "gov_pleno_lgpd",
-     "estado": "concluida"
-    },
-    {
-     "ordem": 5,
-     "titulo": "Resumo executivo do projeto (.md)",
-     "funcionario": "canal_iara",
-     "estado": "concluida"
-    }
-   ]
-  },
-  {
-   "id": "TAR-20261107-e1b418",
-   "titulo": "Projeto Segmentação — TREINO_curva_abc_20261107_043240_60357",
-   "estado": "concluida",
-   "criada_em": "2026-11-07T04:34:18",
-   "etapas": [
-    {
-     "ordem": 1,
-     "titulo": "Diagnóstico da planilha original (o que barraria a produção)",
-     "funcionario": "head_engenharia",
-     "estado": "concluida"
-    },
-    {
-     "ordem": 2,
-     "titulo": "Perfil da base (colunas, indicadores e margem de erro)",
-     "funcionario": "analise_indicadores",
-     "estado": "concluida"
-    },
-    {
-     "ordem": 3,
-     "titulo": "Segmentação de clientes (k-means com silhueta)",
-     "funcionario": "ana_pleno_base",
-     "estado": "concluida"
-    },
-    {
-     "ordem": 4,
-     "titulo": "Anomalias (valores fora do padrão, com a linha)",
-     "funcionario": "analise_monitoramento",
-     "estado": "concluida"
-    },
-    {
-     "ordem": 5,
-     "titulo": "Dados pessoais na base (LGPD)",
-     "funcionario": "sec_senior",
-     "estado": "concluida"
-    },
-    {
-     "ordem": 6,
-     "titulo": "Resumo executivo do projeto (.md)",
-     "funcionario": "analise_relator",
-     "estado": "concluida"
-    }
-   ]
   }
  ],
  "entregas": [
   {
-   "id": 2226,
-   "data_hora": "2026-11-07T04:38:10",
-   "projeto": "TAR-20261107-8740ff",
+   "id": 2228,
+   "data_hora": "2026-11-07T04:43:10",
+   "projeto": "TAR-20261107-36889f",
    "base": "TREINO_curva_abc_20261107_043240_60357.xlsx",
-   "pasta": "/home/runner/work/_temp/empresa/logs/entregas/Entrega_TREINO_curva_abc_20261107_043240_60357_20261107_043808",
+   "pasta": "/home/runner/work/_temp/empresa/logs/entregas/Entrega_TREINO_curva_abc_20261107_043240_60357_20261107_044308",
    "ok": 1,
    "recomendacoes": [
     "Conferir 204 valor(es) fora do padrão em **faturamento** (6,4% da base): podem ser erro de digitação ou casos reais que merecem olhar.",
@@ -2114,7 +2114,7 @@
  ],
  "modelos": {
   "finalidade": "risco_demanda",
-  "rotuladas_agora": 15909,
+  "rotuladas_agora": 15911,
   "minimo_para_treinar": 60,
   "datasets": 246,
   "maior_dataset": 15868,
@@ -3400,8 +3400,8 @@
   },
   {
    "nivel": "profissional",
-   "demandas": 5337,
-   "concluidas": 5325,
+   "demandas": 5339,
+   "concluidas": 5327,
    "parciais": 8,
    "falhas": 4
   }
