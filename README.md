@@ -1,6 +1,6 @@
 # Empresa ao vivo
 
-**Boletim das 06/11 22:31** (horário de Brasília) · trabalhando · SEM BANCO (memória guardada no arquivo do GitHub; o banco é alcançado quando voltar)
+**Boletim das 06/11 22:34** (horário de Brasília) · entre turnos: memória salva; o próximo turno começa em poucos minutos · SEM BANCO (memória guardada no arquivo do GitHub; o banco é alcançado quando voltar)
 
 > Atualiza a cada 5 minutos enquanto a empresa trabalha. Recarregue a página para ver o mais novo.
 
@@ -186,11 +186,11 @@
 
 ## Tempo do último turno (medido)
 
-- 00:09–00:49 (40 min, 89 voltas; cobertura do cronômetro 100%)
-- **Entregas aprovadas na revisão independente: 108 (161.7 por hora)** — o indicador principal
-- operacional 15% · estudo 1% · revisao 2% · coordenacao 0% · manutencao 26% · erro 0% · parado 55% · sem_medicao 0%
-- Bloqueios: 7; etapas esperando dependência: 0
-- Turnos anteriores (entregas/hora): 92.9, 149.7, 154.1, 92.8, 130.3
+- 00:52–01:33 (41 min, 75 voltas; cobertura do cronômetro 100%)
+- **Entregas aprovadas na revisão independente: 80 (117.6 por hora)** — o indicador principal
+- operacional 21% · estudo 1% · revisao 2% · coordenacao 0% · manutencao 30% · erro 0% · parado 45% · sem_medicao 0%
+- Bloqueios: 1; etapas esperando dependência: 0
+- Turnos anteriores (entregas/hora): 161.7, 92.9, 149.7, 154.1, 92.8
 
 ## Projetos entre andares (várias pessoas, uma etapa depende da outra)
 
@@ -455,15 +455,15 @@ Pacote gerado pelo produto (`python -m robo entregar`) a partir de um projeto ap
 
 ## Banco de dados
 
-Levantamento das 06/11 22:28: **78 de 97** tabelas com dados (1.484.854 linhas contadas uma a uma).
+Levantamento das 06/11 22:33: **80 de 99** tabelas com dados (1.488.004 linhas contadas uma a uma).
 
 
 | Onde | Tabelas | Com dados |
 |---|--:|--:|
 | sqlite | 81 | 67 |
-| postgres.laboratorio | 2 | 2 |
+| postgres.laboratorio | 3 | 3 |
 | postgres.robo | 2 | 0 |
-| postgres.treino | 9 | 9 |
+| postgres.treino | 10 | 10 |
 | postgres.bruto | 1 | 0 |
 | postgres.tratado | 1 | 0 |
 | postgres.analitico | 1 | 0 |
