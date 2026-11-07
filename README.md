@@ -1,15 +1,15 @@
 # Empresa ao vivo
 
-**Boletim das 07/11 08:15** (horário de Brasília) · trabalhando · SEM BANCO (memória guardada no arquivo do GitHub; o banco é alcançado quando voltar)
+**Boletim das 07/11 08:21** (horário de Brasília) · trabalhando · SEM BANCO (memória guardada no arquivo do GitHub; o banco é alcançado quando voltar)
 
 > Atualiza a cada 5 minutos enquanto a empresa trabalha. Recarregue a página para ver o mais novo.
 
 ## Hoje
 
-- **1365** demandas, **1360** concluídas (100%), 5 parciais, 0 com falha
+- **1367** demandas, **1362** concluídas (100%), 5 parciais, 0 com falha
 - **105** de 105 funcionários já trabalharam
 - SQL: 117 exercícios, 117 conferidos com o gabarito
-- Fábrica: 60 planilhas, 60 conferidas sem erro
+- Fábrica: 61 planilhas, 61 conferidas sem erro
 
 ## Trabalhando agora
 
@@ -20,7 +20,7 @@
 | Andar | Trabalharam | Demandas | Concluídas | Parciais | Falhas |
 |---|--:|--:|--:|--:|--:|
 | 1º | 19 de 19 | 194 | 194 | 0 | 0 |
-| 2º | 18 de 18 | 370 | 368 | 2 | 0 |
+| 2º | 18 de 18 | 372 | 370 | 2 | 0 |
 | 3º | 12 de 12 | 113 | 112 | 1 | 0 |
 | 4º | 32 de 32 | 224 | 223 | 1 | 0 |
 | 5º | 24 de 24 | 464 | 463 | 1 | 0 |
@@ -29,6 +29,8 @@
 
 | Hora | Quem | Trabalho | Resultado |
 |---|---|---|---|
+| 08:16 | Marcos (2º) | Projeto Segmentação — TREINO_estoque_20261107_111644_04469 | ✅ concluída |
+| 08:16 | Marcos (2º) | Projeto NPS — TREINO_nps_20261107_110125_85299 | ✅ concluída |
 | 08:11 | Marcos (2º) | Projeto Segmentação — TREINO_ponto_20261107_110128_88531 | ✅ concluída |
 | 08:11 | Marcos (2º) | Projeto NPS — TREINO_nps_20261107_110125_85299 | ✅ concluída |
 | 08:06 | Marcos (2º) | Projeto Segmentação — TREINO_ponto_20261107_110128_88531 | ✅ concluída |
@@ -37,8 +39,6 @@
 | 08:06 | Lia (1º) | Perfil e indicadores da base sintética — nível dificil | ✅ concluída |
 | 08:03 | Marcos (2º) | Projeto Segmentação — TREINO_ponto_20261107_110128_88531 | ✅ concluída |
 | 08:03 | Marcos (2º) | Projeto NPS — TREINO_nps_20261107_110125_85299 | ✅ concluída |
-| 08:03 | Ícaro (5º) | Medir a saúde do PostgreSQL — nível dificil | ✅ concluída |
-| 08:03 | Heloísa (5º) | Medir a saúde do PostgreSQL — nível profissional | ✅ concluída |
 
 ## Dificuldade (todo o histórico)
 
@@ -47,7 +47,7 @@
 | basico | 719 | 695 | 0 | 24 | 97% |
 | medio | 2774 | 2750 | 0 | 24 | 99% |
 | dificil | 7588 | 7536 | 30 | 22 | 99% |
-| profissional | 5598 | 5585 | 9 | 4 | 100% |
+| profissional | 5600 | 5587 | 9 | 4 | 100% |
 
 ## Cada funcionário
 
@@ -92,7 +92,7 @@
 | Leandro | Engenheiro de Machine Learning Sênior | trabalho do papel | Drivers do indicador na base sintética — nível dificil (✅ concluída) | 11 |
 | Lucas | Cientista de Dados Júnior | trabalho do papel | Conferir no PostgreSQL os lotes da fábrica — nível medio (✅ concluída) | 11 |
 | Manu | Estagiária de Análise de Dados | estagiário: observa (regra do dono) |   | 0 |
-| Marcos | Coordenador de Análise e Ciência de Dado | trabalho FORA do papel | Projeto Segmentação — TREINO_ponto_20261107_110128_88531 (✅ concluída) | 198 |
+| Marcos | Coordenador de Análise e Ciência de Dado | trabalho FORA do papel | Projeto Segmentação — TREINO_estoque_20261107_111644_04469 (✅ concluída) | 200 |
 | Natália | Head de Ciência de Dados | trabalho do papel | Conferir no PostgreSQL os lotes da fábrica — nível profissio (✅ concluída) | 11 |
 | Patrícia | Gerente de Analytics e Customer Insights | trabalho do papel | Perfil e indicadores da base sintética — nível profissional (✅ concluída) | 11 |
 | Rebeca | Líder de Engenharia de IA e Machine Lear | trabalho do papel | Programa de modelos: backlog e critérios — nível profissiona (✅ concluída) | 11 |
@@ -194,15 +194,15 @@
 
 ## Projetos entre andares (várias pessoas, uma etapa depende da outra)
 
+- Projeto Segmentação — TREINO_estoque_20261107_111644_04469: **✅ concluída** — 1. publicacao (concluida); 2. analise_estatistica (concluida); 3. ana_junior_faixas (concluida); 4. cd_junior_anomalias (concluida); 5. sec_senior (concluida); 6. canal_iara (concluida)
+- Projeto NPS — TREINO_nps_20261107_110125_85299: **✅ concluída** — 1. modelagem (concluida); 2. analise_perfil (concluida); 3. cd_senior_drivers (concluida); 4. gov_pleno_lgpd (concluida); 5. analise_relator (concluida)
 - Projeto Segmentação — TREINO_ponto_20261107_110128_88531: **✅ concluída** — 1. limpeza (concluida); 2. analise_indicadores (concluida); 3. cd_pleno_segmentos (concluida); 4. analise_monitoramento (concluida); 5. sec_senior (concluida); 6. canal_nina (concluida)
-- Projeto NPS — TREINO_nps_20261107_110125_85299: **✅ concluída** — 1. leitura (concluida); 2. analise_estatistica (concluida); 3. head_ciencia (concluida); 4. gov_pleno_lgpd (concluida); 5. canal_iara (concluida)
-- Projeto Segmentação — TREINO_ponto_20261107_110128_88531: **✅ concluída** — 1. head_engenharia (concluida); 2. analise_perfil (concluida); 3. ana_pleno_base (concluida); 4. cd_junior_anomalias (concluida); 5. sec_senior (concluida); 6. analise_relator (concluida)
 
-## Última entrega da empresa (TREINO_ponto_20261107_110128_88531.xlsx, 07/11 08:11)
+## Última entrega da empresa (TREINO_estoque_20261107_111644_04469.xlsx, 07/11 08:16)
 
 Pacote gerado pelo produto (`python -m robo entregar`) a partir de um projeto aprovado:
 
-1. Conferir 70 valor(es) fora do padrão em **atraso_min** (1,9% da base): podem ser erro de digitação ou casos reais que merecem olhar.
+1. Conferir 18 valor(es) fora do padrão em **estoque_un** (1,0% da base): podem ser erro de digitação ou casos reais que merecem olhar.
 
 ## Inteligência própria (modelo de risco das demandas)
 
