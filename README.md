@@ -1,15 +1,15 @@
 # Empresa ao vivo
 
-**Boletim das 07/11 09:46** (horário de Brasília) · trabalhando · SEM BANCO (memória guardada no arquivo do GitHub; o banco é alcançado quando voltar)
+**Boletim das 07/11 09:53** (horário de Brasília) · trabalhando · SEM BANCO (memória guardada no arquivo do GitHub; o banco é alcançado quando voltar)
 
 > Atualiza a cada 5 minutos enquanto a empresa trabalha. Recarregue a página para ver o mais novo.
 
 ## Hoje
 
-- **1531** demandas, **1526** concluídas (100%), 5 parciais, 0 com falha
+- **1533** demandas, **1528** concluídas (100%), 5 parciais, 0 com falha
 - **105** de 105 funcionários já trabalharam
 - SQL: 150 exercícios, 150 conferidos com o gabarito
-- Fábrica: 68 planilhas, 68 conferidas sem erro
+- Fábrica: 69 planilhas, 69 conferidas sem erro
 
 ## Trabalhando agora
 
@@ -20,7 +20,7 @@
 | Andar | Trabalharam | Demandas | Concluídas | Parciais | Falhas |
 |---|--:|--:|--:|--:|--:|
 | 1º | 19 de 19 | 212 | 212 | 0 | 0 |
-| 2º | 18 de 18 | 414 | 412 | 2 | 0 |
+| 2º | 18 de 18 | 416 | 414 | 2 | 0 |
 | 3º | 12 de 12 | 124 | 123 | 1 | 0 |
 | 4º | 32 de 32 | 245 | 244 | 1 | 0 |
 | 5º | 24 de 24 | 536 | 535 | 1 | 0 |
@@ -29,6 +29,8 @@
 
 | Hora | Quem | Trabalho | Resultado |
 |---|---|---|---|
+| 09:48 | Marcos (2º) | Projeto Segmentação — TREINO_csat_ces_20261107_124814_94234 | ✅ concluída |
+| 09:48 | Marcos (2º) | Projeto NPS — TREINO_csat_ces_20261107_124814_94234 | ✅ concluída |
 | 09:43 | Marcos (2º) | Projeto Segmentação — TREINO_nps_20261107_123255_75743 | ✅ concluída |
 | 09:43 | Marcos (2º) | Projeto NPS — TREINO_nps_20261107_123255_75743 | ✅ concluída |
 | 09:39 | Marcos (2º) | Projeto Segmentação — TREINO_nps_20261107_123255_75743 | ✅ concluída |
@@ -37,8 +39,6 @@
 | 09:39 | Heloísa (5º) | Ronda de saúde do sistema — nível profissional | ✅ concluída |
 | 09:39 | Wagner (5º) | Procurar segredos no repositório público — nível dificil | ✅ concluída |
 | 09:39 | Marina (5º) | Conferir se o projeto está pronto para servidor — nível dificil | ✅ concluída |
-| 09:39 | Jonas (5º) | Testar se o último backup volta — nível dificil | ✅ concluída |
-| 09:39 | Rodrigo (5º) | Testar se o último backup volta — nível medio | ✅ concluída |
 
 ## Dificuldade (todo o histórico)
 
@@ -47,7 +47,7 @@
 | basico | 724 | 700 | 0 | 24 | 97% |
 | medio | 2799 | 2775 | 0 | 24 | 99% |
 | dificil | 7664 | 7612 | 30 | 22 | 99% |
-| profissional | 5658 | 5645 | 9 | 4 | 100% |
+| profissional | 5660 | 5647 | 9 | 4 | 100% |
 
 ## Cada funcionário
 
@@ -92,7 +92,7 @@
 | Leandro | Engenheiro de Machine Learning Sênior | trabalho do papel | Perfil e indicadores da base sintética — nível dificil (✅ concluída) | 12 |
 | Lucas | Cientista de Dados Júnior | trabalho do papel | Anomalias na base sintética — nível medio (✅ concluída) | 12 |
 | Manu | Estagiária de Análise de Dados | estagiário: observa (regra do dono) |   | 0 |
-| Marcos | Coordenador de Análise e Ciência de Dado | trabalho FORA do papel | Projeto Segmentação — TREINO_nps_20261107_123255_75743 (✅ concluída) | 226 |
+| Marcos | Coordenador de Análise e Ciência de Dado | trabalho FORA do papel | Projeto Segmentação — TREINO_csat_ces_20261107_124814_94234 (✅ concluída) | 228 |
 | Natália | Head de Ciência de Dados | trabalho do papel | Auditoria por amostragem — nível profissional (✅ concluída) | 12 |
 | Patrícia | Gerente de Analytics e Customer Insights | trabalho do papel | Segmentação da base sintética — nível profissional (✅ concluída) | 12 |
 | Rebeca | Líder de Engenharia de IA e Machine Lear | trabalho do papel | Drivers do indicador na base sintética — nível profissional (✅ concluída) | 12 |
@@ -194,17 +194,15 @@
 
 ## Projetos entre andares (várias pessoas, uma etapa depende da outra)
 
+- Projeto Segmentação — TREINO_csat_ces_20261107_124814_94234: **✅ concluída** — 1. eng_junior_espacos (concluida); 2. analise_indicadores (concluida); 3. cd_pleno_segmentos (concluida); 4. analise_monitoramento (concluida); 5. sec_senior (concluida); 6. canal_nina (concluida)
+- Projeto NPS — TREINO_csat_ces_20261107_124814_94234: **✅ concluída** — 1. eng_junior_auditoria (concluida); 2. analise_estatistica (concluida); 3. cd_senior_drivers (concluida); 4. gov_pleno_lgpd (concluida); 5. canal_iara (concluida)
 - Projeto Segmentação — TREINO_nps_20261107_123255_75743: **✅ concluída** — 1. dir_dados (concluida); 2. analise_perfil (concluida); 3. ana_pleno_base (concluida); 4. cd_junior_anomalias (concluida); 5. sec_senior (concluida); 6. analise_relator (concluida)
-- Projeto NPS — TREINO_nps_20261107_123255_75743: **✅ concluída** — 1. dba (concluida); 2. analise_indicadores (concluida); 3. head_ciencia (concluida); 4. gov_pleno_lgpd (concluida); 5. canal_nina (concluida)
-- Projeto Segmentação — TREINO_nps_20261107_123255_75743: **✅ concluída** — 1. coord_engenharia (concluida); 2. analise_estatistica (concluida); 3. ana_junior_faixas (concluida); 4. analise_monitoramento (concluida); 5. sec_senior (concluida); 6. canal_iara (concluida)
 
-## Última entrega da empresa (TREINO_nps_20261107_123255_75743.xlsx, 07/11 09:43)
+## Última entrega da empresa (TREINO_csat_ces_20261107_124814_94234.xlsx, 07/11 09:48)
 
 Pacote gerado pelo produto (`python -m robo entregar`) a partir de um projeto aprovado:
 
-1. Priorizar **nota_conteudo**: os atributos têm notas parecidas (média ~7,5 de 10), então o maior ganho vem de melhorar o que mais pesa na nota (correlação 0,54).
-2. Investigar **curso = Enfermagem**: NPS -38 contra 8 no restante — diferença real (não é acaso; n=837).
-3. Investigar **curso = Engenharia**: NPS -17 contra 3 no restante — diferença real (não é acaso; n=784).
+1. Priorizar **nota_ces**: os atributos têm notas parecidas (média ~3,0 de 7), então o maior ganho vem de melhorar o que mais pesa na nota (correlação 0,01).
 
 ## Inteligência própria (modelo de risco das demandas)
 
