@@ -1,15 +1,15 @@
 # Empresa ao vivo
 
-**Boletim das 08/11 02:27** (horário de Brasília) · trabalhando · SEM BANCO (memória guardada no arquivo do GitHub; o banco é alcançado quando voltar)
+**Boletim das 08/11 02:34** (horário de Brasília) · trabalhando · SEM BANCO (memória guardada no arquivo do GitHub; o banco é alcançado quando voltar)
 
 > Atualiza a cada 5 minutos enquanto a empresa trabalha. Recarregue a página para ver o mais novo.
 
 ## Hoje
 
-- **672** demandas, **672** concluídas (100%), 0 parciais, 0 com falha
+- **674** demandas, **674** concluídas (100%), 0 parciais, 0 com falha
 - **105** de 105 funcionários já trabalharam
 - SQL: 53 exercícios, 53 conferidos com o gabarito
-- Fábrica: 29 planilhas, 29 conferidas sem erro
+- Fábrica: 30 planilhas, 30 conferidas sem erro
 
 ## Trabalhando agora
 
@@ -20,7 +20,7 @@
 | Andar | Trabalharam | Demandas | Concluídas | Parciais | Falhas |
 |---|--:|--:|--:|--:|--:|
 | 1º | 19 de 19 | 90 | 90 | 0 | 0 |
-| 2º | 18 de 18 | 178 | 178 | 0 | 0 |
+| 2º | 18 de 18 | 180 | 180 | 0 | 0 |
 | 3º | 12 de 12 | 55 | 55 | 0 | 0 |
 | 4º | 32 de 32 | 105 | 105 | 0 | 0 |
 | 5º | 24 de 24 | 244 | 244 | 0 | 0 |
@@ -29,6 +29,8 @@
 
 | Hora | Quem | Trabalho | Resultado |
 |---|---|---|---|
+| 02:32 | Marcos (2º) | Projeto Segmentação — TREINO_pesquisa_mercado_20261108_053137_97075 | ✅ concluída |
+| 02:32 | Marcos (2º) | Projeto NPS — TREINO_nps_20261108_051634_94256 | ✅ concluída |
 | 02:27 | Marcos (2º) | Projeto Segmentação — TREINO_vendas_20261108_051637_97414 | ✅ concluída |
 | 02:27 | Marcos (2º) | Projeto NPS — TREINO_nps_20261108_051634_94256 | ✅ concluída |
 | 02:22 | Marcos (2º) | Projeto Segmentação — TREINO_vendas_20261108_051637_97414 | ✅ concluída |
@@ -37,8 +39,6 @@
 | 02:19 | Marcos (2º) | Projeto NPS — TREINO_nps_20261108_051634_94256 | ✅ concluída |
 | 02:19 | Heloísa (5º) | Conferir se o projeto está pronto para servidor — nível profissional | ✅ concluída |
 | 02:19 | Ícaro (5º) | Medir a saúde do PostgreSQL — nível dificil | ✅ concluída |
-| 02:19 | Marina (5º) | Testar se o último backup volta — nível dificil | ✅ concluída |
-| 02:19 | Jonas (5º) | Integridade, promoção e monitoramento dos modelos — nível dificil | ✅ concluída |
 
 ## Dificuldade (todo o histórico)
 
@@ -47,7 +47,7 @@
 | basico | 783 | 759 | 0 | 24 | 97% |
 | medio | 3126 | 3102 | 0 | 24 | 99% |
 | dificil | 8586 | 8534 | 30 | 22 | 99% |
-| profissional | 6357 | 6344 | 9 | 4 | 100% |
+| profissional | 6359 | 6346 | 9 | 4 | 100% |
 
 ## Cada funcionário
 
@@ -92,7 +92,7 @@
 | Leandro | Engenheiro de Machine Learning Sênior | trabalho do papel | Conferir no PostgreSQL os lotes da fábrica — nível dificil (✅ concluída) | 5 |
 | Lucas | Cientista de Dados Júnior | trabalho do papel | Calcular a média de uma métrica da base sintética — nível me (✅ concluída) | 5 |
 | Manu | Estagiária de Análise de Dados | estagiário: observa (regra do dono) |   | 0 |
-| Marcos | Coordenador de Análise e Ciência de Dado | trabalho FORA do papel | Projeto Segmentação — TREINO_vendas_20261108_051637_97414 (✅ concluída) | 98 |
+| Marcos | Coordenador de Análise e Ciência de Dado | trabalho FORA do papel | Projeto Segmentação — TREINO_pesquisa_mercado_20261108_05313 (✅ concluída) | 100 |
 | Natália | Head de Ciência de Dados | trabalho do papel | Perfil e indicadores da base sintética — nível profissional (✅ concluída) | 5 |
 | Patrícia | Gerente de Analytics e Customer Insights | trabalho do papel | Calcular a média de uma métrica da base sintética — nível pr (✅ concluída) | 5 |
 | Rebeca | Líder de Engenharia de IA e Machine Lear | trabalho do papel | Calcular a média de uma métrica da base sintética — nível pr (✅ concluída) | 5 |
@@ -194,15 +194,15 @@
 
 ## Projetos entre andares (várias pessoas, uma etapa depende da outra)
 
+- Projeto Segmentação — TREINO_pesquisa_mercado_20261108_053137_97075: **✅ concluída** — 1. dir_dados (concluida); 2. analise_monitoramento (concluida); 3. ana_pleno_base (concluida); 4. cd_junior_anomalias (concluida); 5. sec_senior (concluida); 6. analise_relator (concluida)
+- Projeto NPS — TREINO_nps_20261108_051634_94256: **✅ concluída** — 1. dba (concluida); 2. analise_indicadores (concluida); 3. cd_senior_drivers (concluida); 4. gov_pleno_lgpd (concluida); 5. canal_nina (concluida)
 - Projeto Segmentação — TREINO_vendas_20261108_051637_97414: **✅ concluída** — 1. coord_engenharia (concluida); 2. analise_estatistica (concluida); 3. ana_junior_faixas (concluida); 4. cd_junior_anomalias (concluida); 5. sec_senior (concluida); 6. canal_iara (concluida)
-- Projeto NPS — TREINO_nps_20261108_051634_94256: **✅ concluída** — 1. banco (concluida); 2. analise_perfil (concluida); 3. head_ciencia (concluida); 4. gov_pleno_lgpd (concluida); 5. analise_relator (concluida)
-- Projeto Segmentação — TREINO_vendas_20261108_051637_97414: **✅ concluída** — 1. validacao (concluida); 2. analise_indicadores (concluida); 3. cd_pleno_segmentos (concluida); 4. analise_monitoramento (concluida); 5. sec_senior (concluida); 6. canal_nina (concluida)
 
-## Última entrega da empresa (TREINO_vendas_20261108_051637_97414.xlsx, 08/11 02:27)
+## Última entrega da empresa (TREINO_pesquisa_mercado_20261108_053137_97075.xlsx, 08/11 02:32)
 
 Pacote gerado pelo produto (`python -m robo entregar`) a partir de um projeto aprovado:
 
-1. Conferir 47 valor(es) fora do padrão em **valor_da_venda** (1,5% da base): podem ser erro de digitação ou casos reais que merecem olhar.
+1. Nenhuma ação se destaca com segurança estatística nesta base. Comunique os indicadores gerais e evite ranking entre grupos.
 
 ## Inteligência própria (modelo de risco das demandas)
 
