@@ -1,12 +1,12 @@
 # Empresa ao vivo
 
-**Boletim das 08/11 08:58** (horário de Brasília) · trabalhando · SEM BANCO (memória guardada no arquivo do GitHub; o banco é alcançado quando voltar)
+**Boletim das 08/11 09:05** (horário de Brasília) · trabalhando · SEM BANCO (memória guardada no arquivo do GitHub; o banco é alcançado quando voltar)
 
 > Atualiza a cada 5 minutos enquanto a empresa trabalha. Recarregue a página para ver o mais novo.
 
 ## Hoje
 
-- **1439** demandas, **1431** concluídas (99%), 7 parciais, 1 com falha
+- **1441** demandas, **1433** concluídas (99%), 7 parciais, 1 com falha
 - **105** de 105 funcionários já trabalharam
 - SQL: 126 exercícios, 126 conferidos com o gabarito
 - Fábrica: 65 planilhas, 65 conferidas sem erro
@@ -20,7 +20,7 @@
 | Andar | Trabalharam | Demandas | Concluídas | Parciais | Falhas |
 |---|--:|--:|--:|--:|--:|
 | 1º | 19 de 19 | 198 | 196 | 2 | 0 |
-| 2º | 18 de 18 | 384 | 380 | 3 | 1 |
+| 2º | 18 de 18 | 386 | 382 | 3 | 1 |
 | 3º | 12 de 12 | 121 | 120 | 1 | 0 |
 | 4º | 32 de 32 | 231 | 230 | 1 | 0 |
 | 5º | 24 de 24 | 505 | 505 | 0 | 0 |
@@ -29,6 +29,8 @@
 
 | Hora | Quem | Trabalho | Resultado |
 |---|---|---|---|
+| 09:02 | Marcos (2º) | Projeto Segmentação — TREINO_curva_abc_20261108_115228_48454 | ✅ concluída |
+| 09:02 | Marcos (2º) | Projeto NPS — TREINO_nps_20261108_115225_45813 | ✅ concluída |
 | 08:57 | Marcos (2º) | Projeto Segmentação — TREINO_curva_abc_20261108_115228_48454 | ✅ concluída |
 | 08:57 | Marcos (2º) | Projeto NPS — TREINO_nps_20261108_115225_45813 | ✅ concluída |
 | 08:53 | Marcos (2º) | Projeto Segmentação — TREINO_curva_abc_20261108_115228_48454 | ✅ concluída |
@@ -37,8 +39,6 @@
 | 08:52 | Heloísa (5º) | Procurar segredos no repositório público — nível profissional | ✅ concluída |
 | 08:52 | Rodrigo (5º) | Procurar segredos no repositório público — nível medio | ✅ concluída |
 | 08:52 | Marina (5º) | Medir a saúde do PostgreSQL — nível dificil | ✅ concluída |
-| 08:52 | Alexandre (5º) | Testar se o último backup volta — nível profissional | ✅ concluída |
-| 08:52 | Diego (5º) | Ronda de saúde do sistema — nível medio | ✅ concluída |
 
 ## Dificuldade (todo o histórico)
 
@@ -47,7 +47,7 @@
 | basico | 808 | 784 | 0 | 24 | 97% |
 | medio | 3253 | 3228 | 0 | 25 | 99% |
 | dificil | 8938 | 8880 | 36 | 22 | 99% |
-| profissional | 6620 | 6606 | 10 | 4 | 100% |
+| profissional | 6622 | 6608 | 10 | 4 | 100% |
 
 ## Cada funcionário
 
@@ -92,7 +92,7 @@
 | Leandro | Engenheiro de Machine Learning Sênior | trabalho do papel | Perfil e indicadores da base sintética — nível dificil (✅ concluída) | 11 |
 | Lucas | Cientista de Dados Júnior | trabalho do papel | Calcular a média de uma métrica da base sintética — nível me (✅ concluída) | 11 |
 | Manu | Estagiária de Análise de Dados | estagiário: observa (regra do dono) |   | 0 |
-| Marcos | Coordenador de Análise e Ciência de Dado | trabalho FORA do papel | Projeto Segmentação — TREINO_curva_abc_20261108_115228_48454 (✅ concluída) | 208 |
+| Marcos | Coordenador de Análise e Ciência de Dado | trabalho FORA do papel | Projeto Segmentação — TREINO_curva_abc_20261108_115228_48454 (✅ concluída) | 210 |
 | Natália | Head de Ciência de Dados | trabalho do papel | Anomalias na base sintética — nível profissional (✅ concluída) | 11 |
 | Patrícia | Gerente de Analytics e Customer Insights | trabalho do papel | Segmentação da base sintética — nível profissional (✅ concluída) | 11 |
 | Rebeca | Líder de Engenharia de IA e Machine Lear | trabalho do papel | Drivers do indicador na base sintética — nível profissional (✅ concluída) | 11 |
@@ -194,11 +194,11 @@
 
 ## Projetos entre andares (várias pessoas, uma etapa depende da outra)
 
+- Projeto Segmentação — TREINO_curva_abc_20261108_115228_48454: **✅ concluída** — 1. eng_junior_espacos (concluida); 2. analise_monitoramento (concluida); 3. cd_pleno_segmentos (concluida); 4. cd_junior_anomalias (concluida); 5. sec_senior (concluida); 6. canal_nina (concluida)
+- Projeto NPS — TREINO_nps_20261108_115225_45813: **✅ concluída** — 1. eng_junior_auditoria (concluida); 2. analise_indicadores (concluida); 3. head_ciencia (concluida); 4. gov_pleno_lgpd (concluida); 5. canal_iara (concluida)
 - Projeto Segmentação — TREINO_curva_abc_20261108_115228_48454: **✅ concluída** — 1. dir_dados (concluida); 2. analise_estatistica (concluida); 3. ana_pleno_base (concluida); 4. cd_junior_anomalias (concluida); 5. sec_senior (concluida); 6. analise_relator (concluida)
-- Projeto NPS — TREINO_nps_20261108_115225_45813: **✅ concluída** — 1. dba (concluida); 2. analise_perfil (concluida); 3. cd_senior_drivers (concluida); 4. gov_pleno_lgpd (concluida); 5. canal_nina (concluida)
-- Projeto Segmentação — TREINO_curva_abc_20261108_115228_48454: **✅ concluída** — 1. coord_engenharia (concluida); 2. analise_indicadores (concluida); 3. ana_junior_faixas (concluida); 4. analise_monitoramento (concluida); 5. sec_senior (concluida); 6. canal_iara (concluida)
 
-## Última entrega da empresa (TREINO_curva_abc_20261108_115228_48454.xlsx, 08/11 08:57)
+## Última entrega da empresa (TREINO_curva_abc_20261108_115228_48454.xlsx, 08/11 09:02)
 
 Pacote gerado pelo produto (`python -m robo entregar`) a partir de um projeto aprovado:
 
