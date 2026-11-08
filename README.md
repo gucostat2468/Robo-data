@@ -1,15 +1,15 @@
 # Empresa ao vivo
 
-**Boletim das 07/11 21:33** (horário de Brasília) · trabalhando · SEM BANCO (memória guardada no arquivo do GitHub; o banco é alcançado quando voltar)
+**Boletim das 07/11 21:39** (horário de Brasília) · trabalhando · SEM BANCO (memória guardada no arquivo do GitHub; o banco é alcançado quando voltar)
 
 > Atualiza a cada 5 minutos enquanto a empresa trabalha. Recarregue a página para ver o mais novo.
 
 ## Hoje
 
-- **101** demandas, **101** concluídas (100%), 0 parciais, 0 com falha
-- **103** de 105 funcionários já trabalharam
+- **103** demandas, **103** concluídas (100%), 0 parciais, 0 com falha
+- **105** de 105 funcionários já trabalharam
 - SQL: 4 exercícios, 4 conferidos com o gabarito
-- Fábrica: 3 planilhas, 2 conferidas sem erro
+- Fábrica: 3 planilhas, 3 conferidas sem erro
 
 ## Trabalhando agora
 
@@ -20,15 +20,17 @@
 | Andar | Trabalharam | Demandas | Concluídas | Parciais | Falhas |
 |---|--:|--:|--:|--:|--:|
 | 1º | 19 de 19 | 18 | 18 | 0 | 0 |
-| 2º | 18 de 18 | 26 | 26 | 0 | 0 |
+| 2º | 18 de 18 | 28 | 28 | 0 | 0 |
 | 3º | 12 de 12 | 11 | 11 | 0 | 0 |
-| 4º | 30 de 32 | 21 | 21 | 0 | 0 |
+| 4º | 32 de 32 | 21 | 21 | 0 | 0 |
 | 5º | 24 de 24 | 25 | 25 | 0 | 0 |
 
 ## Últimas entregas
 
 | Hora | Quem | Trabalho | Resultado |
 |---|---|---|---|
+| 21:34 | Marcos (2º) | Projeto Segmentação — TREINO_churn_20261108_003317_97109 | ✅ concluída |
+| 21:34 | Marcos (2º) | Projeto NPS — TREINO_csat_ces_20261108_001808_88240 | ✅ concluída |
 | 21:28 | Marcos (2º) | Projeto Segmentação — TREINO_csat_ces_20261108_001808_88240 | ✅ concluída |
 | 21:28 | Marcos (2º) | Projeto NPS — TREINO_csat_ces_20261108_001808_88240 | ✅ concluída |
 | 21:21 | Marcos (2º) | Projeto Segmentação — TREINO_csat_ces_20261108_001808_88240 | ✅ concluída |
@@ -37,8 +39,6 @@
 | 21:21 | Heloísa (5º) | Procurar segredos no repositório público — nível profissional | ✅ concluída |
 | 21:21 | Marina (5º) | Medir a saúde do PostgreSQL — nível dificil | ✅ concluída |
 | 21:17 | Marcos (2º) | Projeto Segmentação — TREINO_nps_20261108_000306_86836 | ✅ concluída |
-| 21:17 | Marcos (2º) | Projeto NPS — TREINO_nps_20261108_000306_86836 | ✅ concluída |
-| 21:17 | Wagner (5º) | Ronda de saúde do sistema — nível dificil | ✅ concluída |
 
 ## Dificuldade (todo o histórico)
 
@@ -47,7 +47,7 @@
 | basico | 766 | 742 | 0 | 24 | 97% |
 | medio | 3035 | 3011 | 0 | 24 | 99% |
 | dificil | 8323 | 8271 | 30 | 22 | 99% |
-| profissional | 6157 | 6144 | 9 | 4 | 100% |
+| profissional | 6159 | 6146 | 9 | 4 | 100% |
 
 ## Cada funcionário
 
@@ -92,7 +92,7 @@
 | Leandro | Engenheiro de Machine Learning Sênior | trabalho do papel | Calcular a média de uma métrica da base sintética — nível di (✅ concluída) | 1 |
 | Lucas | Cientista de Dados Júnior | trabalho do papel | Conferir no PostgreSQL os lotes da fábrica — nível medio (✅ concluída) | 1 |
 | Manu | Estagiária de Análise de Dados | estagiário: observa (regra do dono) |   | 0 |
-| Marcos | Coordenador de Análise e Ciência de Dado | trabalho FORA do papel | Projeto Segmentação — TREINO_csat_ces_20261108_001808_88240 (✅ concluída) | 10 |
+| Marcos | Coordenador de Análise e Ciência de Dado | trabalho FORA do papel | Projeto Segmentação — TREINO_churn_20261108_003317_97109 (✅ concluída) | 12 |
 | Natália | Head de Ciência de Dados | trabalho do papel | Segmentação da base sintética — nível profissional (✅ concluída) | 1 |
 | Patrícia | Gerente de Analytics e Customer Insights | trabalho do papel | Drivers do indicador na base sintética — nível profissional (✅ concluída) | 1 |
 | Rebeca | Líder de Engenharia de IA e Machine Lear | trabalho do papel | Conferir no PostgreSQL os lotes da fábrica — nível profissio (✅ concluída) | 1 |
@@ -194,15 +194,16 @@
 
 ## Projetos entre andares (várias pessoas, uma etapa depende da outra)
 
+- Projeto Segmentação — TREINO_churn_20261108_003317_97109: **✅ concluída** — 1. eng_junior_espacos (concluida); 2. analise_estatistica (concluida); 3. cd_pleno_segmentos (concluida); 4. analise_monitoramento (concluida); 5. sec_senior (concluida); 6. canal_nina (concluida)
+- Projeto NPS — TREINO_csat_ces_20261108_001808_88240: **✅ concluída** — 1. eng_junior_auditoria (concluida); 2. analise_perfil (concluida); 3. cd_senior_drivers (concluida); 4. gov_pleno_lgpd (concluida); 5. canal_iara (concluida)
 - Projeto Segmentação — TREINO_csat_ces_20261108_001808_88240: **✅ concluída** — 1. dir_dados (concluida); 2. analise_monitoramento (concluida); 3. ana_pleno_base (concluida); 4. cd_junior_anomalias (concluida); 5. sec_senior (concluida); 6. analise_relator (concluida)
-- Projeto NPS — TREINO_csat_ces_20261108_001808_88240: **✅ concluída** — 1. dba (concluida); 2. analise_indicadores (concluida); 3. head_ciencia (concluida); 4. gov_pleno_lgpd (concluida); 5. canal_nina (concluida)
-- Projeto Segmentação — TREINO_csat_ces_20261108_001808_88240: **✅ concluída** — 1. coord_engenharia (concluida); 2. analise_estatistica (concluida); 3. ana_junior_faixas (concluida); 4. cd_junior_anomalias (concluida); 5. sec_senior (concluida); 6. canal_iara (concluida)
 
-## Última entrega da empresa (TREINO_csat_ces_20261108_001808_88240.xlsx, 07/11 21:28)
+## Última entrega da empresa (TREINO_churn_20261108_003317_97109.xlsx, 07/11 21:34)
 
 Pacote gerado pelo produto (`python -m robo entregar`) a partir de um projeto aprovado:
 
-1. Priorizar **nota_ces**: os atributos têm notas parecidas (média ~3,0 de 7), então o maior ganho vem de melhorar o que mais pesa na nota (correlação 0,02).
+1. Entender a diferença em **plano = Premium**: Média de mensalidade 150,20 contra 65,41 no restante (diferença real, n=465).
+2. **Valores suspeitos:** 465 apontado(s) (idade impossível (fora de 0 a 120): 465). Estão na aba suspeitos do indicadores.xlsx com a chave de cada linha: confira na origem.
 
 ## Inteligência própria (modelo de risco das demandas)
 
@@ -487,15 +488,15 @@ Pacote gerado pelo produto (`python -m robo entregar`) a partir de um projeto ap
 
 ## Banco de dados
 
-Levantamento das 07/11 20:53: **78 de 97** tabelas com dados (1.663.343 linhas contadas uma a uma).
+Levantamento das 07/11 21:37: **80 de 99** tabelas com dados (1.665.344 linhas contadas uma a uma).
 
 
 | Onde | Tabelas | Com dados |
 |---|--:|--:|
 | sqlite | 81 | 67 |
-| postgres.laboratorio | 2 | 2 |
+| postgres.laboratorio | 3 | 3 |
 | postgres.robo | 2 | 0 |
-| postgres.treino | 9 | 9 |
+| postgres.treino | 10 | 10 |
 | postgres.bruto | 1 | 0 |
 | postgres.tratado | 1 | 0 |
 | postgres.analitico | 1 | 0 |
