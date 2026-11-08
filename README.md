@@ -1,15 +1,15 @@
 # Empresa ao vivo
 
-**Boletim das 08/11 03:52** (horário de Brasília) · trabalhando · SEM BANCO (memória guardada no arquivo do GitHub; o banco é alcançado quando voltar)
+**Boletim das 08/11 03:59** (horário de Brasília) · trabalhando · SEM BANCO (memória guardada no arquivo do GitHub; o banco é alcançado quando voltar)
 
 > Atualiza a cada 5 minutos enquanto a empresa trabalha. Recarregue a página para ver o mais novo.
 
 ## Hoje
 
-- **876** demandas, **876** concluídas (100%), 0 parciais, 0 com falha
+- **880** demandas, **880** concluídas (100%), 0 parciais, 0 com falha
 - **105** de 105 funcionários já trabalharam
 - SQL: 75 exercícios, 75 conferidos com o gabarito
-- Fábrica: 37 planilhas, 37 conferidas sem erro
+- Fábrica: 38 planilhas, 38 conferidas sem erro
 
 ## Trabalhando agora
 
@@ -20,7 +20,7 @@
 | Andar | Trabalharam | Demandas | Concluídas | Parciais | Falhas |
 |---|--:|--:|--:|--:|--:|
 | 1º | 19 de 19 | 126 | 126 | 0 | 0 |
-| 2º | 18 de 18 | 232 | 232 | 0 | 0 |
+| 2º | 18 de 18 | 236 | 236 | 0 | 0 |
 | 3º | 12 de 12 | 77 | 77 | 0 | 0 |
 | 4º | 32 de 32 | 147 | 147 | 0 | 0 |
 | 5º | 24 de 24 | 294 | 294 | 0 | 0 |
@@ -29,16 +29,16 @@
 
 | Hora | Quem | Trabalho | Resultado |
 |---|---|---|---|
+| 03:59 | Marcos (2º) | Projeto Segmentação — TREINO_ponto_20261108_065805_85021 | ✅ concluída |
+| 03:58 | Marcos (2º) | Projeto NPS — TREINO_nps_20261108_064248_68974 | ✅ concluída |
+| 03:54 | Marcos (2º) | Projeto Segmentação — TREINO_folha_20261108_064255_75843 | ✅ concluída |
+| 03:53 | Marcos (2º) | Projeto NPS — TREINO_nps_20261108_064248_68974 | ✅ concluída |
 | 03:48 | Marcos (2º) | Projeto Segmentação — TREINO_folha_20261108_064255_75843 | ✅ concluída |
 | 03:48 | Marcos (2º) | Projeto NPS — TREINO_nps_20261108_064248_68974 | ✅ concluída |
 | 03:45 | Marcos (2º) | Projeto Segmentação — TREINO_folha_20261108_064255_75843 | ✅ concluída |
 | 03:44 | Marcos (2º) | Projeto NPS — TREINO_nps_20261108_064248_68974 | ✅ concluída |
 | 03:44 | Lívia (4º) | Revisar um caso de treino feito por outro designer — nível dificil | ✅ concluída |
 | 03:44 | Renata (4º) | Quadro por andar e nível — nível profissional | ✅ concluída |
-| 03:44 | Fabiana (4º) | Diagnosticar a planilha original da fábrica — nível dificil | ✅ concluída |
-| 03:44 | Lia (1º) | Anomalias na base sintética — nível dificil | ✅ concluída |
-| 03:44 | Murilo (4º) | Revisar um caso de treino feito por outro designer — nível dificil | ✅ concluída |
-| 03:44 | Eduardo (1º) | Auditoria por amostragem — nível profissional | ✅ concluída |
 
 ## Dificuldade (todo o histórico)
 
@@ -47,7 +47,7 @@
 | basico | 789 | 765 | 0 | 24 | 97% |
 | medio | 3164 | 3140 | 0 | 24 | 99% |
 | dificil | 8682 | 8630 | 30 | 22 | 99% |
-| profissional | 6421 | 6408 | 9 | 4 | 100% |
+| profissional | 6425 | 6412 | 9 | 4 | 100% |
 
 ## Cada funcionário
 
@@ -92,7 +92,7 @@
 | Leandro | Engenheiro de Machine Learning Sênior | trabalho do papel | Calcular a média de uma métrica da base sintética — nível di (✅ concluída) | 7 |
 | Lucas | Cientista de Dados Júnior | trabalho do papel | Conferir no PostgreSQL os lotes da fábrica — nível medio (✅ concluída) | 7 |
 | Manu | Estagiária de Análise de Dados | estagiário: observa (regra do dono) |   | 0 |
-| Marcos | Coordenador de Análise e Ciência de Dado | trabalho FORA do papel | Projeto Segmentação — TREINO_folha_20261108_064255_75843 (✅ concluída) | 120 |
+| Marcos | Coordenador de Análise e Ciência de Dado | trabalho FORA do papel | Projeto Segmentação — TREINO_ponto_20261108_065805_85021 (✅ concluída) | 124 |
 | Natália | Head de Ciência de Dados | trabalho do papel | Conferir no PostgreSQL os lotes da fábrica — nível profissio (✅ concluída) | 7 |
 | Patrícia | Gerente de Analytics e Customer Insights | trabalho do papel | Drivers do indicador na base sintética — nível profissional (✅ concluída) | 7 |
 | Rebeca | Líder de Engenharia de IA e Machine Lear | trabalho do papel | Perfil e indicadores da base sintética — nível profissional (✅ concluída) | 7 |
@@ -194,17 +194,16 @@
 
 ## Projetos entre andares (várias pessoas, uma etapa depende da outra)
 
-- Projeto Segmentação — TREINO_folha_20261108_064255_75843: **✅ concluída** — 1. eng_junior_espacos (concluida); 2. analise_monitoramento (concluida); 3. cd_pleno_segmentos (concluida); 4. cd_junior_anomalias (concluida); 5. sec_senior (concluida); 6. canal_nina (concluida)
-- Projeto NPS — TREINO_nps_20261108_064248_68974: **✅ concluída** — 1. eng_junior_auditoria (concluida); 2. analise_indicadores (concluida); 3. cd_senior_drivers (concluida); 4. gov_pleno_lgpd (concluida); 5. canal_iara (concluida)
-- Projeto Segmentação — TREINO_folha_20261108_064255_75843: **✅ concluída** — 1. dir_dados (concluida); 2. analise_estatistica (concluida); 3. ana_pleno_base (concluida); 4. cd_junior_anomalias (concluida); 5. sec_senior (concluida); 6. analise_relator (concluida)
+- Projeto Segmentação — TREINO_ponto_20261108_065805_85021: **✅ concluída** — 1. head_engenharia (concluida); 2. analise_perfil (concluida); 3. ana_pleno_base (concluida); 4. cd_junior_anomalias (concluida); 5. sec_senior (concluida); 6. analise_relator (concluida)
+- Projeto NPS — TREINO_nps_20261108_064248_68974: **✅ concluída** — 1. ger_engenharia (concluida); 2. analise_indicadores (concluida); 3. cd_senior_drivers (concluida); 4. gov_pleno_lgpd (concluida); 5. canal_nina (concluida)
+- Projeto Segmentação — TREINO_folha_20261108_064255_75843: **✅ concluída** — 1. eng_pleno_tipos (concluida); 2. analise_estatistica (concluida); 3. ana_junior_faixas (concluida); 4. analise_monitoramento (concluida); 5. sec_senior (concluida); 6. canal_iara (concluida)
 
-## Última entrega da empresa (TREINO_folha_20261108_064255_75843.xlsx, 08/11 03:48)
+## Última entrega da empresa (TREINO_ponto_20261108_065805_85021.xlsx, 08/11 03:59)
 
 Pacote gerado pelo produto (`python -m robo entregar`) a partir de um projeto aprovado:
 
-1. Conferir 86 valor(es) fora do padrão em **salario_base** (2,6% da base): podem ser erro de digitação ou casos reais que merecem olhar.
-2. Conferir 33 valor(es) fora do padrão em **horas_extras** (1,0% da base): podem ser erro de digitação ou casos reais que merecem olhar.
-3. Entender a diferença em **cargo = Gerente**: Média de salario_base 16.852,36 contra 5.514,77 no restante (diferença real, n=226).
+1. Queda no último mês (2026-09): soma de horas_trabalhadas 23,7% abaixo da média dos 3 meses anteriores. Confirme se o mês está completo antes de concluir.
+2. Conferir 61 valor(es) fora do padrão em **atraso_min** (2,6% da base): podem ser erro de digitação ou casos reais que merecem olhar.
 
 ## Inteligência própria (modelo de risco das demandas)
 
