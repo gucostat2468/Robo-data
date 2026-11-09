@@ -1,15 +1,15 @@
 # Empresa ao vivo
 
-**Boletim das 09/11 01:07** (horário de Brasília) · entre turnos: memória salva; o próximo turno começa em poucos minutos · SEM BANCO (memória guardada no arquivo do GitHub; o banco é alcançado quando voltar)
+**Boletim das 09/11 01:22** (horário de Brasília) · trabalhando · SEM BANCO (memória guardada no arquivo do GitHub; o banco é alcançado quando voltar)
 
 > Atualiza a cada 5 minutos enquanto a empresa trabalha. Recarregue a página para ver o mais novo.
 
 ## Hoje
 
-- **474** demandas, **468** concluídas (99%), 3 parciais, 3 com falha
+- **498** demandas, **492** concluídas (99%), 3 parciais, 3 com falha
 - **105** de 105 funcionários já trabalharam
 - SQL: 45 exercícios, 45 conferidos com o gabarito
-- Fábrica: 10 planilhas, 10 conferidas sem erro
+- Fábrica: 12 planilhas, 10 conferidas sem erro
 
 ## Trabalhando agora
 
@@ -20,34 +20,34 @@
 | Andar | Trabalharam | Demandas | Concluídas | Parciais | Falhas |
 |---|--:|--:|--:|--:|--:|
 | 1º | 19 de 19 | 72 | 72 | 0 | 0 |
-| 2º | 18 de 18 | 124 | 121 | 2 | 1 |
+| 2º | 18 de 18 | 126 | 123 | 2 | 1 |
 | 3º | 12 de 12 | 44 | 41 | 1 | 2 |
 | 4º | 32 de 32 | 84 | 84 | 0 | 0 |
-| 5º | 24 de 24 | 150 | 150 | 0 | 0 |
+| 5º | 24 de 24 | 172 | 172 | 0 | 0 |
 
 ## Últimas entregas
 
 | Hora | Quem | Trabalho | Resultado |
 |---|---|---|---|
-| 00:59 | Marcos (2º) | Projeto Segmentação — TREINO_funil_20261109_033359_39598 | ✅ concluída |
-| 00:58 | Marcos (2º) | Projeto NPS — TREINO_nps_20261109_033357_37107 | ✅ concluída |
-| 00:54 | Marcos (2º) | Projeto Segmentação — TREINO_funil_20261109_033359_39598 | ✅ concluída |
-| 00:54 | Marcos (2º) | Projeto NPS — TREINO_nps_20261109_033357_37107 | ✅ concluída |
-| 00:54 | Lívia (4º) | Revisar um caso de treino feito por outro designer — nível dificil | ✅ concluída |
-| 00:54 | Renata (4º) | Verificar dados pessoais (LGPD) na base sintética — nível profissional | ✅ concluída |
-| 00:54 | Fabiana (4º) | Verificar dados pessoais (LGPD) na base sintética — nível dificil | ✅ concluída |
-| 00:53 | Lia (1º) | Exercício de SQL no PostgreSQL com os dados da fábrica — nível dificil | ✅ concluída |
-| 00:53 | Eduardo (1º) | Exercício de SQL no PostgreSQL com os dados da fábrica — nível profissional | ✅ concluída |
-| 00:53 | Murilo (4º) | Revisar um caso de treino feito por outro designer — nível dificil | ✅ concluída |
+| 01:22 | Marcos (2º) | Projeto Segmentação — TREINO_ponto_20261109_042023_23955 | ✅ concluída |
+| 01:22 | Marcos (2º) | Projeto NPS — TREINO_nps_20261109_042018_18271 | ✅ concluída |
+| 01:21 | Ícaro (5º) | Medir a saúde do PostgreSQL — nível dificil | ✅ concluída |
+| 01:21 | Heloísa (5º) | SLA das rotinas — nível profissional | ✅ concluída |
+| 01:21 | Marina (5º) | Ronda de saúde do sistema — nível dificil | ✅ concluída |
+| 01:21 | Wagner (5º) | Procurar segredos no repositório público — nível dificil | ✅ concluída |
+| 01:21 | Rodrigo (5º) | Ronda de saúde do sistema — nível medio | ✅ concluída |
+| 01:21 | Jonas (5º) | SLA das rotinas — nível dificil | ✅ concluída |
+| 01:21 | Sofia (5º) | Ronda de saúde do sistema — nível dificil | ✅ concluída |
+| 01:21 | Olívia (5º) | Testar se o último backup volta — nível dificil | ✅ concluída |
 
 ## Dificuldade (todo o histórico)
 
 | Nível | Demandas | Concluídas | Parciais | Falhas | Acerto |
 |---|--:|--:|--:|--:|--:|
-| basico | 867 | 842 | 0 | 25 | 97% |
-| medio | 3564 | 3536 | 0 | 28 | 99% |
-| dificil | 9803 | 9733 | 48 | 22 | 99% |
-| profissional | 7236 | 7221 | 11 | 4 | 100% |
+| basico | 868 | 843 | 0 | 25 | 97% |
+| medio | 3567 | 3539 | 0 | 28 | 99% |
+| dificil | 9816 | 9746 | 48 | 22 | 99% |
+| profissional | 7243 | 7228 | 11 | 4 | 100% |
 
 ## Cada funcionário
 
@@ -74,7 +74,7 @@
 | Rafael | Engenheiro de Dados Pleno | trabalho do papel | Exercício de SQL no PostgreSQL com os dados da fábrica — nív (✅ concluída) | 4 |
 | Rita | Recepção | trabalho do papel | Exercício de SQL no PostgreSQL com os dados da fábrica — nív (✅ concluída) | 4 |
 | Saulo | Supervisor de Planilhas | trabalho do papel | Exercício de SQL no PostgreSQL com os dados da fábrica — nív (✅ concluída) | 4 |
-| Théo | Estagiário de Engenharia de Dados | estagiário: observa (regra do dono) |   | 0 |
+| Théo | Estagiário de Engenharia de Dados | estagiário: observa (regra do dono) — Observei Pietro (Especialista em psycopg (PostgreSQL |   | 0 |
 | Tina | Contatos e NPS | trabalho do papel | Diagnosticar a planilha original da fábrica — nível medio (✅ concluída) | 4 |
 
 ### 2º andar
@@ -92,7 +92,7 @@
 | Leandro | Engenheiro de Machine Learning Sênior | trabalho do papel | Conferir no PostgreSQL os lotes da fábrica — nível dificil (✅ concluída) | 4 |
 | Lucas | Cientista de Dados Júnior | trabalho do papel | Anomalias na base sintética — nível medio (✅ concluída) | 4 |
 | Manu | Estagiária de Análise de Dados | estagiário: observa (regra do dono) |   | 0 |
-| Marcos | Coordenador de Análise e Ciência de Dado | trabalho FORA do papel | Projeto Segmentação — TREINO_funil_20261109_033359_39598 (✅ concluída) | 60 |
+| Marcos | Coordenador de Análise e Ciência de Dado | trabalho FORA do papel | Projeto Segmentação — TREINO_ponto_20261109_042023_23955 (✅ concluída) | 62 |
 | Natália | Head de Ciência de Dados | trabalho do papel | Exercício de SQL no PostgreSQL com os dados da fábrica — nív (✅ concluída) | 4 |
 | Patrícia | Gerente de Analytics e Customer Insights | trabalho do papel | Calcular a média de uma métrica da base sintética — nível pr (✅ concluída) | 4 |
 | Rebeca | Líder de Engenharia de IA e Machine Lear | trabalho do papel | Exercício de SQL no PostgreSQL com os dados da fábrica — nív (✅ concluída) | 4 |
@@ -105,7 +105,7 @@
 | Quem | Cargo | Situação | Último trabalho | Hoje |
 |---|---|---|---|--:|
 | Bárbara | Especialista Sênior em Power BI | trabalho do papel | Calcular a média de uma métrica da base sintética — nível di (✅ concluída) | 4 |
-| Enzo | Estagiário da Sala Excel | estagiário: observa (regra do dono) |   | 0 |
+| Enzo | Estagiário da Sala Excel | estagiário: observa (regra do dono) — Observei Pietro (Especialista em psycopg (PostgreSQL |   | 0 |
 | Felipe | Head de BI e Excel | trabalho do papel | Calcular a média de uma métrica da base sintética — nível pr (✅ concluída) | 4 |
 | Gabriel | Especialista em Tabelas Dinâmicas e Dash | trabalho do papel | Segmentação da base sintética — nível dificil (✅ concluída) | 4 |
 | Heitor | Analista Pleno de BI | trabalho do papel | Exercício de SQL no PostgreSQL com os dados da fábrica (✅ concluída) | 4 |
@@ -132,7 +132,7 @@
 | Isadora | Analista Pleno de Distribuição de Demand | trabalho do papel na rotina demandas |   | 0 |
 | Joana | Analista Júnior de Dados Sintéticos | trabalho do papel na rotina fabrica |   | 0 |
 | Juliana | Head de Gente e Gestão | trabalho do papel | Situação das contratações — nível profissional (✅ concluída) | 4 |
-| Lara | Estagiária de Documentação de Dados | estagiário: observa (regra do dono) |   | 0 |
+| Lara | Estagiária de Documentação de Dados | estagiário: observa (regra do dono) — Observei Elisa (Especialista em PyYAML (configuração |   | 0 |
 | Lorena | Estagiária de RH | estagiário: observa (regra do dono) |   | 0 |
 | Lívia | Designer de Casos | trabalho do papel | Revisar um caso de treino feito por outro designer — nível d (✅ concluída) | 4 |
 | Marta | Diretora de Pessoas e Cultura (CHRO) | trabalho do papel | Indicadores de pessoas — nível profissional (✅ concluída) | 4 |
@@ -158,30 +158,30 @@
 
 | Quem | Cargo | Situação | Último trabalho | Hoje |
 |---|---|---|---|--:|
-| Alexandre | Diretor de Tecnologia (CTO) | trabalho do papel | Procurar segredos no repositório público — nível profissiona (✅ concluída) | 6 |
-| André | Head de Infraestrutura e Segurança | trabalho do papel | Ronda de saúde do sistema — nível profissional (✅ concluída) | 6 |
-| Bianca | Engenheira de Dados Pleno | trabalho do papel | Testar se o último backup volta — nível medio (✅ concluída) | 6 |
-| Caetano | Especialista em Orquestração de Dados (A | trabalho do papel | Testar se o último backup volta — nível dificil (✅ concluída) | 6 |
-| Caíque | Estagiário de DevOps | estagiário: observa (regra do dono) |   | 0 |
-| Diego | Desenvolvedor Python Pleno | trabalho do papel | Procurar segredos no repositório público — nível medio (✅ concluída) | 6 |
-| Elisa | Especialista em PyYAML (configuração) | trabalho do papel | Medir a saúde do PostgreSQL — nível dificil (✅ concluída) | 6 |
-| Fernanda | Coordenadora de DevOps e Confiabilidade  | trabalho do papel | Medir a saúde do PostgreSQL — nível dificil (✅ concluída) | 6 |
-| Gael | Estagiário de Engenharia de Dados (Airfl | estagiário: observa (regra do dono) |   | 0 |
-| Gustavo | Gerente de TI e Infraestrutura | trabalho do papel | Medir a saúde do PostgreSQL — nível profissional (✅ concluída) | 6 |
-| Heloísa | Head de AWS, Arquitetura e Governança de | trabalho do papel | Ronda de saúde do sistema — nível profissional (✅ concluída) | 12 |
-| Henrique | Head de Engenharia Python | trabalho do papel | SLA das rotinas — nível profissional (✅ concluída) | 6 |
-| Jonas | Engenheiro de MLOps e Plataforma de Mode | trabalho do papel | Ronda de saúde do sistema — nível dificil (✅ concluída) | 6 |
-| Letícia | Desenvolvedora Júnior | trabalho do papel | Ronda de saúde do sistema (✅ concluída) | 6 |
-| Marina | Arquiteta de Cloud (AWS) | trabalho do papel | Conferir se o projeto está pronto para servidor — nível difi (✅ concluída) | 12 |
-| Nicolas | Especialista em numpy | trabalho do papel | Procurar segredos no repositório público — nível dificil (✅ concluída) | 6 |
-| Olívia | Especialista em openpyxl (Excel) | trabalho do papel | Procurar segredos no repositório público — nível dificil (✅ concluída) | 6 |
-| Pietro | Especialista em psycopg (PostgreSQL) | trabalho do papel | Revisão da biblioteca sob sua responsabilidade — nível dific (✅ concluída) | 6 |
-| Rodrigo | Analista de Infraestrutura Pleno | trabalho do papel | Testar se o último backup volta — nível medio (✅ concluída) | 6 |
-| Silas | Especialista em sqlite3 (memória da empr | trabalho do papel | Procurar segredos no repositório público — nível dificil (✅ concluída) | 6 |
-| Sofia | Especialista em pandas | trabalho do papel | Revisão da biblioteca sob sua responsabilidade — nível dific (✅ concluída) | 6 |
-| Wagner | Especialista Sênior em Segurança da Info | trabalho do papel | Medir a saúde do PostgreSQL — nível dificil (✅ concluída) | 6 |
-| Xavier | Especialista em xlrd (.xls antigo) | trabalho do papel | Procurar segredos no repositório público — nível dificil (✅ concluída) | 6 |
-| Ícaro | Sênior de AWS, Linux e Ubuntu | trabalho do papel | Testar se o último backup volta — nível dificil (✅ concluída) | 12 |
+| Alexandre | Diretor de Tecnologia (CTO) | trabalho do papel | Testar se o último backup volta — nível profissional (✅ concluída) | 7 |
+| André | Head de Infraestrutura e Segurança | trabalho do papel | Situação do andar agora — nível profissional (✅ concluída) | 7 |
+| Bianca | Engenheira de Dados Pleno | trabalho do papel | Ronda de saúde do sistema — nível medio (✅ concluída) | 7 |
+| Caetano | Especialista em Orquestração de Dados (A | trabalho do papel | Ronda de saúde do sistema — nível dificil (✅ concluída) | 7 |
+| Caíque | Estagiário de DevOps | estagiário: observa (regra do dono) — Observei Pietro (Especialista em psycopg (PostgreSQL |   | 0 |
+| Diego | Desenvolvedor Python Pleno | trabalho do papel | Testar se o último backup volta — nível medio (✅ concluída) | 7 |
+| Elisa | Especialista em PyYAML (configuração) | trabalho do papel | Procurar segredos no repositório público — nível dificil (✅ concluída) | 7 |
+| Fernanda | Coordenadora de DevOps e Confiabilidade  | trabalho do papel | Procurar segredos no repositório público — nível dificil (✅ concluída) | 7 |
+| Gael | Estagiário de Engenharia de Dados (Airfl | estagiário: observa (regra do dono) — Observei Pietro (Especialista em psycopg (PostgreSQL |   | 0 |
+| Gustavo | Gerente de TI e Infraestrutura | trabalho do papel | Procurar segredos no repositório público — nível profissiona (✅ concluída) | 7 |
+| Heloísa | Head de AWS, Arquitetura e Governança de | trabalho do papel | SLA das rotinas — nível profissional (✅ concluída) | 13 |
+| Henrique | Head de Engenharia Python | trabalho do papel | Medir a saúde do PostgreSQL — nível profissional (✅ concluída) | 7 |
+| Jonas | Engenheiro de MLOps e Plataforma de Mode | trabalho do papel | SLA das rotinas — nível dificil (✅ concluída) | 7 |
+| Letícia | Desenvolvedora Júnior | trabalho do papel | SLA das rotinas (✅ concluída) | 7 |
+| Marina | Arquiteta de Cloud (AWS) | trabalho do papel | Ronda de saúde do sistema — nível dificil (✅ concluída) | 13 |
+| Nicolas | Especialista em numpy | trabalho do papel | Testar se o último backup volta — nível dificil (✅ concluída) | 7 |
+| Olívia | Especialista em openpyxl (Excel) | trabalho do papel | Testar se o último backup volta — nível dificil (✅ concluída) | 7 |
+| Pietro | Especialista em psycopg (PostgreSQL) | trabalho do papel | Conferir no PostgreSQL os lotes da fábrica — nível dificil (✅ concluída) | 7 |
+| Rodrigo | Analista de Infraestrutura Pleno | trabalho do papel | Ronda de saúde do sistema — nível medio (✅ concluída) | 7 |
+| Silas | Especialista em sqlite3 (memória da empr | trabalho do papel | Testar se o último backup volta — nível dificil (✅ concluída) | 7 |
+| Sofia | Especialista em pandas | trabalho do papel | Ronda de saúde do sistema — nível dificil (✅ concluída) | 7 |
+| Wagner | Especialista Sênior em Segurança da Info | trabalho do papel | Procurar segredos no repositório público — nível dificil (✅ concluída) | 7 |
+| Xavier | Especialista em xlrd (.xls antigo) | trabalho do papel | Testar se o último backup volta — nível dificil (✅ concluída) | 7 |
+| Ícaro | Sênior de AWS, Linux e Ubuntu | trabalho do papel | Medir a saúde do PostgreSQL — nível dificil (✅ concluída) | 13 |
 
 
 ## Tempo do último turno (medido)
@@ -194,17 +194,15 @@
 
 ## Projetos entre andares (várias pessoas, uma etapa depende da outra)
 
+- Projeto Segmentação — TREINO_ponto_20261109_042023_23955: **✅ concluída** — 1. validacao (concluida); 2. analise_indicadores (concluida); 3. cd_pleno_segmentos (concluida); 4. analise_monitoramento (concluida); 5. sec_senior (concluida); 6. canal_nina (concluida)
+- Projeto NPS — TREINO_nps_20261109_042018_18271: **✅ concluída** — 1. tina_contatos (concluida); 2. analise_estatistica (concluida); 3. cd_senior_drivers (concluida); 4. gov_pleno_lgpd (concluida); 5. canal_iara (concluida)
 - Projeto Segmentação — TREINO_funil_20261109_033359_39598: **✅ concluída** — 1. supervisor (concluida); 2. analise_perfil (concluida); 3. ana_pleno_base (concluida); 4. cd_junior_anomalias (concluida); 5. sec_senior (concluida); 6. analise_relator (concluida)
-- Projeto NPS — TREINO_nps_20261109_033357_37107: **✅ concluída** — 1. recepcao (concluida); 2. analise_indicadores (concluida); 3. head_ciencia (concluida); 4. gov_pleno_lgpd (concluida); 5. canal_nina (concluida)
-- Projeto Segmentação — TREINO_funil_20261109_033359_39598: **✅ concluída** — 1. publicacao (concluida); 2. analise_estatistica (concluida); 3. ana_junior_faixas (concluida); 4. analise_monitoramento (concluida); 5. sec_senior (concluida); 6. canal_iara (concluida)
 
-## Última entrega da empresa (TREINO_funil_20261109_033359_39598.xlsx, 09/11 00:59)
+## Última entrega da empresa (TREINO_ponto_20261109_042023_23955.xlsx, 09/11 01:22)
 
 Pacote gerado pelo produto (`python -m robo entregar`) a partir de um projeto aprovado:
 
-1. Conferir 78 valor(es) fora do padrão em **valor_da_oportunidade** (1,8% da base): podem ser erro de digitação ou casos reais que merecem olhar.
-2. **Valores suspeitos:** 4453 apontado(s) (idade impossível (fora de 0 a 120): 4453). Estão na aba suspeitos do indicadores.xlsx com a chave de cada linha: confira na origem.
-3. **Qualidade:** 1 coluna(s) em situação crítica (valor_da_oportunidade): corrija na origem antes de usar em decisão.
+1. Conferir 66 valor(es) fora do padrão em **atraso_min** (2,2% da base): podem ser erro de digitação ou casos reais que merecem olhar.
 
 ## Inteligência própria (modelo de risco das demandas)
 
@@ -523,13 +521,14 @@ Pacote gerado pelo produto (`python -m robo entregar`) a partir de um projeto ap
 - risco_demanda-v313: **reprovado** (treinado por ml_engenheiro)
 - risco_demanda-v314: **reprovado** (treinado por ml_engenheiro)
 - risco_demanda-v315: **reprovado** (treinado por ml_engenheiro)
-- Última avaliação independente (ml_avaliador): risco_demanda-v315 reprovado — log loss 0.041 contra baseline 0.028; motivos: não bate o baseline (log loss 0.0405 ≥ 0.0281)
-- Referência em sombra: risco_demanda-v237; 21498 previsões em sombra
+- risco_demanda-v316: **reprovado** (treinado por ml_engenheiro)
+- Última avaliação independente (ml_avaliador): risco_demanda-v316 reprovado — log loss 0.040 contra baseline 0.028; motivos: não bate o baseline (log loss 0.0404 ≥ 0.0281)
+- Referência em sombra: risco_demanda-v237; 21599 previsões em sombra
 - Uso operacional: desligado: o modelo só roda em sombra até o dono decidir usá-lo em alguma escolha da empresa
 
 ## Banco de dados
 
-Levantamento das 09/11 01:06: **79 de 97** tabelas com dados (1.872.335 linhas contadas uma a uma).
+Levantamento das 08/11 22:47: **79 de 97** tabelas com dados (1.856.442 linhas contadas uma a uma).
 
 
 | Onde | Tabelas | Com dados |
