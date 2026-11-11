@@ -1,8 +1,8 @@
 {
  "versao": 1,
- "gerado_em": "2026-11-11T05:49:10",
+ "gerado_em": "2026-11-11T05:53:00",
  "turno": {
-  "estado": "trabalhando · SEM BANCO (memória guardada no arquivo do GitHub; o banco é alcançado quando voltar)",
+  "estado": "entre turnos: memória salva; o próximo turno começa em poucos minutos · SEM BANCO (memória guardada no arquivo do GitHub; o banco é alcançado quando voltar)",
   "inicio": "2026-11-11T05:25:02",
   "fim_previsto": "2026-11-11T06:05:02",
   "voltas": 52,
@@ -220,9 +220,9 @@
   },
   {
    "rotina": "registro",
-   "execucoes_24h": 234,
+   "execucoes_24h": 235,
    "erros_24h": 0,
-   "ultima": "2026-11-11T05:46:33"
+   "ultima": "2026-11-11T05:52:23"
   },
   {
    "rotina": "rh_desempenho",
@@ -232,9 +232,9 @@
   },
   {
    "rotina": "ronda_ti",
-   "execucoes_24h": 81,
+   "execucoes_24h": 82,
    "erros_24h": 0,
-   "ultima": "2026-11-11T05:42:27"
+   "ultima": "2026-11-11T05:52:21"
   },
   {
    "rotina": "treino",
@@ -247,15 +247,15 @@
   "demandas": 26525,
   "tentativas_treino": 53160,
   "conversas": 11390,
-  "trabalhos_com_prova": 63636
+  "trabalhos_com_prova": 63638
  },
  "banco": {
-  "levantamento": "2026-11-10T15:28:29",
+  "levantamento": "2026-11-11T05:52:23",
   "postgres_conferido": true,
   "erro_postgres": null,
   "tabelas": 97,
   "com_dados": 79,
-  "linhas": 2102339,
+  "linhas": 2163483,
   "resumo": {
    "sqlite": {
     "tabelas": 81,
@@ -1717,6 +1717,70 @@
  ],
  "tempo_turnos": [
   {
+   "id": 342,
+   "inicio": "2026-11-11T05:11:34",
+   "fim": "2026-11-11T05:52:21",
+   "segundos": 2446.2,
+   "voltas": 52,
+   "por_natureza": {
+    "operacional": 740.5,
+    "estudo": 13.3,
+    "revisao": 25.7,
+    "coordenacao": 2.3,
+    "manutencao": 898.6,
+    "erro": 0.0,
+    "parado": 765.0,
+    "sem_medicao": 0.7
+   },
+   "por_chamada": {
+    "pausa": 765.01,
+    "boletim": 693.69,
+    "modelos": 596.39,
+    "demandas": 153.73,
+    "registro": 117.37,
+    "backup": 37.02,
+    "inicio": 35.51,
+    "ronda_ti": 13.93,
+    "treino": 12.58,
+    "paineis": 10.29,
+    "esteira": 4.82,
+    "estrategia": 1.16,
+    "fabrica": 0.95,
+    "laboratorio": 0.74,
+    "dialogo": 0.64,
+    "canal": 0.54,
+    "ideias": 0.4,
+    "jornada": 0.37,
+    "telegram": 0.21,
+    "caixa_dono": 0.08,
+    "pdca": 0.01,
+    "alcadas": 0.01,
+    "rh_desempenho": 0.01,
+    "reuniao": 0.01,
+    "auditoria": 0.0,
+    "estudo": 0.0,
+    "licoes": 0.0
+   },
+   "contagens": {
+    "demandas_executadas": 99,
+    "bloqueios": 16,
+    "etapas_esperando_dependencia": 0
+   },
+   "entregas_aprovadas": 99,
+   "entregas_por_hora": 145.7,
+   "cobertura": 1.0,
+   "percentual": {
+    "operacional": 30.3,
+    "estudo": 0.5,
+    "revisao": 1.1,
+    "coordenacao": 0.1,
+    "manutencao": 36.7,
+    "erro": 0.0,
+    "parado": 31.3,
+    "sem_medicao": 0.0
+   }
+  },
+  {
    "id": 341,
    "inicio": "2026-11-11T04:20:39",
    "fim": "2026-11-11T05:05:05",
@@ -2028,70 +2092,6 @@
     "manutencao": 33.6,
     "erro": 0.0,
     "parado": 29.3,
-    "sem_medicao": 0.0
-   }
-  },
-  {
-   "id": 336,
-   "inicio": "2026-11-10T21:53:26",
-   "fim": "2026-11-10T22:35:12",
-   "segundos": 2505.8,
-   "voltas": 68,
-   "por_natureza": {
-    "operacional": 609.6,
-    "estudo": 19.8,
-    "revisao": 32.7,
-    "coordenacao": 1.6,
-    "manutencao": 836.2,
-    "erro": 0.0,
-    "parado": 1005.0,
-    "sem_medicao": 0.8
-   },
-   "por_chamada": {
-    "pausa": 1005.01,
-    "boletim": 596.78,
-    "modelos": 399.9,
-    "demandas": 222.74,
-    "registro": 147.02,
-    "backup": 38.71,
-    "inicio": 38.16,
-    "treino": 18.99,
-    "ronda_ti": 13.99,
-    "paineis": 11.81,
-    "esteira": 6.55,
-    "estrategia": 1.43,
-    "fabrica": 1.37,
-    "laboratorio": 0.78,
-    "canal": 0.75,
-    "jornada": 0.47,
-    "telegram": 0.33,
-    "caixa_dono": 0.08,
-    "dialogo": 0.07,
-    "pdca": 0.02,
-    "alcadas": 0.01,
-    "rh_desempenho": 0.01,
-    "ideias": 0.01,
-    "auditoria": 0.01,
-    "estudo": 0.01,
-    "reuniao": 0.01,
-    "licoes": 0.0
-   },
-   "contagens": {
-    "demandas_executadas": 103,
-    "bloqueios": 20,
-    "etapas_esperando_dependencia": 0
-   },
-   "entregas_aprovadas": 103,
-   "entregas_por_hora": 147.97,
-   "cobertura": 1.0,
-   "percentual": {
-    "operacional": 24.3,
-    "estudo": 0.8,
-    "revisao": 1.3,
-    "coordenacao": 0.1,
-    "manutencao": 33.4,
-    "erro": 0.0,
-    "parado": 40.1,
     "sem_medicao": 0.0
    }
   }
