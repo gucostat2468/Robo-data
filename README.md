@@ -1,12 +1,12 @@
 # Empresa ao vivo
 
-**Boletim das 14/11 17:37** (horário de Brasília) · trabalhando · SEM BANCO (memória guardada no arquivo do GitHub; o banco é alcançado quando voltar)
+**Boletim das 14/11 17:47** (horário de Brasília) · entre turnos: memória salva; o próximo turno começa em poucos minutos · SEM BANCO (memória guardada no arquivo do GitHub; o banco é alcançado quando voltar)
 
 > Atualiza a cada 5 minutos enquanto a empresa trabalha. Recarregue a página para ver o mais novo.
 
 ## Hoje
 
-- **1255** demandas, **1250** concluídas (100%), 4 parciais, 1 com falha
+- **1257** demandas, **1252** concluídas (100%), 4 parciais, 1 com falha
 - **105** de 105 funcionários já trabalharam
 - SQL: 90 exercícios, 90 conferidos com o gabarito
 - Fábrica: 34 planilhas, 34 conferidas sem erro
@@ -20,7 +20,7 @@
 | Andar | Trabalharam | Demandas | Concluídas | Parciais | Falhas |
 |---|--:|--:|--:|--:|--:|
 | 1º | 19 de 19 | 198 | 198 | 0 | 0 |
-| 2º | 18 de 18 | 303 | 302 | 1 | 0 |
+| 2º | 18 de 18 | 305 | 304 | 1 | 0 |
 | 3º | 12 de 12 | 121 | 120 | 0 | 1 |
 | 4º | 32 de 32 | 231 | 230 | 1 | 0 |
 | 5º | 24 de 24 | 402 | 400 | 2 | 0 |
@@ -29,6 +29,8 @@
 
 | Hora | Quem | Trabalho | Resultado |
 |---|---|---|---|
+| 17:42 | Marcos (2º) | Projeto Segmentação — TREINO_rfm_20261114_202217_37111 | ✅ concluída |
+| 17:42 | Marcos (2º) | Projeto NPS — TREINO_nps_20261114_202212_32310 | ✅ concluída |
 | 17:32 | Marcos (2º) | Projeto Segmentação — TREINO_rfm_20261114_202217_37111 | ✅ concluída |
 | 17:32 | Marcos (2º) | Projeto NPS — TREINO_nps_20261114_202212_32310 | ✅ concluída |
 | 17:28 | Marcos (2º) | Projeto Segmentação — TREINO_rfm_20261114_202217_37111 | ✅ concluída |
@@ -37,8 +39,6 @@
 | 17:28 | Heloísa (5º) | Testar se o último backup volta — nível profissional | ✅ concluída |
 | 17:28 | Elisa (5º) | Medir a saúde do PostgreSQL — nível dificil | ✅ concluída |
 | 17:28 | Marina (5º) | Procurar segredos no repositório público — nível dificil | ✅ concluída |
-| 17:28 | Silas (5º) | SLA das rotinas — nível dificil | ✅ concluída |
-| 17:28 | Xavier (5º) | SLA das rotinas — nível dificil | ✅ concluída |
 
 ## Dificuldade (todo o histórico)
 
@@ -47,7 +47,7 @@
 | basico | 1247 | 1221 | 0 | 26 | 98% |
 | medio | 5561 | 5519 | 0 | 42 | 99% |
 | dificil | 15234 | 15141 | 71 | 22 | 99% |
-| profissional | 10796 | 10779 | 13 | 4 | 100% |
+| profissional | 10798 | 10781 | 13 | 4 | 100% |
 
 ## Cada funcionário
 
@@ -92,7 +92,7 @@
 | Leandro | Engenheiro de Machine Learning Sênior | trabalho do papel | Anomalias na base sintética — nível dificil (✅ concluída) | 11 |
 | Lucas | Cientista de Dados Júnior | trabalho do papel | Perfil e indicadores da base sintética — nível medio (✅ concluída) | 11 |
 | Manu | Estagiária de Análise de Dados | estagiário: observa (regra do dono) |   | 0 |
-| Marcos | Coordenador de Análise e Ciência de Dado | trabalho FORA do papel | Projeto Segmentação — TREINO_rfm_20261114_202217_37111 (✅ concluída) | 127 |
+| Marcos | Coordenador de Análise e Ciência de Dado | trabalho FORA do papel | Projeto Segmentação — TREINO_rfm_20261114_202217_37111 (✅ concluída) | 129 |
 | Natália | Head de Ciência de Dados | trabalho do papel | Exercício de SQL no PostgreSQL com os dados da fábrica — nív (✅ concluída) | 11 |
 | Patrícia | Gerente de Analytics e Customer Insights | trabalho do papel | Situação do andar agora — nível profissional (✅ concluída) | 11 |
 | Rebeca | Líder de Engenharia de IA e Machine Lear | trabalho do papel | Perfil e indicadores da base sintética — nível profissional (✅ concluída) | 11 |
@@ -186,19 +186,19 @@
 
 ## Tempo do último turno (medido)
 
-- 19:18–20:00 (42 min, 27 voltas; cobertura do cronômetro 100%)
-- **Entregas aprovadas na revisão independente: 97 (137.1 por hora)** — o indicador principal
-- operacional 44% · estudo 1% · revisao 2% · coordenacao 0% · manutencao 38% · erro 0% · parado 15% · sem_medicao 0%
-- Bloqueios: 17; etapas esperando dependência: 0
-- Turnos anteriores (entregas/hora): 148.0, 52.3, 134.9, 123.8, 30.9
+- 20:06–20:46 (40 min, 30 voltas; cobertura do cronômetro 100%)
+- **Entregas aprovadas na revisão independente: 27 (40.3 por hora)** — o indicador principal
+- operacional 50% · estudo 0% · revisao 1% · coordenacao 0% · manutencao 30% · erro 0% · parado 18% · sem_medicao 0%
+- Bloqueios: 16; etapas esperando dependência: 1
+- Turnos anteriores (entregas/hora): 137.1, 148.0, 52.3, 134.9, 123.8
 
 ## Projetos entre andares (várias pessoas, uma etapa depende da outra)
 
+- Projeto Segmentação — TREINO_rfm_20261114_202217_37111: **✅ concluída** — 1. dir_dados (concluida); 2. analise_perfil (concluida); 3. ana_pleno_base (concluida); 4. cd_junior_anomalias (concluida); 5. sec_senior (concluida); 6. analise_relator (concluida)
+- Projeto NPS — TREINO_nps_20261114_202212_32310: **✅ concluída** — 1. dba (concluida); 2. analise_indicadores (concluida); 3. cd_senior_drivers (concluida); 4. gov_pleno_lgpd (concluida); 5. canal_nina (concluida)
 - Projeto Segmentação — TREINO_rfm_20261114_202217_37111: **✅ concluída** — 1. coord_engenharia (concluida); 2. analise_estatistica (concluida); 3. ana_junior_faixas (concluida); 4. analise_monitoramento (concluida); 5. sec_senior (concluida); 6. canal_iara (concluida)
-- Projeto NPS — TREINO_nps_20261114_202212_32310: **✅ concluída** — 1. banco (concluida); 2. analise_perfil (concluida); 3. head_ciencia (concluida); 4. gov_pleno_lgpd (concluida); 5. analise_relator (concluida)
-- Projeto Segmentação — TREINO_rfm_20261114_202217_37111: **✅ concluída** — 1. validacao (concluida); 2. analise_monitoramento (concluida); 3. cd_pleno_segmentos (concluida); 4. cd_junior_anomalias (concluida); 5. sec_senior (concluida); 6. canal_nina (concluida)
 
-## Última entrega da empresa (TREINO_rfm_20261114_202217_37111.xlsx, 14/11 17:32)
+## Última entrega da empresa (TREINO_rfm_20261114_202217_37111.xlsx, 14/11 17:42)
 
 Pacote gerado pelo produto (`python -m robo entregar`) a partir de um projeto aprovado:
 
@@ -689,7 +689,7 @@ Pacote gerado pelo produto (`python -m robo entregar`) a partir de um projeto ap
 
 ## Banco de dados
 
-Levantamento das 12/11 07:11: **79 de 97** tabelas com dados (2.287.730 linhas contadas uma a uma).
+Levantamento das 14/11 17:46: **79 de 97** tabelas com dados (2.516.695 linhas contadas uma a uma).
 
 
 | Onde | Tabelas | Com dados |
