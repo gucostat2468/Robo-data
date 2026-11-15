@@ -1,13 +1,13 @@
 # Empresa ao vivo
 
-**Boletim das 15/11 00:06** (horário de Brasília) · trabalhando · SEM BANCO (memória guardada no arquivo do GitHub; o banco é alcançado quando voltar)
+**Boletim das 15/11 00:14** (horário de Brasília) · trabalhando · SEM BANCO (memória guardada no arquivo do GitHub; o banco é alcançado quando voltar)
 
 > Atualiza a cada 5 minutos enquanto a empresa trabalha. Recarregue a página para ver o mais novo.
 
 ## Hoje
 
-- **121** demandas, **121** concluídas (100%), 0 parciais, 0 com falha
-- **94** de 105 funcionários já trabalharam
+- **123** demandas, **123** concluídas (100%), 0 parciais, 0 com falha
+- **99** de 105 funcionários já trabalharam
 - SQL: 0 exercícios, 0 conferidos com o gabarito
 - Fábrica: 4 planilhas, 4 conferidas sem erro
 
@@ -20,15 +20,17 @@
 | Andar | Trabalharam | Demandas | Concluídas | Parciais | Falhas |
 |---|--:|--:|--:|--:|--:|
 | 1º | 19 de 19 | 18 | 18 | 0 | 0 |
-| 2º | 17 de 18 | 27 | 27 | 0 | 0 |
-| 3º | 11 de 12 | 11 | 11 | 0 | 0 |
-| 4º | 24 de 32 | 21 | 21 | 0 | 0 |
+| 2º | 18 de 18 | 29 | 29 | 0 | 0 |
+| 3º | 12 de 12 | 11 | 11 | 0 | 0 |
+| 4º | 27 de 32 | 21 | 21 | 0 | 0 |
 | 5º | 23 de 24 | 44 | 44 | 0 | 0 |
 
 ## Últimas entregas
 
 | Hora | Quem | Trabalho | Resultado |
 |---|---|---|---|
+| 00:09 | Marcos (2º) | Projeto Segmentação — TREINO_leads_20261115_025607_67094 | ✅ concluída |
+| 00:09 | Marcos (2º) | Projeto NPS — TREINO_nps_20261115_025605_65359 | ✅ concluída |
 | 00:02 | Marcos (2º) | Projeto Segmentação — TREINO_leads_20261115_025607_67094 | ✅ concluída |
 | 00:02 | Marcos (2º) | Projeto NPS — TREINO_nps_20261115_025605_65359 | ✅ concluída |
 | 23:58 | Marcos (2º) | Projeto Segmentação — TREINO_leads_20261115_025607_67094 | ✅ concluída |
@@ -37,8 +39,6 @@
 | 23:58 | Heloísa (5º) | Medir a saúde do PostgreSQL — nível profissional | ✅ concluída |
 | 23:57 | Marina (5º) | SLA das rotinas — nível dificil | ✅ concluída |
 | 23:57 | Elisa (5º) | Ronda de saúde do sistema — nível dificil | ✅ concluída |
-| 23:57 | Xavier (5º) | Revisão da biblioteca sob sua responsabilidade — nível dificil | ✅ concluída |
-| 23:57 | Pietro (5º) | Testar se o último backup volta — nível dificil | ✅ concluída |
 
 ## Dificuldade (todo o histórico)
 
@@ -47,7 +47,7 @@
 | basico | 1257 | 1231 | 0 | 26 | 98% |
 | medio | 5622 | 5580 | 0 | 42 | 99% |
 | dificil | 15385 | 15292 | 71 | 22 | 99% |
-| profissional | 10883 | 10866 | 13 | 4 | 100% |
+| profissional | 10885 | 10868 | 13 | 4 | 100% |
 
 ## Cada funcionário
 
@@ -92,7 +92,7 @@
 | Leandro | Engenheiro de Machine Learning Sênior | trabalho do papel | Perfil e indicadores da base sintética — nível dificil (✅ concluída) | 1 |
 | Lucas | Cientista de Dados Júnior | trabalho do papel | Conferir no PostgreSQL os lotes da fábrica — nível medio (✅ concluída) | 1 |
 | Manu | Estagiária de Análise de Dados | estagiário: observa (regra do dono) |   | 0 |
-| Marcos | Coordenador de Análise e Ciência de Dado | trabalho FORA do papel | Projeto Segmentação — TREINO_leads_20261115_025607_67094 (✅ concluída) | 11 |
+| Marcos | Coordenador de Análise e Ciência de Dado | trabalho FORA do papel | Projeto Segmentação — TREINO_leads_20261115_025607_67094 (✅ concluída) | 13 |
 | Natália | Head de Ciência de Dados | trabalho do papel | Anomalias na base sintética — nível profissional (✅ concluída) | 1 |
 | Patrícia | Gerente de Analytics e Customer Insights | trabalho do papel | Perfil e indicadores da base sintética — nível profissional (✅ concluída) | 1 |
 | Rebeca | Líder de Engenharia de IA e Machine Lear | trabalho do papel | Programa de modelos: backlog e critérios — nível profissiona (✅ concluída) | 1 |
@@ -194,11 +194,11 @@
 
 ## Projetos entre andares (várias pessoas, uma etapa depende da outra)
 
+- Projeto Segmentação — TREINO_leads_20261115_025607_67094: **✅ concluída** — 1. eng_pleno_tipos (concluida); 2. analise_indicadores (concluida); 3. ana_junior_faixas (concluida); 4. analise_monitoramento (concluida); 5. sec_senior (concluida); 6. canal_iara (concluida)
+- Projeto NPS — TREINO_nps_20261115_025605_65359: **✅ concluída** — 1. eng_pleno_releitura (concluida); 2. analise_estatistica (concluida); 3. head_ciencia (concluida); 4. gov_pleno_lgpd (concluida); 5. analise_relator (concluida)
 - Projeto Segmentação — TREINO_leads_20261115_025607_67094: **✅ concluída** — 1. eng_junior_espacos (concluida); 2. analise_perfil (concluida); 3. cd_pleno_segmentos (concluida); 4. cd_junior_anomalias (concluida); 5. sec_senior (concluida); 6. canal_nina (concluida)
-- Projeto NPS — TREINO_nps_20261115_025605_65359: **✅ concluída** — 1. eng_junior_auditoria (concluida); 2. analise_indicadores (concluida); 3. cd_senior_drivers (concluida); 4. gov_pleno_lgpd (concluida); 5. canal_iara (concluida)
-- Projeto Segmentação — TREINO_leads_20261115_025607_67094: **✅ concluída** — 1. dir_dados (concluida); 2. analise_estatistica (concluida); 3. ana_pleno_base (concluida); 4. analise_monitoramento (concluida); 5. sec_senior (concluida); 6. analise_relator (concluida)
 
-## Última entrega da empresa (TREINO_leads_20261115_025607_67094.xlsx, 15/11 00:02)
+## Última entrega da empresa (TREINO_leads_20261115_025607_67094.xlsx, 15/11 00:10)
 
 Pacote gerado pelo produto (`python -m robo entregar`) a partir de um projeto aprovado:
 
