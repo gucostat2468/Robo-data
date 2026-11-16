@@ -1,6 +1,6 @@
 # Empresa ao vivo
 
-**Boletim das 15/11 23:48** (horário de Brasília) · trabalhando · SEM BANCO (memória guardada no arquivo do GitHub; o banco é alcançado quando voltar)
+**Boletim das 15/11 23:55** (horário de Brasília) · entre turnos: memória salva; o próximo turno começa em poucos minutos · SEM BANCO (memória guardada no arquivo do GitHub; o banco é alcançado quando voltar)
 
 > Atualiza a cada 5 minutos enquanto a empresa trabalha. Recarregue a página para ver o mais novo.
 
@@ -9,7 +9,7 @@
 - **91** demandas, **91** concluídas (100%), 0 parciais, 0 com falha
 - **89** de 105 funcionários já trabalharam
 - SQL: 0 exercícios, 0 conferidos com o gabarito
-- Fábrica: 2 planilhas, 0 conferidas sem erro
+- Fábrica: 2 planilhas, 2 conferidas sem erro
 
 ## Trabalhando agora
 
@@ -186,11 +186,11 @@
 
 ## Tempo do último turno (medido)
 
-- 22:46–23:30 (45 min, 31 voltas; cobertura do cronômetro 100%)
-- **Entregas aprovadas na revisão independente: 30 (40.5 por hora)** — o indicador principal
-- operacional 42% · estudo 0% · revisao 1% · coordenacao 0% · manutencao 40% · erro 0% · parado 17% · sem_medicao 0%
-- Bloqueios: 16; etapas esperando dependência: 0
-- Turnos anteriores (entregas/hora): 129.8, 116.4, 63.7, 140.3, 46.3
+- 02:02–02:54 (52 min, 0 voltas; cobertura do cronômetro 100%)
+- **Entregas aprovadas na revisão independente: 91 (105.1 por hora)** — o indicador principal
+- operacional 76% · estudo 0% · revisao 9% · coordenacao 0% · manutencao 15% · erro 0% · parado 0% · sem_medicao 0%
+- Bloqueios: 32; etapas esperando dependência: 0
+- Turnos anteriores (entregas/hora): 40.5, 129.8, 116.4, 63.7, 140.3
 
 ## Projetos entre andares (várias pessoas, uma etapa depende da outra)
 
@@ -713,7 +713,7 @@ Pacote gerado pelo produto (`python -m robo entregar`) a partir de um projeto ap
 
 ## Banco de dados
 
-Levantamento das 12/11 07:11: **79 de 97** tabelas com dados (2.287.730 linhas contadas uma a uma).
+Levantamento das 15/11 23:54: **79 de 97** tabelas com dados (2.590.997 linhas contadas uma a uma).
 
 
 | Onde | Tabelas | Com dados |
