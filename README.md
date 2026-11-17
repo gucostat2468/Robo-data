@@ -1,15 +1,15 @@
 # Empresa ao vivo
 
-**Boletim das 17/11 00:26** (horário de Brasília) · trabalhando · SEM BANCO (memória guardada no arquivo do GitHub; o banco é alcançado quando voltar)
+**Boletim das 17/11 00:35** (horário de Brasília) · trabalhando · SEM BANCO (memória guardada no arquivo do GitHub; o banco é alcançado quando voltar)
 
 > Atualiza a cada 5 minutos enquanto a empresa trabalha. Recarregue a página para ver o mais novo.
 
 ## Hoje
 
-- **335** demandas, **326** concluídas (97%), 8 parciais, 1 com falha
+- **339** demandas, **330** concluídas (97%), 8 parciais, 1 com falha
 - **105** de 105 funcionários já trabalharam
 - SQL: 5 exercícios, 5 conferidos com o gabarito
-- Fábrica: 8 planilhas, 6 conferidas sem erro
+- Fábrica: 8 planilhas, 8 conferidas sem erro
 
 ## Trabalhando agora
 
@@ -20,7 +20,7 @@
 | Andar | Trabalharam | Demandas | Concluídas | Parciais | Falhas |
 |---|--:|--:|--:|--:|--:|
 | 1º | 19 de 19 | 54 | 54 | 0 | 0 |
-| 2º | 18 de 18 | 74 | 71 | 3 | 0 |
+| 2º | 18 de 18 | 78 | 75 | 3 | 0 |
 | 3º | 12 de 12 | 33 | 29 | 4 | 0 |
 | 4º | 32 de 32 | 63 | 61 | 1 | 1 |
 | 5º | 24 de 24 | 111 | 111 | 0 | 0 |
@@ -29,16 +29,16 @@
 
 | Hora | Quem | Trabalho | Resultado |
 |---|---|---|---|
+| 00:35 | Marcos (2º) | Projeto Segmentação — TREINO_logistica_20261117_031630_90529 | ✅ concluída |
+| 00:35 | Marcos (2º) | Projeto NPS — TREINO_nps_20261117_031629_89101 | ✅ concluída |
+| 00:29 | Marcos (2º) | Projeto Segmentação — TREINO_logistica_20261117_031630_90529 | ✅ concluída |
+| 00:29 | Marcos (2º) | Projeto NPS — TREINO_nps_20261117_031629_89101 | ✅ concluída |
 | 00:26 | Marcos (2º) | Projeto Segmentação — TREINO_logistica_20261117_031630_90529 | ✅ concluída |
 | 00:26 | Marcos (2º) | Projeto NPS — TREINO_nps_20261117_031629_89101 | ✅ concluída |
 | 00:26 | Heloísa (5º) | SLA das rotinas — nível profissional | ✅ concluída |
 | 00:26 | Ícaro (5º) | SLA das rotinas — nível dificil | ✅ concluída |
 | 00:26 | Marina (5º) | Ronda de saúde do sistema — nível dificil | ✅ concluída |
 | 00:26 | Elisa (5º) | Revisão da biblioteca sob sua responsabilidade — nível dificil | ✅ concluída |
-| 00:26 | Priscila (4º) | Desempenho da semana — nível medio | ✅ concluída |
-| 00:25 | Wagner (5º) | Testar se o último backup volta — nível dificil | ✅ concluída |
-| 00:25 | Helena (4º) | Verificar dados pessoais (LGPD) na base sintética — nível dificil | ✅ concluída |
-| 00:25 | Tiago (4º) | Desempenho da semana — nível medio | ✅ concluída |
 
 ## Dificuldade (todo o histórico)
 
@@ -47,7 +47,7 @@
 | basico | 1326 | 1300 | 0 | 26 | 98% |
 | medio | 6020 | 5977 | 0 | 43 | 99% |
 | dificil | 16423 | 16318 | 83 | 22 | 99% |
-| profissional | 11493 | 11474 | 15 | 4 | 100% |
+| profissional | 11497 | 11478 | 15 | 4 | 100% |
 
 ## Cada funcionário
 
@@ -74,7 +74,7 @@
 | Rafael | Engenheiro de Dados Pleno | trabalho do papel | Anomalias na base sintética — nível medio (✅ concluída) | 3 |
 | Rita | Recepção | trabalho do papel | Conferir no PostgreSQL os lotes da fábrica — nível dificil (✅ concluída) | 3 |
 | Saulo | Supervisor de Planilhas | trabalho do papel | Diagnosticar a planilha original da fábrica — nível dificil (✅ concluída) | 3 |
-| Théo | Estagiário de Engenharia de Dados | estagiário: observa (regra do dono) — Observei Lúcia (Especialista em Fórmulas e Power Que |   | 0 |
+| Théo | Estagiário de Engenharia de Dados | estagiário: observa (regra do dono) |   | 0 |
 | Tina | Contatos e NPS | trabalho do papel | Diagnosticar a planilha original da fábrica — nível medio (✅ concluída) | 3 |
 
 ### 2º andar
@@ -91,8 +91,8 @@
 | Larissa | Analista de Customer Insights Pleno | trabalho do papel | Drivers do indicador na base sintética — nível medio (✅ concluída) | 3 |
 | Leandro | Engenheiro de Machine Learning Sênior | trabalho do papel | Treinar o modelo de risco de demanda — nível dificil (✅ concluída) | 3 |
 | Lucas | Cientista de Dados Júnior | trabalho do papel | Perfil e indicadores da base sintética — nível medio (✅ concluída) | 3 |
-| Manu | Estagiária de Análise de Dados | estagiário: observa (regra do dono) — Observei Carolina (Cientista de Dados Pleno) fazendo |   | 0 |
-| Marcos | Coordenador de Análise e Ciência de Dado | trabalho FORA do papel | Projeto Segmentação — TREINO_logistica_20261117_031630_90529 (✅ concluída) | 26 |
+| Manu | Estagiária de Análise de Dados | estagiário: observa (regra do dono) |   | 0 |
+| Marcos | Coordenador de Análise e Ciência de Dado | trabalho FORA do papel | Projeto Segmentação — TREINO_logistica_20261117_031630_90529 (✅ concluída) | 30 |
 | Natália | Head de Ciência de Dados | trabalho do papel | Drivers do indicador na base sintética — nível profissional (✅ concluída) | 3 |
 | Patrícia | Gerente de Analytics e Customer Insights | trabalho do papel | Drivers do indicador na base sintética — nível profissional (✅ concluída) | 3 |
 | Rebeca | Líder de Engenharia de IA e Machine Lear | trabalho do papel | Programa de modelos: backlog e critérios — nível profissiona (✅ concluída) | 3 |
@@ -105,7 +105,7 @@
 | Quem | Cargo | Situação | Último trabalho | Hoje |
 |---|---|---|---|--:|
 | Bárbara | Especialista Sênior em Power BI | trabalho do papel | Perfil e indicadores da base sintética — nível dificil (✅ concluída) | 3 |
-| Enzo | Estagiário da Sala Excel | estagiário: observa (regra do dono) — Observei Lúcia (Especialista em Fórmulas e Power Que |   | 0 |
+| Enzo | Estagiário da Sala Excel | estagiário: observa (regra do dono) |   | 0 |
 | Felipe | Head de BI e Excel | trabalho do papel | Situação do andar agora — nível profissional (✅ concluída) | 3 |
 | Gabriel | Especialista em Tabelas Dinâmicas e Dash | trabalho do papel | Segmentação da base sintética — nível dificil (✅ concluída) | 3 |
 | Heitor | Analista Pleno de BI | trabalho do papel | Calcular a média de uma métrica da base sintética — nível me (✅ concluída) | 3 |
@@ -132,8 +132,8 @@
 | Isadora | Analista Pleno de Distribuição de Demand | trabalho do papel na rotina demandas |   | 0 |
 | Joana | Analista Júnior de Dados Sintéticos | trabalho do papel na rotina fabrica |   | 0 |
 | Juliana | Head de Gente e Gestão | trabalho do papel | Situação das contratações — nível profissional (✅ concluída) | 3 |
-| Lara | Estagiária de Documentação de Dados | estagiário: observa (regra do dono) — Observei Camila (Analista de Dados Júnior) fazendo " |   | 0 |
-| Lorena | Estagiária de RH | estagiário: observa (regra do dono) — Observei Marta (Diretora de Pessoas e Cultura (CHRO) |   | 0 |
+| Lara | Estagiária de Documentação de Dados | estagiário: observa (regra do dono) |   | 0 |
+| Lorena | Estagiária de RH | estagiário: observa (regra do dono) |   | 0 |
 | Lívia | Designer de Casos | trabalho do papel | Revisar um caso de treino feito por outro designer — nível d (✅ concluída) | 3 |
 | Marta | Diretora de Pessoas e Cultura (CHRO) | trabalho do papel | Situação das contratações — nível profissional (✅ concluída) | 3 |
 | Mauro | Analista de Desempenho Sênior | trabalho do papel | Indicadores de pessoas — nível dificil (✅ concluída) | 3 |
@@ -162,11 +162,11 @@
 | André | Head de Infraestrutura e Segurança | trabalho do papel | Auditoria por amostragem — nível profissional (✅ concluída) | 5 |
 | Bianca | Engenheira de Dados Pleno | trabalho do papel | Ronda de saúde do sistema — nível medio (✅ concluída) | 5 |
 | Caetano | Especialista em Orquestração de Dados (A | trabalho do papel | Ronda de saúde do sistema — nível dificil (✅ concluída) | 5 |
-| Caíque | Estagiário de DevOps | estagiário: observa (regra do dono) — Observei Lúcia (Especialista em Fórmulas e Power Que |   | 0 |
+| Caíque | Estagiário de DevOps | estagiário: observa (regra do dono) |   | 0 |
 | Diego | Desenvolvedor Python Pleno | trabalho do papel | Ronda de saúde do sistema — nível medio (✅ concluída) | 5 |
 | Elisa | Especialista em PyYAML (configuração) | trabalho do papel | Revisão da biblioteca sob sua responsabilidade — nível dific (✅ concluída) | 5 |
 | Fernanda | Coordenadora de DevOps e Confiabilidade  | trabalho do papel | SLA das rotinas — nível dificil (✅ concluída) | 5 |
-| Gael | Estagiário de Engenharia de Dados (Airfl | estagiário: observa (regra do dono) — Observei Lúcia (Especialista em Fórmulas e Power Que |   | 0 |
+| Gael | Estagiário de Engenharia de Dados (Airfl | estagiário: observa (regra do dono) |   | 0 |
 | Gustavo | Gerente de TI e Infraestrutura | trabalho do papel | SLA das rotinas — nível profissional (✅ concluída) | 4 |
 | Heloísa | Head de AWS, Arquitetura e Governança de | trabalho do papel | SLA das rotinas — nível profissional (✅ concluída) | 6 |
 | Henrique | Head de Engenharia Python | trabalho do papel | Ronda de saúde do sistema — nível profissional (✅ concluída) | 4 |
@@ -194,11 +194,11 @@
 
 ## Projetos entre andares (várias pessoas, uma etapa depende da outra)
 
-- Projeto Segmentação — TREINO_logistica_20261117_031630_90529: **✅ concluída** — 1. eng_pleno_tipos (concluida); 2. analise_estatistica (concluida); 3. ana_junior_faixas (concluida); 4. cd_junior_anomalias (concluida); 5. sec_senior (concluida); 6. canal_iara (concluida)
-- Projeto NPS — TREINO_nps_20261117_031629_89101: **✅ concluída** — 1. eng_pleno_releitura (concluida); 2. analise_perfil (concluida); 3. cd_senior_drivers (concluida); 4. gov_pleno_lgpd (concluida); 5. analise_relator (concluida)
-- Projeto Segmentação — TREINO_ponto_20261117_023129_89944: **✅ concluída** — 1. eng_junior_espacos (concluida); 2. analise_indicadores (concluida); 3. cd_pleno_segmentos (concluida); 4. analise_monitoramento (concluida); 5. sec_senior (concluida); 6. canal_nina (concluida)
+- Projeto Segmentação — TREINO_logistica_20261117_031630_90529: **✅ concluída** — 1. limpeza (concluida); 2. analise_estatistica (concluida); 3. cd_pleno_segmentos (concluida); 4. analise_monitoramento (concluida); 5. sec_senior (concluida); 6. canal_nina (concluida)
+- Projeto NPS — TREINO_nps_20261117_031629_89101: **✅ concluída** — 1. leitura (concluida); 2. analise_perfil (concluida); 3. cd_senior_drivers (concluida); 4. gov_pleno_lgpd (concluida); 5. canal_iara (concluida)
+- Projeto Segmentação — TREINO_logistica_20261117_031630_90529: **✅ concluída** — 1. head_engenharia (concluida); 2. analise_monitoramento (concluida); 3. ana_pleno_base (concluida); 4. cd_junior_anomalias (concluida); 5. sec_senior (concluida); 6. analise_relator (concluida)
 
-## Última entrega da empresa (TREINO_logistica_20261117_031630_90529.xlsx, 17/11 00:26)
+## Última entrega da empresa (TREINO_logistica_20261117_031630_90529.xlsx, 17/11 00:35)
 
 Pacote gerado pelo produto (`python -m robo entregar`) a partir de um projeto aprovado:
 
