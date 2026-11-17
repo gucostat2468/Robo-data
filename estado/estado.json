@@ -1,11 +1,11 @@
 {
  "versao": 1,
- "gerado_em": "2026-11-17T04:23:43",
+ "gerado_em": "2026-11-17T04:32:56",
  "turno": {
-  "estado": "trabalhando · SEM BANCO (memória guardada no arquivo do GitHub; o banco é alcançado quando voltar)",
+  "estado": "entre turnos: memória salva; o próximo turno começa em poucos minutos · SEM BANCO (memória guardada no arquivo do GitHub; o banco é alcançado quando voltar)",
   "inicio": "2026-11-17T04:07:13",
   "fim_previsto": "2026-11-17T04:47:13",
-  "voltas": 30,
+  "voltas": 42,
   "planilhas": 2
  },
  "funcionarios": 105,
@@ -14,23 +14,23 @@
    "andar": 1,
    "pessoas": 19,
    "trabalharam_hoje": 19,
-   "demandas": 66,
-   "concluidas": 66,
+   "demandas": 72,
+   "concluidas": 72,
    "parciais": 0,
    "falhas": 0,
-   "treino": 45,
-   "acertos": 14
+   "treino": 51,
+   "acertos": 20
   },
   {
    "andar": 2,
    "pessoas": 18,
    "trabalharam_hoje": 18,
-   "demandas": 100,
-   "concluidas": 97,
+   "demandas": 106,
+   "concluidas": 103,
    "parciais": 3,
    "falhas": 0,
-   "treino": 40,
-   "acertos": 6
+   "treino": 44,
+   "acertos": 10
   },
   {
    "andar": 3,
@@ -47,29 +47,29 @@
    "andar": 4,
    "pessoas": 32,
    "trabalharam_hoje": 32,
-   "demandas": 75,
-   "concluidas": 73,
+   "demandas": 84,
+   "concluidas": 82,
    "parciais": 1,
    "falhas": 1,
-   "treino": 53,
-   "acertos": 3
+   "treino": 56,
+   "acertos": 6
   },
   {
    "andar": 5,
    "pessoas": 24,
    "trabalharam_hoje": 24,
-   "demandas": 133,
-   "concluidas": 133,
+   "demandas": 136,
+   "concluidas": 136,
    "parciais": 0,
    "falhas": 0,
-   "treino": 51,
-   "acertos": 4
+   "treino": 54,
+   "acertos": 7
   }
  ],
  "agora": [],
  "ultimos": [
   {
-   "quando": "2026-11-17T04:21:59",
+   "quando": "2026-11-17T04:28:20",
    "funcionario": "Marcos",
    "cargo": "Coordenador de Análise e Ciência de Dados",
    "andar": 2,
@@ -77,7 +77,7 @@
    "estado": "concluida"
   },
   {
-   "quando": "2026-11-17T04:21:52",
+   "quando": "2026-11-17T04:28:14",
    "funcionario": "Marcos",
    "cargo": "Coordenador de Análise e Ciência de Dados",
    "andar": 2,
@@ -85,73 +85,73 @@
    "estado": "concluida"
   },
   {
-   "quando": "2026-11-17T04:21:49",
-   "funcionario": "Marcelo",
-   "cargo": "Gerente de Engenharia de Dados",
+   "quando": "2026-11-17T04:28:10",
+   "funcionario": "Helena",
+   "cargo": "RH e desenvolvimento da equipe",
+   "andar": 4,
+   "trabalho": "Quadro por andar e nível — nível dificil",
+   "estado": "concluida"
+  },
+  {
+   "quando": "2026-11-17T04:28:10",
+   "funcionario": "Priscila",
+   "cargo": "Analista de Recrutamento e Seleção Pleno",
+   "andar": 4,
+   "trabalho": "Indicadores de pessoas — nível medio",
+   "estado": "concluida"
+  },
+  {
+   "quando": "2026-11-17T04:28:09",
+   "funcionario": "Beatriz",
+   "cargo": "Diretora de Dados e Engenharia (CDO)",
    "andar": 1,
    "trabalho": "Anomalias na base sintética — nível profissional",
    "estado": "concluida"
   },
   {
-   "quando": "2026-11-17T04:21:49",
-   "funcionario": "Leandro",
-   "cargo": "Engenheiro de Machine Learning Sênior",
-   "andar": 2,
-   "trabalho": "Conferir no PostgreSQL os lotes da fábrica — nível dificil",
-   "estado": "concluida"
-  },
-  {
-   "quando": "2026-11-17T04:21:47",
-   "funcionario": "Otávio",
-   "cargo": "Head da Sala de Casos",
+   "quando": "2026-11-17T04:28:09",
+   "funcionario": "Tiago",
+   "cargo": "Analista de People Analytics Pleno",
    "andar": 4,
-   "trabalho": "Revisar um caso de treino feito por outro designer — nível profissional",
+   "trabalho": "Planos de desenvolvimento 70-20-10 — nível medio",
    "estado": "concluida"
   },
   {
-   "quando": "2026-11-17T04:21:46",
-   "funcionario": "Bárbara",
-   "cargo": "Especialista Sênior em Power BI",
-   "andar": 3,
-   "trabalho": "Conferir no PostgreSQL os lotes da fábrica — nível dificil",
+   "quando": "2026-11-17T04:28:07",
+   "funcionario": "Iara",
+   "cargo": "Ideias e evolução da plataforma",
+   "andar": 4,
+   "trabalho": "Calcular a média de uma métrica da base sintética — nível dificil",
    "estado": "concluida"
   },
   {
-   "quando": "2026-11-17T04:21:45",
-   "funcionario": "Natália",
-   "cargo": "Head de Ciência de Dados",
-   "andar": 2,
-   "trabalho": "Situação do andar agora — nível profissional",
-   "estado": "concluida"
-  },
-  {
-   "quando": "2026-11-17T04:21:45",
-   "funcionario": "Júlia",
-   "cargo": "Engenheira de Dados Pleno",
+   "quando": "2026-11-17T04:28:05",
+   "funcionario": "Dora",
+   "cargo": "DBA PostgreSQL",
    "andar": 1,
-   "trabalho": "Exercício de SQL no PostgreSQL com os dados da fábrica — nível medio",
+   "trabalho": "Exercício de SQL no PostgreSQL com os dados da fábrica — nível dificil",
    "estado": "concluida"
   },
   {
-   "quando": "2026-11-17T04:21:43",
-   "funcionario": "Augusto",
-   "cargo": "Designer de Casos",
+   "quando": "2026-11-17T04:28:04",
+   "funcionario": "Otto",
+   "cargo": "Auditoria (Validação)",
+   "andar": 1,
+   "trabalho": "Diagnosticar a planilha original da fábrica — nível dificil",
+   "estado": "concluida"
+  },
+  {
+   "quando": "2026-11-17T04:28:04",
+   "funcionario": "Mauro",
+   "cargo": "Analista de Desempenho Sênior",
    "andar": 4,
-   "trabalho": "Revisar um caso de treino feito por outro designer — nível dificil",
-   "estado": "concluida"
-  },
-  {
-   "quando": "2026-11-17T04:21:42",
-   "funcionario": "Felipe",
-   "cargo": "Head de BI e Excel",
-   "andar": 3,
-   "trabalho": "Perfil e indicadores da base sintética — nível profissional",
+   "trabalho": "Planos de desenvolvimento 70-20-10 — nível dificil",
    "estado": "concluida"
   }
  ],
  "sql": {
-  "exercicios_hoje": 14,
-  "concluidos_hoje": 14
+  "exercicios_hoje": 17,
+  "concluidos_hoje": 17
  },
  "fabrica": {
   "lotes_hoje": 10,
@@ -166,9 +166,9 @@
   },
   {
    "rotina": "demandas",
-   "execucoes_24h": 36,
+   "execucoes_24h": 37,
    "erros_24h": 0,
-   "ultima": "2026-11-17T04:22:02"
+   "ultima": "2026-11-17T04:28:23"
   },
   {
    "rotina": "dialogo",
@@ -196,9 +196,9 @@
   },
   {
    "rotina": "laboratorio",
-   "execucoes_24h": 18,
+   "execucoes_24h": 19,
    "erros_24h": 0,
-   "ultima": "2026-11-17T04:20:55"
+   "ultima": "2026-11-17T04:31:07"
   },
   {
    "rotina": "licoes",
@@ -220,9 +220,9 @@
   },
   {
    "rotina": "registro",
-   "execucoes_24h": 74,
+   "execucoes_24h": 76,
    "erros_24h": 0,
-   "ultima": "2026-11-17T04:23:06"
+   "ultima": "2026-11-17T04:31:58"
   },
   {
    "rotina": "rh_desempenho",
@@ -232,30 +232,30 @@
   },
   {
    "rotina": "ronda_ti",
-   "execucoes_24h": 33,
+   "execucoes_24h": 34,
    "erros_24h": 0,
-   "ultima": "2026-11-17T04:22:48"
+   "ultima": "2026-11-17T04:31:55"
   },
   {
    "rotina": "treino",
-   "execucoes_24h": 53,
+   "execucoes_24h": 55,
    "erros_24h": 0,
-   "ultima": "2026-11-17T04:23:07"
+   "ultima": "2026-11-17T04:29:54"
   }
  ],
  "totais": {
-  "demandas": 35446,
-  "tentativas_treino": 58149,
-  "conversas": 13262,
-  "trabalhos_com_prova": 77797
+  "demandas": 35470,
+  "tentativas_treino": 58165,
+  "conversas": 13263,
+  "trabalhos_com_prova": 77832
  },
  "banco": {
-  "levantamento": "2026-11-12T10:11:57",
+  "levantamento": "2026-11-17T04:31:58",
   "postgres_conferido": true,
   "erro_postgres": null,
   "tabelas": 97,
   "com_dados": 79,
-  "linhas": 2287730,
+  "linhas": 2646506,
   "resumo": {
    "sqlite": {
     "tabelas": 81,
@@ -431,9 +431,9 @@
    "andar": 1,
    "cargo": "Diretora de Dados e Engenharia (CDO)",
    "area": "Engenharia de Dados",
-   "demandas_hoje": 3,
-   "ultimo": "Conferir no PostgreSQL os lotes da fábrica — nível profissional",
-   "quando": "2026-11-17T03:25:48",
+   "demandas_hoje": 4,
+   "ultimo": "Anomalias na base sintética — nível profissional",
+   "quando": "2026-11-17T04:28:07",
    "estado": "concluida",
    "situacao": "trabalho do papel"
   },
@@ -442,9 +442,9 @@
    "andar": 1,
    "cargo": "Banco de dados (ELT)",
    "area": "Engenharia de Dados",
-   "demandas_hoje": 3,
-   "ultimo": "Conferir no PostgreSQL os lotes da fábrica — nível dificil",
-   "quando": "2026-11-17T03:22:46",
+   "demandas_hoje": 4,
+   "ultimo": "Exercício de SQL no PostgreSQL com os dados da fábrica — nível dificil",
+   "quando": "2026-11-17T04:27:42",
    "estado": "concluida",
    "situacao": "trabalho do papel"
   },
@@ -486,9 +486,9 @@
    "andar": 1,
    "cargo": "DBA PostgreSQL",
    "area": "Engenharia de Dados",
-   "demandas_hoje": 3,
-   "ultimo": "Conferir no PostgreSQL os lotes da fábrica — nível dificil",
-   "quando": "2026-11-17T03:25:38",
+   "demandas_hoje": 4,
+   "ultimo": "Exercício de SQL no PostgreSQL com os dados da fábrica — nível dificil",
+   "quando": "2026-11-17T04:28:04",
    "estado": "concluida",
    "situacao": "trabalho do papel"
   },
@@ -530,9 +530,9 @@
    "andar": 1,
    "cargo": "Leitura (Extração)",
    "area": "Engenharia de Dados",
-   "demandas_hoje": 3,
-   "ultimo": "Conferir no PostgreSQL os lotes da fábrica — nível dificil",
-   "quando": "2026-11-17T03:22:44",
+   "demandas_hoje": 4,
+   "ultimo": "Exercício de SQL no PostgreSQL com os dados da fábrica — nível dificil",
+   "quando": "2026-11-17T04:27:38",
    "estado": "concluida",
    "situacao": "trabalho do papel"
   },
@@ -563,9 +563,9 @@
    "andar": 1,
    "cargo": "Auditoria (Validação)",
    "area": "Governança e Privacidade",
-   "demandas_hoje": 3,
-   "ultimo": "Verificar dados pessoais (LGPD) na base sintética — nível dificil",
-   "quando": "2026-11-17T03:25:28",
+   "demandas_hoje": 4,
+   "ultimo": "Diagnosticar a planilha original da fábrica — nível dificil",
+   "quando": "2026-11-17T04:28:03",
    "estado": "concluida",
    "situacao": "trabalho do papel"
   },
@@ -611,16 +611,16 @@
    "ultimo": "",
    "quando": "",
    "estado": "",
-   "situacao": "estagiário: observa (regra do dono) — Observei Lúcia (Especialista em Fórmulas e Power Query) fazendo \"Exercício de SQL no PostgreSQL com os dados da fábrica\""
+   "situacao": "estagiário: observa (regra do dono) — Observei Leo (Leitura (Extração)) fazendo \"Exercício de SQL no PostgreSQL com os dados da fábrica\" no nível dificil: ter"
   },
   {
    "nome": "Tina",
    "andar": 1,
    "cargo": "Contatos e NPS",
    "area": "",
-   "demandas_hoje": 3,
-   "ultimo": "Diagnosticar a planilha original da fábrica — nível medio",
-   "quando": "2026-11-17T03:23:00",
+   "demandas_hoje": 4,
+   "ultimo": "Conferir no PostgreSQL os lotes da fábrica — nível medio",
+   "quando": "2026-11-17T04:27:50",
    "estado": "concluida",
    "situacao": "trabalho do papel"
   },
@@ -728,9 +728,9 @@
    "andar": 2,
    "cargo": "Cientista de Dados Júnior",
    "area": "Qualidade de Dados",
-   "demandas_hoje": 3,
-   "ultimo": "Perfil e indicadores da base sintética — nível medio",
-   "quando": "2026-11-17T03:22:44",
+   "demandas_hoje": 4,
+   "ultimo": "Calcular a média de uma métrica da base sintética — nível medio",
+   "quando": "2026-11-17T04:27:39",
    "estado": "concluida",
    "situacao": "trabalho do papel"
   },
@@ -743,16 +743,16 @@
    "ultimo": "",
    "quando": "",
    "estado": "",
-   "situacao": "estagiário: observa (regra do dono) — Observei Carolina (Cientista de Dados Pleno) fazendo \"Perfil e indicadores da base sintética\" no nível medio: terminou c"
+   "situacao": "estagiário: observa (regra do dono) — Observei Lucas (Cientista de Dados Júnior) fazendo \"Calcular a média de uma métrica da base sintética\" no nível medio: t"
   },
   {
    "nome": "Marcos",
    "andar": 2,
    "cargo": "Coordenador de Análise e Ciência de Dados",
    "area": "Análise de Dados",
-   "demandas_hoje": 40,
+   "demandas_hoje": 42,
    "ultimo": "Projeto Segmentação — TREINO_leads_20261117_040543_43423",
-   "quando": "2026-11-17T04:21:54",
+   "quando": "2026-11-17T04:28:16",
    "estado": "concluida",
    "situacao": "trabalho FORA do papel"
   },
@@ -783,9 +783,9 @@
    "andar": 2,
    "cargo": "Líder de Engenharia de IA e Machine Learning",
    "area": "Estatística",
-   "demandas_hoje": 3,
-   "ultimo": "Programa de modelos: backlog e critérios — nível profissional",
-   "quando": "2026-11-17T03:23:02",
+   "demandas_hoje": 4,
+   "ultimo": "Drivers do indicador na base sintética — nível profissional",
+   "quando": "2026-11-17T04:28:01",
    "estado": "concluida",
    "situacao": "trabalho do papel"
   },
@@ -794,9 +794,9 @@
    "andar": 2,
    "cargo": "Diretor de Analytics, Ciência de Dados e BI",
    "area": "Customer Insights e Pesquisa",
-   "demandas_hoje": 3,
-   "ultimo": "Conferir no PostgreSQL os lotes da fábrica — nível profissional",
-   "quando": "2026-11-17T03:22:46",
+   "demandas_hoje": 4,
+   "ultimo": "Calcular a média de uma métrica da base sintética — nível profissional",
+   "quando": "2026-11-17T04:27:43",
    "estado": "concluida",
    "situacao": "trabalho do papel"
   },
@@ -805,9 +805,9 @@
    "andar": 2,
    "cargo": "Analista de Dados Pleno",
    "area": "Estatística",
-   "demandas_hoje": 3,
-   "ultimo": "Perfil e indicadores da base sintética — nível medio",
-   "quando": "2026-11-17T03:22:59",
+   "demandas_hoje": 4,
+   "ultimo": "Calcular a média de uma métrica da base sintética — nível medio",
+   "quando": "2026-11-17T04:27:48",
    "estado": "concluida",
    "situacao": "trabalho do papel"
   },
@@ -842,7 +842,7 @@
    "ultimo": "",
    "quando": "",
    "estado": "",
-   "situacao": "estagiário: observa (regra do dono) — Observei Lúcia (Especialista em Fórmulas e Power Query) fazendo \"Exercício de SQL no PostgreSQL com os dados da fábrica\""
+   "situacao": "estagiário: observa (regra do dono) — Observei Leo (Leitura (Extração)) fazendo \"Exercício de SQL no PostgreSQL com os dados da fábrica\" no nível dificil: ter"
   },
   {
    "nome": "Felipe",
@@ -1025,9 +1025,9 @@
    "andar": 4,
    "cargo": "RH e desenvolvimento da equipe",
    "area": "Governança e Privacidade",
-   "demandas_hoje": 3,
-   "ultimo": "Verificar dados pessoais (LGPD) na base sintética — nível dificil",
-   "quando": "2026-11-17T03:25:59",
+   "demandas_hoje": 4,
+   "ultimo": "Quadro por andar e nível — nível dificil",
+   "quando": "2026-11-17T04:28:10",
    "estado": "concluida",
    "situacao": "trabalho do papel"
   },
@@ -1036,9 +1036,9 @@
    "andar": 4,
    "cargo": "Ideias e evolução da plataforma",
    "area": "Storytelling e Negócio",
-   "demandas_hoje": 3,
-   "ultimo": "Perfil e indicadores da base sintética — nível dificil",
-   "quando": "2026-11-17T03:25:38",
+   "demandas_hoje": 4,
+   "ultimo": "Calcular a média de uma métrica da base sintética — nível dificil",
+   "quando": "2026-11-17T04:28:05",
    "estado": "concluida",
    "situacao": "trabalho do papel"
   },
@@ -1069,9 +1069,9 @@
    "andar": 4,
    "cargo": "Head de Gente e Gestão",
    "area": "Pessoas e Cultura",
-   "demandas_hoje": 3,
-   "ultimo": "Situação das contratações — nível profissional",
-   "quando": "2026-11-17T03:23:01",
+   "demandas_hoje": 4,
+   "ultimo": "Auditoria por amostragem — nível profissional",
+   "quando": "2026-11-17T04:27:59",
    "estado": "concluida",
    "situacao": "trabalho do papel"
   },
@@ -1084,7 +1084,7 @@
    "ultimo": "",
    "quando": "",
    "estado": "",
-   "situacao": "estagiário: observa (regra do dono) — Observei Camila (Analista de Dados Júnior) fazendo \"Diagnosticar a planilha original da fábrica\" no nível basico: termin"
+   "situacao": "estagiário: observa (regra do dono) — Observei Vitor (Analista de Governança Pleno) fazendo \"Verificar dados pessoais (LGPD) na base sintética\" no nível medio"
   },
   {
    "nome": "Lorena",
@@ -1095,7 +1095,7 @@
    "ultimo": "",
    "quando": "",
    "estado": "",
-   "situacao": "estagiário: observa (regra do dono) — Observei Marta (Diretora de Pessoas e Cultura (CHRO)) fazendo \"Indicadores de pessoas\" no nível profissional: terminou c"
+   "situacao": "estagiário: observa (regra do dono) — Observei Juliana (Head de Gente e Gestão) fazendo \"Auditoria por amostragem\" no nível profissional: terminou concluida."
   },
   {
    "nome": "Lívia",
@@ -1124,9 +1124,9 @@
    "andar": 4,
    "cargo": "Analista de Desempenho Sênior",
    "area": "Pessoas e Cultura",
-   "demandas_hoje": 3,
-   "ultimo": "Indicadores de pessoas — nível dificil",
-   "quando": "2026-11-17T03:25:27",
+   "demandas_hoje": 4,
+   "ultimo": "Planos de desenvolvimento 70-20-10 — nível dificil",
+   "quando": "2026-11-17T04:28:04",
    "estado": "concluida",
    "situacao": "trabalho do papel"
   },
@@ -1146,9 +1146,9 @@
    "andar": 4,
    "cargo": "Assistente do canal",
    "area": "Storytelling e Negócio",
-   "demandas_hoje": 3,
-   "ultimo": "Calcular a média de uma métrica da base sintética",
-   "quando": "2026-11-17T03:22:45",
+   "demandas_hoje": 4,
+   "ultimo": "Perfil e indicadores da base sintética — nível medio",
+   "quando": "2026-11-17T04:27:41",
    "estado": "concluida",
    "situacao": "trabalho do papel"
   },
@@ -1168,9 +1168,9 @@
    "andar": 4,
    "cargo": "Analista de Recrutamento e Seleção Pleno",
    "area": "Pessoas e Cultura",
-   "demandas_hoje": 3,
-   "ultimo": "Desempenho da semana — nível medio",
-   "quando": "2026-11-17T03:26:00",
+   "demandas_hoje": 4,
+   "ultimo": "Indicadores de pessoas — nível medio",
+   "quando": "2026-11-17T04:28:10",
    "estado": "concluida",
    "situacao": "trabalho do papel"
   },
@@ -1234,9 +1234,9 @@
    "andar": 4,
    "cargo": "Head de Governança de Dados",
    "area": "Governança e Privacidade",
-   "demandas_hoje": 3,
-   "ultimo": "Situação do andar agora — nível profissional",
-   "quando": "2026-11-17T03:22:48",
+   "demandas_hoje": 4,
+   "ultimo": "Auditoria por amostragem — nível profissional",
+   "quando": "2026-11-17T04:27:47",
    "estado": "concluida",
    "situacao": "trabalho do papel"
   },
@@ -1256,9 +1256,9 @@
    "andar": 4,
    "cargo": "Analista de People Analytics Pleno",
    "area": "Pessoas e Cultura",
-   "demandas_hoje": 3,
-   "ultimo": "Desempenho da semana — nível medio",
-   "quando": "2026-11-17T03:25:49",
+   "demandas_hoje": 4,
+   "ultimo": "Planos de desenvolvimento 70-20-10 — nível medio",
+   "quando": "2026-11-17T04:28:09",
    "estado": "concluida",
    "situacao": "trabalho do papel"
   },
@@ -1289,9 +1289,9 @@
    "andar": 4,
    "cargo": "Analista de Governança Pleno",
    "area": "Governança e Privacidade",
-   "demandas_hoje": 3,
-   "ultimo": "Diagnosticar a planilha original da fábrica — nível medio",
-   "quando": "2026-11-17T03:22:43",
+   "demandas_hoje": 4,
+   "ultimo": "Verificar dados pessoais (LGPD) na base sintética — nível medio",
+   "quando": "2026-11-17T04:27:37",
    "estado": "concluida",
    "situacao": "trabalho do papel"
   },
@@ -1359,7 +1359,7 @@
    "ultimo": "",
    "quando": "",
    "estado": "",
-   "situacao": "estagiário: observa (regra do dono) — Observei Lúcia (Especialista em Fórmulas e Power Query) fazendo \"Exercício de SQL no PostgreSQL com os dados da fábrica\""
+   "situacao": "estagiário: observa (regra do dono) — Observei Leo (Leitura (Extração)) fazendo \"Exercício de SQL no PostgreSQL com os dados da fábrica\" no nível dificil: ter"
   },
   {
    "nome": "Diego",
@@ -1403,7 +1403,7 @@
    "ultimo": "",
    "quando": "",
    "estado": "",
-   "situacao": "estagiário: observa (regra do dono) — Observei Lúcia (Especialista em Fórmulas e Power Query) fazendo \"Exercício de SQL no PostgreSQL com os dados da fábrica\""
+   "situacao": "estagiário: observa (regra do dono) — Observei Leo (Leitura (Extração)) fazendo \"Exercício de SQL no PostgreSQL com os dados da fábrica\" no nível dificil: ter"
   },
   {
    "nome": "Gustavo",
@@ -1421,9 +1421,9 @@
    "andar": 5,
    "cargo": "Head de AWS, Arquitetura e Governança de Nuvem",
    "area": "Engenharia de Dados",
-   "demandas_hoje": 7,
-   "ultimo": "Medir a saúde do PostgreSQL — nível profissional",
-   "quando": "2026-11-17T04:06:58",
+   "demandas_hoje": 8,
+   "ultimo": "Procurar segredos no repositório público — nível profissional",
+   "quando": "2026-11-17T04:27:45",
    "estado": "concluida",
    "situacao": "trabalho do papel"
   },
@@ -1465,9 +1465,9 @@
    "andar": 5,
    "cargo": "Arquiteta de Cloud (AWS)",
    "area": "Engenharia de Dados",
-   "demandas_hoje": 7,
-   "ultimo": "SLA das rotinas — nível dificil",
-   "quando": "2026-11-17T04:06:58",
+   "demandas_hoje": 8,
+   "ultimo": "Medir a saúde do PostgreSQL — nível dificil",
+   "quando": "2026-11-17T04:27:41",
    "estado": "concluida",
    "situacao": "trabalho do papel"
   },
@@ -1564,14 +1564,96 @@
    "andar": 5,
    "cargo": "Sênior de AWS, Linux e Ubuntu",
    "area": "Engenharia de Dados",
-   "demandas_hoje": 7,
-   "ultimo": "Procurar segredos no repositório público — nível dificil",
-   "quando": "2026-11-17T04:07:00",
+   "demandas_hoje": 8,
+   "ultimo": "Testar se o último backup volta — nível dificil",
+   "quando": "2026-11-17T04:27:50",
    "estado": "concluida",
    "situacao": "trabalho do papel"
   }
  ],
  "projetos": [
+  {
+   "id": "TAR-20261117-3b6ee8",
+   "titulo": "Projeto Segmentação — TREINO_leads_20261117_040543_43423",
+   "estado": "concluida",
+   "criada_em": "2026-11-17T04:28:16",
+   "etapas": [
+    {
+     "ordem": 1,
+     "titulo": "Diagnóstico da planilha original (o que barraria a produção)",
+     "funcionario": "eng_junior_espacos",
+     "estado": "concluida"
+    },
+    {
+     "ordem": 2,
+     "titulo": "Perfil da base (colunas, indicadores e margem de erro)",
+     "funcionario": "analise_perfil",
+     "estado": "concluida"
+    },
+    {
+     "ordem": 3,
+     "titulo": "Segmentação de clientes (k-means com silhueta)",
+     "funcionario": "cd_pleno_segmentos",
+     "estado": "concluida"
+    },
+    {
+     "ordem": 4,
+     "titulo": "Anomalias (valores fora do padrão, com a linha)",
+     "funcionario": "cd_junior_anomalias",
+     "estado": "concluida"
+    },
+    {
+     "ordem": 5,
+     "titulo": "Dados pessoais na base (LGPD)",
+     "funcionario": "sec_senior",
+     "estado": "concluida"
+    },
+    {
+     "ordem": 6,
+     "titulo": "Resumo executivo do projeto (.md)",
+     "funcionario": "canal_nina",
+     "estado": "concluida"
+    }
+   ]
+  },
+  {
+   "id": "TAR-20261117-b8a03f",
+   "titulo": "Projeto NPS — TREINO_nps_20261117_040540_40886",
+   "estado": "concluida",
+   "criada_em": "2026-11-17T04:28:11",
+   "etapas": [
+    {
+     "ordem": 1,
+     "titulo": "Diagnóstico da planilha original (o que barraria a produção)",
+     "funcionario": "eng_junior_auditoria",
+     "estado": "concluida"
+    },
+    {
+     "ordem": 2,
+     "titulo": "Perfil e indicadores (NPS com margem de erro)",
+     "funcionario": "analise_indicadores",
+     "estado": "concluida"
+    },
+    {
+     "ordem": 3,
+     "titulo": "Drivers do NPS (o que mais pesa na nota)",
+     "funcionario": "cd_senior_drivers",
+     "estado": "concluida"
+    },
+    {
+     "ordem": 4,
+     "titulo": "Dados pessoais na base (LGPD)",
+     "funcionario": "gov_pleno_lgpd",
+     "estado": "concluida"
+    },
+    {
+     "ordem": 5,
+     "titulo": "Resumo executivo do projeto (.md)",
+     "funcionario": "canal_iara",
+     "estado": "concluida"
+    }
+   ]
+  },
   {
    "id": "TAR-20261117-aa159b",
    "titulo": "Projeto Segmentação — TREINO_leads_20261117_040543_43423",
@@ -1615,97 +1697,15 @@
      "estado": "concluida"
     }
    ]
-  },
-  {
-   "id": "TAR-20261117-fe4ec3",
-   "titulo": "Projeto NPS — TREINO_nps_20261117_040540_40886",
-   "estado": "concluida",
-   "criada_em": "2026-11-17T04:21:50",
-   "etapas": [
-    {
-     "ordem": 1,
-     "titulo": "Diagnóstico da planilha original (o que barraria a produção)",
-     "funcionario": "dba",
-     "estado": "concluida"
-    },
-    {
-     "ordem": 2,
-     "titulo": "Perfil e indicadores (NPS com margem de erro)",
-     "funcionario": "analise_perfil",
-     "estado": "concluida"
-    },
-    {
-     "ordem": 3,
-     "titulo": "Drivers do NPS (o que mais pesa na nota)",
-     "funcionario": "head_ciencia",
-     "estado": "concluida"
-    },
-    {
-     "ordem": 4,
-     "titulo": "Dados pessoais na base (LGPD)",
-     "funcionario": "gov_pleno_lgpd",
-     "estado": "concluida"
-    },
-    {
-     "ordem": 5,
-     "titulo": "Resumo executivo do projeto (.md)",
-     "funcionario": "canal_nina",
-     "estado": "concluida"
-    }
-   ]
-  },
-  {
-   "id": "TAR-20261117-dc2c7c",
-   "titulo": "Projeto Segmentação — TREINO_leads_20261117_040543_43423",
-   "estado": "concluida",
-   "criada_em": "2026-11-17T04:15:57",
-   "etapas": [
-    {
-     "ordem": 1,
-     "titulo": "Diagnóstico da planilha original (o que barraria a produção)",
-     "funcionario": "coord_engenharia",
-     "estado": "concluida"
-    },
-    {
-     "ordem": 2,
-     "titulo": "Perfil da base (colunas, indicadores e margem de erro)",
-     "funcionario": "analise_monitoramento",
-     "estado": "concluida"
-    },
-    {
-     "ordem": 3,
-     "titulo": "Segmentação de clientes (k-means com silhueta)",
-     "funcionario": "ana_junior_faixas",
-     "estado": "concluida"
-    },
-    {
-     "ordem": 4,
-     "titulo": "Anomalias (valores fora do padrão, com a linha)",
-     "funcionario": "cd_junior_anomalias",
-     "estado": "concluida"
-    },
-    {
-     "ordem": 5,
-     "titulo": "Dados pessoais na base (LGPD)",
-     "funcionario": "sec_senior",
-     "estado": "concluida"
-    },
-    {
-     "ordem": 6,
-     "titulo": "Resumo executivo do projeto (.md)",
-     "funcionario": "canal_iara",
-     "estado": "concluida"
-    }
-   ]
   }
  ],
  "entregas": [
   {
-   "id": 4450,
-   "data_hora": "2026-11-17T04:22:01",
-   "projeto": "TAR-20261117-aa159b",
+   "id": 4452,
+   "data_hora": "2026-11-17T04:28:23",
+   "projeto": "TAR-20261117-3b6ee8",
    "base": "TREINO_leads_20261117_040543_43423.xlsx",
-   "pasta": "/home/runner/work/_temp/empresa/logs/entregas/Entrega_TREINO_leads_20261117_040543_43423_20261117_042200",
+   "pasta": "/home/runner/work/_temp/empresa/logs/entregas/Entrega_TREINO_leads_20261117_040543_43423_20261117_042821",
    "ok": 1,
    "recomendacoes": [
     "Conferir 23 valor(es) fora do padrão em **mql** (0,5% da base): podem ser erro de digitação ou casos reais que merecem olhar."
@@ -1714,6 +1714,70 @@
   }
  ],
  "tempo_turnos": [
+  {
+   "id": 463,
+   "inicio": "2026-11-17T03:51:45",
+   "fim": "2026-11-17T04:31:55",
+   "segundos": 2409.8,
+   "voltas": 42,
+   "por_natureza": {
+    "operacional": 907.6,
+    "estudo": 13.0,
+    "revisao": 45.2,
+    "coordenacao": 2.2,
+    "manutencao": 824.1,
+    "erro": 0.0,
+    "parado": 617.2,
+    "sem_medicao": 0.6
+   },
+   "por_chamada": {
+    "modelos": 705.66,
+    "pausa": 617.18,
+    "boletim": 566.36,
+    "demandas": 226.16,
+    "registro": 125.51,
+    "backup": 57.18,
+    "inicio": 52.66,
+    "ronda_ti": 21.52,
+    "paineis": 12.84,
+    "treino": 11.33,
+    "esteira": 7.02,
+    "estrategia": 1.37,
+    "fabrica": 1.07,
+    "licoes": 1.07,
+    "dialogo": 0.64,
+    "laboratorio": 0.59,
+    "canal": 0.4,
+    "jornada": 0.35,
+    "telegram": 0.17,
+    "caixa_dono": 0.09,
+    "pdca": 0.02,
+    "alcadas": 0.01,
+    "rh_desempenho": 0.01,
+    "auditoria": 0.01,
+    "ideias": 0.01,
+    "estudo": 0.0,
+    "reuniao": 0.0
+   },
+   "contagens": {
+    "demandas_executadas": 101,
+    "bloqueios": 16,
+    "etapas_esperando_dependencia": 0
+   },
+   "entregas_aprovadas": 101,
+   "entregas_por_hora": 150.88,
+   "cobertura": 1.0,
+   "percentual": {
+    "operacional": 37.7,
+    "estudo": 0.5,
+    "revisao": 1.9,
+    "coordenacao": 0.1,
+    "manutencao": 34.2,
+    "erro": 0.0,
+    "parado": 25.6,
+    "sem_medicao": 0.0
+   }
+  },
   {
    "id": 462,
    "inicio": "2026-11-17T03:03:02",
@@ -2033,75 +2097,11 @@
     "parado": 7.9,
     "sem_medicao": 0.0
    }
-  },
-  {
-   "id": 457,
-   "inicio": "2026-11-16T22:49:42",
-   "fim": "2026-11-16T23:29:52",
-   "segundos": 2409.5,
-   "voltas": 42,
-   "por_natureza": {
-    "operacional": 912.2,
-    "estudo": 11.3,
-    "revisao": 52.9,
-    "coordenacao": 2.2,
-    "manutencao": 803.6,
-    "erro": 0.0,
-    "parado": 626.6,
-    "sem_medicao": 0.6
-   },
-   "por_chamada": {
-    "modelos": 687.85,
-    "pausa": 626.64,
-    "boletim": 557.53,
-    "demandas": 254.94,
-    "registro": 116.56,
-    "backup": 57.09,
-    "inicio": 51.6,
-    "ronda_ti": 19.95,
-    "paineis": 12.78,
-    "treino": 10.65,
-    "esteira": 8.43,
-    "estrategia": 1.42,
-    "fabrica": 1.19,
-    "dialogo": 0.64,
-    "laboratorio": 0.6,
-    "canal": 0.39,
-    "jornada": 0.34,
-    "telegram": 0.17,
-    "caixa_dono": 0.08,
-    "pdca": 0.02,
-    "alcadas": 0.01,
-    "rh_desempenho": 0.01,
-    "auditoria": 0.01,
-    "ideias": 0.01,
-    "reuniao": 0.0,
-    "licoes": 0.0,
-    "estudo": 0.0
-   },
-   "contagens": {
-    "demandas_executadas": 101,
-    "bloqueios": 17,
-    "etapas_esperando_dependencia": 0
-   },
-   "entregas_aprovadas": 101,
-   "entregas_por_hora": 150.9,
-   "cobertura": 1.0,
-   "percentual": {
-    "operacional": 37.9,
-    "estudo": 0.5,
-    "revisao": 2.2,
-    "coordenacao": 0.1,
-    "manutencao": 33.4,
-    "erro": 0.0,
-    "parado": 26.0,
-    "sem_medicao": 0.0
-   }
   }
  ],
  "modelos": {
   "finalidade": "risco_demanda",
-  "rotuladas_agora": 35345,
+  "rotuladas_agora": 35369,
   "minimo_para_treinar": 60,
   "datasets": 513,
   "maior_dataset": 35268,
@@ -4708,22 +4708,22 @@
   },
   {
    "nivel": "medio",
-   "demandas": 6032,
-   "concluidas": 5989,
+   "demandas": 6039,
+   "concluidas": 5996,
    "parciais": 0,
    "falhas": 43
   },
   {
    "nivel": "dificil",
-   "demandas": 16462,
-   "concluidas": 16357,
+   "demandas": 16471,
+   "concluidas": 16366,
    "parciais": 83,
    "falhas": 22
   },
   {
    "nivel": "profissional",
-   "demandas": 11522,
-   "concluidas": 11503,
+   "demandas": 11530,
+   "concluidas": 11511,
    "parciais": 15,
    "falhas": 4
   }
