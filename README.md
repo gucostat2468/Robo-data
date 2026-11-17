@@ -1,6 +1,6 @@
 # Empresa ao vivo
 
-**Boletim das 17/11 10:57** (horário de Brasília) · trabalhando · SEM BANCO (memória guardada no arquivo do GitHub; o banco é alcançado quando voltar)
+**Boletim das 17/11 11:05** (horário de Brasília) · entre turnos: memória salva; o próximo turno começa em poucos minutos · SEM BANCO (memória guardada no arquivo do GitHub; o banco é alcançado quando voltar)
 
 > Atualiza a cada 5 minutos enquanto a empresa trabalha. Recarregue a página para ver o mais novo.
 
@@ -9,7 +9,7 @@
 - **948** demandas, **939** concluídas (99%), 8 parciais, 1 com falha
 - **105** de 105 funcionários já trabalharam
 - SQL: 38 exercícios, 38 conferidos com o gabarito
-- Fábrica: 24 planilhas, 22 conferidas sem erro
+- Fábrica: 24 planilhas, 24 conferidas sem erro
 
 ## Trabalhando agora
 
@@ -186,11 +186,11 @@
 
 ## Tempo do último turno (medido)
 
-- 08:54–09:48 (54 min, 0 voltas; cobertura do cronômetro 100%)
-- **Entregas aprovadas na revisão independente: 84 (93.7 por hora)** — o indicador principal
-- operacional 77% · estudo 0% · revisao 1% · coordenacao 0% · manutencao 22% · erro 0% · parado 0% · sem_medicao 0%
-- Bloqueios: 31; etapas esperando dependência: 0
-- Turnos anteriores (entregas/hora): 137.3, 55.2, 128.5, 119.6, 36.0
+- 13:20–14:04 (44 min, 0 voltas; cobertura do cronômetro 100%)
+- **Entregas aprovadas na revisão independente: 91 (124.2 por hora)** — o indicador principal
+- operacional 70% · estudo 0% · revisao 9% · coordenacao 0% · manutencao 21% · erro 0% · parado 0% · sem_medicao 0%
+- Bloqueios: 33; etapas esperando dependência: 0
+- Turnos anteriores (entregas/hora): 93.7, 137.3, 55.2, 128.5, 119.6
 
 ## Projetos entre andares (várias pessoas, uma etapa depende da outra)
 
@@ -734,7 +734,7 @@ Pacote gerado pelo produto (`python -m robo entregar`) a partir de um projeto ap
 
 ## Banco de dados
 
-Levantamento das 12/11 07:11: **79 de 97** tabelas com dados (2.287.730 linhas contadas uma a uma).
+Levantamento das 17/11 11:04: **79 de 97** tabelas com dados (2.660.569 linhas contadas uma a uma).
 
 
 | Onde | Tabelas | Com dados |
