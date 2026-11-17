@@ -1,12 +1,12 @@
 # Empresa ao vivo
 
-**Boletim das 17/11 00:35** (horário de Brasília) · trabalhando · SEM BANCO (memória guardada no arquivo do GitHub; o banco é alcançado quando voltar)
+**Boletim das 17/11 00:42** (horário de Brasília) · trabalhando · SEM BANCO (memória guardada no arquivo do GitHub; o banco é alcançado quando voltar)
 
 > Atualiza a cada 5 minutos enquanto a empresa trabalha. Recarregue a página para ver o mais novo.
 
 ## Hoje
 
-- **339** demandas, **330** concluídas (97%), 8 parciais, 1 com falha
+- **341** demandas, **332** concluídas (97%), 8 parciais, 1 com falha
 - **105** de 105 funcionários já trabalharam
 - SQL: 5 exercícios, 5 conferidos com o gabarito
 - Fábrica: 8 planilhas, 8 conferidas sem erro
@@ -20,7 +20,7 @@
 | Andar | Trabalharam | Demandas | Concluídas | Parciais | Falhas |
 |---|--:|--:|--:|--:|--:|
 | 1º | 19 de 19 | 54 | 54 | 0 | 0 |
-| 2º | 18 de 18 | 78 | 75 | 3 | 0 |
+| 2º | 18 de 18 | 80 | 77 | 3 | 0 |
 | 3º | 12 de 12 | 33 | 29 | 4 | 0 |
 | 4º | 32 de 32 | 63 | 61 | 1 | 1 |
 | 5º | 24 de 24 | 111 | 111 | 0 | 0 |
@@ -29,6 +29,8 @@
 
 | Hora | Quem | Trabalho | Resultado |
 |---|---|---|---|
+| 00:40 | Marcos (2º) | Projeto Segmentação — TREINO_logistica_20261117_031630_90529 | ✅ concluída |
+| 00:40 | Marcos (2º) | Projeto NPS — TREINO_nps_20261117_031629_89101 | ✅ concluída |
 | 00:35 | Marcos (2º) | Projeto Segmentação — TREINO_logistica_20261117_031630_90529 | ✅ concluída |
 | 00:35 | Marcos (2º) | Projeto NPS — TREINO_nps_20261117_031629_89101 | ✅ concluída |
 | 00:29 | Marcos (2º) | Projeto Segmentação — TREINO_logistica_20261117_031630_90529 | ✅ concluída |
@@ -37,8 +39,6 @@
 | 00:26 | Marcos (2º) | Projeto NPS — TREINO_nps_20261117_031629_89101 | ✅ concluída |
 | 00:26 | Heloísa (5º) | SLA das rotinas — nível profissional | ✅ concluída |
 | 00:26 | Ícaro (5º) | SLA das rotinas — nível dificil | ✅ concluída |
-| 00:26 | Marina (5º) | Ronda de saúde do sistema — nível dificil | ✅ concluída |
-| 00:26 | Elisa (5º) | Revisão da biblioteca sob sua responsabilidade — nível dificil | ✅ concluída |
 
 ## Dificuldade (todo o histórico)
 
@@ -47,7 +47,7 @@
 | basico | 1326 | 1300 | 0 | 26 | 98% |
 | medio | 6020 | 5977 | 0 | 43 | 99% |
 | dificil | 16423 | 16318 | 83 | 22 | 99% |
-| profissional | 11497 | 11478 | 15 | 4 | 100% |
+| profissional | 11499 | 11480 | 15 | 4 | 100% |
 
 ## Cada funcionário
 
@@ -92,7 +92,7 @@
 | Leandro | Engenheiro de Machine Learning Sênior | trabalho do papel | Treinar o modelo de risco de demanda — nível dificil (✅ concluída) | 3 |
 | Lucas | Cientista de Dados Júnior | trabalho do papel | Perfil e indicadores da base sintética — nível medio (✅ concluída) | 3 |
 | Manu | Estagiária de Análise de Dados | estagiário: observa (regra do dono) |   | 0 |
-| Marcos | Coordenador de Análise e Ciência de Dado | trabalho FORA do papel | Projeto Segmentação — TREINO_logistica_20261117_031630_90529 (✅ concluída) | 30 |
+| Marcos | Coordenador de Análise e Ciência de Dado | trabalho FORA do papel | Projeto Segmentação — TREINO_logistica_20261117_031630_90529 (✅ concluída) | 32 |
 | Natália | Head de Ciência de Dados | trabalho do papel | Drivers do indicador na base sintética — nível profissional (✅ concluída) | 3 |
 | Patrícia | Gerente de Analytics e Customer Insights | trabalho do papel | Drivers do indicador na base sintética — nível profissional (✅ concluída) | 3 |
 | Rebeca | Líder de Engenharia de IA e Machine Lear | trabalho do papel | Programa de modelos: backlog e critérios — nível profissiona (✅ concluída) | 3 |
@@ -194,11 +194,11 @@
 
 ## Projetos entre andares (várias pessoas, uma etapa depende da outra)
 
+- Projeto Segmentação — TREINO_logistica_20261117_031630_90529: **✅ concluída** — 1. publicacao (concluida); 2. analise_perfil (concluida); 3. ana_junior_faixas (concluida); 4. cd_junior_anomalias (concluida); 5. sec_senior (concluida); 6. canal_iara (concluida)
+- Projeto NPS — TREINO_nps_20261117_031629_89101: **✅ concluída** — 1. modelagem (concluida); 2. analise_indicadores (concluida); 3. head_ciencia (concluida); 4. gov_pleno_lgpd (concluida); 5. analise_relator (concluida)
 - Projeto Segmentação — TREINO_logistica_20261117_031630_90529: **✅ concluída** — 1. limpeza (concluida); 2. analise_estatistica (concluida); 3. cd_pleno_segmentos (concluida); 4. analise_monitoramento (concluida); 5. sec_senior (concluida); 6. canal_nina (concluida)
-- Projeto NPS — TREINO_nps_20261117_031629_89101: **✅ concluída** — 1. leitura (concluida); 2. analise_perfil (concluida); 3. cd_senior_drivers (concluida); 4. gov_pleno_lgpd (concluida); 5. canal_iara (concluida)
-- Projeto Segmentação — TREINO_logistica_20261117_031630_90529: **✅ concluída** — 1. head_engenharia (concluida); 2. analise_monitoramento (concluida); 3. ana_pleno_base (concluida); 4. cd_junior_anomalias (concluida); 5. sec_senior (concluida); 6. analise_relator (concluida)
 
-## Última entrega da empresa (TREINO_logistica_20261117_031630_90529.xlsx, 17/11 00:35)
+## Última entrega da empresa (TREINO_logistica_20261117_031630_90529.xlsx, 17/11 00:40)
 
 Pacote gerado pelo produto (`python -m robo entregar`) a partir de um projeto aprovado:
 
