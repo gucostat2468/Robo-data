@@ -1,6 +1,6 @@
 # Empresa ao vivo
 
-**Boletim das 17/11 03:09** (horário de Brasília) · trabalhando · SEM BANCO (memória guardada no arquivo do GitHub; o banco é alcançado quando voltar)
+**Boletim das 17/11 03:17** (horário de Brasília) · entre turnos: memória salva; o próximo turno começa em poucos minutos · SEM BANCO (memória guardada no arquivo do GitHub; o banco é alcançado quando voltar)
 
 > Atualiza a cada 5 minutos enquanto a empresa trabalha. Recarregue a página para ver o mais novo.
 
@@ -9,7 +9,7 @@
 - **558** demandas, **549** concluídas (98%), 8 parciais, 1 com falha
 - **105** de 105 funcionários já trabalharam
 - SQL: 17 exercícios, 17 conferidos com o gabarito
-- Fábrica: 14 planilhas, 12 conferidas sem erro
+- Fábrica: 14 planilhas, 14 conferidas sem erro
 
 ## Trabalhando agora
 
@@ -186,11 +186,11 @@
 
 ## Tempo do último turno (medido)
 
-- 04:37–05:22 (45 min, 15 voltas; cobertura do cronômetro 100%)
-- **Entregas aprovadas na revisão independente: 27 (36.0 por hora)** — o indicador principal
-- operacional 56% · estudo 0% · revisao 1% · coordenacao 0% · manutencao 35% · erro 0% · parado 8% · sem_medicao 0%
-- Bloqueios: 17; etapas esperando dependência: 0
-- Turnos anteriores (entregas/hora): 150.9, 132.3, 36.0, 124.4, 137.4
+- 05:31–06:15 (45 min, 0 voltas; cobertura do cronômetro 100%)
+- **Entregas aprovadas na revisão independente: 89 (119.6 por hora)** — o indicador principal
+- operacional 80% · estudo 0% · revisao 1% · coordenacao 0% · manutencao 19% · erro 0% · parado 0% · sem_medicao 0%
+- Bloqueios: 27; etapas esperando dependência: 0
+- Turnos anteriores (entregas/hora): 36.0, 150.9, 132.3, 36.0, 124.4
 
 ## Projetos entre andares (várias pessoas, uma etapa depende da outra)
 
@@ -729,15 +729,15 @@ Pacote gerado pelo produto (`python -m robo entregar`) a partir de um projeto ap
 
 ## Banco de dados
 
-Levantamento das 12/11 07:11: **79 de 97** tabelas com dados (2.287.730 linhas contadas uma a uma).
+Levantamento das 17/11 03:15: **77 de 95** tabelas com dados (2.649.992 linhas contadas uma a uma).
 
 
 | Onde | Tabelas | Com dados |
 |---|--:|--:|
 | sqlite | 81 | 68 |
-| postgres.laboratorio | 2 | 2 |
+| postgres.laboratorio | 1 | 1 |
 | postgres.robo | 2 | 0 |
-| postgres.treino | 9 | 9 |
+| postgres.treino | 8 | 8 |
 | postgres.bruto | 1 | 0 |
 | postgres.tratado | 1 | 0 |
 | postgres.analitico | 1 | 0 |
