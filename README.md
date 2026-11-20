@@ -1,12 +1,12 @@
 # Empresa ao vivo
 
-**Boletim das 20/11 17:45** (horário de Brasília) · trabalhando · SEM BANCO (memória guardada no arquivo do GitHub; o banco é alcançado quando voltar)
+**Boletim das 20/11 17:54** (horário de Brasília) · entre turnos: memória salva; o próximo turno começa em poucos minutos · SEM BANCO (memória guardada no arquivo do GitHub; o banco é alcançado quando voltar)
 
 > Atualiza a cada 5 minutos enquanto a empresa trabalha. Recarregue a página para ver o mais novo.
 
 ## Hoje
 
-- **780** demandas, **771** concluídas (99%), 6 parciais, 3 com falha
+- **782** demandas, **773** concluídas (99%), 6 parciais, 3 com falha
 - **105** de 105 funcionários já trabalharam
 - SQL: 46 exercícios, 46 conferidos com o gabarito
 - Fábrica: 22 planilhas, 22 conferidas sem erro
@@ -20,7 +20,7 @@
 | Andar | Trabalharam | Demandas | Concluídas | Parciais | Falhas |
 |---|--:|--:|--:|--:|--:|
 | 1º | 19 de 19 | 133 | 133 | 0 | 0 |
-| 2º | 18 de 18 | 165 | 162 | 2 | 1 |
+| 2º | 18 de 18 | 167 | 164 | 2 | 1 |
 | 3º | 12 de 12 | 83 | 81 | 1 | 1 |
 | 4º | 32 de 32 | 154 | 150 | 3 | 1 |
 | 5º | 24 de 24 | 245 | 245 | 0 | 0 |
@@ -29,6 +29,8 @@
 
 | Hora | Quem | Trabalho | Resultado |
 |---|---|---|---|
+| 17:48 | Marcos (2º) | Projeto Segmentação — TREINO_funil_20261120_202808_88425 | ✅ concluída |
+| 17:48 | Marcos (2º) | Projeto NPS — TREINO_nps_20261120_202805_85725 | ✅ concluída |
 | 17:40 | Marcos (2º) | Projeto Segmentação — TREINO_funil_20261120_202808_88425 | ✅ concluída |
 | 17:40 | Marcos (2º) | Projeto NPS — TREINO_nps_20261120_202805_85725 | ✅ concluída |
 | 17:36 | Marcos (2º) | Projeto Segmentação — TREINO_funil_20261120_202808_88425 | ✅ concluída |
@@ -37,8 +39,6 @@
 | 17:36 | Heloísa (5º) | Conferir se o projeto está pronto para servidor — nível profissional | ✅ concluída |
 | 17:36 | Valéria (4º) | Revisar um caso de treino feito por outro designer — nível dificil | ✅ concluída |
 | 17:36 | Marina (5º) | Testar se o último backup volta — nível dificil | ✅ concluída |
-| 17:36 | Wagner (5º) | Ronda de saúde do sistema — nível dificil | ✅ concluída |
-| 17:36 | Yasmin (4º) | Revisar um caso de treino feito por outro designer — nível dificil | ✅ concluída |
 
 ## Dificuldade (todo o histórico)
 
@@ -47,7 +47,7 @@
 | basico | 1440 | 1413 | 0 | 27 | 98% |
 | medio | 6662 | 6615 | 0 | 47 | 99% |
 | dificil | 18053 | 17932 | 99 | 22 | 99% |
-| profissional | 12394 | 12374 | 16 | 4 | 100% |
+| profissional | 12396 | 12376 | 16 | 4 | 100% |
 
 ## Cada funcionário
 
@@ -92,7 +92,7 @@
 | Leandro | Engenheiro de Machine Learning Sênior | trabalho do papel | Treinar o modelo de risco de demanda — nível dificil (✅ concluída) | 8 |
 | Lucas | Cientista de Dados Júnior | trabalho do papel | Anomalias na base sintética — nível medio (✅ concluída) | 8 |
 | Manu | Estagiária de Análise de Dados | estagiário: observa (regra do dono) |   | 0 |
-| Marcos | Coordenador de Análise e Ciência de Dado | trabalho FORA do papel | Projeto Segmentação — TREINO_funil_20261120_202808_88425 (✅ concluída) | 46 |
+| Marcos | Coordenador de Análise e Ciência de Dado | trabalho FORA do papel | Projeto Segmentação — TREINO_funil_20261120_202808_88425 (✅ concluída) | 48 |
 | Natália | Head de Ciência de Dados | trabalho do papel | Calcular a média de uma métrica da base sintética — nível pr (✅ concluída) | 7 |
 | Patrícia | Gerente de Analytics e Customer Insights | trabalho do papel | Drivers do indicador na base sintética — nível profissional (✅ concluída) | 8 |
 | Rebeca | Líder de Engenharia de IA e Machine Lear | trabalho do papel | Conferir no PostgreSQL os lotes da fábrica — nível profissio (✅ concluída) | 8 |
@@ -186,19 +186,19 @@
 
 ## Tempo do último turno (medido)
 
-- 14:11–15:04 (53 min, 0 voltas; cobertura do cronômetro 100%)
-- **Entregas aprovadas na revisão independente: 84 (95.0 por hora)** — o indicador principal
-- operacional 6% · estudo 0% · revisao 1% · coordenacao 0% · manutencao 19% · erro 74% · parado 0% · sem_medicao 0%
-- Bloqueios: 26; etapas esperando dependência: 6
-- Turnos anteriores (entregas/hora): 37.1, 142.5, 110.0, 55.9, 114.5
+- 20:12–20:53 (40 min, 30 voltas; cobertura do cronômetro 100%)
+- **Entregas aprovadas na revisão independente: 95 (141.9 por hora)** — o indicador principal
+- operacional 15% · estudo 0% · revisao 8% · coordenacao 0% · manutencao 26% · erro 32% · parado 18% · sem_medicao 0%
+- Bloqueios: 33; etapas esperando dependência: 0
+- Turnos anteriores (entregas/hora): 95.0, 37.1, 142.5, 110.0, 55.9
 
 ## Projetos entre andares (várias pessoas, uma etapa depende da outra)
 
+- Projeto Segmentação — TREINO_funil_20261120_202808_88425: **✅ concluída** — 1. limpeza (concluida); 2. analise_monitoramento (concluida); 3. cd_pleno_segmentos (concluida); 4. cd_junior_anomalias (concluida); 5. sec_senior (concluida); 6. canal_nina (concluida)
+- Projeto NPS — TREINO_nps_20261120_202805_85725: **✅ concluída** — 1. leitura (concluida); 2. analise_indicadores (concluida); 3. head_ciencia (concluida); 4. gov_pleno_lgpd (concluida); 5. canal_iara (concluida)
 - Projeto Segmentação — TREINO_funil_20261120_202808_88425: **✅ concluída** — 1. head_engenharia (concluida); 2. analise_estatistica (concluida); 3. ana_pleno_base (concluida); 4. cd_junior_anomalias (concluida); 5. sec_senior (concluida); 6. analise_relator (concluida)
-- Projeto NPS — TREINO_nps_20261120_202805_85725: **✅ concluída** — 1. ger_engenharia (concluida); 2. analise_perfil (concluida); 3. cd_senior_drivers (concluida); 4. gov_pleno_lgpd (concluida); 5. canal_nina (concluida)
-- Projeto Segmentação — TREINO_funil_20261120_202808_88425: **✅ concluída** — 1. eng_pleno_tipos (concluida); 2. analise_indicadores (concluida); 3. ana_junior_faixas (concluida); 4. analise_monitoramento (concluida); 5. sec_senior (concluida); 6. canal_iara (concluida)
 
-## Última entrega da empresa (TREINO_funil_20261120_202808_88425.xlsx, 20/11 17:40)
+## Última entrega da empresa (TREINO_funil_20261120_202808_88425.xlsx, 20/11 17:48)
 
 Pacote gerado pelo produto (`python -m robo entregar`) a partir de um projeto aprovado:
 
@@ -772,7 +772,7 @@ Pacote gerado pelo produto (`python -m robo entregar`) a partir de um projeto ap
 
 ## Banco de dados
 
-Levantamento das 12/11 07:11: **79 de 97** tabelas com dados (2.287.730 linhas contadas uma a uma).
+Levantamento das 20/11 17:53: **79 de 97** tabelas com dados (2.791.900 linhas contadas uma a uma).
 
 
 | Onde | Tabelas | Com dados |
